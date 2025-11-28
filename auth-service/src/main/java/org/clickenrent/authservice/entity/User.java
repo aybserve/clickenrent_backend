@@ -1,0 +1,94 @@
+package org.clickenrent.authservice.entity;
+
+import jakarta.persistence.*;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
+import lombok.*;
+
+/**
+ * Entity representing a user in the system.
+ * Contains user profile information, credentials, and audit fields.
+ */
+@Entity
+@Table(
+    name = "users",
+    indexes = {
+        @Index(name = "idx_user_external_id", columnList = "external_id"),
+        @Index(name = "idx_user_email", columnList = "email"),
+        @Index(name = "idx_user_username", columnList = "user_name")
+    }
+)
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+@ToString(exclude = {"password"})
+@EqualsAndHashCode(of = "id", callSuper = false)
+public class User extends BaseAuditEntity {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Column(name = "external_id", unique = true, length = 100)
+    private String externalId;
+
+    @NotBlank(message = "Username is required")
+    @Size(max = 100, message = "Username must not exceed 100 characters")
+    @Column(name = "user_name", nullable = false, unique = true, length = 100)
+    private String userName;
+
+    @NotBlank(message = "Password is required")
+    @Size(max = 255, message = "Password must not exceed 255 characters")
+    @Column(name = "password", nullable = false, length = 255)
+    private String password;
+
+    @NotBlank(message = "Email is required")
+    @Email(message = "Email must be valid")
+    @Size(max = 255, message = "Email must not exceed 255 characters")
+    @Column(name = "email", nullable = false, unique = true, length = 255)
+    private String email;
+
+    @Size(max = 100, message = "First name must not exceed 100 characters")
+    @Column(name = "first_name", length = 100)
+    private String firstName;
+
+    @Size(max = 100, message = "Last name must not exceed 100 characters")
+    @Column(name = "last_name", length = 100)
+    private String lastName;
+
+    @Size(max = 20, message = "Phone must not exceed 20 characters")
+    @Column(name = "phone", length = 20)
+    private String phone;
+
+    @Size(max = 100, message = "City must not exceed 100 characters")
+    @Column(name = "city", length = 100)
+    private String city;
+
+    @Size(max = 255, message = "Address must not exceed 255 characters")
+    @Column(name = "address", length = 255)
+    private String address;
+
+    @Size(max = 20, message = "Zipcode must not exceed 20 characters")
+    @Column(name = "zipcode", length = 20)
+    private String zipcode;
+
+    @Size(max = 500, message = "Image URL must not exceed 500 characters")
+    @Column(name = "image_url", length = 500)
+    private String imageUrl;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "language_id")
+    private Language language;
+
+    @Builder.Default
+    @Column(name = "is_active", nullable = false)
+    private Boolean isActive = true;
+
+    @Builder.Default
+    @Column(name = "is_deleted", nullable = false)
+    private Boolean isDeleted = false;
+}
+
