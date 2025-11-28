@@ -7,6 +7,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.clickenrent.authservice.service.CustomUserDetailsService;
 import org.clickenrent.authservice.service.JwtService;
+import org.clickenrent.authservice.service.TokenBlacklistService;
 import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -19,6 +20,7 @@ import java.io.IOException;
 
 /**
  * JWT authentication filter that intercepts requests and validates JWT tokens.
+ * Also checks if tokens are blacklisted.
  */
 @Component
 @RequiredArgsConstructor
@@ -26,6 +28,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     
     private final JwtService jwtService;
     private final CustomUserDetailsService userDetailsService;
+    private final TokenBlacklistService tokenBlacklistService;
     
     @Override
     protected void doFilterInternal(
@@ -48,6 +51,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         jwt = authHeader.substring(7);
         
         try {
+            // Check if token is blacklisted
+            if (tokenBlacklistService.isTokenBlacklisted(jwt)) {
+                logger.warn("Attempted to use blacklisted token");
+                filterChain.doFilter(request, response);
+                return;
+            }
+            
             // Extract username from token
             username = jwtService.extractUsername(jwt);
             

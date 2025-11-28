@@ -18,6 +18,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Date;
 import java.util.UUID;
 
 /**
@@ -35,6 +36,7 @@ public class AuthService {
     private final CustomUserDetailsService userDetailsService;
     private final AuthenticationManager authenticationManager;
     private final UserMapper userMapper;
+    private final TokenBlacklistService tokenBlacklistService;
     
     /**
      * Register a new user in the system.
@@ -153,6 +155,20 @@ public class AuthService {
     public UserDTO getCurrentUser(String username) {
         User user = userDetailsService.loadUserEntityByUsername(username);
         return userMapper.toDto(user);
+    }
+    
+    /**
+     * Logout user by blacklisting the access token.
+     * @param token The JWT access token to blacklist
+     */
+    public void logout(String token) {
+        try {
+            Date expirationDate = jwtService.extractExpiration(token);
+            tokenBlacklistService.blacklistToken(token, expirationDate);
+        } catch (Exception e) {
+            // If token is invalid, we don't need to blacklist it
+            // Just log the attempt
+        }
     }
 }
 

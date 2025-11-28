@@ -1,5 +1,6 @@
 package org.clickenrent.authservice.controller;
 
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.clickenrent.authservice.dto.*;
@@ -64,14 +65,18 @@ public class AuthController {
     }
     
     /**
-     * Logout user (client-side token invalidation).
+     * Logout user by blacklisting the current access token.
      * POST /api/auth/logout
      */
     @PostMapping("/logout")
-    public ResponseEntity<Void> logout() {
-        // In JWT-based authentication, logout is typically handled on the client side
-        // by removing the token from storage. Here we can add additional logic if needed
-        // (e.g., token blacklisting)
+    public ResponseEntity<Void> logout(HttpServletRequest request) {
+        String authHeader = request.getHeader("Authorization");
+        
+        if (authHeader != null && authHeader.startsWith("Bearer ")) {
+            String token = authHeader.substring(7);
+            authService.logout(token);
+        }
+        
         return ResponseEntity.noContent().build();
     }
 }
