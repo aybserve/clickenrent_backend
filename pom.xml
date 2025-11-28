@@ -40,6 +40,7 @@
   </dependencyManagement>
 
   <modules>
+    <module>eureka-server</module>
     <module>auth-service</module>
     <module>rental-service</module>
     <module>payment-service</module>
