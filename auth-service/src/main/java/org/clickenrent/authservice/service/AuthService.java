@@ -13,13 +13,17 @@ import org.clickenrent.authservice.repository.UserRepository;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 /**
  * Service for handling authentication operations.
@@ -75,9 +79,17 @@ public class AuthService {
         
         user = userRepository.save(user);
         
-        // Generate tokens
+        // Generate tokens with custom claims
         UserDetails userDetails = userDetailsService.loadUserByUsername(user.getUserName());
-        String accessToken = jwtService.generateToken(userDetails);
+        
+        Map<String, Object> claims = new HashMap<>();
+        claims.put("userId", user.getId());
+        claims.put("email", user.getEmail());
+        claims.put("roles", userDetails.getAuthorities().stream()
+                .map(GrantedAuthority::getAuthority)
+                .collect(Collectors.toList()));
+        
+        String accessToken = jwtService.generateToken(claims, userDetails);
         String refreshToken = jwtService.generateRefreshToken(userDetails);
         
         return new AuthResponse(
@@ -109,8 +121,15 @@ public class AuthService {
         User user = userDetailsService.loadUserEntityByUsername(request.getUsernameOrEmail());
         UserDetails userDetails = userDetailsService.loadUserByUsername(request.getUsernameOrEmail());
         
-        // Generate tokens
-        String accessToken = jwtService.generateToken(userDetails);
+        // Generate tokens with custom claims
+        Map<String, Object> claims = new HashMap<>();
+        claims.put("userId", user.getId());
+        claims.put("email", user.getEmail());
+        claims.put("roles", userDetails.getAuthorities().stream()
+                .map(GrantedAuthority::getAuthority)
+                .collect(Collectors.toList()));
+        
+        String accessToken = jwtService.generateToken(claims, userDetails);
         String refreshToken = jwtService.generateRefreshToken(userDetails);
         
         return new AuthResponse(
@@ -135,7 +154,16 @@ public class AuthService {
             }
             
             User user = userDetailsService.loadUserEntityByUsername(username);
-            String accessToken = jwtService.generateToken(userDetails);
+            
+            // Generate new access token with custom claims
+            Map<String, Object> claims = new HashMap<>();
+            claims.put("userId", user.getId());
+            claims.put("email", user.getEmail());
+            claims.put("roles", userDetails.getAuthorities().stream()
+                    .map(GrantedAuthority::getAuthority)
+                    .collect(Collectors.toList()));
+            
+            String accessToken = jwtService.generateToken(claims, userDetails);
             
             return new AuthResponse(
                     accessToken,

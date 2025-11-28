@@ -50,6 +50,7 @@ public class GatewayConfig {
                         .uri("lb://auth-service"))
 
                 // Fallback route for any other auth-service endpoints
+                // NOTE: All endpoints not explicitly listed above will require JWT authentication
                 .route("auth-fallback", r -> r
                         .path("/api/auth/**")
                         .filters(f -> f.filter(jwtAuthenticationFilter))

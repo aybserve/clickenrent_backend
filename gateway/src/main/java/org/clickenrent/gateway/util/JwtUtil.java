@@ -63,7 +63,7 @@ public class JwtUtil {
      * Extract email from token
      */
     public String extractEmail(String token) {
-        return extractClaim(token, Claims::getSubject);
+        return extractClaim(token, claims -> claims.get("email", String.class));
     }
 
     /**
