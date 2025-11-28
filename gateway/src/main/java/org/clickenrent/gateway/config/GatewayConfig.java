@@ -49,6 +49,26 @@ public class GatewayConfig {
                         .filters(f -> f.filter(jwtAuthenticationFilter))
                         .uri("lb://auth-service"))
 
+                // Company Management Routes
+                .route("companies", r -> r
+                        .path("/api/companies/**")
+                        .filters(f -> f.filter(jwtAuthenticationFilter))
+                        .uri("lb://auth-service"))
+
+                // User Management Routes
+                .route("users", r -> r
+                        .path("/api/users/**")
+                        .filters(f -> f.filter(jwtAuthenticationFilter))
+                        .uri("lb://auth-service"))
+
+                // Global Roles, Company Roles, Company Types, Languages
+                .route("admin-resources", r -> r
+                        .path("/api/global-roles/**", "/api/company-roles/**", 
+                              "/api/company-types/**", "/api/languages/**",
+                              "/api/user-companies/**", "/api/user-global-roles/**")
+                        .filters(f -> f.filter(jwtAuthenticationFilter))
+                        .uri("lb://auth-service"))
+
                 // Fallback route for any other auth-service endpoints
                 // NOTE: All endpoints not explicitly listed above will require JWT authentication
                 .route("auth-fallback", r -> r

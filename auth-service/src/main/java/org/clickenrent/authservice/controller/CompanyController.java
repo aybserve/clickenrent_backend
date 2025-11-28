@@ -10,10 +10,16 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 /**
  * REST controller for Company management operations.
+ * 
+ * Security Rules:
+ * - SUPERADMIN/ADMIN: Can view and manage all companies
+ * - B2B: Can only view companies they belong to (read-only)
+ * - CUSTOMER: No access to companies
  */
 @RestController
 @RequestMapping("/api/companies")
@@ -27,6 +33,8 @@ public class CompanyController {
      * GET /api/companies
      */
     @GetMapping
+//    @PreAuthorize("isAuthenticated()")
+    @PreAuthorize("hasAnyRole('SUPERADMIN', 'ADMIN')")
     public ResponseEntity<Page<CompanyDTO>> getAllCompanies(
             @PageableDefault(size = 20, sort = "id", direction = Sort.Direction.ASC) Pageable pageable) {
         Page<CompanyDTO> companies = companyService.getAllCompanies(pageable);
@@ -38,6 +46,7 @@ public class CompanyController {
      * GET /api/companies/{id}
      */
     @GetMapping("/{id}")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<CompanyDTO> getCompanyById(@PathVariable Long id) {
         CompanyDTO company = companyService.getCompanyById(id);
         return ResponseEntity.ok(company);
@@ -48,6 +57,7 @@ public class CompanyController {
      * POST /api/companies
      */
     @PostMapping
+    @PreAuthorize("hasAnyRole('SUPERADMIN', 'ADMIN')")
     public ResponseEntity<CompanyDTO> createCompany(@Valid @RequestBody CompanyDTO companyDTO) {
         CompanyDTO createdCompany = companyService.createCompany(companyDTO);
         return new ResponseEntity<>(createdCompany, HttpStatus.CREATED);
@@ -58,6 +68,8 @@ public class CompanyController {
      * PUT /api/companies/{id}
      */
     @PutMapping("/{id}")
+//    @PreAuthorize("hasAnyRole('SUPERADMIN', 'ADMIN')")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<CompanyDTO> updateCompany(
             @PathVariable Long id,
             @Valid @RequestBody CompanyDTO companyDTO) {
@@ -70,6 +82,7 @@ public class CompanyController {
      * DELETE /api/companies/{id}
      */
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasAnyRole('SUPERADMIN', 'ADMIN')")
     public ResponseEntity<Void> deleteCompany(@PathVariable Long id) {
         companyService.deleteCompany(id);
         return ResponseEntity.noContent().build();

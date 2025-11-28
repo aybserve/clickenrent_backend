@@ -26,6 +26,7 @@ public class CompanyRoleController {
      * GET /api/company-roles
      */
     @GetMapping
+    @PreAuthorize("hasAnyRole('SUPERADMIN', 'ADMIN')")
     public ResponseEntity<List<CompanyRoleDTO>> getAllCompanyRoles() {
         List<CompanyRoleDTO> companyRoles = companyRoleService.getAllCompanyRoles();
         return ResponseEntity.ok(companyRoles);
@@ -36,6 +37,7 @@ public class CompanyRoleController {
      * GET /api/company-roles/{id}
      */
     @GetMapping("/{id}")
+    @PreAuthorize("hasAnyRole('SUPERADMIN', 'ADMIN')")
     public ResponseEntity<CompanyRoleDTO> getCompanyRoleById(@PathVariable Long id) {
         CompanyRoleDTO companyRole = companyRoleService.getCompanyRoleById(id);
         return ResponseEntity.ok(companyRole);
@@ -46,7 +48,7 @@ public class CompanyRoleController {
      * POST /api/company-roles
      */
     @PostMapping
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('SUPERADMIN', 'ADMIN')")
     public ResponseEntity<CompanyRoleDTO> createCompanyRole(@Valid @RequestBody CompanyRoleDTO companyRoleDTO) {
         CompanyRoleDTO createdCompanyRole = companyRoleService.createCompanyRole(companyRoleDTO);
         return new ResponseEntity<>(createdCompanyRole, HttpStatus.CREATED);
@@ -57,7 +59,7 @@ public class CompanyRoleController {
      * PUT /api/company-roles/{id}
      */
     @PutMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('SUPERADMIN', 'ADMIN')")
     public ResponseEntity<CompanyRoleDTO> updateCompanyRole(
             @PathVariable Long id,
             @Valid @RequestBody CompanyRoleDTO companyRoleDTO) {
@@ -70,7 +72,7 @@ public class CompanyRoleController {
      * DELETE /api/company-roles/{id}
      */
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('SUPERADMIN', 'ADMIN')")
     public ResponseEntity<Void> deleteCompanyRole(@PathVariable Long id) {
         companyRoleService.deleteCompanyRole(id);
         return ResponseEntity.noContent().build();

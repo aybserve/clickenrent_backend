@@ -26,6 +26,7 @@ public class GlobalRoleController {
      * GET /api/global-roles
      */
     @GetMapping
+    @PreAuthorize("hasAnyRole('SUPERADMIN', 'ADMIN')")
     public ResponseEntity<List<GlobalRoleDTO>> getAllGlobalRoles() {
         List<GlobalRoleDTO> globalRoles = globalRoleService.getAllGlobalRoles();
         return ResponseEntity.ok(globalRoles);
@@ -36,6 +37,7 @@ public class GlobalRoleController {
      * GET /api/global-roles/{id}
      */
     @GetMapping("/{id}")
+    @PreAuthorize("hasAnyRole('SUPERADMIN', 'ADMIN')")
     public ResponseEntity<GlobalRoleDTO> getGlobalRoleById(@PathVariable Long id) {
         GlobalRoleDTO globalRole = globalRoleService.getGlobalRoleById(id);
         return ResponseEntity.ok(globalRole);
@@ -46,7 +48,7 @@ public class GlobalRoleController {
      * POST /api/global-roles
      */
     @PostMapping
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('SUPERADMIN', 'ADMIN')")
     public ResponseEntity<GlobalRoleDTO> createGlobalRole(@Valid @RequestBody GlobalRoleDTO globalRoleDTO) {
         GlobalRoleDTO createdGlobalRole = globalRoleService.createGlobalRole(globalRoleDTO);
         return new ResponseEntity<>(createdGlobalRole, HttpStatus.CREATED);
@@ -57,7 +59,7 @@ public class GlobalRoleController {
      * PUT /api/global-roles/{id}
      */
     @PutMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('SUPERADMIN', 'ADMIN')")
     public ResponseEntity<GlobalRoleDTO> updateGlobalRole(
             @PathVariable Long id,
             @Valid @RequestBody GlobalRoleDTO globalRoleDTO) {
@@ -70,7 +72,7 @@ public class GlobalRoleController {
      * DELETE /api/global-roles/{id}
      */
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('SUPERADMIN', 'ADMIN')")
     public ResponseEntity<Void> deleteGlobalRole(@PathVariable Long id) {
         globalRoleService.deleteGlobalRole(id);
         return ResponseEntity.noContent().build();

@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 
 /**
  * Data Transfer Object for CompanyType entity.
- * Represents types of companies (e.g., Hotel, B&B, Vacation Rental).
+ * Represents types of companies (e.g., Hotel, B&B, Camping).
  */
 @Data
 @Builder
