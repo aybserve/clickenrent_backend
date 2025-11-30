@@ -7,7 +7,7 @@ import lombok.*;
 
 /**
  * Entity representing types of companies.
- * Examples: Hotel, B&B, Vacation Rental, etc.
+ * Examples: Hotel, B&B, Camping, etc.
  */
 @Entity
 @Table(name = "company_type")

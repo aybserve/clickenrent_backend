@@ -20,6 +20,17 @@ public class GatewayConfig {
         log.info("Configuring Gateway routes...");
 
         return builder.routes()
+                // Route for fetching auth-service API docs (SpringDoc will aggregate)
+                .route("auth-service-api-docs", r -> r
+                        .path("/auth-service/v3/api-docs")
+                        .filters(f -> f.rewritePath("/auth-service/v3/api-docs", "/v3/api-docs"))
+                        .uri("lb://auth-service"))
+                
+                // Actuator endpoints (public for health checks)
+                .route("actuator", r -> r
+                        .path("/actuator/**")
+                        .uri("lb://auth-service"))
+                
                 // Public Auth Routes - No JWT validation required
                 .route("auth-public-register", r -> r
                         .path("/api/auth/register")
@@ -46,6 +57,26 @@ public class GatewayConfig {
 
                 .route("auth-protected-profile", r -> r
                         .path("/api/auth/profile/**")
+                        .filters(f -> f.filter(jwtAuthenticationFilter))
+                        .uri("lb://auth-service"))
+
+                // Company Management Routes
+                .route("companies", r -> r
+                        .path("/api/companies/**")
+                        .filters(f -> f.filter(jwtAuthenticationFilter))
+                        .uri("lb://auth-service"))
+
+                // User Management Routes
+                .route("users", r -> r
+                        .path("/api/users/**")
+                        .filters(f -> f.filter(jwtAuthenticationFilter))
+                        .uri("lb://auth-service"))
+
+                // Global Roles, Company Roles, Company Types, Languages
+                .route("admin-resources", r -> r
+                        .path("/api/global-roles/**", "/api/company-roles/**", 
+                              "/api/company-types/**", "/api/languages/**",
+                              "/api/user-companies/**", "/api/user-global-roles/**")
                         .filters(f -> f.filter(jwtAuthenticationFilter))
                         .uri("lb://auth-service"))
 

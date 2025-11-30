@@ -1,5 +1,7 @@
 package org.clickenrent.authservice.controller;
 
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.clickenrent.authservice.dto.LanguageDTO;
@@ -17,6 +19,8 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/languages")
 @RequiredArgsConstructor
+@Tag(name = "Language", description = "Language management endpoints")
+@SecurityRequirement(name = "bearerAuth")
 public class LanguageController {
     
     private final LanguageService languageService;
@@ -26,6 +30,7 @@ public class LanguageController {
      * GET /api/languages
      */
     @GetMapping
+    @PreAuthorize("hasAnyRole('SUPERADMIN', 'ADMIN')")
     public ResponseEntity<List<LanguageDTO>> getAllLanguages() {
         List<LanguageDTO> languages = languageService.getAllLanguages();
         return ResponseEntity.ok(languages);
@@ -36,6 +41,7 @@ public class LanguageController {
      * GET /api/languages/{id}
      */
     @GetMapping("/{id}")
+    @PreAuthorize("hasAnyRole('SUPERADMIN', 'ADMIN')")
     public ResponseEntity<LanguageDTO> getLanguageById(@PathVariable Long id) {
         LanguageDTO language = languageService.getLanguageById(id);
         return ResponseEntity.ok(language);
@@ -46,7 +52,7 @@ public class LanguageController {
      * POST /api/languages
      */
     @PostMapping
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('SUPERADMIN', 'ADMIN')")
     public ResponseEntity<LanguageDTO> createLanguage(@Valid @RequestBody LanguageDTO languageDTO) {
         LanguageDTO createdLanguage = languageService.createLanguage(languageDTO);
         return new ResponseEntity<>(createdLanguage, HttpStatus.CREATED);
@@ -57,7 +63,7 @@ public class LanguageController {
      * PUT /api/languages/{id}
      */
     @PutMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('SUPERADMIN', 'ADMIN')")
     public ResponseEntity<LanguageDTO> updateLanguage(
             @PathVariable Long id,
             @Valid @RequestBody LanguageDTO languageDTO) {
@@ -70,7 +76,7 @@ public class LanguageController {
      * DELETE /api/languages/{id}
      */
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('SUPERADMIN', 'ADMIN')")
     public ResponseEntity<Void> deleteLanguage(@PathVariable Long id) {
         languageService.deleteLanguage(id);
         return ResponseEntity.noContent().build();

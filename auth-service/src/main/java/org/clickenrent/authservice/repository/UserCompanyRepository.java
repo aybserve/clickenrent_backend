@@ -23,5 +23,10 @@ public interface UserCompanyRepository extends JpaRepository<UserCompany, Long> 
      * Find all company associations for a user by user ID.
      */
     List<UserCompany> findByUserId(Long userId);
+    
+    /**
+     * Find all user associations for a company by company ID.
+     */
+    List<UserCompany> findByCompanyId(Long companyId);
 }
 

@@ -2,11 +2,13 @@ package org.clickenrent.authservice.service;
 
 import lombok.RequiredArgsConstructor;
 import org.clickenrent.authservice.dto.UserCompanyDTO;
+import org.clickenrent.authservice.dto.UserCompanyDetailDTO;
 import org.clickenrent.authservice.entity.Company;
 import org.clickenrent.authservice.entity.CompanyRole;
 import org.clickenrent.authservice.entity.User;
 import org.clickenrent.authservice.entity.UserCompany;
 import org.clickenrent.authservice.exception.ResourceNotFoundException;
+import org.clickenrent.authservice.exception.UnauthorizedException;
 import org.clickenrent.authservice.mapper.UserCompanyMapper;
 import org.clickenrent.authservice.repository.CompanyRepository;
 import org.clickenrent.authservice.repository.CompanyRoleRepository;
@@ -30,6 +32,7 @@ public class UserCompanyService {
     private final CompanyRepository companyRepository;
     private final CompanyRoleRepository companyRoleRepository;
     private final UserCompanyMapper userCompanyMapper;
+    private final SecurityService securityService;
     
     @Transactional
     public UserCompanyDTO assignUserToCompany(Long userId, Long companyId, Long companyRoleId) {
@@ -53,26 +56,36 @@ public class UserCompanyService {
     }
     
     @Transactional(readOnly = true)
-    public List<UserCompanyDTO> getUserCompanies(Long userId) {
+    public List<UserCompanyDetailDTO> getUserCompanies(Long userId) {
+        // Security check: Only admins or the user themselves can view their companies
+        Long currentUserId = securityService.getCurrentUserId();
+        if (!securityService.isAdmin() && (currentUserId == null || !currentUserId.equals(userId))) {
+            throw new UnauthorizedException("You don't have permission to view this user's companies");
+        }
+        
         // Verify user exists
         userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User", "id", userId));
         
-        return userCompanyRepository.findAll().stream()
-                .filter(uc -> uc.getUser().getId().equals(userId))
-                .map(userCompanyMapper::toDto)
+        return userCompanyRepository.findByUserId(userId).stream()
+                .map(userCompanyMapper::toDetailDto)
                 .collect(Collectors.toList());
     }
     
     @Transactional(readOnly = true)
-    public List<UserCompanyDTO> getCompanyUsers(Long companyId) {
+    public List<UserCompanyDetailDTO> getCompanyUsers(Long companyId) {
+        // Security check: Must have access to this company
+        if (!securityService.hasAccessToCompany(companyId)) {
+            throw new UnauthorizedException("You don't have permission to view users in this company");
+        }
+        
         // Verify company exists
         companyRepository.findById(companyId)
                 .orElseThrow(() -> new ResourceNotFoundException("Company", "id", companyId));
         
-        return userCompanyRepository.findAll().stream()
-                .filter(uc -> uc.getCompany().getId().equals(companyId))
-                .map(userCompanyMapper::toDto)
+        // Use optimized query instead of loading all records
+        return userCompanyRepository.findByCompanyId(companyId).stream()
+                .map(userCompanyMapper::toDetailDto)
                 .collect(Collectors.toList());
     }
     
