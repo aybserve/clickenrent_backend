@@ -1,5 +1,7 @@
 package org.clickenrent.authservice.controller;
 
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.clickenrent.authservice.dto.AssignUserToCompanyRequest;
@@ -25,6 +27,8 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/user-companies")
 @RequiredArgsConstructor
+@Tag(name = "User-Company", description = "User-Company management endpoints")
+@SecurityRequirement(name = "bearerAuth")
 public class UserCompanyController {
     
     private final UserCompanyService userCompanyService;

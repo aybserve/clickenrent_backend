@@ -1,5 +1,7 @@
 package org.clickenrent.authservice.controller;
 
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.clickenrent.authservice.dto.CompanyRoleDTO;
@@ -17,6 +19,8 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/company-roles")
 @RequiredArgsConstructor
+@Tag(name = "Company Role", description = "Company role management endpoints")
+@SecurityRequirement(name = "bearerAuth")
 public class CompanyRoleController {
     
     private final CompanyRoleService companyRoleService;

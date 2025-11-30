@@ -1,5 +1,7 @@
 package org.clickenrent.authservice.controller;
 
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.clickenrent.authservice.dto.AssignGlobalRoleRequest;
@@ -22,6 +24,8 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/user-global-roles")
 @RequiredArgsConstructor
+@Tag(name = "User-Global Role", description = "User-Global Role management endpoints")
+@SecurityRequirement(name = "bearerAuth")
 public class UserGlobalRoleController {
     
     private final UserGlobalRoleService userGlobalRoleService;

@@ -20,6 +20,17 @@ public class GatewayConfig {
         log.info("Configuring Gateway routes...");
 
         return builder.routes()
+                // Route for fetching auth-service API docs (SpringDoc will aggregate)
+                .route("auth-service-api-docs", r -> r
+                        .path("/auth-service/v3/api-docs")
+                        .filters(f -> f.rewritePath("/auth-service/v3/api-docs", "/v3/api-docs"))
+                        .uri("lb://auth-service"))
+                
+                // Actuator endpoints (public for health checks)
+                .route("actuator", r -> r
+                        .path("/actuator/**")
+                        .uri("lb://auth-service"))
+                
                 // Public Auth Routes - No JWT validation required
                 .route("auth-public-register", r -> r
                         .path("/api/auth/register")

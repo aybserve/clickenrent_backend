@@ -1,5 +1,13 @@
 package org.clickenrent.authservice.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.clickenrent.authservice.dto.CompanyDTO;
@@ -24,6 +32,8 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/companies")
 @RequiredArgsConstructor
+@Tag(name = "Company", description = "Company management endpoints")
+@SecurityRequirement(name = "bearerAuth")
 public class CompanyController {
     
     private final CompanyService companyService;
@@ -35,6 +45,15 @@ public class CompanyController {
     @GetMapping
 //    @PreAuthorize("isAuthenticated()")
     @PreAuthorize("hasAnyRole('SUPERADMIN', 'ADMIN')")
+    @Operation(
+            summary = "Get all companies",
+            description = "Returns a paginated list of all companies. Requires SUPERADMIN or ADMIN role."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Companies retrieved successfully"),
+            @ApiResponse(responseCode = "401", description = "Not authenticated"),
+            @ApiResponse(responseCode = "403", description = "Insufficient permissions")
+    })
     public ResponseEntity<Page<CompanyDTO>> getAllCompanies(
             @PageableDefault(size = 20, sort = "id", direction = Sort.Direction.ASC) Pageable pageable) {
         Page<CompanyDTO> companies = companyService.getAllCompanies(pageable);
@@ -47,7 +66,19 @@ public class CompanyController {
      */
     @GetMapping("/{id}")
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<CompanyDTO> getCompanyById(@PathVariable Long id) {
+    @Operation(
+            summary = "Get company by ID",
+            description = "Returns company details by company ID"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Company found",
+                    content = @Content(schema = @Schema(implementation = CompanyDTO.class))),
+            @ApiResponse(responseCode = "401", description = "Not authenticated"),
+            @ApiResponse(responseCode = "403", description = "Access denied"),
+            @ApiResponse(responseCode = "404", description = "Company not found")
+    })
+    public ResponseEntity<CompanyDTO> getCompanyById(
+            @Parameter(description = "Company ID", required = true) @PathVariable Long id) {
         CompanyDTO company = companyService.getCompanyById(id);
         return ResponseEntity.ok(company);
     }
@@ -58,6 +89,17 @@ public class CompanyController {
      */
     @PostMapping
     @PreAuthorize("hasAnyRole('SUPERADMIN', 'ADMIN')")
+    @Operation(
+            summary = "Create a new company",
+            description = "Creates a new company. Requires SUPERADMIN or ADMIN role."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Company created successfully",
+                    content = @Content(schema = @Schema(implementation = CompanyDTO.class))),
+            @ApiResponse(responseCode = "400", description = "Invalid input data"),
+            @ApiResponse(responseCode = "401", description = "Not authenticated"),
+            @ApiResponse(responseCode = "403", description = "Insufficient permissions")
+    })
     public ResponseEntity<CompanyDTO> createCompany(@Valid @RequestBody CompanyDTO companyDTO) {
         CompanyDTO createdCompany = companyService.createCompany(companyDTO);
         return new ResponseEntity<>(createdCompany, HttpStatus.CREATED);
@@ -70,8 +112,20 @@ public class CompanyController {
     @PutMapping("/{id}")
 //    @PreAuthorize("hasAnyRole('SUPERADMIN', 'ADMIN')")
     @PreAuthorize("isAuthenticated()")
+    @Operation(
+            summary = "Update company",
+            description = "Updates company information by ID"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Company updated successfully",
+                    content = @Content(schema = @Schema(implementation = CompanyDTO.class))),
+            @ApiResponse(responseCode = "400", description = "Invalid input data"),
+            @ApiResponse(responseCode = "401", description = "Not authenticated"),
+            @ApiResponse(responseCode = "403", description = "Access denied"),
+            @ApiResponse(responseCode = "404", description = "Company not found")
+    })
     public ResponseEntity<CompanyDTO> updateCompany(
-            @PathVariable Long id,
+            @Parameter(description = "Company ID", required = true) @PathVariable Long id,
             @Valid @RequestBody CompanyDTO companyDTO) {
         CompanyDTO updatedCompany = companyService.updateCompany(id, companyDTO);
         return ResponseEntity.ok(updatedCompany);
@@ -83,7 +137,18 @@ public class CompanyController {
      */
     @DeleteMapping("/{id}")
     @PreAuthorize("hasAnyRole('SUPERADMIN', 'ADMIN')")
-    public ResponseEntity<Void> deleteCompany(@PathVariable Long id) {
+    @Operation(
+            summary = "Delete company",
+            description = "Deletes a company by ID. Requires SUPERADMIN or ADMIN role."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "Company deleted successfully"),
+            @ApiResponse(responseCode = "401", description = "Not authenticated"),
+            @ApiResponse(responseCode = "403", description = "Insufficient permissions"),
+            @ApiResponse(responseCode = "404", description = "Company not found")
+    })
+    public ResponseEntity<Void> deleteCompany(
+            @Parameter(description = "Company ID", required = true) @PathVariable Long id) {
         companyService.deleteCompany(id);
         return ResponseEntity.noContent().build();
     }
