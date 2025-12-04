@@ -49,8 +49,13 @@ public class Company {
     @Column(name = "logo", length = 500)
     private String logo;
 
+    @Size(max = 100, message = "ERP Partner ID must not exceed 100 characters")
+    @Column(name = "erp_partner_id", length = 100)
+    private String erpPartnerId;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "company_type_id")
     private CompanyType companyType;
 }
+
 

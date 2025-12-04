@@ -25,3 +25,4 @@ public class AssignUserToCompanyRequest {
     private Long companyRoleId;
 }
 
+

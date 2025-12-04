@@ -47,3 +47,4 @@ public class UserCompany {
     private CompanyRole companyRole;
 }
 
+

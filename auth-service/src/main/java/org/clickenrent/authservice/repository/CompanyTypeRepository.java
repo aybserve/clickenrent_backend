@@ -12,3 +12,4 @@ import org.springframework.stereotype.Repository;
 public interface CompanyTypeRepository extends JpaRepository<CompanyType, Long> {
 }
 
+

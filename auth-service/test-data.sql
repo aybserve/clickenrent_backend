@@ -68,3 +68,4 @@ SELECT setval('company_role_id_seq', (SELECT MAX(id) FROM company_role));
 -- SELECT * FROM company;
 -- SELECT * FROM company_role;
 
+

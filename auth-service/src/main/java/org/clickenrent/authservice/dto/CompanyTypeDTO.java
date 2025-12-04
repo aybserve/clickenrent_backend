@@ -19,3 +19,4 @@ public class CompanyTypeDTO {
     private String name;
 }
 
+

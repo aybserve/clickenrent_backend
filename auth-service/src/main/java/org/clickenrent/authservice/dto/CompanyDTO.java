@@ -21,6 +21,8 @@ public class CompanyDTO {
     private String description;
     private String website;
     private String logo;
+    private String erpPartnerId;
     private Long companyTypeId;
 }
+
 

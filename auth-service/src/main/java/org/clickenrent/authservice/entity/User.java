@@ -90,5 +90,18 @@ public class User extends BaseAuditEntity {
     @Builder.Default
     @Column(name = "is_deleted", nullable = false)
     private Boolean isDeleted = false;
+
+    @Builder.Default
+    @Column(name = "is_email_verified")
+    private Boolean isEmailVerified = false;
+
+    @Builder.Default
+    @Column(name = "is_accepted_terms")
+    private Boolean isAcceptedTerms = false;
+
+    @Builder.Default
+    @Column(name = "is_accepted_privacy_policy")
+    private Boolean isAcceptedPrivacyPolicy = false;
 }
+
 

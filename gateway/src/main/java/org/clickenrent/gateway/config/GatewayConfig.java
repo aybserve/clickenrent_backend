@@ -80,6 +80,13 @@ public class GatewayConfig {
                         .filters(f -> f.filter(jwtAuthenticationFilter))
                         .uri("lb://auth-service"))
 
+                // Address Management Routes (Countries, Cities, Addresses, User-Addresses)
+                .route("address-resources", r -> r
+                        .path("/api/countries/**", "/api/cities/**", 
+                              "/api/addresses/**", "/api/user-addresses/**")
+                        .filters(f -> f.filter(jwtAuthenticationFilter))
+                        .uri("lb://auth-service"))
+
                 // Fallback route for any other auth-service endpoints
                 // NOTE: All endpoints not explicitly listed above will require JWT authentication
                 .route("auth-fallback", r -> r

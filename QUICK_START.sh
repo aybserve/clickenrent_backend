@@ -132,3 +132,4 @@ echo "  🧪 auth-service/test-api.sh - Automated test script"
 
 echo ""
 
+
