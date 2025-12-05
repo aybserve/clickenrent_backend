@@ -1,0 +1,109 @@
+package org.clickenrent.rentalservice.service;
+
+import lombok.RequiredArgsConstructor;
+import org.clickenrent.rentalservice.dto.LocationDTO;
+import org.clickenrent.rentalservice.entity.Hub;
+import org.clickenrent.rentalservice.entity.Location;
+import org.clickenrent.rentalservice.exception.ResourceNotFoundException;
+import org.clickenrent.rentalservice.exception.UnauthorizedException;
+import org.clickenrent.rentalservice.mapper.LocationMapper;
+import org.clickenrent.rentalservice.repository.HubRepository;
+import org.clickenrent.rentalservice.repository.LocationRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+/**
+ * Service for managing Location entities with automatic hub creation.
+ */
+@Service
+@RequiredArgsConstructor
+public class LocationService {
+
+    private final LocationRepository locationRepository;
+    private final HubRepository hubRepository;
+    private final LocationMapper locationMapper;
+    private final SecurityService securityService;
+
+    @Transactional(readOnly = true)
+    public Page<LocationDTO> getAllLocations(Pageable pageable) {
+        // Admin can see all locations
+        if (securityService.isAdmin()) {
+            return locationRepository.findAll(pageable)
+                    .map(locationMapper::toDto);
+        }
+
+        // B2B/Customer can see locations of their companies
+        // Implementation depends on user's company access
+        throw new UnauthorizedException("You don't have permission to view all locations");
+    }
+
+    @Transactional(readOnly = true)
+    public LocationDTO getLocationById(Long id) {
+        Location location = locationRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Location", "id", id));
+
+        // Check if user has access to this location's company
+        if (!securityService.isAdmin() && !securityService.hasAccessToCompany(location.getCompanyId())) {
+            throw new UnauthorizedException("You don't have permission to view this location");
+        }
+
+        return locationMapper.toDto(location);
+    }
+
+    @Transactional(readOnly = true)
+    public LocationDTO getLocationByExternalId(String externalId) {
+        Location location = locationRepository.findByExternalId(externalId)
+                .orElseThrow(() -> new ResourceNotFoundException("Location", "externalId", externalId));
+        return locationMapper.toDto(location);
+    }
+
+    @Transactional
+    public LocationDTO createLocation(LocationDTO locationDTO) {
+        // Check if user has access to the company
+        if (!securityService.isAdmin() && !securityService.hasAccessToCompany(locationDTO.getCompanyId())) {
+            throw new UnauthorizedException("You don't have permission to create location for this company");
+        }
+
+        Location location = locationMapper.toEntity(locationDTO);
+        location = locationRepository.save(location);
+
+        // Auto-create "Main" hub for this location
+        Hub mainHub = Hub.builder()
+                .name("Main")
+                .location(location)
+                .build();
+        hubRepository.save(mainHub);
+
+        return locationMapper.toDto(location);
+    }
+
+    @Transactional
+    public LocationDTO updateLocation(Long id, LocationDTO locationDTO) {
+        Location location = locationRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Location", "id", id));
+
+        // Check if user has access to this location's company
+        if (!securityService.isAdmin() && !securityService.hasAccessToCompany(location.getCompanyId())) {
+            throw new UnauthorizedException("You don't have permission to update this location");
+        }
+
+        locationMapper.updateEntityFromDto(locationDTO, location);
+        location = locationRepository.save(location);
+        return locationMapper.toDto(location);
+    }
+
+    @Transactional
+    public void deleteLocation(Long id) {
+        Location location = locationRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Location", "id", id));
+
+        // Check if user has access to this location's company
+        if (!securityService.isAdmin() && !securityService.hasAccessToCompany(location.getCompanyId())) {
+            throw new UnauthorizedException("You don't have permission to delete this location");
+        }
+
+        locationRepository.delete(location);
+    }
+}

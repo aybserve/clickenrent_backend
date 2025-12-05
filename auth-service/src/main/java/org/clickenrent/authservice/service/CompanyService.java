@@ -96,6 +96,12 @@ public class CompanyService {
     
     @Transactional
     public CompanyDTO updateCompany(Long id, CompanyDTO companyDTO) {
+        // Check if user has permission to update this company
+        // Only SUPERADMIN/ADMIN can update companies (B2B is read-only)
+        if (!securityService.isAdmin()) {
+            throw new UnauthorizedException("You don't have permission to update companies");
+        }
+        
         Company company = companyRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Company", "id", id));
         
@@ -113,6 +119,12 @@ public class CompanyService {
     
     @Transactional
     public void deleteCompany(Long id) {
+        // Check if user has permission to delete this company
+        // Only SUPERADMIN/ADMIN can delete companies
+        if (!securityService.isAdmin()) {
+            throw new UnauthorizedException("You don't have permission to delete companies");
+        }
+        
         Company company = companyRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Company", "id", id));
         companyRepository.delete(company);

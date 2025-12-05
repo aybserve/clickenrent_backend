@@ -2,14 +2,14 @@ package org.clickenrent.authservice.service;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.security.Keys;
 import org.clickenrent.authservice.exception.InvalidTokenException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import javax.crypto.SecretKey;
-import java.nio.charset.StandardCharsets;
+import javax.crypto.spec.SecretKeySpec;
+import java.util.Base64;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -122,8 +122,9 @@ public class JwtService {
      * Get signing key for JWT.
      */
     private SecretKey getSigningKey() {
-        byte[] keyBytes = secret.getBytes(StandardCharsets.UTF_8);
-        return Keys.hmacShaKeyFor(keyBytes);
+        // Decode Base64-encoded secret to match rental service configuration
+        byte[] keyBytes = Base64.getDecoder().decode(secret);
+        return new SecretKeySpec(keyBytes, "HmacSHA256");
     }
     
     /**

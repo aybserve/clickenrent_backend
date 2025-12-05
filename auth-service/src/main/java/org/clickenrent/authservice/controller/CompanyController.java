@@ -110,11 +110,10 @@ public class CompanyController {
      * PUT /api/companies/{id}
      */
     @PutMapping("/{id}")
-//    @PreAuthorize("hasAnyRole('SUPERADMIN', 'ADMIN')")
-    @PreAuthorize("isAuthenticated()")
+    @PreAuthorize("hasAnyRole('SUPERADMIN', 'ADMIN')")
     @Operation(
             summary = "Update company",
-            description = "Updates company information by ID"
+            description = "Updates company information by ID. Requires SUPERADMIN or ADMIN role."
     )
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Company updated successfully",

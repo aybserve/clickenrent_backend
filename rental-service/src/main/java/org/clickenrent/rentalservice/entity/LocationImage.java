@@ -1,0 +1,50 @@
+package org.clickenrent.rentalservice.entity;
+
+import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
+import lombok.*;
+
+/**
+ * Entity representing images for locations.
+ */
+@Entity
+@Table(
+    name = "location_image",
+    indexes = {
+        @Index(name = "idx_location_image_external_id", columnList = "external_id")
+    }
+)
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+@ToString
+@EqualsAndHashCode(of = "id", callSuper = false)
+public class LocationImage extends BaseAuditEntity {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Column(name = "external_id", unique = true, length = 100)
+    private String externalId;
+
+    @NotNull(message = "Location is required")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "location_id", nullable = false)
+    private Location location;
+
+    @NotNull(message = "Image URL is required")
+    @Size(max = 500, message = "Image URL must not exceed 500 characters")
+    @Column(name = "image_url", nullable = false, length = 500)
+    private String imageUrl;
+
+    @Column(name = "sort_order")
+    private Integer sortOrder;
+
+    @Builder.Default
+    @Column(name = "is_thumbnail", nullable = false)
+    private Boolean isThumbnail = false;
+}
