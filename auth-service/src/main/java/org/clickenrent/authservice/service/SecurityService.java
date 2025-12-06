@@ -2,7 +2,9 @@ package org.clickenrent.authservice.service;
 
 import lombok.RequiredArgsConstructor;
 import org.clickenrent.authservice.entity.User;
+import org.clickenrent.authservice.entity.UserAddress;
 import org.clickenrent.authservice.entity.UserCompany;
+import org.clickenrent.authservice.repository.UserAddressRepository;
 import org.clickenrent.authservice.repository.UserCompanyRepository;
 import org.clickenrent.authservice.repository.UserRepository;
 import org.springframework.security.core.Authentication;
@@ -23,6 +25,7 @@ public class SecurityService {
     
     private final UserRepository userRepository;
     private final UserCompanyRepository userCompanyRepository;
+    private final UserAddressRepository userAddressRepository;
     
     /**
      * Check if current user is SuperAdmin or Admin.
@@ -135,6 +138,69 @@ public class SecurityService {
         }
         
         return List.of(); // Customers have no company access
+    }
+    
+    /**
+     * Check if current user has access to a specific address.
+     * - SUPERADMIN/ADMIN: always true
+     * - B2B/CUSTOMER: only if they are linked to the address via UserAddress
+     */
+    public boolean hasAccessToAddress(Long addressId) {
+        if (isAdmin()) {
+            return true;
+        }
+        
+        User currentUser = getCurrentUser();
+        if (currentUser == null) {
+            return false;
+        }
+        
+        // Check if user has this address in their UserAddress relationships
+        List<UserAddress> userAddresses = userAddressRepository.findByUserId(currentUser.getId());
+        return userAddresses.stream()
+                .anyMatch(ua -> ua.getAddress().getId().equals(addressId));
+    }
+    
+    /**
+     * Get list of address IDs that current user has access to.
+     * - SUPERADMIN/ADMIN: all addresses (returns null to indicate all)
+     * - B2B/CUSTOMER: only their addresses
+     */
+    public List<Long> getAccessibleAddressIds() {
+        if (isAdmin()) {
+            return null; // null means all addresses
+        }
+        
+        User currentUser = getCurrentUser();
+        if (currentUser == null) {
+            return List.of();
+        }
+        
+        List<UserAddress> userAddresses = userAddressRepository.findByUserId(currentUser.getId());
+        return userAddresses.stream()
+                .map(ua -> ua.getAddress().getId())
+                .toList();
+    }
+    
+    /**
+     * Check if current user can invite users to a company.
+     * - SUPERADMIN/ADMIN: can invite to any company
+     * - B2B: can invite to companies they belong to
+     * - CUSTOMER: cannot invite
+     * 
+     * @param companyId The company ID to check invitation permission for
+     * @return true if user can invite to the company
+     */
+    public boolean canInviteToCompany(Long companyId) {
+        if (isAdmin()) {
+            return true;
+        }
+        
+        if (isB2B()) {
+            return hasAccessToCompany(companyId);
+        }
+        
+        return false; // CUSTOMER cannot invite
     }
     
     /**

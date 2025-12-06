@@ -46,6 +46,15 @@ public class GatewayConfig {
                 .route("auth-public-refresh", r -> r
                         .path("/api/auth/refresh")
                         .uri("lb://auth-service"))
+                
+                // Public Invitation Routes - No JWT validation required
+                .route("invitation-public-validate", r -> r
+                        .path("/api/invitations/validate/**")
+                        .uri("lb://auth-service"))
+                
+                .route("invitation-public-complete", r -> r
+                        .path("/api/invitations/complete")
+                        .uri("lb://auth-service"))
 
                 // Protected Auth Routes - JWT validation required
                 .route("auth-protected-users", r -> r
@@ -87,6 +96,26 @@ public class GatewayConfig {
                 .route("address-resources", r -> r
                         .path("/api/countries/**", "/api/cities/**", 
                               "/api/addresses/**", "/api/user-addresses/**")
+                        .filters(f -> f.filter(jwtAuthenticationFilter))
+                        .uri("lb://auth-service"))
+                
+                // Invitation Management Routes (Protected - requires JWT)
+                // Note: Specific protected invitation routes, not catch-all
+                .route("invitations-create", r -> r
+                        .path("/api/invitations")
+                        .and().method("POST")
+                        .filters(f -> f.filter(jwtAuthenticationFilter))
+                        .uri("lb://auth-service"))
+                
+                .route("invitations-list", r -> r
+                        .path("/api/invitations")
+                        .and().method("GET")
+                        .filters(f -> f.filter(jwtAuthenticationFilter))
+                        .uri("lb://auth-service"))
+                
+                .route("invitations-cancel", r -> r
+                        .path("/api/invitations/*")
+                        .and().method("DELETE")
                         .filters(f -> f.filter(jwtAuthenticationFilter))
                         .uri("lb://auth-service"))
 

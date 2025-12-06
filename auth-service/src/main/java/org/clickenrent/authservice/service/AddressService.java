@@ -4,10 +4,14 @@ import lombok.RequiredArgsConstructor;
 import org.clickenrent.authservice.dto.AddressDTO;
 import org.clickenrent.authservice.entity.Address;
 import org.clickenrent.authservice.entity.City;
+import org.clickenrent.authservice.entity.User;
+import org.clickenrent.authservice.entity.UserAddress;
 import org.clickenrent.authservice.exception.ResourceNotFoundException;
 import org.clickenrent.authservice.mapper.AddressMapper;
 import org.clickenrent.authservice.repository.AddressRepository;
 import org.clickenrent.authservice.repository.CityRepository;
+import org.clickenrent.authservice.repository.UserAddressRepository;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -16,6 +20,12 @@ import java.util.stream.Collectors;
 
 /**
  * Service for managing Address entities.
+ * 
+ * Security Implementation (Defense in Depth):
+ * - Primary: Controller layer uses @PreAuthorize with SpEL expressions
+ * - Secondary: Service layer validates access (protects internal service-to-service calls)
+ * 
+ * This dual-layer approach ensures security even if services are called directly.
  */
 @Service
 @RequiredArgsConstructor
@@ -24,6 +34,8 @@ public class AddressService {
     private final AddressRepository addressRepository;
     private final AddressMapper addressMapper;
     private final CityRepository cityRepository;
+    private final SecurityService securityService;
+    private final UserAddressRepository userAddressRepository;
     
     @Transactional(readOnly = true)
     public List<AddressDTO> getAllAddresses() {
@@ -36,6 +48,12 @@ public class AddressService {
     public AddressDTO getAddressById(Long id) {
         Address address = addressRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Address", "id", id));
+        
+        // Defense in depth: Secondary access check (primary check is in controller @PreAuthorize)
+        if (!securityService.hasAccessToAddress(id)) {
+            throw new AccessDeniedException("You don't have permission to access this address");
+        }
+        
         return addressMapper.toDto(address);
     }
     
@@ -58,6 +76,19 @@ public class AddressService {
         }
         
         address = addressRepository.save(address);
+        
+        // If user is B2B or CUSTOMER, automatically associate the address with them
+        if (!securityService.isAdmin()) {
+            User currentUser = securityService.getCurrentUser();
+            if (currentUser != null) {
+                UserAddress userAddress = UserAddress.builder()
+                        .user(currentUser)
+                        .address(address)
+                        .build();
+                userAddressRepository.save(userAddress);
+            }
+        }
+        
         return addressMapper.toDto(address);
     }
     
@@ -65,6 +96,11 @@ public class AddressService {
     public AddressDTO updateAddress(Long id, AddressDTO addressDTO) {
         Address address = addressRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Address", "id", id));
+        
+        // Defense in depth: Secondary access check (primary check is in controller @PreAuthorize)
+        if (!securityService.hasAccessToAddress(id)) {
+            throw new AccessDeniedException("You don't have permission to update this address");
+        }
         
         addressMapper.updateEntityFromDto(addressDTO, address);
         
@@ -83,6 +119,12 @@ public class AddressService {
     public void deleteAddress(Long id) {
         Address address = addressRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Address", "id", id));
+        
+        // Defense in depth: Secondary access check (primary check is in controller @PreAuthorize)
+        if (!securityService.hasAccessToAddress(id)) {
+            throw new AccessDeniedException("You don't have permission to delete this address");
+        }
+        
         addressRepository.delete(address);
     }
 }

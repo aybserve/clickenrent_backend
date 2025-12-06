@@ -2,13 +2,18 @@ package org.clickenrent.authservice.service;
 
 import lombok.RequiredArgsConstructor;
 import org.clickenrent.authservice.dto.*;
+import org.clickenrent.authservice.entity.GlobalRole;
 import org.clickenrent.authservice.entity.Language;
 import org.clickenrent.authservice.entity.User;
+import org.clickenrent.authservice.entity.UserGlobalRole;
 import org.clickenrent.authservice.exception.DuplicateResourceException;
 import org.clickenrent.authservice.exception.InvalidTokenException;
+import org.clickenrent.authservice.exception.ResourceNotFoundException;
 import org.clickenrent.authservice.exception.UnauthorizedException;
 import org.clickenrent.authservice.mapper.UserMapper;
+import org.clickenrent.authservice.repository.GlobalRoleRepository;
 import org.clickenrent.authservice.repository.LanguageRepository;
+import org.clickenrent.authservice.repository.UserGlobalRoleRepository;
 import org.clickenrent.authservice.repository.UserRepository;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -35,6 +40,8 @@ public class AuthService {
     
     private final UserRepository userRepository;
     private final LanguageRepository languageRepository;
+    private final GlobalRoleRepository globalRoleRepository;
+    private final UserGlobalRoleRepository userGlobalRoleRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final CustomUserDetailsService userDetailsService;
@@ -44,6 +51,7 @@ public class AuthService {
     
     /**
      * Register a new user in the system.
+     * Public endpoint - automatically assigns CUSTOMER role during registration.
      */
     @Transactional
     public AuthResponse register(RegisterRequest request) {
@@ -77,14 +85,23 @@ public class AuthService {
             user.setLanguage(language);
         }
         
-        user = userRepository.save(user);
+        User savedUser = userRepository.save(user);
+        
+        // Automatically assign CUSTOMER role to new user
+        globalRoleRepository.findByNameIgnoreCase("CUSTOMER").ifPresent(customerRole -> {
+            UserGlobalRole userGlobalRole = UserGlobalRole.builder()
+                    .user(savedUser)
+                    .globalRole(customerRole)
+                    .build();
+            userGlobalRoleRepository.save(userGlobalRole);
+        });
         
         // Generate tokens with custom claims
-        UserDetails userDetails = userDetailsService.loadUserByUsername(user.getUserName());
+        UserDetails userDetails = userDetailsService.loadUserByUsername(savedUser.getUserName());
         
         Map<String, Object> claims = new HashMap<>();
-        claims.put("userId", user.getId());
-        claims.put("email", user.getEmail());
+        claims.put("userId", savedUser.getId());
+        claims.put("email", savedUser.getEmail());
         claims.put("roles", userDetails.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
                 .collect(Collectors.toList()));
@@ -96,8 +113,72 @@ public class AuthService {
                 accessToken,
                 refreshToken,
                 jwtService.getExpirationTime(),
-                userMapper.toDto(user)
+                userMapper.toDto(savedUser)
         );
+    }
+    
+    /**
+     * Register a new user with pre-assigned global roles.
+     * This endpoint is restricted to SUPERADMIN only and is used to create privileged users (ADMIN, B2B, etc.).
+     * 
+     * @param request AdminRegisterRequest containing user details and role IDs
+     * @return UserDTO of the created user (no tokens since SUPERADMIN is creating the account)
+     */
+    @Transactional
+    public UserDTO registerAdmin(AdminRegisterRequest request) {
+        // Check if username already exists
+        if (userRepository.findByUserName(request.getUserName()).isPresent()) {
+            throw new DuplicateResourceException("User", "username", request.getUserName());
+        }
+        
+        // Check if email already exists
+        if (userRepository.findByEmail(request.getEmail()).isPresent()) {
+            throw new DuplicateResourceException("User", "email", request.getEmail());
+        }
+        
+        // Validate that all provided role IDs exist
+        for (Long roleId : request.getGlobalRoleIds()) {
+            if (!globalRoleRepository.existsById(roleId)) {
+                throw new ResourceNotFoundException("GlobalRole", "id", roleId);
+            }
+        }
+        
+        // Create new user
+        User user = User.builder()
+                .externalId(UUID.randomUUID().toString())
+                .userName(request.getUserName())
+                .email(request.getEmail())
+                .password(passwordEncoder.encode(request.getPassword()))
+                .firstName(request.getFirstName())
+                .lastName(request.getLastName())
+                .phone(request.getPhone())
+                .isActive(true)
+                .isDeleted(false)
+                .build();
+        
+        // Set language if provided
+        if (request.getLanguageId() != null) {
+            Language language = languageRepository.findById(request.getLanguageId())
+                    .orElse(null);
+            user.setLanguage(language);
+        }
+        
+        user = userRepository.save(user);
+        
+        // Assign global roles to the user
+        for (Long roleId : request.getGlobalRoleIds()) {
+            GlobalRole globalRole = globalRoleRepository.findById(roleId)
+                    .orElseThrow(() -> new ResourceNotFoundException("GlobalRole", "id", roleId));
+            
+            UserGlobalRole userGlobalRole = UserGlobalRole.builder()
+                    .user(user)
+                    .globalRole(globalRole)
+                    .build();
+            
+            userGlobalRoleRepository.save(userGlobalRole);
+        }
+        
+        return userMapper.toDto(user);
     }
     
     /**
