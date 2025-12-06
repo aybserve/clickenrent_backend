@@ -15,18 +15,18 @@ import lombok.experimental.SuperBuilder;
 @Getter
 @Setter
 @NoArgsConstructor
-@AllArgsConstructor
+//@AllArgsConstructor
 @SuperBuilder
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
 public class ServiceProduct extends Product {
 
-    @NotNull(message = "Service is required")
+//    @NotNull(message = "Service is required")
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "service_id", nullable = false)
+    @JoinColumn(name = "service_id", nullable = true)
     private Service service;
 
-    @NotNull(message = "Product ID is required")
-    @Column(name = "service_product_id", nullable = false)
-    private Long serviceProductId;
+//    @NotNull(message = "Product ID is required")
+    @Column(name = "product_id", nullable = true)
+    private Long productId;
 }

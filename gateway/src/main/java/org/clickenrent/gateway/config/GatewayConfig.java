@@ -20,6 +20,9 @@ public class GatewayConfig {
         log.info("Configuring Gateway routes...");
 
         return builder.routes()
+
+                // AUTH SERVICE ROUTES
+
                 // Route for fetching auth-service API docs (SpringDoc will aggregate)
                 .route("auth-service-api-docs", r -> r
                         .path("/auth-service/v3/api-docs")
@@ -94,9 +97,9 @@ public class GatewayConfig {
                         .filters(f -> f.filter(jwtAuthenticationFilter))
                         .uri("lb://auth-service"))
 
-                // ============================================
+
                 // RENTAL SERVICE ROUTES
-                // ============================================
+
                 
                 // Route for fetching rental-service API docs (SpringDoc will aggregate)
                 .route("rental-service-api-docs", r -> r

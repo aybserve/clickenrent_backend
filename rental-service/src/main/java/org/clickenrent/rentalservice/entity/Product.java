@@ -7,7 +7,7 @@ import lombok.experimental.SuperBuilder;
 /**
  * Abstract base class for all product types.
  * Uses SINGLE_TABLE inheritance strategy for best performance.
- * Subclasses: Bike, ChargingStation, Part, ServiceProduct, BikeRental
+ * Subclasses: Bike, ChargingStation, Part, ServiceProduct
  */
 @Entity
 @Table(
@@ -22,7 +22,7 @@ import lombok.experimental.SuperBuilder;
 @Getter
 @Setter
 @NoArgsConstructor
-@AllArgsConstructor
+//@AllArgsConstructor
 @SuperBuilder
 @ToString
 @EqualsAndHashCode(of = "id", callSuper = false)
@@ -39,3 +39,4 @@ public abstract class Product extends BaseAuditEntity {
     @Column(name = "is_b2b_rentable", nullable = false)
     private Boolean isB2BRentable = false;
 }
+

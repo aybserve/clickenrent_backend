@@ -36,7 +36,9 @@ Uses SINGLE_TABLE inheritance strategy for all product types:
 - `ChargingStation` - Charging infrastructure
 - `Part` - Spare parts and accessories
 - `ServiceProduct` - Service-related products
-- `BikeRental` - Links bikes to rental orders
+
+### Rental System
+- `BikeRental` - Separate entity that links bikes to rental orders with revenue sharing support
 
 ### Security & Access Control
 - **Admin**: Full access to all resources
@@ -148,7 +150,7 @@ http://localhost:8082/v3/api-docs
 
 **Product Hierarchy (Abstract SINGLE_TABLE)**:
 - Product (abstract base)
-- Bike, ChargingStation, Part, ServiceProduct, BikeRental
+- Bike, ChargingStation, Part, ServiceProduct
 
 **Status/Type Entities**:
 - BikeType, BikeStatus, BatteryChargeStatus, ChargingStationStatus
@@ -223,3 +225,4 @@ For issues and questions, please contact the development team.
 ## License
 
 Proprietary - Click & Rent Platform
+

@@ -16,15 +16,15 @@ import java.time.LocalDate;
 @Getter
 @Setter
 @NoArgsConstructor
-@AllArgsConstructor
+//@AllArgsConstructor
 @SuperBuilder
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
 public class ChargingStation extends Product {
 
-    @NotNull(message = "Charging station status is required")
+//    @NotNull(message = "Charging station status is required")
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "charging_station_status_id", nullable = false)
+    @JoinColumn(name = "charging_station_status_id", nullable = true)
     private ChargingStationStatus chargingStationStatus;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -32,7 +32,7 @@ public class ChargingStation extends Product {
     private Coordinates coordinates;
 
     @Builder.Default
-    @Column(name = "is_active", nullable = false)
+    @Column(name = "is_active", nullable = true)
     private Boolean isActive = true;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -42,8 +42,8 @@ public class ChargingStation extends Product {
     @Column(name = "in_service_date")
     private LocalDate inServiceDate;
 
-    @NotNull(message = "Charging station model is required")
+//    @NotNull(message = "Charging station model is required")
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "charging_station_model_id", nullable = false)
+    @JoinColumn(name = "charging_station_model_id", nullable = true)
     private ChargingStationModel chargingStationModel;
 }

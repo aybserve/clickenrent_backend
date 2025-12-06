@@ -14,7 +14,7 @@ import lombok.experimental.SuperBuilder;
 @Getter
 @Setter
 @NoArgsConstructor
-@AllArgsConstructor
+//@AllArgsConstructor
 @SuperBuilder
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
@@ -24,8 +24,8 @@ public class Part extends Product {
     @JoinColumn(name = "hub_id")
     private Hub hub;
 
-    @NotNull(message = "Part model is required")
+//    @NotNull(message = "Part model is required")
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "part_model_id", nullable = false)
+    @JoinColumn(name = "part_model_id", nullable = true)
     private PartModel partModel;
 }

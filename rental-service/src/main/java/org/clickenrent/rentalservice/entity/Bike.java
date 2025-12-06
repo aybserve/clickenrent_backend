@@ -19,7 +19,7 @@ import java.time.LocalDate;
 @Getter
 @Setter
 @NoArgsConstructor
-@AllArgsConstructor
+//@AllArgsConstructor
 @SuperBuilder
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
@@ -38,9 +38,9 @@ public class Bike extends Product {
     @Column(name = "frame_number", length = 100)
     private String frameNumber;
 
-    @NotNull(message = "Bike status is required")
+//    @NotNull(message = "Bike status is required")
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "bike_status_id", nullable = false)
+    @JoinColumn(name = "bike_status_id", nullable = true)
     private BikeStatus bikeStatus;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -55,7 +55,7 @@ public class Bike extends Product {
     private BigDecimal vat;
 
     @Builder.Default
-    @Column(name = "is_vat_include", nullable = false)
+    @Column(name = "is_vat_include", nullable = true)
     private Boolean isVatInclude = false;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -66,9 +66,9 @@ public class Bike extends Product {
     @JoinColumn(name = "coordinates_id")
     private Coordinates coordinates;
 
-    @NotNull(message = "Bike type is required")
+//    @NotNull(message = "Bike type is required")
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "bike_type_id", nullable = false)
+    @JoinColumn(name = "bike_type_id", nullable = true)
     private BikeType bikeType;
 
     @Column(name = "currency_id")
@@ -86,9 +86,9 @@ public class Bike extends Product {
     @Column(name = "in_service_date")
     private LocalDate inServiceDate;
 
-    @NotNull(message = "Bike model is required")
+//    @NotNull(message = "Bike model is required")
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "bike_model_id", nullable = false)
+    @JoinColumn(name = "bike_model_id", nullable = true)
     private BikeModel bikeModel;
 
     @Column(name = "revenue_share_percent", precision = 5, scale = 2)

@@ -1,0 +1,324 @@
+{
+  "info": {
+    "name": "Rental Service Tests",
+    "description": "Collection to test Rental Service JWT authentication",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{access_token}}",
+        "type": "string"
+      }
+    ]
+  },
+  "variable": [
+    {
+      "key": "auth_service_url",
+      "value": "http://localhost:8081",
+      "type": "string"
+    },
+    {
+      "key": "rental_service_url",
+      "value": "http://localhost:8082",
+      "type": "string"
+    },
+    {
+      "key": "gateway_url",
+      "value": "http://localhost:8080",
+      "type": "string"
+    },
+    {
+      "key": "access_token",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "0. Setup & Health Checks",
+      "item": [
+        {
+          "name": "Health Check - Auth Service",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{auth_service_url}}/actuator/health",
+              "host": ["{{auth_service_url}}"],
+              "path": ["actuator", "health"]
+            }
+          }
+        },
+        {
+          "name": "Health Check - Rental Service",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{rental_service_url}}/actuator/health",
+              "host": ["{{rental_service_url}}"],
+              "path": ["actuator", "health"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "1. Authentication",
+      "item": [
+        {
+          "name": "Register Test User",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"userName\": \"admin\",\n  \"email\": \"admin@test.com\",\n  \"password\": \"admin\",\n  \"firstName\": \"Admin\",\n  \"lastName\": \"User\"\n}"
+            },
+            "url": {
+              "raw": "{{auth_service_url}}/api/auth/register",
+              "host": ["{{auth_service_url}}"],
+              "path": ["api", "auth", "register"]
+            }
+          }
+        },
+        {
+          "name": "Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "// Save access token to collection variable",
+                  "if (pm.response.code === 200) {",
+                  "    const jsonData = pm.response.json();",
+                  "    pm.collectionVariables.set(\"access_token\", jsonData.accessToken);",
+                  "    console.log(\"✅ Access token saved!\");",
+                  "    console.log(\"Token:\", jsonData.accessToken.substring(0, 50) + \"...\");",
+                  "} else {",
+                  "    console.log(\"❌ Login failed\");",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"usernameOrEmail\": \"admin\",\n  \"password\": \"admin\"\n}"
+            },
+            "url": {
+              "raw": "{{auth_service_url}}/api/auth/login",
+              "host": ["{{auth_service_url}}"],
+              "path": ["api", "auth", "login"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "2. Direct - Rental Service",
+      "item": [
+        {
+          "name": "GET All Bikes",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{rental_service_url}}/api/bikes",
+              "host": ["{{rental_service_url}}"],
+              "path": ["api", "bikes"]
+            }
+          }
+        },
+        {
+          "name": "GET Bike by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{rental_service_url}}/api/bikes/1",
+              "host": ["{{rental_service_url}}"],
+              "path": ["api", "bikes", "1"]
+            }
+          }
+        },
+        {
+          "name": "POST Create Bike (Admin)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"code\": \"BIKE001\",\n  \"externalId\": \"test-bike-001\"\n}"
+            },
+            "url": {
+              "raw": "{{rental_service_url}}/api/bikes",
+              "host": ["{{rental_service_url}}"],
+              "path": ["api", "bikes"]
+            }
+          }
+        },
+        {
+          "name": "GET All Rentals",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{rental_service_url}}/api/rentals",
+              "host": ["{{rental_service_url}}"],
+              "path": ["api", "rentals"]
+            }
+          }
+        },
+        {
+          "name": "GET Charging Stations",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{rental_service_url}}/api/charging-stations",
+              "host": ["{{rental_service_url}}"],
+              "path": ["api", "charging-stations"]
+            }
+          }
+        },
+        {
+          "name": "GET Locations",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{rental_service_url}}/api/locations",
+              "host": ["{{rental_service_url}}"],
+              "path": ["api", "locations"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "3. Via Gateway",
+      "item": [
+        {
+          "name": "GET All Bikes (Gateway)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{gateway_url}}/api/bikes",
+              "host": ["{{gateway_url}}"],
+              "path": ["api", "bikes"]
+            }
+          }
+        },
+        {
+          "name": "GET Rentals (Gateway)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{gateway_url}}/api/rentals",
+              "host": ["{{gateway_url}}"],
+              "path": ["api", "rentals"]
+            }
+          }
+        },
+        {
+          "name": "POST Create Bike (Gateway)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"code\": \"BIKE002\",\n  \"externalId\": \"gateway-test-bike\"\n}"
+            },
+            "url": {
+              "raw": "{{gateway_url}}/api/bikes",
+              "host": ["{{gateway_url}}"],
+              "path": ["api", "bikes"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "4. Reference Data",
+      "item": [
+        {
+          "name": "GET Bike Types",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{rental_service_url}}/api/bike-types",
+              "host": ["{{rental_service_url}}"],
+              "path": ["api", "bike-types"]
+            }
+          }
+        },
+        {
+          "name": "GET Bike Brands",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{rental_service_url}}/api/bike-brands",
+              "host": ["{{rental_service_url}}"],
+              "path": ["api", "bike-brands"]
+            }
+          }
+        },
+        {
+          "name": "GET Bike Statuses",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{rental_service_url}}/api/bike-statuses",
+              "host": ["{{rental_service_url}}"],
+              "path": ["api", "bike-statuses"]
+            }
+          }
+        },
+        {
+          "name": "GET Rental Statuses",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{rental_service_url}}/api/rental-statuses",
+              "host": ["{{rental_service_url}}"],
+              "path": ["api", "rental-statuses"]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

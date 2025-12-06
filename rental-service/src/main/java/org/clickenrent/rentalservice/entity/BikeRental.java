@@ -8,20 +8,30 @@ import lombok.experimental.SuperBuilder;
 import java.time.LocalDateTime;
 
 /**
- * Entity representing a bike rental (extends Product).
- * Links a bike to a rental with dates.
- * Uses SINGLE_TABLE inheritance.
+ * Entity representing a bike rental
  */
 @Entity
-@DiscriminatorValue("BIKE_RENTAL")
+@Table(
+        name = "bike_rental",
+        indexes = {
+                @Index(name = "idx_bike_rental_external_id", columnList = "external_id")
+        }
+)
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @SuperBuilder
 @ToString(callSuper = true)
-@EqualsAndHashCode(callSuper = true)
-public class BikeRental extends Product {
+@EqualsAndHashCode(of = "id", callSuper = false)
+public class BikeRental extends BaseAuditEntity {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Column(name = "external_id", unique = true, length = 100)
+    private String externalId;
 
     @NotNull(message = "Bike is required")
     @ManyToOne(fetch = FetchType.LAZY)
@@ -52,4 +62,9 @@ public class BikeRental extends Product {
     @Builder.Default
     @Column(name = "is_revenue_share_paid", nullable = false)
     private Boolean isRevenueSharePaid = false;
+
+    @Builder.Default
+    @Column(name = "is_b2b_rentable", nullable = false)
+    private Boolean isB2BRentable = false;
 }
+

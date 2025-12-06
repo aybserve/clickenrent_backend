@@ -2,13 +2,13 @@ package org.clickenrent.gateway.util;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.security.Keys;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
-import java.nio.charset.StandardCharsets;
+import javax.crypto.spec.SecretKeySpec;
+import java.util.Base64;
 import java.util.Date;
 import java.util.List;
 import java.util.function.Function;
@@ -22,10 +22,11 @@ public class JwtUtil {
 
     /**
      * Get the signing key from the secret
+     * Uses Base64 decoding to match auth-service and rental-service configuration
      */
     private SecretKey getSigningKey() {
-        byte[] keyBytes = secret.getBytes(StandardCharsets.UTF_8);
-        return Keys.hmacShaKeyFor(keyBytes);
+        byte[] keyBytes = Base64.getDecoder().decode(secret);
+        return new SecretKeySpec(keyBytes, "HmacSHA256");
     }
 
     /**
