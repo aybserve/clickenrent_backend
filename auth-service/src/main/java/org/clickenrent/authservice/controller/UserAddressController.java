@@ -43,7 +43,7 @@ public class UserAddressController {
      * GET /api/user-addresses/{id}
      */
     @GetMapping("/{id}")
-    @PreAuthorize("hasAnyRole('SUPERADMIN', 'ADMIN')")
+    @PreAuthorize("hasAnyRole('SUPERADMIN', 'ADMIN') or @resourceSecurity.canAccessUserAddress(#id)")
     @Operation(summary = "Get user-address link by ID", description = "Retrieve a specific user-address link by its ID")
     public ResponseEntity<UserAddressDTO> getUserAddressById(@PathVariable Long id) {
         UserAddressDTO userAddress = userAddressService.getUserAddressById(id);
@@ -55,7 +55,7 @@ public class UserAddressController {
      * GET /api/user-addresses/by-user/{userId}
      */
     @GetMapping("/by-user/{userId}")
-    @PreAuthorize("hasAnyRole('SUPERADMIN', 'ADMIN')")
+    @PreAuthorize("hasAnyRole('SUPERADMIN', 'ADMIN') or @resourceSecurity.canAccessUser(#userId)")
     @Operation(summary = "Get addresses by user", description = "Retrieve all addresses associated with a specific user")
     public ResponseEntity<List<UserAddressDTO>> getUserAddressesByUserId(@PathVariable Long userId) {
         List<UserAddressDTO> userAddresses = userAddressService.getUserAddressesByUserId(userId);
@@ -67,7 +67,7 @@ public class UserAddressController {
      * GET /api/user-addresses/by-address/{addressId}
      */
     @GetMapping("/by-address/{addressId}")
-    @PreAuthorize("hasAnyRole('SUPERADMIN', 'ADMIN')")
+    @PreAuthorize("hasAnyRole('SUPERADMIN', 'ADMIN') or @resourceSecurity.canAccessAddress(#addressId)")
     @Operation(summary = "Get users by address", description = "Retrieve all users associated with a specific address")
     public ResponseEntity<List<UserAddressDTO>> getUserAddressesByAddressId(@PathVariable Long addressId) {
         List<UserAddressDTO> userAddresses = userAddressService.getUserAddressesByAddressId(addressId);
@@ -79,7 +79,7 @@ public class UserAddressController {
      * POST /api/user-addresses
      */
     @PostMapping
-    @PreAuthorize("hasAnyRole('SUPERADMIN', 'ADMIN')")
+    @PreAuthorize("hasAnyRole('SUPERADMIN', 'ADMIN', 'B2B')")
     @Operation(summary = "Create user-address link", description = "Link a user to an address")
     public ResponseEntity<UserAddressDTO> createUserAddress(@Valid @RequestBody UserAddressDTO userAddressDTO) {
         UserAddressDTO createdUserAddress = userAddressService.createUserAddress(userAddressDTO);
@@ -91,7 +91,7 @@ public class UserAddressController {
      * PUT /api/user-addresses/{id}
      */
     @PutMapping("/{id}")
-    @PreAuthorize("hasAnyRole('SUPERADMIN', 'ADMIN')")
+    @PreAuthorize("hasAnyRole('SUPERADMIN', 'ADMIN') or @resourceSecurity.canAccessUserAddress(#id)")
     @Operation(summary = "Update user-address link", description = "Update an existing user-address link")
     public ResponseEntity<UserAddressDTO> updateUserAddress(
             @PathVariable Long id,
@@ -105,7 +105,7 @@ public class UserAddressController {
      * DELETE /api/user-addresses/{id}
      */
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasAnyRole('SUPERADMIN', 'ADMIN')")
+    @PreAuthorize("hasAnyRole('SUPERADMIN', 'ADMIN') or @resourceSecurity.canAccessUserAddress(#id)")
     @Operation(summary = "Delete user-address link", description = "Remove a user-address link by its ID")
     public ResponseEntity<Void> deleteUserAddress(@PathVariable Long id) {
         userAddressService.deleteUserAddress(id);

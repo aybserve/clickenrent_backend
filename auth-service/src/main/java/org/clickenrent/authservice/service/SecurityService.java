@@ -115,6 +115,27 @@ public class SecurityService {
     }
     
     /**
+     * Check if current user has access to a user by external ID.
+     * - SUPERADMIN/ADMIN: always true
+     * - B2B/CUSTOMER: only if the external ID matches their own
+     * 
+     * @param externalId The external ID to check
+     * @return true if user can access the user with this external ID
+     */
+    public boolean hasAccessToUserByExternalId(String externalId) {
+        if (isAdmin()) {
+            return true;
+        }
+        
+        User currentUser = getCurrentUser();
+        if (currentUser == null || currentUser.getExternalId() == null) {
+            return false;
+        }
+        
+        return currentUser.getExternalId().equals(externalId);
+    }
+    
+    /**
      * Get list of company IDs that current user has access to.
      * - SUPERADMIN/ADMIN: all companies (returns null to indicate all)
      * - B2B: only their companies
@@ -180,6 +201,62 @@ public class SecurityService {
         return userAddresses.stream()
                 .map(ua -> ua.getAddress().getId())
                 .toList();
+    }
+    
+    /**
+     * Check if current user has access to a specific UserAddress relationship.
+     * - SUPERADMIN/ADMIN: always true
+     * - B2B/CUSTOMER: only if the UserAddress belongs to them
+     * 
+     * @param userAddressId The UserAddress ID to check
+     * @return true if user can access the UserAddress
+     */
+    public boolean hasAccessToUserAddress(Long userAddressId) {
+        if (isAdmin()) {
+            return true;
+        }
+        
+        User currentUser = getCurrentUser();
+        if (currentUser == null) {
+            return false;
+        }
+        
+        // Find the UserAddress and check if it belongs to current user
+        return userAddressRepository.findById(userAddressId)
+                .map(ua -> ua.getUser().getId().equals(currentUser.getId()))
+                .orElse(false);
+    }
+    
+    /**
+     * Check if current user has access to a specific UserCompany relationship.
+     * - SUPERADMIN/ADMIN: always true
+     * - B2B: only if the UserCompany's company is one they belong to
+     * - CUSTOMER: only if the UserCompany's user matches them
+     * 
+     * @param userCompanyId The UserCompany ID to check
+     * @return true if user can access the UserCompany
+     */
+    public boolean hasAccessToUserCompany(Long userCompanyId) {
+        if (isAdmin()) {
+            return true;
+        }
+        
+        User currentUser = getCurrentUser();
+        if (currentUser == null) {
+            return false;
+        }
+        
+        // Find the UserCompany and check if current user has access
+        return userCompanyRepository.findById(userCompanyId)
+                .map(uc -> {
+                    // B2B: can access if they belong to the same company
+                    if (isB2B()) {
+                        return hasAccessToCompany(uc.getCompany().getId());
+                    }
+                    // CUSTOMER: can only access their own UserCompany records
+                    return uc.getUser().getId().equals(currentUser.getId());
+                })
+                .orElse(false);
     }
     
     /**

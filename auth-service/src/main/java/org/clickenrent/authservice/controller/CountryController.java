@@ -31,7 +31,7 @@ public class CountryController {
      * GET /api/countries
      */
     @GetMapping
-    @PreAuthorize("hasAnyRole('SUPERADMIN', 'ADMIN')")
+    @PreAuthorize("hasAnyRole('SUPERADMIN', 'ADMIN', 'B2B', 'CUSTOMER')")
     @Operation(summary = "Get all countries", description = "Retrieve a list of all countries")
     public ResponseEntity<List<CountryDTO>> getAllCountries() {
         List<CountryDTO> countries = countryService.getAllCountries();
@@ -43,7 +43,7 @@ public class CountryController {
      * GET /api/countries/{id}
      */
     @GetMapping("/{id}")
-    @PreAuthorize("hasAnyRole('SUPERADMIN', 'ADMIN')")
+    @PreAuthorize("hasAnyRole('SUPERADMIN', 'ADMIN', 'B2B', 'CUSTOMER')")
     @Operation(summary = "Get country by ID", description = "Retrieve a specific country by its ID")
     public ResponseEntity<CountryDTO> getCountryById(@PathVariable Long id) {
         CountryDTO country = countryService.getCountryById(id);
@@ -55,7 +55,7 @@ public class CountryController {
      * GET /api/countries/by-name?name={name}
      */
     @GetMapping("/by-name")
-    @PreAuthorize("hasAnyRole('SUPERADMIN', 'ADMIN')")
+    @PreAuthorize("hasAnyRole('SUPERADMIN', 'ADMIN', 'B2B', 'CUSTOMER')")
     @Operation(summary = "Get country by name", description = "Retrieve a country by its name")
     public ResponseEntity<CountryDTO> getCountryByName(@RequestParam String name) {
         CountryDTO country = countryService.getCountryByName(name);

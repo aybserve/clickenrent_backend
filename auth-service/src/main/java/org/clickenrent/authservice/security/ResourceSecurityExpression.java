@@ -44,6 +44,8 @@ public class ResourceSecurityExpression {
             case "ADDRESS" -> securityService.hasAccessToAddress(resourceId);
             case "COMPANY" -> securityService.hasAccessToCompany(resourceId);
             case "USER" -> securityService.hasAccessToUser(resourceId);
+            case "USER_ADDRESS" -> securityService.hasAccessToUserAddress(resourceId);
+            case "USER_COMPANY" -> securityService.hasAccessToUserCompany(resourceId);
             // Add more resource types here as needed:
             // case "VEHICLE" -> securityService.hasAccessToVehicle(resourceId);
             // case "BOOKING" -> securityService.hasAccessToBooking(resourceId);
@@ -99,6 +101,21 @@ public class ResourceSecurityExpression {
     }
     
     /**
+     * Check if current user can access a user by external ID.
+     * - SUPERADMIN/ADMIN: always true
+     * - B2B/CUSTOMER: true only if the external ID matches their own
+     * 
+     * @param externalId The external ID to check
+     * @return true if user can access the user with this external ID
+     */
+    public boolean canAccessUserByExternalId(String externalId) {
+        if (externalId == null) {
+            return false;
+        }
+        return securityService.hasAccessToUserByExternalId(externalId);
+    }
+    
+    /**
      * Check if current user is the owner of a resource (matches their user ID).
      * Useful for endpoints where users can only access their own data.
      * 
@@ -111,6 +128,37 @@ public class ResourceSecurityExpression {
         }
         Long currentUserId = securityService.getCurrentUserId();
         return currentUserId != null && currentUserId.equals(userId);
+    }
+    
+    /**
+     * Check if current user can access a specific UserAddress relationship.
+     * - SUPERADMIN/ADMIN: always true
+     * - B2B/CUSTOMER: true only if the UserAddress belongs to them
+     * 
+     * @param userAddressId The UserAddress ID to check
+     * @return true if user can access the UserAddress
+     */
+    public boolean canAccessUserAddress(Long userAddressId) {
+        if (userAddressId == null) {
+            return false;
+        }
+        return securityService.hasAccessToUserAddress(userAddressId);
+    }
+    
+    /**
+     * Check if current user can access a specific UserCompany relationship.
+     * - SUPERADMIN/ADMIN: always true
+     * - B2B: true only if the UserCompany's company is one they belong to
+     * - CUSTOMER: true only if it's their own record
+     * 
+     * @param userCompanyId The UserCompany ID to check
+     * @return true if user can access the UserCompany
+     */
+    public boolean canAccessUserCompany(Long userCompanyId) {
+        if (userCompanyId == null) {
+            return false;
+        }
+        return securityService.hasAccessToUserCompany(userCompanyId);
     }
     
     /**

@@ -31,7 +31,7 @@ public class CityController {
      * GET /api/cities
      */
     @GetMapping
-    @PreAuthorize("hasAnyRole('SUPERADMIN', 'ADMIN')")
+    @PreAuthorize("hasAnyRole('SUPERADMIN', 'ADMIN', 'B2B', 'CUSTOMER')")
     @Operation(summary = "Get all cities", description = "Retrieve a list of all cities")
     public ResponseEntity<List<CityDTO>> getAllCities() {
         List<CityDTO> cities = cityService.getAllCities();
@@ -43,7 +43,7 @@ public class CityController {
      * GET /api/cities/{id}
      */
     @GetMapping("/{id}")
-    @PreAuthorize("hasAnyRole('SUPERADMIN', 'ADMIN')")
+    @PreAuthorize("hasAnyRole('SUPERADMIN', 'ADMIN', 'B2B', 'CUSTOMER')")
     @Operation(summary = "Get city by ID", description = "Retrieve a specific city by its ID")
     public ResponseEntity<CityDTO> getCityById(@PathVariable Long id) {
         CityDTO city = cityService.getCityById(id);
@@ -55,7 +55,7 @@ public class CityController {
      * GET /api/cities/by-country/{countryId}
      */
     @GetMapping("/by-country/{countryId}")
-    @PreAuthorize("hasAnyRole('SUPERADMIN', 'ADMIN')")
+    @PreAuthorize("hasAnyRole('SUPERADMIN', 'ADMIN', 'B2B', 'CUSTOMER')")
     @Operation(summary = "Get cities by country", description = "Retrieve all cities in a specific country")
     public ResponseEntity<List<CityDTO>> getCitiesByCountryId(@PathVariable Long countryId) {
         List<CityDTO> cities = cityService.getCitiesByCountryId(countryId);

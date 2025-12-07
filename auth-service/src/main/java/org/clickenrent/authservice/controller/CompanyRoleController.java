@@ -30,7 +30,7 @@ public class CompanyRoleController {
      * GET /api/company-roles
      */
     @GetMapping
-    @PreAuthorize("hasAnyRole('SUPERADMIN', 'ADMIN')")
+    @PreAuthorize("hasAnyRole('SUPERADMIN', 'ADMIN', 'B2B')")
     public ResponseEntity<List<CompanyRoleDTO>> getAllCompanyRoles() {
         List<CompanyRoleDTO> companyRoles = companyRoleService.getAllCompanyRoles();
         return ResponseEntity.ok(companyRoles);
@@ -41,7 +41,7 @@ public class CompanyRoleController {
      * GET /api/company-roles/{id}
      */
     @GetMapping("/{id}")
-    @PreAuthorize("hasAnyRole('SUPERADMIN', 'ADMIN')")
+    @PreAuthorize("hasAnyRole('SUPERADMIN', 'ADMIN', 'B2B')")
     public ResponseEntity<CompanyRoleDTO> getCompanyRoleById(@PathVariable Long id) {
         CompanyRoleDTO companyRole = companyRoleService.getCompanyRoleById(id);
         return ResponseEntity.ok(companyRole);

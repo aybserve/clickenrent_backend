@@ -44,7 +44,7 @@ public class UserController {
      * GET /api/users
      */
     @GetMapping
-    @PreAuthorize("isAuthenticated()")
+    @PreAuthorize("hasAnyRole('SUPERADMIN', 'ADMIN')")
     @Operation(
             summary = "Get all users",
             description = "Returns a paginated list of all users. Access control based on user role."
@@ -65,7 +65,7 @@ public class UserController {
      * GET /api/users/{id}
      */
     @GetMapping("/{id}")
-    @PreAuthorize("isAuthenticated()")
+    @PreAuthorize("hasAnyRole('SUPERADMIN', 'ADMIN') or @resourceSecurity.canAccessUser(#id)")
     @Operation(
             summary = "Get user by ID",
             description = "Returns user details by user ID"
@@ -88,7 +88,7 @@ public class UserController {
      * GET /api/users/external/{externalId}
      */
     @GetMapping("/external/{externalId}")
-    @PreAuthorize("hasAnyRole('SUPERADMIN', 'ADMIN')")
+    @PreAuthorize("hasAnyRole('SUPERADMIN', 'ADMIN') or @resourceSecurity.canAccessUserByExternalId(#externalId)")
     public ResponseEntity<UserDTO> getUserByExternalId(@PathVariable String externalId) {
         UserDTO user = userService.getUserByExternalId(externalId);
         return ResponseEntity.ok(user);
@@ -102,7 +102,7 @@ public class UserController {
      * Security: Password is securely transmitted in the request body (not URL).
      */
     @PostMapping
-    @PreAuthorize("hasAnyRole('SUPERADMIN', 'ADMIN')")
+    @PreAuthorize("hasAnyRole('SUPERADMIN', 'ADMIN', 'CUSTOMER')")
     @Operation(
             summary = "Create a new user",
             description = "Creates a new user account. Requires SUPERADMIN or ADMIN role."
@@ -139,7 +139,7 @@ public class UserController {
      * PUT /api/users/{id}
      */
     @PutMapping("/{id}")
-    @PreAuthorize("isAuthenticated()")
+    @PreAuthorize("hasAnyRole('SUPERADMIN', 'ADMIN') or @resourceSecurity.canAccessUser(#id)")
     @Operation(
             summary = "Update user",
             description = "Updates user information by ID"
@@ -164,7 +164,7 @@ public class UserController {
      * DELETE /api/users/{id}
      */
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasAnyRole('SUPERADMIN', 'ADMIN')")
+    @PreAuthorize("hasAnyRole('SUPERADMIN', 'ADMIN') or @resourceSecurity.canAccessUser(#id)")
     @Operation(
             summary = "Delete user",
             description = "Soft deletes a user by ID. Requires SUPERADMIN or ADMIN role."

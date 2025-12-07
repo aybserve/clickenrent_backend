@@ -96,10 +96,10 @@ public class CompanyService {
     
     @Transactional
     public CompanyDTO updateCompany(Long id, CompanyDTO companyDTO) {
-        // Check if user has permission to update this company
-        // Only SUPERADMIN/ADMIN can update companies (B2B is read-only)
-        if (!securityService.isAdmin()) {
-            throw new UnauthorizedException("You don't have permission to update companies");
+        // Defense in depth: Secondary access check (primary check is in controller @PreAuthorize)
+        // SUPERADMIN/ADMIN can update all companies; B2B can update only their companies
+        if (!securityService.hasAccessToCompany(id)) {
+            throw new UnauthorizedException("You don't have permission to update this company");
         }
         
         Company company = companyRepository.findById(id)
