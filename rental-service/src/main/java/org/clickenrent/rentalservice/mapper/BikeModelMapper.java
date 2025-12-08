@@ -32,6 +32,8 @@ public class BikeModelMapper {
                 .imageUrl(bikeModel.getImageUrl())
                 .bikeTypeId(bikeModel.getBikeType() != null ? bikeModel.getBikeType().getId() : null)
                 .bikeEngineId(bikeModel.getBikeEngine() != null ? bikeModel.getBikeEngine().getId() : null)
+                .b2bSalePrice(bikeModel.getB2bSalePrice())
+                .b2bSubscriptionPrice(bikeModel.getB2bSubscriptionPrice())
                 .build();
     }
 
@@ -44,7 +46,9 @@ public class BikeModelMapper {
                 .id(dto.getId())
                 .externalId(dto.getExternalId())
                 .name(dto.getName())
-                .imageUrl(dto.getImageUrl());
+                .imageUrl(dto.getImageUrl())
+                .b2bSalePrice(dto.getB2bSalePrice())
+                .b2bSubscriptionPrice(dto.getB2bSubscriptionPrice());
 
         if (dto.getBikeBrandId() != null) {
             builder.bikeBrand(bikeBrandRepository.findById(dto.getBikeBrandId()).orElse(null));
@@ -69,6 +73,12 @@ public class BikeModelMapper {
         }
         if (dto.getImageUrl() != null) {
             bikeModel.setImageUrl(dto.getImageUrl());
+        }
+        if (dto.getB2bSalePrice() != null) {
+            bikeModel.setB2bSalePrice(dto.getB2bSalePrice());
+        }
+        if (dto.getB2bSubscriptionPrice() != null) {
+            bikeModel.setB2bSubscriptionPrice(dto.getB2bSubscriptionPrice());
         }
     }
 }

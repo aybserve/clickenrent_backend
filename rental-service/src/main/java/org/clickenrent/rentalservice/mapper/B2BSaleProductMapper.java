@@ -26,6 +26,8 @@ public class B2BSaleProductMapper {
                 .b2bSaleId(b2bSaleProduct.getB2bSale() != null ? b2bSaleProduct.getB2bSale().getId() : null)
                 .productId(b2bSaleProduct.getProductId())
                 .price(b2bSaleProduct.getPrice())
+                .quantity(b2bSaleProduct.getQuantity())
+                .totalPrice(b2bSaleProduct.getTotalPrice())
                 .build();
     }
 
@@ -38,7 +40,9 @@ public class B2BSaleProductMapper {
                 .id(dto.getId())
                 .externalId(dto.getExternalId())
                 .productId(dto.getProductId())
-                .price(dto.getPrice());
+                .price(dto.getPrice())
+                .quantity(dto.getQuantity())
+                .totalPrice(dto.getTotalPrice());
 
         if (dto.getB2bSaleId() != null) {
             builder.b2bSale(b2bSaleRepository.findById(dto.getB2bSaleId()).orElse(null));
@@ -54,6 +58,12 @@ public class B2BSaleProductMapper {
 
         if (dto.getPrice() != null) {
             entity.setPrice(dto.getPrice());
+        }
+        if (dto.getQuantity() != null) {
+            entity.setQuantity(dto.getQuantity());
+        }
+        if (dto.getTotalPrice() != null) {
+            entity.setTotalPrice(dto.getTotalPrice());
         }
     }
 }

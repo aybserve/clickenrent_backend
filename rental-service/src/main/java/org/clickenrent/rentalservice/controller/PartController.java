@@ -19,17 +19,17 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/parts")
 @RequiredArgsConstructor
-@Tag(name = "Part", description = "Parts inventory management")
+@Tag(name = "Part", description = "Part management")
 @SecurityRequirement(name = "bearerAuth")
 public class PartController {
 
     private final PartService partService;
 
     @GetMapping
-    @PreAuthorize("hasAnyRole('SUPERADMIN', 'ADMIN')")
+    @PreAuthorize("isAuthenticated()")
     @Operation(summary = "Get all parts")
     public ResponseEntity<Page<PartDTO>> getAllParts(
-            @PageableDefault(size = 20, sort = "id", direction = Sort.Direction.ASC) Pageable pageable) {
+            @PageableDefault(size = 20, sort = "name", direction = Sort.Direction.ASC) Pageable pageable) {
         return ResponseEntity.ok(partService.getAllParts(pageable));
     }
 
@@ -45,6 +45,13 @@ public class PartController {
     @Operation(summary = "Create part")
     public ResponseEntity<PartDTO> createPart(@Valid @RequestBody PartDTO dto) {
         return new ResponseEntity<>(partService.createPart(dto), HttpStatus.CREATED);
+    }
+
+    @PutMapping("/{id}")
+    @PreAuthorize("hasAnyRole('SUPERADMIN', 'ADMIN')")
+    @Operation(summary = "Update part")
+    public ResponseEntity<PartDTO> updatePart(@PathVariable Long id, @Valid @RequestBody PartDTO dto) {
+        return ResponseEntity.ok(partService.updatePart(id, dto));
     }
 
     @DeleteMapping("/{id}")

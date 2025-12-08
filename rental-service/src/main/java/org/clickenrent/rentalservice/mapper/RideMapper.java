@@ -33,7 +33,6 @@ public class RideMapper {
                 .endLocationId(ride.getEndLocation() != null ? ride.getEndLocation().getId() : null)
                 .coordinatesId(ride.getCoordinates() != null ? ride.getCoordinates().getId() : null)
                 .rideStatusId(ride.getRideStatus() != null ? ride.getRideStatus().getId() : null)
-                .photoUrl(ride.getPhotoUrl())
                 .build();
     }
 
@@ -46,8 +45,7 @@ public class RideMapper {
                 .id(dto.getId())
                 .externalId(dto.getExternalId())
                 .startDateTime(dto.getStartDateTime())
-                .endDateTime(dto.getEndDateTime())
-                .photoUrl(dto.getPhotoUrl());
+                .endDateTime(dto.getEndDateTime());
 
         if (dto.getBikeRentalId() != null) {
             builder.bikeRental(bikeRentalRepository.findById(dto.getBikeRentalId()).orElse(null));
@@ -75,9 +73,6 @@ public class RideMapper {
 
         if (dto.getEndDateTime() != null) {
             ride.setEndDateTime(dto.getEndDateTime());
-        }
-        if (dto.getPhotoUrl() != null) {
-            ride.setPhotoUrl(dto.getPhotoUrl());
         }
     }
 }

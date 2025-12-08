@@ -22,12 +22,8 @@ public class PartService {
 
     @Transactional(readOnly = true)
     public Page<PartDTO> getAllParts(Pageable pageable) {
-        if (securityService.isAdmin()) {
-            return partRepository.findAll(pageable)
-                    .map(partMapper::toDto);
-        }
-
-        throw new UnauthorizedException("You don't have permission to view all parts");
+        return partRepository.findAll(pageable)
+                .map(partMapper::toDto);
     }
 
     @Transactional(readOnly = true)
@@ -44,6 +40,20 @@ public class PartService {
         }
 
         Part part = partMapper.toEntity(dto);
+        part = partRepository.save(part);
+        return partMapper.toDto(part);
+    }
+
+    @Transactional
+    public PartDTO updatePart(Long id, PartDTO dto) {
+        if (!securityService.isAdmin()) {
+            throw new UnauthorizedException("Only administrators can update parts");
+        }
+
+        Part part = partRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Part", "id", id));
+
+        partMapper.updateEntityFromDto(dto, part);
         part = partRepository.save(part);
         return partMapper.toDto(part);
     }

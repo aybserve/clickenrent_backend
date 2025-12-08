@@ -1,10 +1,12 @@
 package org.clickenrent.rentalservice.entity;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 
 /**
@@ -21,6 +23,22 @@ import java.time.LocalDate;
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
 public class ChargingStation extends Product {
+
+    @NotBlank(message = "Charging station code is required")
+    @Size(max = 50, message = "Charging station code must not exceed 50 characters")
+    @Column(name = "code", nullable = false, unique = true, length = 50)
+    private String code;
+
+    @Size(max = 500, message = "QR code URL must not exceed 500 characters")
+    @Column(name = "qr_code_url", length = 500)
+    private String qrCodeUrl;
+
+    @Column(name = "vat", precision = 5, scale = 2)
+    private BigDecimal vat;
+
+    @Builder.Default
+    @Column(name = "is_vat_include", nullable = true)
+    private Boolean isVatInclude = false;
 
 //    @NotNull(message = "Charging station status is required")
     @ManyToOne(fetch = FetchType.LAZY)

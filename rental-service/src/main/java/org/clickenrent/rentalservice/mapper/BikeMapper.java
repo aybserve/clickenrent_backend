@@ -41,9 +41,6 @@ public class BikeMapper {
                 .coordinatesId(bike.getCoordinates() != null ? bike.getCoordinates().getId() : null)
                 .bikeTypeId(bike.getBikeType() != null ? bike.getBikeType().getId() : null)
                 .currencyId(bike.getCurrencyId())
-                .costPerDay(bike.getCostPerDay())
-                .costPerHour(bike.getCostPerHour())
-                .costPerWeek(bike.getCostPerWeek())
                 .inServiceDate(bike.getInServiceDate())
                 .bikeModelId(bike.getBikeModel() != null ? bike.getBikeModel().getId() : null)
                 .isB2BRentable(bike.getIsB2BRentable())
@@ -69,9 +66,6 @@ public class BikeMapper {
                 .vat(dto.getVat())
                 .isVatInclude(dto.getIsVatInclude())
                 .currencyId(dto.getCurrencyId())
-                .costPerDay(dto.getCostPerDay())
-                .costPerHour(dto.getCostPerHour())
-                .costPerWeek(dto.getCostPerWeek())
                 .inServiceDate(dto.getInServiceDate())
                 .isB2BRentable(dto.getIsB2BRentable())
                 .revenueSharePercent(dto.getRevenueSharePercent());
@@ -120,15 +114,6 @@ public class BikeMapper {
         }
         if (dto.getIsVatInclude() != null) {
             bike.setIsVatInclude(dto.getIsVatInclude());
-        }
-        if (dto.getCostPerDay() != null) {
-            bike.setCostPerDay(dto.getCostPerDay());
-        }
-        if (dto.getCostPerHour() != null) {
-            bike.setCostPerHour(dto.getCostPerHour());
-        }
-        if (dto.getCostPerWeek() != null) {
-            bike.setCostPerWeek(dto.getCostPerWeek());
         }
         if (dto.getInServiceDate() != null) {
             bike.setInServiceDate(dto.getInServiceDate());

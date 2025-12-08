@@ -27,6 +27,8 @@ public class ChargingStationModelMapper {
                 .chargingStationBrandId(model.getChargingStationBrand() != null ? 
                         model.getChargingStationBrand().getId() : null)
                 .imageUrl(model.getImageUrl())
+                .b2bSalePrice(model.getB2bSalePrice())
+                .b2bSubscriptionPrice(model.getB2bSubscriptionPrice())
                 .build();
     }
 
@@ -39,7 +41,9 @@ public class ChargingStationModelMapper {
                 .id(dto.getId())
                 .externalId(dto.getExternalId())
                 .name(dto.getName())
-                .imageUrl(dto.getImageUrl());
+                .imageUrl(dto.getImageUrl())
+                .b2bSalePrice(dto.getB2bSalePrice())
+                .b2bSubscriptionPrice(dto.getB2bSubscriptionPrice());
 
         if (dto.getChargingStationBrandId() != null) {
             builder.chargingStationBrand(chargingStationBrandRepository.findById(dto.getChargingStationBrandId()).orElse(null));
@@ -58,6 +62,12 @@ public class ChargingStationModelMapper {
         }
         if (dto.getImageUrl() != null) {
             model.setImageUrl(dto.getImageUrl());
+        }
+        if (dto.getB2bSalePrice() != null) {
+            model.setB2bSalePrice(dto.getB2bSalePrice());
+        }
+        if (dto.getB2bSubscriptionPrice() != null) {
+            model.setB2bSubscriptionPrice(dto.getB2bSubscriptionPrice());
         }
     }
 }

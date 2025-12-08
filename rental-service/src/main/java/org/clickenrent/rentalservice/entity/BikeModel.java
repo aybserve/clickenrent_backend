@@ -6,6 +6,8 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 
+import java.math.BigDecimal;
+
 /**
  * Entity representing bike models.
  */
@@ -54,4 +56,12 @@ public class BikeModel {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "bike_engine_id")
     private BikeEngine bikeEngine;
+
+    @NotNull(message = "B2B sale price is required")
+    @Column(name = "b2b_sale_price", nullable = false, precision = 5, scale = 2)
+    private BigDecimal b2bSalePrice;
+
+    @NotNull(message = "B2B subscription price is required")
+    @Column(name = "b2b_subscription_price", nullable = false, precision = 5, scale = 2)
+    private BigDecimal b2bSubscriptionPrice;
 }

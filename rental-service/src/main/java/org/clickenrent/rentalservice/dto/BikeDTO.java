@@ -32,9 +32,6 @@ public class BikeDTO {
     private Long coordinatesId;
     private Long bikeTypeId;
     private Long currencyId;
-    private BigDecimal costPerDay;
-    private BigDecimal costPerHour;
-    private BigDecimal costPerWeek;
     private LocalDate inServiceDate;
     private Long bikeModelId;
     private Boolean isB2BRentable;

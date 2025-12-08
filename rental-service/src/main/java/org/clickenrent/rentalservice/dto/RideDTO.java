@@ -25,5 +25,4 @@ public class RideDTO {
     private Long endLocationId;
     private Long coordinatesId;
     private Long rideStatusId;
-    private String photoUrl;
 }

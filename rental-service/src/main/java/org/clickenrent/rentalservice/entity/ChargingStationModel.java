@@ -6,6 +6,8 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 
+import java.math.BigDecimal;
+
 /**
  * Entity representing charging station models.
  */
@@ -45,4 +47,12 @@ public class ChargingStationModel {
     @Size(max = 500, message = "Image URL must not exceed 500 characters")
     @Column(name = "image_url", length = 500)
     private String imageUrl;
+
+    @NotNull(message = "B2B sale price is required")
+    @Column(name = "b2b_sale_price", nullable = false, precision = 5, scale = 2)
+    private BigDecimal b2bSalePrice;
+
+    @NotNull(message = "B2B subscription price is required")
+    @Column(name = "b2b_subscription_price", nullable = false, precision = 5, scale = 2)
+    private BigDecimal b2bSubscriptionPrice;
 }

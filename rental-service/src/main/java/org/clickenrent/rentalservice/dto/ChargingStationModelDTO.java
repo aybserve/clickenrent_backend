@@ -5,6 +5,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
+
 /**
  * Data Transfer Object for ChargingStationModel entity.
  */
@@ -19,4 +21,6 @@ public class ChargingStationModelDTO {
     private String name;
     private Long chargingStationBrandId;
     private String imageUrl;
+    private BigDecimal b2bSalePrice;
+    private BigDecimal b2bSubscriptionPrice;
 }

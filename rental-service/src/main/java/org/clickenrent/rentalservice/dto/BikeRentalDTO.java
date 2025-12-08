@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 /**
@@ -26,6 +27,9 @@ public class BikeRentalDTO {
     private Long rentalUnitId;
     private Boolean isRevenueSharePaid;
     private Boolean isB2BRentable;
+    private String photoUrl;
+    private BigDecimal price;
+    private BigDecimal totalPrice;
 
     // Audit fields
     private LocalDateTime dateCreated;

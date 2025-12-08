@@ -23,5 +23,6 @@ public class B2BSubscriptionItemDTO {
     private Long productId;
     private LocalDateTime startDateTime;
     private LocalDateTime endDateTime;
-    private BigDecimal agreedMonthlyFee;
+    private BigDecimal price;
+    private BigDecimal totalPrice;
 }

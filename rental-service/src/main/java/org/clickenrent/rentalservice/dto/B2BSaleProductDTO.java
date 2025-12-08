@@ -21,4 +21,6 @@ public class B2BSaleProductDTO {
     private Long b2bSaleId;
     private Long productId;
     private BigDecimal price;
+    private Integer quantity;
+    private BigDecimal totalPrice;
 }

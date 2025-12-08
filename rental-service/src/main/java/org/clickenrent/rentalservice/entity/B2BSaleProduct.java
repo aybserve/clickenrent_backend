@@ -45,4 +45,13 @@ public class B2BSaleProduct {
     @NotNull(message = "Price is required")
     @Column(name = "price", nullable = false, precision = 10, scale = 2)
     private BigDecimal price;
+
+    @NotNull(message = "Quantity is required")
+    @Builder.Default
+    @Column(name = "quantity", nullable = false)
+    private Integer quantity = 1;
+
+    @NotNull(message = "Total price is required")
+    @Column(name = "total_price", nullable = false, precision = 10, scale = 2)
+    private BigDecimal totalPrice;
 }

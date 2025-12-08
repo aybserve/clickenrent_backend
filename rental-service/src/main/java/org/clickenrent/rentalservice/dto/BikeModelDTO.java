@@ -5,6 +5,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
+
 /**
  * Data Transfer Object for BikeModel entity.
  */
@@ -21,4 +23,6 @@ public class BikeModelDTO {
     private String imageUrl;
     private Long bikeTypeId;
     private Long bikeEngineId;
+    private BigDecimal b2bSalePrice;
+    private BigDecimal b2bSubscriptionPrice;
 }

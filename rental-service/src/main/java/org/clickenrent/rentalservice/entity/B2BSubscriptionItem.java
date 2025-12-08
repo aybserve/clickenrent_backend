@@ -50,7 +50,11 @@ public class B2BSubscriptionItem {
     @Column(name = "end_date_time")
     private LocalDateTime endDateTime;
 
-    @NotNull(message = "Agreed monthly fee is required")
-    @Column(name = "agreed_monthly_fee", nullable = false, precision = 10, scale = 2)
-    private BigDecimal agreedMonthlyFee;
+    @NotNull(message = "Price is required")
+    @Column(name = "price", nullable = false, precision = 10, scale = 2)
+    private BigDecimal price;
+
+    @NotNull(message = "Total price is required")
+    @Column(name = "total_price", nullable = false, precision = 10, scale = 2)
+    private BigDecimal totalPrice;
 }

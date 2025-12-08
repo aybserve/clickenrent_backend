@@ -2,7 +2,6 @@ package org.clickenrent.rentalservice.entity;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
 import lombok.*;
 
 import java.time.LocalDateTime;
@@ -61,8 +60,4 @@ public class Ride {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "ride_status_id", nullable = false)
     private RideStatus rideStatus;
-
-    @Size(max = 500, message = "Photo URL must not exceed 500 characters")
-    @Column(name = "photo_url", length = 500)
-    private String photoUrl;
 }

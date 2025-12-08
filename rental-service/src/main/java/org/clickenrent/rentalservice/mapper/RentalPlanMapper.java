@@ -29,6 +29,7 @@ public class RentalPlanMapper {
                 .minUnit(rentalPlan.getMinUnit())
                 .maxUnit(rentalPlan.getMaxUnit())
                 .locationId(rentalPlan.getLocation() != null ? rentalPlan.getLocation().getId() : null)
+                .defaultPrice(rentalPlan.getDefaultPrice())
                 .build();
     }
 
@@ -41,7 +42,8 @@ public class RentalPlanMapper {
                 .id(dto.getId())
                 .name(dto.getName())
                 .minUnit(dto.getMinUnit())
-                .maxUnit(dto.getMaxUnit());
+                .maxUnit(dto.getMaxUnit())
+                .defaultPrice(dto.getDefaultPrice());
 
         if (dto.getRentalUnitId() != null) {
             builder.rentalUnit(rentalUnitRepository.findById(dto.getRentalUnitId()).orElse(null));
@@ -66,6 +68,9 @@ public class RentalPlanMapper {
         }
         if (dto.getMaxUnit() != null) {
             rentalPlan.setMaxUnit(dto.getMaxUnit());
+        }
+        if (dto.getDefaultPrice() != null) {
+            rentalPlan.setDefaultPrice(dto.getDefaultPrice());
         }
     }
 }

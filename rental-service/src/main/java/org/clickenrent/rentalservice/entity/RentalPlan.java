@@ -6,6 +6,8 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 
+import java.math.BigDecimal;
+
 /**
  * Entity representing rental plans.
  */
@@ -44,4 +46,7 @@ public class RentalPlan {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "location_id", nullable = false)
     private Location location;
+
+    @Column(name = "default_price", precision = 10, scale = 2)
+    private BigDecimal defaultPrice;
 }

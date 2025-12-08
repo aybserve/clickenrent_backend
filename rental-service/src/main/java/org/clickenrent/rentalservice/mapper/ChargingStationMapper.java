@@ -26,6 +26,10 @@ public class ChargingStationMapper {
         return ChargingStationDTO.builder()
                 .id(chargingStation.getId())
                 .externalId(chargingStation.getExternalId())
+                .code(chargingStation.getCode())
+                .qrCodeUrl(chargingStation.getQrCodeUrl())
+                .vat(chargingStation.getVat())
+                .isVatInclude(chargingStation.getIsVatInclude())
                 .chargingStationStatusId(chargingStation.getChargingStationStatus() != null ? 
                         chargingStation.getChargingStationStatus().getId() : null)
                 .coordinatesId(chargingStation.getCoordinates() != null ? chargingStation.getCoordinates().getId() : null)
@@ -50,6 +54,10 @@ public class ChargingStationMapper {
         ChargingStation.ChargingStationBuilder<?, ?> builder = ChargingStation.builder()
                 .id(dto.getId())
                 .externalId(dto.getExternalId())
+                .code(dto.getCode())
+                .qrCodeUrl(dto.getQrCodeUrl())
+                .vat(dto.getVat())
+                .isVatInclude(dto.getIsVatInclude())
                 .isActive(dto.getIsActive())
                 .inServiceDate(dto.getInServiceDate())
                 .isB2BRentable(dto.getIsB2BRentable());
@@ -75,6 +83,18 @@ public class ChargingStationMapper {
             return;
         }
 
+        if (dto.getCode() != null) {
+            chargingStation.setCode(dto.getCode());
+        }
+        if (dto.getQrCodeUrl() != null) {
+            chargingStation.setQrCodeUrl(dto.getQrCodeUrl());
+        }
+        if (dto.getVat() != null) {
+            chargingStation.setVat(dto.getVat());
+        }
+        if (dto.getIsVatInclude() != null) {
+            chargingStation.setIsVatInclude(dto.getIsVatInclude());
+        }
         if (dto.getIsActive() != null) {
             chargingStation.setIsActive(dto.getIsActive());
         }

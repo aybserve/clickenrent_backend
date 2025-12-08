@@ -5,6 +5,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
+
 /**
  * Data Transfer Object for Service entity.
  */
@@ -16,4 +18,5 @@ public class ServiceDTO {
 
     private Long id;
     private String name;
+    private BigDecimal b2bSubscriptionPrice;
 }

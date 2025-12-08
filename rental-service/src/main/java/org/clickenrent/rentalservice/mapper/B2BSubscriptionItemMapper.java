@@ -27,7 +27,8 @@ public class B2BSubscriptionItemMapper {
                 .productId(item.getProductId())
                 .startDateTime(item.getStartDateTime())
                 .endDateTime(item.getEndDateTime())
-                .agreedMonthlyFee(item.getAgreedMonthlyFee())
+                .price(item.getPrice())
+                .totalPrice(item.getTotalPrice())
                 .build();
     }
 
@@ -42,7 +43,8 @@ public class B2BSubscriptionItemMapper {
                 .productId(dto.getProductId())
                 .startDateTime(dto.getStartDateTime())
                 .endDateTime(dto.getEndDateTime())
-                .agreedMonthlyFee(dto.getAgreedMonthlyFee());
+                .price(dto.getPrice())
+                .totalPrice(dto.getTotalPrice());
 
         if (dto.getB2bSubscriptionId() != null) {
             builder.b2bSubscription(b2bSubscriptionRepository.findById(dto.getB2bSubscriptionId()).orElse(null));
@@ -59,8 +61,11 @@ public class B2BSubscriptionItemMapper {
         if (dto.getEndDateTime() != null) {
             item.setEndDateTime(dto.getEndDateTime());
         }
-        if (dto.getAgreedMonthlyFee() != null) {
-            item.setAgreedMonthlyFee(dto.getAgreedMonthlyFee());
+        if (dto.getPrice() != null) {
+            item.setPrice(dto.getPrice());
+        }
+        if (dto.getTotalPrice() != null) {
+            item.setTotalPrice(dto.getTotalPrice());
         }
     }
 }

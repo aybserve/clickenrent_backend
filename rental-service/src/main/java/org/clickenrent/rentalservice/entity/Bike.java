@@ -2,7 +2,6 @@ package org.clickenrent.rentalservice.entity;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
@@ -73,15 +72,6 @@ public class Bike extends Product {
 
     @Column(name = "currency_id")
     private Long currencyId;
-
-    @Column(name = "cost_per_day", precision = 10, scale = 2)
-    private BigDecimal costPerDay;
-
-    @Column(name = "cost_per_hour", precision = 10, scale = 2)
-    private BigDecimal costPerHour;
-
-    @Column(name = "cost_per_week", precision = 10, scale = 2)
-    private BigDecimal costPerWeek;
 
     @Column(name = "in_service_date")
     private LocalDate inServiceDate;

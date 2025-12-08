@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
@@ -19,6 +20,10 @@ public class ChargingStationDTO {
 
     private Long id;
     private String externalId;
+    private String code;
+    private String qrCodeUrl;
+    private BigDecimal vat;
+    private Boolean isVatInclude;
     private Long chargingStationStatusId;
     private Long coordinatesId;
     private Boolean isActive;

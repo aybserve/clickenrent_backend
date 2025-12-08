@@ -18,6 +18,7 @@ public class ServiceMapper {
         return ServiceDTO.builder()
                 .id(service.getId())
                 .name(service.getName())
+                .b2bSubscriptionPrice(service.getB2bSubscriptionPrice())
                 .build();
     }
 
@@ -29,6 +30,7 @@ public class ServiceMapper {
         return Service.builder()
                 .id(dto.getId())
                 .name(dto.getName())
+                .b2bSubscriptionPrice(dto.getB2bSubscriptionPrice())
                 .build();
     }
 
@@ -39,6 +41,9 @@ public class ServiceMapper {
 
         if (dto.getName() != null) {
             service.setName(dto.getName());
+        }
+        if (dto.getB2bSubscriptionPrice() != null) {
+            service.setB2bSubscriptionPrice(dto.getB2bSubscriptionPrice());
         }
     }
 }

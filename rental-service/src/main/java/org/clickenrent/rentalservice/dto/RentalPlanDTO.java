@@ -5,6 +5,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
+
 /**
  * Data Transfer Object for RentalPlan entity.
  */
@@ -20,4 +22,5 @@ public class RentalPlanDTO {
     private Integer minUnit;
     private Integer maxUnit;
     private Long locationId;
+    private BigDecimal defaultPrice;
 }

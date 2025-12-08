@@ -2,9 +2,11 @@ package org.clickenrent.rentalservice.entity;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 /**
@@ -66,5 +68,16 @@ public class BikeRental extends BaseAuditEntity {
     @Builder.Default
     @Column(name = "is_b2b_rentable", nullable = false)
     private Boolean isB2BRentable = false;
+
+    @Size(max = 500, message = "Photo URL must not exceed 500 characters")
+    @Column(name = "photo_url", length = 500)
+    private String photoUrl;
+
+    @Column(name = "price", precision = 10, scale = 2)
+    private BigDecimal price;
+
+    @NotNull(message = "Total price is required")
+    @Column(name = "total_price", nullable = false, precision = 10, scale = 2)
+    private BigDecimal totalPrice;
 }
 

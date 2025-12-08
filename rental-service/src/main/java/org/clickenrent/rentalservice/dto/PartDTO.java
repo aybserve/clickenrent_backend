@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 /**
@@ -18,9 +19,15 @@ public class PartDTO {
 
     private Long id;
     private String externalId;
+    private String name;
+    private Long partBrandId;
+    private String imageUrl;
+    private Long partCategoryId;
     private Long hubId;
-    private Long partModelId;
+    private BigDecimal vat;
+    private Boolean isVatInclude;
     private Boolean isB2BRentable;
+    private BigDecimal b2bSalePrice;
 
     // Audit fields
     private LocalDateTime dateCreated;
