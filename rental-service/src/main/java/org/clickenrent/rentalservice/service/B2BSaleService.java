@@ -33,23 +33,13 @@ public class B2BSaleService {
     }
 
     @Transactional(readOnly = true)
-    public List<B2BSaleDTO> getSalesBySellerCompany(Long sellerCompanyId) {
-        if (!securityService.isAdmin() && !securityService.hasAccessToCompany(sellerCompanyId)) {
-            throw new UnauthorizedException("You don't have permission to view sales for this company");
+    public List<B2BSaleDTO> getSalesByLocation(Long locationId) {
+        // Access control - admin or users with access to the location
+        if (!securityService.isAdmin()) {
+            throw new UnauthorizedException("You don't have permission to view sales for this location");
         }
 
-        return b2bSaleRepository.findBySellerCompanyId(sellerCompanyId).stream()
-                .map(b2bSaleMapper::toDto)
-                .toList();
-    }
-
-    @Transactional(readOnly = true)
-    public List<B2BSaleDTO> getSalesByBuyerCompany(Long buyerCompanyId) {
-        if (!securityService.isAdmin() && !securityService.hasAccessToCompany(buyerCompanyId)) {
-            throw new UnauthorizedException("You don't have permission to view sales for this company");
-        }
-
-        return b2bSaleRepository.findByBuyerCompanyId(buyerCompanyId).stream()
+        return b2bSaleRepository.findByLocationId(locationId).stream()
                 .map(b2bSaleMapper::toDto)
                 .toList();
     }
@@ -60,9 +50,7 @@ public class B2BSaleService {
                 .orElseThrow(() -> new ResourceNotFoundException("B2BSale", "id", id));
 
         // Check access
-        if (!securityService.isAdmin() && 
-            !securityService.hasAccessToCompany(sale.getSellerCompanyId()) &&
-            !securityService.hasAccessToCompany(sale.getBuyerCompanyId())) {
+        if (!securityService.isAdmin()) {
             throw new UnauthorizedException("You don't have permission to view this sale");
         }
 
@@ -71,9 +59,9 @@ public class B2BSaleService {
 
     @Transactional
     public B2BSaleDTO createSale(B2BSaleDTO dto) {
-        // Validate user has access to seller company
-        if (!securityService.isAdmin() && !securityService.hasAccessToCompany(dto.getSellerCompanyId())) {
-            throw new UnauthorizedException("You don't have permission to create sales for this company");
+        // Validate user has admin access
+        if (!securityService.isAdmin()) {
+            throw new UnauthorizedException("You don't have permission to create sales");
         }
 
         B2BSale sale = b2bSaleMapper.toEntity(dto);
@@ -86,7 +74,7 @@ public class B2BSaleService {
         B2BSale sale = b2bSaleRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("B2BSale", "id", id));
 
-        if (!securityService.isAdmin() && !securityService.hasAccessToCompany(sale.getSellerCompanyId())) {
+        if (!securityService.isAdmin()) {
             throw new UnauthorizedException("You don't have permission to update this sale");
         }
 

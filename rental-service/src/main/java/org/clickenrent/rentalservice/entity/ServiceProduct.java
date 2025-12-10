@@ -19,7 +19,7 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
-public class ServiceProduct extends Product {
+public class ServiceProduct extends Product implements ProductModelType {
 
 //    @NotNull(message = "Service is required")
     @ManyToOne(fetch = FetchType.LAZY)
@@ -29,4 +29,9 @@ public class ServiceProduct extends Product {
 //    @NotNull(message = "Product ID is required")
     @Column(name = "product_id", nullable = true)
     private Long productId;
+
+    @Override
+    public String getProductModelTypeName() {
+        return "SERVICE_PRODUCT";
+    }
 }

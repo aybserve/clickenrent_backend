@@ -24,6 +24,10 @@ public class CompanyMapper {
                 .logo(company.getLogo())
                 .erpPartnerId(company.getErpPartnerId())
                 .companyTypeId(company.getCompanyType() != null ? company.getCompanyType().getId() : null)
+                .dateCreated(company.getDateCreated())
+                .lastDateModified(company.getLastDateModified())
+                .createdBy(company.getCreatedBy())
+                .lastModifiedBy(company.getLastModifiedBy())
                 .build();
     }
     

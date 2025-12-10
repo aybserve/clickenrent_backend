@@ -33,12 +33,13 @@ public class B2BSubscriptionService {
     }
 
     @Transactional(readOnly = true)
-    public List<B2BSubscriptionDTO> getSubscriptionsByCompany(Long companyId) {
-        if (!securityService.isAdmin() && !securityService.hasAccessToCompany(companyId)) {
-            throw new UnauthorizedException("You don't have permission to view subscriptions for this company");
+    public List<B2BSubscriptionDTO> getSubscriptionsByLocation(Long locationId) {
+        // Access control - admin only
+        if (!securityService.isAdmin()) {
+            throw new UnauthorizedException("You don't have permission to view subscriptions for this location");
         }
 
-        return b2bSubscriptionRepository.findByCompanyId(companyId).stream()
+        return b2bSubscriptionRepository.findByLocationId(locationId).stream()
                 .map(b2bSubscriptionMapper::toDto)
                 .toList();
     }
@@ -48,7 +49,7 @@ public class B2BSubscriptionService {
         B2BSubscription subscription = b2bSubscriptionRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("B2BSubscription", "id", id));
 
-        if (!securityService.isAdmin() && !securityService.hasAccessToCompany(subscription.getCompanyId())) {
+        if (!securityService.isAdmin()) {
             throw new UnauthorizedException("You don't have permission to view this subscription");
         }
 
@@ -57,8 +58,8 @@ public class B2BSubscriptionService {
 
     @Transactional
     public B2BSubscriptionDTO createSubscription(B2BSubscriptionDTO dto) {
-        if (!securityService.isAdmin() && !securityService.hasAccessToCompany(dto.getCompanyId())) {
-            throw new UnauthorizedException("You don't have permission to create subscriptions for this company");
+        if (!securityService.isAdmin()) {
+            throw new UnauthorizedException("You don't have permission to create subscriptions");
         }
 
         B2BSubscription subscription = b2bSubscriptionMapper.toEntity(dto);
@@ -71,7 +72,7 @@ public class B2BSubscriptionService {
         B2BSubscription subscription = b2bSubscriptionRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("B2BSubscription", "id", id));
 
-        if (!securityService.isAdmin() && !securityService.hasAccessToCompany(subscription.getCompanyId())) {
+        if (!securityService.isAdmin()) {
             throw new UnauthorizedException("You don't have permission to update this subscription");
         }
 

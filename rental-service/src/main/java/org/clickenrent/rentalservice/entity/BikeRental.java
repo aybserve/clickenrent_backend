@@ -5,6 +5,8 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.Where;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -19,6 +21,8 @@ import java.time.LocalDateTime;
                 @Index(name = "idx_bike_rental_external_id", columnList = "external_id")
         }
 )
+@SQLDelete(sql = "UPDATE bike_rental SET is_deleted = true WHERE id = ?")
+@Where(clause = "is_deleted = false")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -60,6 +64,10 @@ public class BikeRental extends BaseAuditEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "rental_unit_id")
     private RentalUnit rentalUnit;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "bike_rental_status_id")
+    private BikeRentalStatus bikeRentalStatus;
 
     @Builder.Default
     @Column(name = "is_revenue_share_paid", nullable = false)

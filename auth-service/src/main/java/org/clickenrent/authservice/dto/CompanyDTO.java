@@ -5,6 +5,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
+
 /**
  * Data Transfer Object for Company entity.
  * Represents a company/organization in the system.
@@ -23,6 +25,12 @@ public class CompanyDTO {
     private String logo;
     private String erpPartnerId;
     private Long companyTypeId;
+
+    // Audit fields
+    private LocalDateTime dateCreated;
+    private LocalDateTime lastDateModified;
+    private String createdBy;
+    private String lastModifiedBy;
 }
 
 

@@ -18,7 +18,7 @@ public class B2BSubscriptionDTO {
 
     private Long id;
     private String externalId;
-    private Long companyId;
+    private Long locationId;
     private LocalDateTime endDateTime;
     private Long b2bSubscriptionStatusId;
 }

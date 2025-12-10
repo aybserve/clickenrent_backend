@@ -33,9 +33,12 @@ public class InvitationMapper {
                 .companyName(invitation.getCompany().getName())
                 .status(invitation.getStatus().name())
                 .expiresAt(invitation.getExpiresAt())
-                .createdAt(invitation.getCreatedAt())
                 .acceptedAt(invitation.getAcceptedAt())
                 .invitationLink(buildInvitationLink(invitation.getToken()))
+                .dateCreated(invitation.getDateCreated())
+                .lastDateModified(invitation.getLastDateModified())
+                .createdBy(invitation.getCreatedBy())
+                .lastModifiedBy(invitation.getLastModifiedBy())
                 .build();
     }
     

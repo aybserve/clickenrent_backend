@@ -26,8 +26,13 @@ public class InvitationDTO {
     private String companyName;
     private String status;
     private LocalDateTime expiresAt;
-    private LocalDateTime createdAt;
     private LocalDateTime acceptedAt;
     private String invitationLink;
+
+    // Audit fields
+    private LocalDateTime dateCreated;
+    private LocalDateTime lastDateModified;
+    private String createdBy;
+    private String lastModifiedBy;
 }
 

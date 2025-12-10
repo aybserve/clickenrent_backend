@@ -17,6 +17,7 @@ public class BikeRentalMapper {
     private final LocationRepository locationRepository;
     private final RentalRepository rentalRepository;
     private final RentalUnitRepository rentalUnitRepository;
+    private final BikeRentalStatusRepository bikeRentalStatusRepository;
 
     public BikeRentalDTO toDto(BikeRental bikeRental) {
         if (bikeRental == null) {
@@ -32,6 +33,7 @@ public class BikeRentalMapper {
                 .startDateTime(bikeRental.getStartDateTime())
                 .endDateTime(bikeRental.getEndDateTime())
                 .rentalUnitId(bikeRental.getRentalUnit() != null ? bikeRental.getRentalUnit().getId() : null)
+                .bikeRentalStatusId(bikeRental.getBikeRentalStatus() != null ? bikeRental.getBikeRentalStatus().getId() : null)
                 .isRevenueSharePaid(bikeRental.getIsRevenueSharePaid())
                 .isB2BRentable(bikeRental.getIsB2BRentable())
                 .photoUrl(bikeRental.getPhotoUrl())
@@ -71,6 +73,9 @@ public class BikeRentalMapper {
         }
         if (dto.getRentalUnitId() != null) {
             builder.rentalUnit(rentalUnitRepository.findById(dto.getRentalUnitId()).orElse(null));
+        }
+        if (dto.getBikeRentalStatusId() != null) {
+            builder.bikeRentalStatus(bikeRentalStatusRepository.findById(dto.getBikeRentalStatusId()).orElse(null));
         }
 
         return builder.build();

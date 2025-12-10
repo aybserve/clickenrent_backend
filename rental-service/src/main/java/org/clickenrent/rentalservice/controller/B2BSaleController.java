@@ -35,18 +35,11 @@ public class B2BSaleController {
         return ResponseEntity.ok(b2bSaleService.getAllSales(pageable));
     }
 
-    @GetMapping("/by-seller/{sellerCompanyId}")
+    @GetMapping("/by-location/{locationId}")
     @PreAuthorize("hasAnyRole('SUPERADMIN', 'ADMIN', 'B2B')")
-    @Operation(summary = "Get sales by seller company")
-    public ResponseEntity<List<B2BSaleDTO>> getSalesBySellerCompany(@PathVariable Long sellerCompanyId) {
-        return ResponseEntity.ok(b2bSaleService.getSalesBySellerCompany(sellerCompanyId));
-    }
-
-    @GetMapping("/by-buyer/{buyerCompanyId}")
-    @PreAuthorize("hasAnyRole('SUPERADMIN', 'ADMIN', 'B2B')")
-    @Operation(summary = "Get sales by buyer company")
-    public ResponseEntity<List<B2BSaleDTO>> getSalesByBuyerCompany(@PathVariable Long buyerCompanyId) {
-        return ResponseEntity.ok(b2bSaleService.getSalesByBuyerCompany(buyerCompanyId));
+    @Operation(summary = "Get sales by location")
+    public ResponseEntity<List<B2BSaleDTO>> getSalesByLocation(@PathVariable Long locationId) {
+        return ResponseEntity.ok(b2bSaleService.getSalesByLocation(locationId));
     }
 
     @GetMapping("/{id}")

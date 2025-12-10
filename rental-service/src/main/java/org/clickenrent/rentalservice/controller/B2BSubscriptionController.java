@@ -35,11 +35,11 @@ public class B2BSubscriptionController {
         return ResponseEntity.ok(b2bSubscriptionService.getAllSubscriptions(pageable));
     }
 
-    @GetMapping("/by-company/{companyId}")
+    @GetMapping("/by-location/{locationId}")
     @PreAuthorize("hasAnyRole('SUPERADMIN', 'ADMIN', 'B2B')")
-    @Operation(summary = "Get subscriptions by company")
-    public ResponseEntity<List<B2BSubscriptionDTO>> getSubscriptionsByCompany(@PathVariable Long companyId) {
-        return ResponseEntity.ok(b2bSubscriptionService.getSubscriptionsByCompany(companyId));
+    @Operation(summary = "Get subscriptions by location")
+    public ResponseEntity<List<B2BSubscriptionDTO>> getSubscriptionsByLocation(@PathVariable Long locationId) {
+        return ResponseEntity.ok(b2bSubscriptionService.getSubscriptionsByLocation(locationId));
     }
 
     @GetMapping("/{id}")

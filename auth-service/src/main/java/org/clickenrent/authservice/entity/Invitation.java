@@ -6,6 +6,9 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.*;
+import lombok.experimental.SuperBuilder;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.Where;
 
 import java.time.LocalDateTime;
 
@@ -22,14 +25,15 @@ import java.time.LocalDateTime;
         @Index(name = "idx_invitation_status", columnList = "status")
     }
 )
+@SQLDelete(sql = "UPDATE invitation SET is_deleted = true WHERE id = ?")
+@Where(clause = "is_deleted = false")
 @Getter
 @Setter
 @NoArgsConstructor
-@AllArgsConstructor
-@Builder
-@ToString(exclude = {"invitedBy", "company"})
-@EqualsAndHashCode(of = "id")
-public class Invitation {
+@SuperBuilder
+@ToString(exclude = {"invitedBy", "company"}, callSuper = true)
+@EqualsAndHashCode(of = "id", callSuper = false)
+public class Invitation extends BaseAuditEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -65,15 +69,11 @@ public class Invitation {
     @Column(name = "expires_at", nullable = false)
     private LocalDateTime expiresAt;
 
-    @Column(name = "created_at", nullable = false, updatable = false)
-    private LocalDateTime createdAt;
-
     @Column(name = "accepted_at")
     private LocalDateTime acceptedAt;
 
     @PrePersist
     protected void onCreate() {
-        createdAt = LocalDateTime.now();
         if (status == null) {
             status = InvitationStatus.PENDING;
         }

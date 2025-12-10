@@ -18,8 +18,7 @@ public class B2BSaleDTO {
 
     private Long id;
     private String externalId;
-    private Long sellerCompanyId;
-    private Long buyerCompanyId;
+    private Long locationId;
     private Long b2bSaleStatusId;
     private LocalDateTime dateTime;
 }

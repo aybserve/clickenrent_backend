@@ -19,6 +19,10 @@ public class UserAddressMapper {
                 .id(userAddress.getId())
                 .userId(userAddress.getUser() != null ? userAddress.getUser().getId() : null)
                 .addressId(userAddress.getAddress() != null ? userAddress.getAddress().getId() : null)
+                .dateCreated(userAddress.getDateCreated())
+                .lastDateModified(userAddress.getLastDateModified())
+                .createdBy(userAddress.getCreatedBy())
+                .lastModifiedBy(userAddress.getLastModifiedBy())
                 .build();
     }
     

@@ -4,6 +4,9 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.*;
+import lombok.experimental.SuperBuilder;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.Where;
 
 /**
  * Entity representing images for locations.
@@ -15,12 +18,14 @@ import lombok.*;
         @Index(name = "idx_location_image_external_id", columnList = "external_id")
     }
 )
+@SQLDelete(sql = "UPDATE location_image SET is_deleted = true WHERE id = ?")
+@Where(clause = "is_deleted = false")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
-@ToString
+@SuperBuilder
+@ToString(callSuper = true)
 @EqualsAndHashCode(of = "id", callSuper = false)
 public class LocationImage extends BaseAuditEntity {
 

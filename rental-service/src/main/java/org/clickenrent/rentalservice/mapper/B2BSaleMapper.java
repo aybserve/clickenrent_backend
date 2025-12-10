@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.clickenrent.rentalservice.dto.B2BSaleDTO;
 import org.clickenrent.rentalservice.entity.B2BSale;
 import org.clickenrent.rentalservice.repository.B2BSaleStatusRepository;
+import org.clickenrent.rentalservice.repository.LocationRepository;
 import org.springframework.stereotype.Component;
 
 /**
@@ -14,6 +15,7 @@ import org.springframework.stereotype.Component;
 public class B2BSaleMapper {
 
     private final B2BSaleStatusRepository b2bSaleStatusRepository;
+    private final LocationRepository locationRepository;
 
     public B2BSaleDTO toDto(B2BSale b2bSale) {
         if (b2bSale == null) {
@@ -23,8 +25,7 @@ public class B2BSaleMapper {
         return B2BSaleDTO.builder()
                 .id(b2bSale.getId())
                 .externalId(b2bSale.getExternalId())
-                .sellerCompanyId(b2bSale.getSellerCompanyId())
-                .buyerCompanyId(b2bSale.getBuyerCompanyId())
+                .locationId(b2bSale.getLocation() != null ? b2bSale.getLocation().getId() : null)
                 .b2bSaleStatusId(b2bSale.getB2bSaleStatus() != null ? b2bSale.getB2bSaleStatus().getId() : null)
                 .dateTime(b2bSale.getDateTime())
                 .build();
@@ -35,13 +36,14 @@ public class B2BSaleMapper {
             return null;
         }
 
-        B2BSale.B2BSaleBuilder builder = B2BSale.builder()
+        var builder = B2BSale.builder()
                 .id(dto.getId())
                 .externalId(dto.getExternalId())
-                .sellerCompanyId(dto.getSellerCompanyId())
-                .buyerCompanyId(dto.getBuyerCompanyId())
                 .dateTime(dto.getDateTime());
 
+        if (dto.getLocationId() != null) {
+            builder.location(locationRepository.findById(dto.getLocationId()).orElse(null));
+        }
         if (dto.getB2bSaleStatusId() != null) {
             builder.b2bSaleStatus(b2bSaleStatusRepository.findById(dto.getB2bSaleStatusId()).orElse(null));
         }

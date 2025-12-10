@@ -166,7 +166,6 @@ public class InvitationService {
                 .lastName(request.getLastName())
                 .phone(request.getPhone())
                 .isActive(true)
-                .isDeleted(false)
                 .build();
         
         // Set language if provided

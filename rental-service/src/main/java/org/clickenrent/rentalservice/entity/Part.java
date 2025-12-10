@@ -22,7 +22,7 @@ import java.math.BigDecimal;
 @SuperBuilder
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
-public class Part extends Product {
+public class Part extends Product implements ProductModelType {
 
     @Column(name = "vat", precision = 5, scale = 2)
     private BigDecimal vat;
@@ -58,4 +58,9 @@ public class Part extends Product {
     @NotNull(message = "B2B sale price is required")
     @Column(name = "b2b_sale_price", nullable = false, precision = 5, scale = 2)
     private BigDecimal b2bSalePrice;
+
+    @Override
+    public String getProductModelTypeName() {
+        return "PART";
+    }
 }

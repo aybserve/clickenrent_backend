@@ -18,7 +18,7 @@ import lombok.*;
 @Builder
 @ToString
 @EqualsAndHashCode(of = "id")
-public class BikeType {
+public class BikeType implements ProductModelType {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -28,4 +28,9 @@ public class BikeType {
     @Size(max = 100, message = "Bike type name must not exceed 100 characters")
     @Column(name = "name", nullable = false, unique = true, length = 100)
     private String name;
+
+    @Override
+    public String getProductModelTypeName() {
+        return "BIKE_TYPE";
+    }
 }

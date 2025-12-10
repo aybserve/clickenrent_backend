@@ -25,6 +25,7 @@ public class BikeRentalDTO {
     private LocalDateTime startDateTime;
     private LocalDateTime endDateTime;
     private Long rentalUnitId;
+    private Long bikeRentalStatusId;
     private Boolean isRevenueSharePaid;
     private Boolean isB2BRentable;
     private String photoUrl;

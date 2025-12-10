@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.clickenrent.rentalservice.dto.B2BSubscriptionDTO;
 import org.clickenrent.rentalservice.entity.B2BSubscription;
 import org.clickenrent.rentalservice.repository.B2BSubscriptionStatusRepository;
+import org.clickenrent.rentalservice.repository.LocationRepository;
 import org.springframework.stereotype.Component;
 
 /**
@@ -14,6 +15,7 @@ import org.springframework.stereotype.Component;
 public class B2BSubscriptionMapper {
 
     private final B2BSubscriptionStatusRepository b2bSubscriptionStatusRepository;
+    private final LocationRepository locationRepository;
 
     public B2BSubscriptionDTO toDto(B2BSubscription b2bSubscription) {
         if (b2bSubscription == null) {
@@ -23,7 +25,7 @@ public class B2BSubscriptionMapper {
         return B2BSubscriptionDTO.builder()
                 .id(b2bSubscription.getId())
                 .externalId(b2bSubscription.getExternalId())
-                .companyId(b2bSubscription.getCompanyId())
+                .locationId(b2bSubscription.getLocation() != null ? b2bSubscription.getLocation().getId() : null)
                 .endDateTime(b2bSubscription.getEndDateTime())
                 .b2bSubscriptionStatusId(b2bSubscription.getB2bSubscriptionStatus() != null ? 
                         b2bSubscription.getB2bSubscriptionStatus().getId() : null)
@@ -35,12 +37,14 @@ public class B2BSubscriptionMapper {
             return null;
         }
 
-        B2BSubscription.B2BSubscriptionBuilder builder = B2BSubscription.builder()
+        var builder = B2BSubscription.builder()
                 .id(dto.getId())
                 .externalId(dto.getExternalId())
-                .companyId(dto.getCompanyId())
                 .endDateTime(dto.getEndDateTime());
 
+        if (dto.getLocationId() != null) {
+            builder.location(locationRepository.findById(dto.getLocationId()).orElse(null));
+        }
         if (dto.getB2bSubscriptionStatusId() != null) {
             builder.b2bSubscriptionStatus(b2bSubscriptionStatusRepository.findById(dto.getB2bSubscriptionStatusId()).orElse(null));
         }
