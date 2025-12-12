@@ -43,7 +43,6 @@ public class CompanyController {
      * GET /api/companies
      */
     @GetMapping
-//    @PreAuthorize("isAuthenticated()")
     @PreAuthorize("hasAnyRole('SUPERADMIN', 'ADMIN')")
     @Operation(
             summary = "Get all companies",

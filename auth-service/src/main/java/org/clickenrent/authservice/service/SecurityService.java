@@ -19,7 +19,7 @@ import java.util.List;
  * Service for handling security and permission checks.
  * Used for fine-grained authorization logic.
  */
-@Service
+@Service("resourceSecurity")
 @RequiredArgsConstructor
 public class SecurityService {
     

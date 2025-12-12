@@ -10,14 +10,12 @@ import org.clickenrent.authservice.mapper.CompanyMapper;
 import org.clickenrent.authservice.repository.CompanyRepository;
 import org.clickenrent.authservice.repository.CompanyTypeRepository;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 /**
  * Service for managing Company entities.
@@ -46,18 +44,9 @@ public class CompanyService {
                 return Page.empty(pageable);
             }
             
-            // Filter companies by accessible IDs
-            List<CompanyDTO> companies = companyRepository.findAll().stream()
-                    .filter(company -> accessibleCompanyIds.contains(company.getId()))
-                    .map(companyMapper::toDto)
-                    .collect(Collectors.toList());
-            
-            // Apply pagination manually
-            int start = (int) pageable.getOffset();
-            int end = Math.min((start + pageable.getPageSize()), companies.size());
-            List<CompanyDTO> pageContent = companies.subList(start, end);
-            
-            return new PageImpl<>(pageContent, pageable, companies.size());
+            // Query database with pagination and filtering (efficient!)
+            return companyRepository.findByIdIn(accessibleCompanyIds, pageable)
+                    .map(companyMapper::toDto);
         }
         
         // Customer and others have no company access

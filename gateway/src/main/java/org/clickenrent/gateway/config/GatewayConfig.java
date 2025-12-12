@@ -29,11 +29,6 @@ public class GatewayConfig {
                         .filters(f -> f.rewritePath("/auth-service/v3/api-docs", "/v3/api-docs"))
                         .uri("lb://auth-service"))
                 
-                // Actuator endpoints (public for health checks)
-                .route("actuator", r -> r
-                        .path("/actuator/**")
-                        .uri("lb://auth-service"))
-                
                 // Public Auth Routes - No JWT validation required
                 .route("auth-public-register", r -> r
                         .path("/api/auth/register")
@@ -57,16 +52,6 @@ public class GatewayConfig {
                         .uri("lb://auth-service"))
 
                 // Protected Auth Routes - JWT validation required
-                .route("auth-protected-users", r -> r
-                        .path("/api/auth/users/**")
-                        .filters(f -> f.filter(jwtAuthenticationFilter))
-                        .uri("lb://auth-service"))
-
-                .route("auth-protected-companies", r -> r
-                        .path("/api/auth/companies/**")
-                        .filters(f -> f.filter(jwtAuthenticationFilter))
-                        .uri("lb://auth-service"))
-
                 .route("auth-protected-profile", r -> r
                         .path("/api/auth/profile/**")
                         .filters(f -> f.filter(jwtAuthenticationFilter))

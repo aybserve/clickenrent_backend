@@ -26,6 +26,12 @@ public class UserGlobalRoleMapper {
                 .build();
     }
     
+    /**
+     * Converts DTO to entity.
+     * NOTE: This method only sets the ID. User and GlobalRole relationships
+     * must be set separately by the service layer when creating new entities.
+     * This is intentional to avoid loading entities unnecessarily in the mapper.
+     */
     public UserGlobalRole toEntity(UserGlobalRoleDTO dto) {
         if (dto == null) {
             return null;
@@ -33,6 +39,7 @@ public class UserGlobalRoleMapper {
         
         return UserGlobalRole.builder()
                 .id(dto.getId())
+                // User and GlobalRole must be set by the service layer
                 .build();
     }
 }
