@@ -59,6 +59,9 @@ public class Part extends Product implements ProductModelType {
     @Column(name = "b2b_sale_price", nullable = false, precision = 5, scale = 2)
     private BigDecimal b2bSalePrice;
 
+    @Column(name = "quantity")
+    private Integer quantity;
+
     @Override
     public String getProductModelTypeName() {
         return "PART";

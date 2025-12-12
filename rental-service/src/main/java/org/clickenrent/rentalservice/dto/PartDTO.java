@@ -28,6 +28,7 @@ public class PartDTO {
     private Boolean isVatInclude;
     private Boolean isB2BRentable;
     private BigDecimal b2bSalePrice;
+    private Integer quantity;
 
     // Audit fields
     private LocalDateTime dateCreated;

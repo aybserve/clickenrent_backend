@@ -360,7 +360,209 @@ public class GatewayConfig {
                         .filters(f -> f.filter(jwtAuthenticationFilter))
                         .uri("lb://rental-service"))
 
+                // Bike Parts Routes
+                .route("bike-parts", r -> r
+                        .path("/api/bike-parts/**")
+                        .filters(f -> f.filter(jwtAuthenticationFilter))
+                        .uri("lb://rental-service"))
+
+                // Additional B2B Routes
+                .route("b2b-subscription-orders", r -> r
+                        .path("/api/b2b-subscription-orders/**")
+                        .filters(f -> f.filter(jwtAuthenticationFilter))
+                        .uri("lb://rental-service"))
+
+                .route("b2b-subscription-order-items", r -> r
+                        .path("/api/b2b-subscription-order-items/**")
+                        .filters(f -> f.filter(jwtAuthenticationFilter))
+                        .uri("lb://rental-service"))
+
+                .route("b2b-subscription-order-statuses", r -> r
+                        .path("/api/b2b-subscription-order-statuses/**")
+                        .filters(f -> f.filter(jwtAuthenticationFilter))
+                        .uri("lb://rental-service"))
+
+                .route("b2b-sale-orders", r -> r
+                        .path("/api/b2b-sale-orders/**")
+                        .filters(f -> f.filter(jwtAuthenticationFilter))
+                        .uri("lb://rental-service"))
+
+                .route("b2b-sale-order-statuses", r -> r
+                        .path("/api/b2b-sale-order-statuses/**")
+                        .filters(f -> f.filter(jwtAuthenticationFilter))
+                        .uri("lb://rental-service"))
+
+                .route("b2b-sale-order-product-models", r -> r
+                        .path("/api/b2b-sale-order-product-models/**")
+                        .filters(f -> f.filter(jwtAuthenticationFilter))
+                        .uri("lb://rental-service"))
+
+                // Bike Rental Status Routes
+                .route("bike-rental-statuses", r -> r
+                        .path("/api/bike-rental-statuses/**")
+                        .filters(f -> f.filter(jwtAuthenticationFilter))
+                        .uri("lb://rental-service"))
+
+
+                // SUPPORT SERVICE ROUTES
+
+                // Route for fetching support-service API docs (SpringDoc will aggregate)
+                .route("support-service-api-docs", r -> r
+                        .path("/support-service/v3/api-docs")
+                        .filters(f -> f.rewritePath("/support-service/v3/api-docs", "/v3/api-docs"))
+                        .uri("lb://support-service"))
+
+                // Responsible Person Routes
+                .route("responsible-persons", r -> r
+                        .path("/api/responsible-persons/**")
+                        .filters(f -> f.filter(jwtAuthenticationFilter))
+                        .uri("lb://support-service"))
+
+                // Support Request Status Routes
+                .route("support-request-statuses", r -> r
+                        .path("/api/support-request-statuses/**")
+                        .filters(f -> f.filter(jwtAuthenticationFilter))
+                        .uri("lb://support-service"))
+
+                // Bike Issue Routes
+                .route("bike-issues", r -> r
+                        .path("/api/bike-issues/**")
+                        .filters(f -> f.filter(jwtAuthenticationFilter))
+                        .uri("lb://support-service"))
+
+                // Error Code Routes
+                .route("error-codes", r -> r
+                        .path("/api/error-codes/**")
+                        .filters(f -> f.filter(jwtAuthenticationFilter))
+                        .uri("lb://support-service"))
+
+                // Support Request Routes
+                .route("support-requests", r -> r
+                        .path("/api/support-requests/**")
+                        .filters(f -> f.filter(jwtAuthenticationFilter))
+                        .uri("lb://support-service"))
+
+                // Feedback Routes
+                .route("feedbacks", r -> r
+                        .path("/api/feedbacks/**")
+                        .filters(f -> f.filter(jwtAuthenticationFilter))
+                        .uri("lb://support-service"))
+
+                // Bike Rental Feedback Routes
+                .route("bike-rental-feedbacks", r -> r
+                        .path("/api/bike-rental-feedbacks/**")
+                        .filters(f -> f.filter(jwtAuthenticationFilter))
+                        .uri("lb://support-service"))
+
+                // Support Request Guide Item Routes
+                .route("support-request-guide-items", r -> r
+                        .path("/api/support-request-guide-items/**")
+                        .filters(f -> f.filter(jwtAuthenticationFilter))
+                        .uri("lb://support-service"))
+
+                // Bike Type Bike Issue Routes
+                .route("bike-type-bike-issues", r -> r
+                        .path("/api/bike-type-bike-issues/**")
+                        .filters(f -> f.filter(jwtAuthenticationFilter))
+                        .uri("lb://support-service"))
+
+                // Support Request Bike Issue Routes
+                .route("support-request-bike-issues", r -> r
+                        .path("/api/support-request-bike-issues/**")
+                        .filters(f -> f.filter(jwtAuthenticationFilter))
+                        .uri("lb://support-service"))
+
+
+                // PAYMENT SERVICE ROUTES
+
+                // Route for fetching payment-service API docs (SpringDoc will aggregate)
+                .route("payment-service-api-docs", r -> r
+                        .path("/payment-service/v3/api-docs")
+                        .filters(f -> f.rewritePath("/payment-service/v3/api-docs", "/v3/api-docs"))
+                        .uri("lb://payment-service"))
+
+                // Public Stripe Webhook Route - No JWT validation required
+                .route("stripe-webhooks", r -> r
+                        .path("/api/webhooks/stripe/**")
+                        .uri("lb://payment-service"))
+
+                // Reference Data Routes
+                .route("currencies", r -> r
+                        .path("/api/currencies/**")
+                        .filters(f -> f.filter(jwtAuthenticationFilter))
+                        .uri("lb://payment-service"))
+
+                .route("payment-statuses", r -> r
+                        .path("/api/payment-statuses/**")
+                        .filters(f -> f.filter(jwtAuthenticationFilter))
+                        .uri("lb://payment-service"))
+
+                .route("payment-methods", r -> r
+                        .path("/api/payment-methods/**")
+                        .filters(f -> f.filter(jwtAuthenticationFilter))
+                        .uri("lb://payment-service"))
+
+                .route("service-providers", r -> r
+                        .path("/api/service-providers/**")
+                        .filters(f -> f.filter(jwtAuthenticationFilter))
+                        .uri("lb://payment-service"))
+
+                // Financial Transaction Routes
+                .route("financial-transactions", r -> r
+                        .path("/api/financial-transactions/**")
+                        .filters(f -> f.filter(jwtAuthenticationFilter))
+                        .uri("lb://payment-service"))
+
+                // User Payment Profile Routes
+                .route("user-payment-profiles", r -> r
+                        .path("/api/user-payment-profiles/**")
+                        .filters(f -> f.filter(jwtAuthenticationFilter))
+                        .uri("lb://payment-service"))
+
+                // User Payment Method Routes
+                .route("user-payment-methods", r -> r
+                        .path("/api/user-payment-methods/**")
+                        .filters(f -> f.filter(jwtAuthenticationFilter))
+                        .uri("lb://payment-service"))
+
+                // Junction Table Routes - Rental Financial Transactions
+                .route("rental-fin-transactions", r -> r
+                        .path("/api/rental-fin-transactions/**")
+                        .filters(f -> f.filter(jwtAuthenticationFilter))
+                        .uri("lb://payment-service"))
+
+                // Junction Table Routes - B2B Sale Financial Transactions
+                .route("b2b-sale-fin-transactions", r -> r
+                        .path("/api/b2b-sale-fin-transactions/**")
+                        .filters(f -> f.filter(jwtAuthenticationFilter))
+                        .uri("lb://payment-service"))
+
+                // Junction Table Routes - B2B Subscription Financial Transactions
+                .route("b2b-subscription-fin-transactions", r -> r
+                        .path("/api/b2b-subscription-fin-transactions/**")
+                        .filters(f -> f.filter(jwtAuthenticationFilter))
+                        .uri("lb://payment-service"))
+
+                // B2B Revenue Share Payout Routes
+                .route("b2b-revenue-share-payouts", r -> r
+                        .path("/api/b2b-revenue-share-payouts/**")
+                        .filters(f -> f.filter(jwtAuthenticationFilter))
+                        .uri("lb://payment-service"))
+
+                // B2B Revenue Share Payout Item Routes
+                .route("b2b-revenue-share-payout-items", r -> r
+                        .path("/api/b2b-revenue-share-payout-items/**")
+                        .filters(f -> f.filter(jwtAuthenticationFilter))
+                        .uri("lb://payment-service"))
+
+                // Junction Table Routes - Payout Financial Transactions
+                .route("payout-fin-transactions", r -> r
+                        .path("/api/payout-fin-transactions/**")
+                        .filters(f -> f.filter(jwtAuthenticationFilter))
+                        .uri("lb://payment-service"))
+
                 .build();
     }
 }
+
 

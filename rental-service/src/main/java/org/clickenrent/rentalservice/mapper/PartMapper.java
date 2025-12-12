@@ -36,6 +36,7 @@ public class PartMapper {
                 .isVatInclude(part.getIsVatInclude())
                 .isB2BRentable(part.getIsB2BRentable())
                 .b2bSalePrice(part.getB2bSalePrice())
+                .quantity(part.getQuantity())
                 .dateCreated(part.getDateCreated())
                 .lastDateModified(part.getLastDateModified())
                 .createdBy(part.getCreatedBy())
@@ -56,7 +57,8 @@ public class PartMapper {
                 .vat(dto.getVat())
                 .isVatInclude(dto.getIsVatInclude())
                 .isB2BRentable(dto.getIsB2BRentable())
-                .b2bSalePrice(dto.getB2bSalePrice());
+                .b2bSalePrice(dto.getB2bSalePrice())
+                .quantity(dto.getQuantity());
 
         if (dto.getPartBrandId() != null) {
             builder.partBrand(partBrandRepository.findById(dto.getPartBrandId()).orElse(null));
@@ -99,6 +101,9 @@ public class PartMapper {
         }
         if (dto.getB2bSalePrice() != null) {
             part.setB2bSalePrice(dto.getB2bSalePrice());
+        }
+        if (dto.getQuantity() != null) {
+            part.setQuantity(dto.getQuantity());
         }
     }
 }
