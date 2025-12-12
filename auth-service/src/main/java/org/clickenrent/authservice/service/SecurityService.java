@@ -2,7 +2,9 @@ package org.clickenrent.authservice.service;
 
 import lombok.RequiredArgsConstructor;
 import org.clickenrent.authservice.entity.User;
+import org.clickenrent.authservice.entity.UserAddress;
 import org.clickenrent.authservice.entity.UserCompany;
+import org.clickenrent.authservice.repository.UserAddressRepository;
 import org.clickenrent.authservice.repository.UserCompanyRepository;
 import org.clickenrent.authservice.repository.UserRepository;
 import org.springframework.security.core.Authentication;
@@ -23,6 +25,7 @@ public class SecurityService {
     
     private final UserRepository userRepository;
     private final UserCompanyRepository userCompanyRepository;
+    private final UserAddressRepository userAddressRepository;
     
     /**
      * Check if current user is SuperAdmin or Admin.
@@ -112,6 +115,27 @@ public class SecurityService {
     }
     
     /**
+     * Check if current user has access to a user by external ID.
+     * - SUPERADMIN/ADMIN: always true
+     * - B2B/CUSTOMER: only if the external ID matches their own
+     * 
+     * @param externalId The external ID to check
+     * @return true if user can access the user with this external ID
+     */
+    public boolean hasAccessToUserByExternalId(String externalId) {
+        if (isAdmin()) {
+            return true;
+        }
+        
+        User currentUser = getCurrentUser();
+        if (currentUser == null || currentUser.getExternalId() == null) {
+            return false;
+        }
+        
+        return currentUser.getExternalId().equals(externalId);
+    }
+    
+    /**
      * Get list of company IDs that current user has access to.
      * - SUPERADMIN/ADMIN: all companies (returns null to indicate all)
      * - B2B: only their companies
@@ -135,6 +159,125 @@ public class SecurityService {
         }
         
         return List.of(); // Customers have no company access
+    }
+    
+    /**
+     * Check if current user has access to a specific address.
+     * - SUPERADMIN/ADMIN: always true
+     * - B2B/CUSTOMER: only if they are linked to the address via UserAddress
+     */
+    public boolean hasAccessToAddress(Long addressId) {
+        if (isAdmin()) {
+            return true;
+        }
+        
+        User currentUser = getCurrentUser();
+        if (currentUser == null) {
+            return false;
+        }
+        
+        // Check if user has this address in their UserAddress relationships
+        List<UserAddress> userAddresses = userAddressRepository.findByUserId(currentUser.getId());
+        return userAddresses.stream()
+                .anyMatch(ua -> ua.getAddress().getId().equals(addressId));
+    }
+    
+    /**
+     * Get list of address IDs that current user has access to.
+     * - SUPERADMIN/ADMIN: all addresses (returns null to indicate all)
+     * - B2B/CUSTOMER: only their addresses
+     */
+    public List<Long> getAccessibleAddressIds() {
+        if (isAdmin()) {
+            return null; // null means all addresses
+        }
+        
+        User currentUser = getCurrentUser();
+        if (currentUser == null) {
+            return List.of();
+        }
+        
+        List<UserAddress> userAddresses = userAddressRepository.findByUserId(currentUser.getId());
+        return userAddresses.stream()
+                .map(ua -> ua.getAddress().getId())
+                .toList();
+    }
+    
+    /**
+     * Check if current user has access to a specific UserAddress relationship.
+     * - SUPERADMIN/ADMIN: always true
+     * - B2B/CUSTOMER: only if the UserAddress belongs to them
+     * 
+     * @param userAddressId The UserAddress ID to check
+     * @return true if user can access the UserAddress
+     */
+    public boolean hasAccessToUserAddress(Long userAddressId) {
+        if (isAdmin()) {
+            return true;
+        }
+        
+        User currentUser = getCurrentUser();
+        if (currentUser == null) {
+            return false;
+        }
+        
+        // Find the UserAddress and check if it belongs to current user
+        return userAddressRepository.findById(userAddressId)
+                .map(ua -> ua.getUser().getId().equals(currentUser.getId()))
+                .orElse(false);
+    }
+    
+    /**
+     * Check if current user has access to a specific UserCompany relationship.
+     * - SUPERADMIN/ADMIN: always true
+     * - B2B: only if the UserCompany's company is one they belong to
+     * - CUSTOMER: only if the UserCompany's user matches them
+     * 
+     * @param userCompanyId The UserCompany ID to check
+     * @return true if user can access the UserCompany
+     */
+    public boolean hasAccessToUserCompany(Long userCompanyId) {
+        if (isAdmin()) {
+            return true;
+        }
+        
+        User currentUser = getCurrentUser();
+        if (currentUser == null) {
+            return false;
+        }
+        
+        // Find the UserCompany and check if current user has access
+        return userCompanyRepository.findById(userCompanyId)
+                .map(uc -> {
+                    // B2B: can access if they belong to the same company
+                    if (isB2B()) {
+                        return hasAccessToCompany(uc.getCompany().getId());
+                    }
+                    // CUSTOMER: can only access their own UserCompany records
+                    return uc.getUser().getId().equals(currentUser.getId());
+                })
+                .orElse(false);
+    }
+    
+    /**
+     * Check if current user can invite users to a company.
+     * - SUPERADMIN/ADMIN: can invite to any company
+     * - B2B: can invite to companies they belong to
+     * - CUSTOMER: cannot invite
+     * 
+     * @param companyId The company ID to check invitation permission for
+     * @return true if user can invite to the company
+     */
+    public boolean canInviteToCompany(Long companyId) {
+        if (isAdmin()) {
+            return true;
+        }
+        
+        if (isB2B()) {
+            return hasAccessToCompany(companyId);
+        }
+        
+        return false; // CUSTOMER cannot invite
     }
     
     /**
@@ -191,4 +334,5 @@ public class SecurityService {
         return false;
     }
 }
+
 

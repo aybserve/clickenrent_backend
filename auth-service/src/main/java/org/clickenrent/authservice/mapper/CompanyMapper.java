@@ -22,7 +22,12 @@ public class CompanyMapper {
                 .description(company.getDescription())
                 .website(company.getWebsite())
                 .logo(company.getLogo())
+                .erpPartnerId(company.getErpPartnerId())
                 .companyTypeId(company.getCompanyType() != null ? company.getCompanyType().getId() : null)
+                .dateCreated(company.getDateCreated())
+                .lastDateModified(company.getLastDateModified())
+                .createdBy(company.getCreatedBy())
+                .lastModifiedBy(company.getLastModifiedBy())
                 .build();
     }
     
@@ -38,6 +43,7 @@ public class CompanyMapper {
                 .description(dto.getDescription())
                 .website(dto.getWebsite())
                 .logo(dto.getLogo())
+                .erpPartnerId(dto.getErpPartnerId())
                 .build();
     }
     
@@ -58,6 +64,10 @@ public class CompanyMapper {
         if (dto.getLogo() != null) {
             company.setLogo(dto.getLogo());
         }
+        if (dto.getErpPartnerId() != null) {
+            company.setErpPartnerId(dto.getErpPartnerId());
+        }
     }
 }
+
 

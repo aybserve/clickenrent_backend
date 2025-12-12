@@ -43,9 +43,9 @@
     <module>eureka-server</module>
     <module>auth-service</module>
     <module>rental-service</module>
+    <module>support-service</module>
     <module>payment-service</module>
     <module>gateway</module>
-    <module>common-libs</module>
   </modules>
 
   <build>

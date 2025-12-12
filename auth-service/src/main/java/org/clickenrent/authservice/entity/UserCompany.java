@@ -3,6 +3,9 @@ package org.clickenrent.authservice.entity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
+import lombok.experimental.SuperBuilder;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.Where;
 
 /**
  * Join table entity linking users to companies with their respective company roles.
@@ -18,14 +21,15 @@ import lombok.*;
         )
     }
 )
+@SQLDelete(sql = "UPDATE user_company SET is_deleted = true WHERE id = ?")
+@Where(clause = "is_deleted = false")
 @Getter
 @Setter
 @NoArgsConstructor
-@AllArgsConstructor
-@Builder
-@ToString
-@EqualsAndHashCode(of = "id")
-public class UserCompany {
+@SuperBuilder
+@ToString(callSuper = true)
+@EqualsAndHashCode(of = "id", callSuper = false)
+public class UserCompany extends BaseAuditEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -46,4 +50,5 @@ public class UserCompany {
     @JoinColumn(name = "company_role_id", nullable = false)
     private CompanyRole companyRole;
 }
+
 

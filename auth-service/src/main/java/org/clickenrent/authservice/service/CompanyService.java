@@ -96,6 +96,12 @@ public class CompanyService {
     
     @Transactional
     public CompanyDTO updateCompany(Long id, CompanyDTO companyDTO) {
+        // Defense in depth: Secondary access check (primary check is in controller @PreAuthorize)
+        // SUPERADMIN/ADMIN can update all companies; B2B can update only their companies
+        if (!securityService.hasAccessToCompany(id)) {
+            throw new UnauthorizedException("You don't have permission to update this company");
+        }
+        
         Company company = companyRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Company", "id", id));
         
@@ -113,6 +119,12 @@ public class CompanyService {
     
     @Transactional
     public void deleteCompany(Long id) {
+        // Check if user has permission to delete this company
+        // Only SUPERADMIN/ADMIN can delete companies
+        if (!securityService.isAdmin()) {
+            throw new UnauthorizedException("You don't have permission to delete companies");
+        }
+        
         Company company = companyRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Company", "id", id));
         companyRepository.delete(company);

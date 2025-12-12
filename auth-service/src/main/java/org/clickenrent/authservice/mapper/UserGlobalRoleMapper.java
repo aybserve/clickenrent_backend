@@ -19,6 +19,10 @@ public class UserGlobalRoleMapper {
                 .id(userGlobalRole.getId())
                 .userId(userGlobalRole.getUser() != null ? userGlobalRole.getUser().getId() : null)
                 .globalRoleId(userGlobalRole.getGlobalRole() != null ? userGlobalRole.getGlobalRole().getId() : null)
+                .dateCreated(userGlobalRole.getDateCreated())
+                .lastDateModified(userGlobalRole.getLastDateModified())
+                .createdBy(userGlobalRole.getCreatedBy())
+                .lastModifiedBy(userGlobalRole.getLastModifiedBy())
                 .build();
     }
     
@@ -32,4 +36,5 @@ public class UserGlobalRoleMapper {
                 .build();
     }
 }
+
 

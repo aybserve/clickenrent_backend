@@ -26,7 +26,7 @@ import org.springframework.web.bind.annotation.*;
  * 
  * Security Rules:
  * - SUPERADMIN/ADMIN: Can view and manage all companies
- * - B2B: Can only view companies they belong to (read-only)
+ * - B2B: Can view and update companies they belong to
  * - CUSTOMER: No access to companies
  */
 @RestController
@@ -65,7 +65,7 @@ public class CompanyController {
      * GET /api/companies/{id}
      */
     @GetMapping("/{id}")
-    @PreAuthorize("isAuthenticated()")
+    @PreAuthorize("hasAnyRole('SUPERADMIN', 'ADMIN') or @resourceSecurity.canAccessCompany(#id)")
     @Operation(
             summary = "Get company by ID",
             description = "Returns company details by company ID"
@@ -110,11 +110,10 @@ public class CompanyController {
      * PUT /api/companies/{id}
      */
     @PutMapping("/{id}")
-//    @PreAuthorize("hasAnyRole('SUPERADMIN', 'ADMIN')")
-    @PreAuthorize("isAuthenticated()")
+    @PreAuthorize("hasAnyRole('SUPERADMIN', 'ADMIN') or @resourceSecurity.canAccessCompany(#id)")
     @Operation(
             summary = "Update company",
-            description = "Updates company information by ID"
+            description = "Updates company information by ID. Requires SUPERADMIN or ADMIN role."
     )
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Company updated successfully",

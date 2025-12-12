@@ -19,3 +19,4 @@ public class CompanyRoleDTO {
     private String name;
 }
 
+

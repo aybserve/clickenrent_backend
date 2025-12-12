@@ -30,7 +30,7 @@ public class LanguageController {
      * GET /api/languages
      */
     @GetMapping
-    @PreAuthorize("hasAnyRole('SUPERADMIN', 'ADMIN')")
+    @PreAuthorize("hasAnyRole('SUPERADMIN', 'ADMIN', 'B2B', 'CUSTOMER')")
     public ResponseEntity<List<LanguageDTO>> getAllLanguages() {
         List<LanguageDTO> languages = languageService.getAllLanguages();
         return ResponseEntity.ok(languages);
@@ -41,7 +41,7 @@ public class LanguageController {
      * GET /api/languages/{id}
      */
     @GetMapping("/{id}")
-    @PreAuthorize("hasAnyRole('SUPERADMIN', 'ADMIN')")
+    @PreAuthorize("hasAnyRole('SUPERADMIN', 'ADMIN', 'B2B', 'CUSTOMER')")
     public ResponseEntity<LanguageDTO> getLanguageById(@PathVariable Long id) {
         LanguageDTO language = languageService.getLanguageById(id);
         return ResponseEntity.ok(language);
@@ -82,4 +82,5 @@ public class LanguageController {
         return ResponseEntity.noContent().build();
     }
 }
+
 

@@ -31,6 +31,9 @@ public class UserMapper {
                 .languageId(user.getLanguage() != null ? user.getLanguage().getId() : null)
                 .isActive(user.getIsActive())
                 .isDeleted(user.getIsDeleted())
+                .isEmailVerified(user.getIsEmailVerified())
+                .isAcceptedTerms(user.getIsAcceptedTerms())
+                .isAcceptedPrivacyPolicy(user.getIsAcceptedPrivacyPolicy())
                 .dateCreated(user.getDateCreated())
                 .lastDateModified(user.getLastDateModified())
                 .createdBy(user.getCreatedBy())
@@ -57,6 +60,9 @@ public class UserMapper {
                 .imageUrl(dto.getImageUrl())
                 .isActive(dto.getIsActive())
                 .isDeleted(dto.getIsDeleted())
+                .isEmailVerified(dto.getIsEmailVerified())
+                .isAcceptedTerms(dto.getIsAcceptedTerms())
+                .isAcceptedPrivacyPolicy(dto.getIsAcceptedPrivacyPolicy())
                 .build();
     }
     
@@ -94,4 +100,5 @@ public class UserMapper {
         }
     }
 }
+
 

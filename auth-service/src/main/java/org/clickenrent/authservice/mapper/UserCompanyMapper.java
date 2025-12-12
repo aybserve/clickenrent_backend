@@ -30,6 +30,10 @@ public class UserCompanyMapper {
                 .userId(userCompany.getUser() != null ? userCompany.getUser().getId() : null)
                 .companyId(userCompany.getCompany() != null ? userCompany.getCompany().getId() : null)
                 .companyRoleId(userCompany.getCompanyRole() != null ? userCompany.getCompanyRole().getId() : null)
+                .dateCreated(userCompany.getDateCreated())
+                .lastDateModified(userCompany.getLastDateModified())
+                .createdBy(userCompany.getCreatedBy())
+                .lastModifiedBy(userCompany.getLastModifiedBy())
                 .build();
     }
     

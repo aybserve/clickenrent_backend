@@ -58,7 +58,7 @@ public class UserCompanyController {
      * - B2B/CUSTOMER: Can only view their own associations
      */
     @GetMapping("/user/{userId}")
-    @PreAuthorize("isAuthenticated()")
+    @PreAuthorize("hasAnyRole('SUPERADMIN', 'ADMIN') or @resourceSecurity.canAccessUser(#userId)")
     public ResponseEntity<List<UserCompanyDetailDTO>> getUserCompanies(@PathVariable Long userId) {
         List<UserCompanyDetailDTO> userCompanies = userCompanyService.getUserCompanies(userId);
         return ResponseEntity.ok(userCompanies);
@@ -73,7 +73,7 @@ public class UserCompanyController {
      * - CUSTOMER: Access denied
      */
     @GetMapping("/company/{companyId}")
-    @PreAuthorize("isAuthenticated()")
+    @PreAuthorize("hasAnyRole('SUPERADMIN', 'ADMIN') or @resourceSecurity.canAccessCompany(#companyId)")
     public ResponseEntity<List<UserCompanyDetailDTO>> getCompanyUsers(@PathVariable Long companyId) {
         List<UserCompanyDetailDTO> companyUsers = userCompanyService.getCompanyUsers(companyId);
         return ResponseEntity.ok(companyUsers);
@@ -85,7 +85,7 @@ public class UserCompanyController {
      * Requires: SUPERADMIN or ADMIN role
      */
     @PutMapping("/{id}/role")
-    @PreAuthorize("hasAnyRole('SUPERADMIN', 'ADMIN')")
+    @PreAuthorize("hasAnyRole('SUPERADMIN', 'ADMIN') or @resourceSecurity.canAccessUserCompany(#id)")
     public ResponseEntity<UserCompanyDTO> updateUserCompanyRole(
             @PathVariable Long id,
             @Valid @RequestBody UpdateUserCompanyRoleRequest request) {
@@ -99,7 +99,7 @@ public class UserCompanyController {
      * Requires: SUPERADMIN or ADMIN role
      */
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasAnyRole('SUPERADMIN', 'ADMIN')")
+    @PreAuthorize("hasAnyRole('SUPERADMIN', 'ADMIN') or @resourceSecurity.canAccessUserCompany(#id)")
     public ResponseEntity<Void> removeUserFromCompany(@PathVariable Long id) {
         userCompanyService.removeUserFromCompany(id);
         return ResponseEntity.noContent().build();

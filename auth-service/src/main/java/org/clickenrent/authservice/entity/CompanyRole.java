@@ -30,3 +30,4 @@ public class CompanyRole {
     private String name;
 }
 
+

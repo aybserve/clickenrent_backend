@@ -32,6 +32,9 @@ public class UserDTO {
     private Long languageId;
     private Boolean isActive;
     private Boolean isDeleted;
+    private Boolean isEmailVerified;
+    private Boolean isAcceptedTerms;
+    private Boolean isAcceptedPrivacyPolicy;
 
     // Audit fields
     private LocalDateTime dateCreated;
@@ -39,4 +42,5 @@ public class UserDTO {
     private String createdBy;
     private String lastModifiedBy;
 }
+
 

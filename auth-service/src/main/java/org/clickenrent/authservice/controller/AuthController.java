@@ -14,6 +14,7 @@ import org.clickenrent.authservice.dto.*;
 import org.clickenrent.authservice.service.AuthService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
@@ -31,13 +32,17 @@ public class AuthController {
     private final AuthService authService;
     
     /**
-     * Register a new user.
+     * Register a new user (Public endpoint).
      * POST /api/auth/register
+     * 
+     * Security: Public access - no authentication required.
+     * Note: Automatically assigns CUSTOMER role during registration.
+     * Returns JWT tokens that include CUSTOMER role in authorities.
      */
     @PostMapping("/register")
     @Operation(
             summary = "Register a new user",
-            description = "Creates a new user account and returns JWT tokens for authentication"
+            description = "Creates a new user account with CUSTOMER role and returns JWT tokens for authentication. Public endpoint."
     )
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "User registered successfully",
@@ -52,13 +57,44 @@ public class AuthController {
     }
     
     /**
+     * Register a new user with pre-assigned roles (SUPERADMIN only).
+     * POST /api/auth/register-admin
+     * 
+     * Security: Requires SUPERADMIN role.
+     * Used to create privileged users (ADMIN, B2B) with roles assigned during registration.
+     */
+    @PostMapping("/register-admin")
+    @PreAuthorize("hasRole('SUPERADMIN')")
+    @Operation(
+            summary = "Register a privileged user (SUPERADMIN only)",
+            description = "Creates a new user account with pre-assigned global roles. Restricted to SUPERADMIN. Used for creating ADMIN and B2B users."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "User created successfully",
+                    content = @Content(schema = @Schema(implementation = UserDTO.class))),
+            @ApiResponse(responseCode = "400", description = "Invalid input data"),
+            @ApiResponse(responseCode = "401", description = "Not authenticated"),
+            @ApiResponse(responseCode = "403", description = "Insufficient permissions - SUPERADMIN required"),
+            @ApiResponse(responseCode = "404", description = "One or more role IDs not found"),
+            @ApiResponse(responseCode = "409", description = "User already exists")
+    })
+    @SecurityRequirement(name = "bearerAuth")
+    public ResponseEntity<UserDTO> registerAdmin(@Valid @RequestBody AdminRegisterRequest request) {
+        UserDTO createdUser = authService.registerAdmin(request);
+        return new ResponseEntity<>(createdUser, HttpStatus.CREATED);
+    }
+    
+    /**
      * Authenticate user and generate JWT tokens.
      * POST /api/auth/login
+     * 
+     * Security: Public access - no authentication required.
+     * Available to all users regardless of role.
      */
     @PostMapping("/login")
     @Operation(
             summary = "Login user",
-            description = "Authenticates user credentials and returns JWT access and refresh tokens"
+            description = "Authenticates user credentials and returns JWT access and refresh tokens. Public endpoint."
     )
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Login successful",
@@ -75,11 +111,14 @@ public class AuthController {
     /**
      * Refresh access token using refresh token.
      * POST /api/auth/refresh
+     * 
+     * Security: Public access - no authentication required (uses refresh token in request body).
+     * Available to all users regardless of role.
      */
     @PostMapping("/refresh")
     @Operation(
             summary = "Refresh access token",
-            description = "Generates a new access token using a valid refresh token"
+            description = "Generates a new access token using a valid refresh token. Public endpoint."
     )
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Token refreshed successfully",
@@ -95,11 +134,14 @@ public class AuthController {
     /**
      * Get current authenticated user's profile.
      * GET /api/auth/me
+     * 
+     * Security: Requires authentication (any authenticated user).
+     * Available to all roles: SUPERADMIN, ADMIN, B2B, CUSTOMER.
      */
     @GetMapping("/me")
     @Operation(
             summary = "Get current user profile",
-            description = "Returns the profile information of the currently authenticated user"
+            description = "Returns the profile information of the currently authenticated user. Requires authentication."
     )
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "User profile retrieved successfully",
@@ -117,11 +159,14 @@ public class AuthController {
     /**
      * Logout user by blacklisting the current access token.
      * POST /api/auth/logout
+     * 
+     * Security: Requires authentication (any authenticated user).
+     * Available to all roles: SUPERADMIN, ADMIN, B2B, CUSTOMER.
      */
     @PostMapping("/logout")
     @Operation(
             summary = "Logout user",
-            description = "Invalidates the current access token by blacklisting it"
+            description = "Invalidates the current access token by blacklisting it. Requires authentication."
     )
     @ApiResponses(value = {
             @ApiResponse(responseCode = "204", description = "Logout successful"),
