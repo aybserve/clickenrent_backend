@@ -31,4 +31,29 @@ public class LocationRoleService {
                 .orElseThrow(() -> new ResourceNotFoundException("LocationRole", "id", id));
         return locationRoleMapper.toDto(role);
     }
+
+    @Transactional
+    public LocationRoleDTO createLocationRole(LocationRoleDTO locationRoleDTO) {
+        LocationRole role = locationRoleMapper.toEntity(locationRoleDTO);
+        LocationRole savedRole = locationRoleRepository.save(role);
+        return locationRoleMapper.toDto(savedRole);
+    }
+
+    @Transactional
+    public LocationRoleDTO updateLocationRole(Long id, LocationRoleDTO locationRoleDTO) {
+        LocationRole role = locationRoleRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("LocationRole", "id", id));
+        
+        role.setName(locationRoleDTO.getName());
+        
+        LocationRole updatedRole = locationRoleRepository.save(role);
+        return locationRoleMapper.toDto(updatedRole);
+    }
+
+    @Transactional
+    public void deleteLocationRole(Long id) {
+        LocationRole role = locationRoleRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("LocationRole", "id", id));
+        locationRoleRepository.delete(role);
+    }
 }
