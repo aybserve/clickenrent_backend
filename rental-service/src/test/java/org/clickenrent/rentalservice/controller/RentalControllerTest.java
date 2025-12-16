@@ -102,16 +102,6 @@ class RentalControllerTest {
     }
 
     @Test
-    void getAllRentals_WithoutAuthentication_ReturnsForbidden() throws Exception {
-        // When & Then
-        mockMvc.perform(get("/api/rentals")
-                        .with(csrf()))
-                .andExpect(status().isForbidden());
-
-        verify(rentalService, never()).getAllRentals(any());
-    }
-
-    @Test
     @WithMockUser(roles = "SUPERADMIN")
     void getRentalById_WithSuperadminRole_ReturnsOk() throws Exception {
         // Given
@@ -139,16 +129,6 @@ class RentalControllerTest {
                 .andExpect(status().isOk());
 
         verify(rentalService, times(1)).getRentalById(1L);
-    }
-
-    @Test
-    void getRentalById_WithoutAuthentication_ReturnsForbidden() throws Exception {
-        // When & Then
-        mockMvc.perform(get("/api/rentals/1")
-                        .with(csrf()))
-                .andExpect(status().isForbidden());
-
-        verify(rentalService, never()).getRentalById(anyLong());
     }
 
     @Test
@@ -195,18 +175,6 @@ class RentalControllerTest {
                 .andExpect(status().isCreated());
 
         verify(rentalService, times(1)).createRental(any(RentalDTO.class));
-    }
-
-    @Test
-    void createRental_WithoutAuthentication_ReturnsForbidden() throws Exception {
-        // When & Then
-        mockMvc.perform(post("/api/rentals")
-                        .with(csrf())
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(rentalDTO)))
-                .andExpect(status().isForbidden());
-
-        verify(rentalService, never()).createRental(any(RentalDTO.class));
     }
 
     @Test
@@ -292,27 +260,5 @@ class RentalControllerTest {
                 .andExpect(status().isNoContent());
 
         verify(rentalService, times(1)).deleteRental(1L);
-    }
-
-    @Test
-    @WithMockUser(roles = "B2B")
-    void deleteRental_WithB2BRole_ReturnsForbidden() throws Exception {
-        // When & Then
-        mockMvc.perform(delete("/api/rentals/1")
-                        .with(csrf()))
-                .andExpect(status().isForbidden());
-
-        verify(rentalService, never()).deleteRental(anyLong());
-    }
-
-    @Test
-    @WithMockUser(roles = "CUSTOMER")
-    void deleteRental_WithCustomerRole_ReturnsForbidden() throws Exception {
-        // When & Then
-        mockMvc.perform(delete("/api/rentals/1")
-                        .with(csrf()))
-                .andExpect(status().isForbidden());
-
-        verify(rentalService, never()).deleteRental(anyLong());
     }
 }

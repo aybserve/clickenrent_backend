@@ -45,20 +45,18 @@ class ChargingStationBrandServiceTest {
     @BeforeEach
     void setUp() {
         testBrand = ChargingStationBrand.builder()
-                .id(1L)
-                .name("Tesla")
-                .companyId(1L)
-                .build();
+        .id(1L)
+        .name("Tesla")
+        .companyId(1L)
+        .build();
 
         testBrandDTO = ChargingStationBrandDTO.builder()
-                .id(1L)
-                .name("Tesla")
-                .companyId(1L)
-                .build();
+        .id(1L)
+        .name("Tesla")
+        .companyId(1L)
+        .build();
 
-        when(securityService.isAdmin()).thenReturn(true);
-        when(securityService.hasAccessToCompany(anyLong())).thenReturn(true);
-    }
+            }
 
     @Test
     void getAllBrands_ReturnsAllBrands() {
@@ -75,6 +73,7 @@ class ChargingStationBrandServiceTest {
 
     @Test
     void getBrandsByCompany_Success() {
+        when(securityService.isAdmin()).thenReturn(true);
         when(chargingStationBrandRepository.findByCompanyId(1L)).thenReturn(Collections.singletonList(testBrand));
         when(chargingStationBrandMapper.toDto(testBrand)).thenReturn(testBrandDTO);
 
@@ -106,6 +105,7 @@ class ChargingStationBrandServiceTest {
 
     @Test
     void createBrand_Success() {
+        when(securityService.isAdmin()).thenReturn(true);
         when(chargingStationBrandMapper.toEntity(testBrandDTO)).thenReturn(testBrand);
         when(chargingStationBrandRepository.save(any())).thenReturn(testBrand);
         when(chargingStationBrandMapper.toDto(testBrand)).thenReturn(testBrandDTO);
@@ -118,6 +118,7 @@ class ChargingStationBrandServiceTest {
 
     @Test
     void updateBrand_Success() {
+        when(securityService.isAdmin()).thenReturn(true);
         when(chargingStationBrandRepository.findById(1L)).thenReturn(Optional.of(testBrand));
         doNothing().when(chargingStationBrandMapper).updateEntityFromDto(testBrandDTO, testBrand);
         when(chargingStationBrandRepository.save(any())).thenReturn(testBrand);
@@ -132,6 +133,7 @@ class ChargingStationBrandServiceTest {
 
     @Test
     void deleteBrand_Success() {
+        when(securityService.isAdmin()).thenReturn(true);
         when(chargingStationBrandRepository.findById(1L)).thenReturn(Optional.of(testBrand));
         doNothing().when(chargingStationBrandRepository).delete(testBrand);
 
@@ -142,6 +144,7 @@ class ChargingStationBrandServiceTest {
 
     @Test
     void deleteBrand_NotFound() {
+        when(securityService.isAdmin()).thenReturn(true);
         when(chargingStationBrandRepository.findById(999L)).thenReturn(Optional.empty());
 
         assertThrows(ResourceNotFoundException.class, () -> chargingStationBrandService.deleteBrand(999L));

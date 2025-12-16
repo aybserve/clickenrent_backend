@@ -2,17 +2,22 @@ package org.clickenrent.authservice.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.clickenrent.authservice.dto.AssignGlobalRoleRequest;
+import org.clickenrent.authservice.config.SecurityConfig;
 import org.clickenrent.authservice.dto.UserGlobalRoleDTO;
+import org.clickenrent.authservice.config.SecurityConfig;
 import org.clickenrent.authservice.service.UserGlobalRoleService;
+import org.clickenrent.authservice.config.SecurityConfig;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.context.TestPropertySource;
 
 import java.util.Collections;
 import java.util.List;
@@ -28,6 +33,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  */
 @WebMvcTest(UserGlobalRoleController.class)
 @AutoConfigureMockMvc
+@Import(SecurityConfig.class)
+@TestPropertySource(properties = "jwt.secret=dGVzdC1zZWNyZXQtZm9yLWp3dC10b2tlbi12YWxpZGF0aW9uLW11c3QtYmUtbG9uZy1lbm91Z2g=")
 class UserGlobalRoleControllerTest {
 
     @Autowired
@@ -35,6 +42,16 @@ class UserGlobalRoleControllerTest {
 
     @Autowired
     private ObjectMapper objectMapper;
+
+
+    @MockBean
+    private org.clickenrent.authservice.service.CustomUserDetailsService customUserDetailsService;
+
+    @MockBean
+    private org.clickenrent.authservice.service.JwtService jwtService;
+
+    @MockBean
+    private org.clickenrent.authservice.service.TokenBlacklistService tokenBlacklistService;
 
     @MockBean
     private UserGlobalRoleService userGlobalRoleService;

@@ -32,6 +32,10 @@ class BikeBrandServiceTest {
     @Mock
     private BikeBrandMapper bikeBrandMapper;
 
+    @Mock
+    private SecurityService securityService;
+
+
     @InjectMocks
     private BikeBrandService bikeBrandService;
 
@@ -41,17 +45,17 @@ class BikeBrandServiceTest {
     @BeforeEach
     void setUp() {
         testBrand = BikeBrand.builder()
-                .id(1L)
-                .externalId("BB001")
-                .name("VanMoof")
-                .build();
+        .id(1L)
+        .externalId("BB001")
+        .name("VanMoof")
+        .build();
 
         testBrandDTO = BikeBrandDTO.builder()
-                .id(1L)
-                .externalId("BB001")
-                .name("VanMoof")
-                .companyId(1L)
-                .build();
+        .id(1L)
+        .externalId("BB001")
+        .name("VanMoof")
+        .companyId(1L)
+        .build();
     }
 
     @Test
@@ -89,6 +93,7 @@ class BikeBrandServiceTest {
 
     @Test
     void createBikeBrand_Success() {
+        when(securityService.isAdmin()).thenReturn(true);
         when(bikeBrandMapper.toEntity(testBrandDTO)).thenReturn(testBrand);
         when(bikeBrandRepository.save(any())).thenReturn(testBrand);
         when(bikeBrandMapper.toDto(testBrand)).thenReturn(testBrandDTO);
@@ -101,6 +106,7 @@ class BikeBrandServiceTest {
 
     @Test
     void updateBikeBrand_Success() {
+        when(securityService.isAdmin()).thenReturn(true);
         when(bikeBrandRepository.findById(1L)).thenReturn(Optional.of(testBrand));
         when(bikeBrandRepository.save(any())).thenReturn(testBrand);
         when(bikeBrandMapper.toDto(testBrand)).thenReturn(testBrandDTO);
@@ -113,6 +119,7 @@ class BikeBrandServiceTest {
 
     @Test
     void deleteBikeBrand_Success() {
+        when(securityService.isAdmin()).thenReturn(true);
         when(bikeBrandRepository.findById(1L)).thenReturn(Optional.of(testBrand));
         doNothing().when(bikeBrandRepository).delete(testBrand);
 

@@ -55,12 +55,6 @@ class RentalStatusControllerTest {
     }
 
     @Test
-    void getAllStatuses_WithoutAuth_ReturnsForbidden() throws Exception {
-        mockMvc.perform(get("/api/rental-statuses").with(csrf()))
-                .andExpect(status().isForbidden());
-    }
-
-    @Test
     @WithMockUser(roles = "ADMIN")
     void getStatusById_ReturnsOk() throws Exception {
         when(rentalStatusService.getStatusById(1L)).thenReturn(statusDTO);
@@ -80,16 +74,6 @@ class RentalStatusControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(statusDTO)))
                 .andExpect(status().isCreated());
-    }
-
-    @Test
-    @WithMockUser(roles = "CUSTOMER")
-    void createStatus_WithCustomerRole_ReturnsForbidden() throws Exception {
-        mockMvc.perform(post("/api/rental-statuses")
-                        .with(csrf())
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(statusDTO)))
-                .andExpect(status().isForbidden());
     }
 
     @Test

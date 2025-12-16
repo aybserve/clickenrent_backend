@@ -48,19 +48,19 @@ class BikeModelServiceTest {
     @BeforeEach
     void setUp() {
         testBikeModel = BikeModel.builder()
-                .id(1L)
-                .externalId("BM001")
-                .name("VanMoof S3")
-                .build();
+        .id(1L)
+        .externalId("BM001")
+        .name("VanMoof S3")
+        .build();
 
         testBikeModelDTO = BikeModelDTO.builder()
-                .id(1L)
-                .externalId("BM001")
-                .name("VanMoof S3")
-                .bikeBrandId(1L)
-                .bikeTypeId(1L)
-                .bikeEngineId(1L)
-                .build();
+        .id(1L)
+        .externalId("BM001")
+        .name("VanMoof S3")
+        .bikeBrandId(1L)
+        .bikeTypeId(1L)
+        .bikeEngineId(1L)
+        .build();
     }
 
     @Test
@@ -107,8 +107,8 @@ class BikeModelServiceTest {
 
     @Test
     void createBikeModel_WithAdminRole_Success() {
-        // Arrange
         when(securityService.isAdmin()).thenReturn(true);
+        // Arrange
         when(bikeModelMapper.toEntity(testBikeModelDTO)).thenReturn(testBikeModel);
         when(bikeModelRepository.save(any(BikeModel.class))).thenReturn(testBikeModel);
         when(bikeModelMapper.toDto(testBikeModel)).thenReturn(testBikeModelDTO);
@@ -125,8 +125,6 @@ class BikeModelServiceTest {
     @Test
     void createBikeModel_WithoutAdminRole_ThrowsUnauthorizedException() {
         // Arrange
-        when(securityService.isAdmin()).thenReturn(false);
-
         // Act & Assert
         assertThrows(UnauthorizedException.class, () -> bikeModelService.createBikeModel(testBikeModelDTO));
         verify(bikeModelRepository, never()).save(any(BikeModel.class));
@@ -134,8 +132,8 @@ class BikeModelServiceTest {
 
     @Test
     void updateBikeModel_WithAdminRole_Success() {
-        // Arrange
         when(securityService.isAdmin()).thenReturn(true);
+        // Arrange
         when(bikeModelRepository.findById(1L)).thenReturn(Optional.of(testBikeModel));
         when(bikeModelRepository.save(any(BikeModel.class))).thenReturn(testBikeModel);
         when(bikeModelMapper.toDto(testBikeModel)).thenReturn(testBikeModelDTO);
@@ -152,8 +150,6 @@ class BikeModelServiceTest {
     @Test
     void updateBikeModel_WithoutAdminRole_ThrowsUnauthorizedException() {
         // Arrange
-        when(securityService.isAdmin()).thenReturn(false);
-
         // Act & Assert
         assertThrows(UnauthorizedException.class, () -> bikeModelService.updateBikeModel(1L, testBikeModelDTO));
         verify(bikeModelRepository, never()).save(any(BikeModel.class));
@@ -161,8 +157,8 @@ class BikeModelServiceTest {
 
     @Test
     void updateBikeModel_NotFound() {
-        // Arrange
         when(securityService.isAdmin()).thenReturn(true);
+        // Arrange
         when(bikeModelRepository.findById(999L)).thenReturn(Optional.empty());
 
         // Act & Assert
@@ -171,8 +167,8 @@ class BikeModelServiceTest {
 
     @Test
     void deleteBikeModel_WithAdminRole_Success() {
-        // Arrange
         when(securityService.isAdmin()).thenReturn(true);
+        // Arrange
         when(bikeModelRepository.findById(1L)).thenReturn(Optional.of(testBikeModel));
         doNothing().when(bikeModelRepository).delete(testBikeModel);
 
@@ -187,8 +183,6 @@ class BikeModelServiceTest {
     @Test
     void deleteBikeModel_WithoutAdminRole_ThrowsUnauthorizedException() {
         // Arrange
-        when(securityService.isAdmin()).thenReturn(false);
-
         // Act & Assert
         assertThrows(UnauthorizedException.class, () -> bikeModelService.deleteBikeModel(1L));
         verify(bikeModelRepository, never()).delete(any(BikeModel.class));
@@ -196,8 +190,8 @@ class BikeModelServiceTest {
 
     @Test
     void deleteBikeModel_NotFound() {
-        // Arrange
         when(securityService.isAdmin()).thenReturn(true);
+        // Arrange
         when(bikeModelRepository.findById(999L)).thenReturn(Optional.empty());
 
         // Act & Assert

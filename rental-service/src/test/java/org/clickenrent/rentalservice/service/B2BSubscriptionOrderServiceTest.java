@@ -33,6 +33,10 @@ class B2BSubscriptionOrderServiceTest {
     @Mock
     private B2BSubscriptionOrderMapper b2bSubscriptionOrderMapper;
 
+    @Mock
+    private SecurityService securityService;
+
+
     @InjectMocks
     private B2BSubscriptionOrderService b2bSubscriptionOrderService;
 
@@ -42,23 +46,24 @@ class B2BSubscriptionOrderServiceTest {
     @BeforeEach
     void setUp() {
         testOrder = B2BSubscriptionOrder.builder()
-                .id(1L)
-                .externalId("B2BSORD001")
-                .dateTime(LocalDateTime.now())
-                .build();
+        .id(1L)
+        .externalId("B2BSORD001")
+        .dateTime(LocalDateTime.now())
+        .build();
 
         testOrderDTO = B2BSubscriptionOrderDTO.builder()
-                .id(1L)
-                .externalId("B2BSORD001")
-                .locationId(1L)
-                .dateTime(LocalDateTime.now())
-                .b2bSubscriptionOrderStatusId(2L)
-                .b2bSubscriptionId(1L)
-                .build();
+        .id(1L)
+        .externalId("B2BSORD001")
+        .locationId(1L)
+        .dateTime(LocalDateTime.now())
+        .b2bSubscriptionOrderStatusId(2L)
+        .b2bSubscriptionId(1L)
+        .build();
     }
 
     @Test
     void getAllOrders_ReturnsAll() {
+        when(securityService.isAdmin()).thenReturn(true);
         Pageable pageable = PageRequest.of(0, 20);
         Page<B2BSubscriptionOrder> orderPage = new PageImpl<>(Collections.singletonList(testOrder));
         when(b2bSubscriptionOrderRepository.findAll(pageable)).thenReturn(orderPage);
@@ -73,6 +78,7 @@ class B2BSubscriptionOrderServiceTest {
 
     @Test
     void getOrderById_Success() {
+        when(securityService.isAdmin()).thenReturn(true);
         when(b2bSubscriptionOrderRepository.findById(1L)).thenReturn(Optional.of(testOrder));
         when(b2bSubscriptionOrderMapper.toDto(testOrder)).thenReturn(testOrderDTO);
 
@@ -92,6 +98,7 @@ class B2BSubscriptionOrderServiceTest {
 
     @Test
     void createOrder_Success() {
+        when(securityService.isAdmin()).thenReturn(true);
         when(b2bSubscriptionOrderMapper.toEntity(testOrderDTO)).thenReturn(testOrder);
         when(b2bSubscriptionOrderRepository.save(any())).thenReturn(testOrder);
         when(b2bSubscriptionOrderMapper.toDto(testOrder)).thenReturn(testOrderDTO);
@@ -105,6 +112,7 @@ class B2BSubscriptionOrderServiceTest {
 
     @Test
     void updateOrder_Success() {
+        when(securityService.isAdmin()).thenReturn(true);
         when(b2bSubscriptionOrderRepository.findById(1L)).thenReturn(Optional.of(testOrder));
         doNothing().when(b2bSubscriptionOrderMapper).updateEntityFromDto(testOrderDTO, testOrder);
         when(b2bSubscriptionOrderRepository.save(any())).thenReturn(testOrder);
@@ -120,6 +128,7 @@ class B2BSubscriptionOrderServiceTest {
 
     @Test
     void deleteOrder_Success() {
+        when(securityService.isAdmin()).thenReturn(true);
         when(b2bSubscriptionOrderRepository.findById(1L)).thenReturn(Optional.of(testOrder));
         doNothing().when(b2bSubscriptionOrderRepository).delete(testOrder);
 
@@ -130,6 +139,7 @@ class B2BSubscriptionOrderServiceTest {
 
     @Test
     void deleteOrder_NotFound() {
+        when(securityService.isAdmin()).thenReturn(true);
         when(b2bSubscriptionOrderRepository.findById(999L)).thenReturn(Optional.empty());
 
         assertThrows(ResourceNotFoundException.class, () -> b2bSubscriptionOrderService.deleteOrder(999L));

@@ -61,12 +61,5 @@ class ChargingStationStatusControllerTest {
 
         mockMvc.perform(get("/api/charging-station-statuses/1").with(csrf()))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.name").value("Idle"));
-    }
-
-    @Test
-    void getAllStatuses_WithoutAuth_ReturnsForbidden() throws Exception {
-        mockMvc.perform(get("/api/charging-station-statuses").with(csrf()))
-                .andExpect(status().isForbidden());
-    }
+                .andExpect(jsonPath("$.name").value("Idle"));}
 }

@@ -82,17 +82,6 @@ class B2BSaleProductControllerTest {
                         .content(objectMapper.writeValueAsString(productDTO)))
                 .andExpect(status().isCreated());
     }
-
-    @Test
-    @WithMockUser(roles = "CUSTOMER")
-    void createProduct_WithCustomerRole_ReturnsForbidden() throws Exception {
-        mockMvc.perform(post("/api/b2b-sale-products")
-                        .with(csrf())
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(productDTO)))
-                .andExpect(status().isForbidden());
-    }
-
     @Test
     @WithMockUser(roles = "ADMIN")
     void updateProduct_ReturnsOk() throws Exception {

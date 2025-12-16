@@ -50,6 +50,7 @@ class BikeRentalServiceTest {
     @Mock
     private SecurityService securityService;
 
+
     @InjectMocks
     private BikeRentalService bikeRentalService;
 
@@ -61,44 +62,44 @@ class BikeRentalServiceTest {
     @BeforeEach
     void setUp() {
         testBike = Bike.builder()
-                .id(1L)
-                .code("BIKE001")
-                .build();
+        .id(1L)
+        .code("BIKE001")
+        .build();
 
         testRental = Rental.builder()
-                .id(1L)
-                .userId(1L)
-                .companyId(1L)
-                .build();
+        .id(1L)
+        .userId(1L)
+        .companyId(1L)
+        .build();
 
         testBikeRental = BikeRental.builder()
-                .id(1L)
-                .externalId("BR001")
-                .rental(testRental)
-                .bike(testBike)
-                .startDateTime(LocalDateTime.now())
-                .endDateTime(LocalDateTime.now().plusDays(1))
-                .build();
+        .id(1L)
+        .externalId("BR001")
+        .rental(testRental)
+        .bike(testBike)
+        .startDateTime(LocalDateTime.now())
+        .endDateTime(LocalDateTime.now().plusDays(1))
+        .build();
 
         testBikeRentalDTO = BikeRentalDTO.builder()
-                .id(1L)
-                .externalId("BR001")
-                .rentalId(1L)
-                .bikeId(1L)
-                .locationId(1L)
-                .bikeRentalStatusId(1L)
-                .rentalUnitId(1L)
-                .startDateTime(LocalDateTime.now())
-                .endDateTime(LocalDateTime.now().plusDays(1))
-                .build();
+        .id(1L)
+        .externalId("BR001")
+        .rentalId(1L)
+        .bikeId(1L)
+        .locationId(1L)
+        .bikeRentalStatusId(1L)
+        .rentalUnitId(1L)
+        .startDateTime(LocalDateTime.now())
+        .endDateTime(LocalDateTime.now().plusDays(1))
+        .build();
     }
 
     @Test
     void getAllBikeRentals_WithAdminRole_ReturnsAllRentals() {
         // Arrange
+        when(securityService.isAdmin()).thenReturn(true);
         Pageable pageable = PageRequest.of(0, 20);
         Page<BikeRental> rentalPage = new PageImpl<>(Collections.singletonList(testBikeRental));
-        when(securityService.isAdmin()).thenReturn(true);
         when(bikeRentalRepository.findAll(pageable)).thenReturn(rentalPage);
         when(bikeRentalMapper.toDto(testBikeRental)).thenReturn(testBikeRentalDTO);
 
@@ -116,8 +117,6 @@ class BikeRentalServiceTest {
     void getAllBikeRentals_WithoutAdminRole_ThrowsUnauthorizedException() {
         // Arrange
         Pageable pageable = PageRequest.of(0, 20);
-        when(securityService.isAdmin()).thenReturn(false);
-
         // Act & Assert
         assertThrows(UnauthorizedException.class, () -> bikeRentalService.getAllBikeRentals(pageable));
     }
@@ -125,8 +124,8 @@ class BikeRentalServiceTest {
     @Test
     void getBikeRentalById_WithAdminRole_Success() {
         // Arrange
-        when(bikeRentalRepository.findById(1L)).thenReturn(Optional.of(testBikeRental));
         when(securityService.isAdmin()).thenReturn(true);
+        when(bikeRentalRepository.findById(1L)).thenReturn(Optional.of(testBikeRental));
         when(bikeRentalMapper.toDto(testBikeRental)).thenReturn(testBikeRentalDTO);
 
         // Act
@@ -152,8 +151,6 @@ class BikeRentalServiceTest {
         // Arrange
         when(bikeRentalRepository.findById(1L)).thenReturn(Optional.of(testBikeRental));
         when(securityService.isAdmin()).thenReturn(false);
-        when(securityService.hasAccessToUser(1L)).thenReturn(false);
-
         // Act & Assert
         assertThrows(UnauthorizedException.class, () -> bikeRentalService.getBikeRentalById(1L));
     }
@@ -161,6 +158,7 @@ class BikeRentalServiceTest {
     @Test
     void createBikeRental_Success() {
         // Arrange
+        when(securityService.hasAccessToUser(anyLong())).thenReturn(true);
         when(bikeRepository.findById(1L)).thenReturn(Optional.of(testBike));
         when(rentalRepository.findById(1L)).thenReturn(Optional.of(testRental));
         when(bikeRentalMapper.toEntity(testBikeRentalDTO)).thenReturn(testBikeRental);
@@ -198,8 +196,8 @@ class BikeRentalServiceTest {
     @Test
     void deleteBikeRental_WithAdminRole_Success() {
         // Arrange
-        when(bikeRentalRepository.findById(1L)).thenReturn(Optional.of(testBikeRental));
         when(securityService.isAdmin()).thenReturn(true);
+        when(bikeRentalRepository.findById(1L)).thenReturn(Optional.of(testBikeRental));
         doNothing().when(bikeRentalRepository).delete(testBikeRental);
 
         // Act
@@ -214,8 +212,6 @@ class BikeRentalServiceTest {
     void deleteBikeRental_WithoutAdminRole_ThrowsUnauthorizedException() {
         // Arrange
         when(bikeRentalRepository.findById(1L)).thenReturn(Optional.of(testBikeRental));
-        when(securityService.isAdmin()).thenReturn(false);
-
         // Act & Assert
         assertThrows(UnauthorizedException.class, () -> bikeRentalService.deleteBikeRental(1L));
         verify(bikeRentalRepository, never()).delete(any(BikeRental.class));

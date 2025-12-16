@@ -34,6 +34,9 @@ class B2BSaleServiceTest {
     @Mock
     private B2BSaleMapper b2bSaleMapper;
 
+    @Mock
+    private SecurityService securityService;
+
     @InjectMocks
     private B2BSaleService b2bSaleService;
 
@@ -43,22 +46,23 @@ class B2BSaleServiceTest {
     @BeforeEach
     void setUp() {
         testSale = B2BSale.builder()
-                .id(1L)
-                .externalId("B2BS001")
-                .dateTime(LocalDateTime.now())
-                .build();
+        .id(1L)
+        .externalId("B2BS001")
+        .dateTime(LocalDateTime.now())
+        .build();
 
         testSaleDTO = B2BSaleDTO.builder()
-                .id(1L)
-                .externalId("B2BS001")
-                .locationId(1L)
-                .b2bSaleStatusId(2L)
-                .dateTime(LocalDateTime.now())
-                .build();
+        .id(1L)
+        .externalId("B2BS001")
+        .locationId(1L)
+        .b2bSaleStatusId(2L)
+        .dateTime(LocalDateTime.now())
+        .build();
     }
 
     @Test
     void getAllSales_ReturnsAllSales() {
+        when(securityService.isAdmin()).thenReturn(true);
         Pageable pageable = PageRequest.of(0, 20);
         Page<B2BSale> salePage = new PageImpl<>(Collections.singletonList(testSale));
         when(b2bSaleRepository.findAll(pageable)).thenReturn(salePage);
@@ -72,6 +76,7 @@ class B2BSaleServiceTest {
 
     @Test
     void getSaleById_Success() {
+        when(securityService.isAdmin()).thenReturn(true);
         when(b2bSaleRepository.findById(1L)).thenReturn(Optional.of(testSale));
         when(b2bSaleMapper.toDto(testSale)).thenReturn(testSaleDTO);
 
@@ -91,6 +96,7 @@ class B2BSaleServiceTest {
 
     @Test
     void createSale_Success() {
+        when(securityService.isAdmin()).thenReturn(true);
         when(b2bSaleMapper.toEntity(testSaleDTO)).thenReturn(testSale);
         when(b2bSaleRepository.save(any())).thenReturn(testSale);
         when(b2bSaleMapper.toDto(testSale)).thenReturn(testSaleDTO);
@@ -102,6 +108,7 @@ class B2BSaleServiceTest {
 
     @Test
     void updateSale_Success() {
+        when(securityService.isAdmin()).thenReturn(true);
         when(b2bSaleRepository.findById(1L)).thenReturn(Optional.of(testSale));
         when(b2bSaleRepository.save(any())).thenReturn(testSale);
         when(b2bSaleMapper.toDto(testSale)).thenReturn(testSaleDTO);
@@ -113,6 +120,7 @@ class B2BSaleServiceTest {
 
     @Test
     void deleteSale_Success() {
+        when(securityService.isAdmin()).thenReturn(true);
         when(b2bSaleRepository.findById(1L)).thenReturn(Optional.of(testSale));
         doNothing().when(b2bSaleRepository).delete(testSale);
 

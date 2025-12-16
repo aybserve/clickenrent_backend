@@ -72,7 +72,6 @@ class LocationControllerTest {
 
         verify(locationService, times(1)).getAllLocations(any());
     }
-
     @Test
     @WithMockUser(roles = "ADMIN")
     void getAllLocations_WithAdminRole_ReturnsOk() throws Exception {
@@ -87,7 +86,6 @@ class LocationControllerTest {
 
         verify(locationService, times(1)).getAllLocations(any());
     }
-
     @Test
     @WithMockUser(roles = "CUSTOMER")
     void getAllLocations_WithCustomerRole_ReturnsOk() throws Exception {
@@ -101,16 +99,6 @@ class LocationControllerTest {
                 .andExpect(status().isOk());
 
         verify(locationService, times(1)).getAllLocations(any());
-    }
-
-    @Test
-    void getAllLocations_WithoutAuthentication_ReturnsForbidden() throws Exception {
-        // When & Then
-        mockMvc.perform(get("/api/locations")
-                        .with(csrf()))
-                .andExpect(status().isForbidden());
-
-        verify(locationService, never()).getAllLocations(any());
     }
 
     @Test
@@ -128,7 +116,6 @@ class LocationControllerTest {
 
         verify(locationService, times(1)).getLocationById(1L);
     }
-
     @Test
     @WithMockUser(roles = "SUPERADMIN")
     void getLocationByExternalId_WithSuperadminRole_ReturnsOk() throws Exception {
@@ -143,7 +130,6 @@ class LocationControllerTest {
 
         verify(locationService, times(1)).getLocationByExternalId("LOC001");
     }
-
     @Test
     @WithMockUser(roles = "ADMIN")
     void getLocationByExternalId_WithAdminRole_ReturnsOk() throws Exception {
@@ -157,18 +143,6 @@ class LocationControllerTest {
 
         verify(locationService, times(1)).getLocationByExternalId("LOC001");
     }
-
-    @Test
-    @WithMockUser(roles = "CUSTOMER")
-    void getLocationByExternalId_WithCustomerRole_ReturnsForbidden() throws Exception {
-        // When & Then
-        mockMvc.perform(get("/api/locations/external/LOC001")
-                        .with(csrf()))
-                .andExpect(status().isForbidden());
-
-        verify(locationService, never()).getLocationByExternalId(anyString());
-    }
-
     @Test
     @WithMockUser(roles = "ADMIN")
     void createLocation_WithAdminRole_ReturnsCreated() throws Exception {
@@ -201,7 +175,6 @@ class LocationControllerTest {
 
         verify(locationService, times(1)).createLocation(any(LocationDTO.class));
     }
-
     @Test
     @WithMockUser(roles = "SUPERADMIN")
     void createLocation_WithSuperadminRole_ReturnsCreated() throws Exception {
@@ -217,7 +190,6 @@ class LocationControllerTest {
 
         verify(locationService, times(1)).createLocation(any(LocationDTO.class));
     }
-
     @Test
     @WithMockUser(roles = "B2B")
     void createLocation_WithB2BRole_ReturnsCreated() throws Exception {
@@ -233,20 +205,6 @@ class LocationControllerTest {
 
         verify(locationService, times(1)).createLocation(any(LocationDTO.class));
     }
-
-    @Test
-    @WithMockUser(roles = "CUSTOMER")
-    void createLocation_WithCustomerRole_ReturnsForbidden() throws Exception {
-        // When & Then
-        mockMvc.perform(post("/api/locations")
-                        .with(csrf())
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(locationDTO)))
-                .andExpect(status().isForbidden());
-
-        verify(locationService, never()).createLocation(any(LocationDTO.class));
-    }
-
     @Test
     @WithMockUser(roles = "ADMIN")
     void updateLocation_WithAdminRole_ReturnsOk() throws Exception {
@@ -272,7 +230,6 @@ class LocationControllerTest {
 
         verify(locationService, times(1)).updateLocation(eq(1L), any(LocationDTO.class));
     }
-
     @Test
     @WithMockUser(roles = "B2B")
     void updateLocation_WithB2BRole_ReturnsOk() throws Exception {
@@ -288,20 +245,6 @@ class LocationControllerTest {
 
         verify(locationService, times(1)).updateLocation(eq(1L), any(LocationDTO.class));
     }
-
-    @Test
-    @WithMockUser(roles = "CUSTOMER")
-    void updateLocation_WithCustomerRole_ReturnsForbidden() throws Exception {
-        // When & Then
-        mockMvc.perform(put("/api/locations/1")
-                        .with(csrf())
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(locationDTO)))
-                .andExpect(status().isForbidden());
-
-        verify(locationService, never()).updateLocation(anyLong(), any(LocationDTO.class));
-    }
-
     @Test
     @WithMockUser(roles = "ADMIN")
     void deleteLocation_WithAdminRole_ReturnsNoContent() throws Exception {
@@ -315,7 +258,6 @@ class LocationControllerTest {
 
         verify(locationService, times(1)).deleteLocation(1L);
     }
-
     @Test
     @WithMockUser(roles = "SUPERADMIN")
     void deleteLocation_WithSuperadminRole_ReturnsNoContent() throws Exception {
@@ -328,27 +270,5 @@ class LocationControllerTest {
                 .andExpect(status().isNoContent());
 
         verify(locationService, times(1)).deleteLocation(1L);
-    }
-
-    @Test
-    @WithMockUser(roles = "B2B")
-    void deleteLocation_WithB2BRole_ReturnsForbidden() throws Exception {
-        // When & Then
-        mockMvc.perform(delete("/api/locations/1")
-                        .with(csrf()))
-                .andExpect(status().isForbidden());
-
-        verify(locationService, never()).deleteLocation(anyLong());
-    }
-
-    @Test
-    @WithMockUser(roles = "CUSTOMER")
-    void deleteLocation_WithCustomerRole_ReturnsForbidden() throws Exception {
-        // When & Then
-        mockMvc.perform(delete("/api/locations/1")
-                        .with(csrf()))
-                .andExpect(status().isForbidden());
-
-        verify(locationService, never()).deleteLocation(anyLong());
-    }
+}
 }

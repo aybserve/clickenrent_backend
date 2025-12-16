@@ -48,24 +48,24 @@ class BikeServiceTest {
     @BeforeEach
     void setUp() {
         testBike = Bike.builder()
-                .id(1L)
-                .code("BIKE001")
-                .frameNumber("FR123456")
-                .build();
+        .id(1L)
+        .code("BIKE001")
+        .frameNumber("FR123456")
+        .build();
 
         testBikeDTO = BikeDTO.builder()
-                .id(1L)
-                .code("BIKE001")
-                .frameNumber("FR123456")
-                .build();
+        .id(1L)
+        .code("BIKE001")
+        .frameNumber("FR123456")
+        .build();
     }
 
     @Test
     void getAllBikes_WithAdminRole_ReturnsAllBikes() {
         // Arrange
+        when(securityService.isAdmin()).thenReturn(true);
         Pageable pageable = PageRequest.of(0, 20);
         Page<Bike> bikePage = new PageImpl<>(Collections.singletonList(testBike));
-        when(securityService.isAdmin()).thenReturn(true);
         when(bikeRepository.findAll(pageable)).thenReturn(bikePage);
         when(bikeMapper.toDto(testBike)).thenReturn(testBikeDTO);
 
@@ -84,8 +84,6 @@ class BikeServiceTest {
     void getAllBikes_WithoutAdminRole_ThrowsUnauthorizedException() {
         // Arrange
         Pageable pageable = PageRequest.of(0, 20);
-        when(securityService.isAdmin()).thenReturn(false);
-
         // Act & Assert
         assertThrows(UnauthorizedException.class, () -> bikeService.getAllBikes(pageable));
         verify(bikeRepository, never()).findAll(any(Pageable.class));
@@ -160,8 +158,6 @@ class BikeServiceTest {
     @Test
     void createBike_WithoutAdminRole_ThrowsUnauthorizedException() {
         // Arrange
-        when(securityService.isAdmin()).thenReturn(false);
-
         // Act & Assert
         assertThrows(UnauthorizedException.class, () -> bikeService.createBike(testBikeDTO));
         verify(bikeRepository, never()).save(any(Bike.class));
@@ -188,8 +184,6 @@ class BikeServiceTest {
     void updateBike_WithoutAdminRole_ThrowsUnauthorizedException() {
         // Arrange
         when(bikeRepository.findById(1L)).thenReturn(Optional.of(testBike));
-        when(securityService.isAdmin()).thenReturn(false);
-
         // Act & Assert
         assertThrows(UnauthorizedException.class, () -> bikeService.updateBike(1L, testBikeDTO));
         verify(bikeRepository, never()).save(any(Bike.class));
@@ -224,8 +218,6 @@ class BikeServiceTest {
     void deleteBike_WithoutAdminRole_ThrowsUnauthorizedException() {
         // Arrange
         when(bikeRepository.findById(1L)).thenReturn(Optional.of(testBike));
-        when(securityService.isAdmin()).thenReturn(false);
-
         // Act & Assert
         assertThrows(UnauthorizedException.class, () -> bikeService.deleteBike(1L));
         verify(bikeRepository, never()).delete(any(Bike.class));

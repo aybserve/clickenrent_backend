@@ -9,6 +9,7 @@ import org.clickenrent.paymentservice.dto.CurrencyDTO;
 import org.clickenrent.paymentservice.service.CurrencyService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -49,6 +50,7 @@ public class CurrencyController {
     }
 
     @PostMapping
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Create new currency")
     @ApiResponse(responseCode = "201", description = "Currency created successfully")
     @ApiResponse(responseCode = "400", description = "Invalid input")

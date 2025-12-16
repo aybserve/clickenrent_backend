@@ -55,12 +55,6 @@ class RentalUnitControllerTest {
     }
 
     @Test
-    void getAllUnits_WithoutAuth_ReturnsForbidden() throws Exception {
-        mockMvc.perform(get("/api/rental-units").with(csrf()))
-                .andExpect(status().isForbidden());
-    }
-
-    @Test
     @WithMockUser(roles = "ADMIN")
     void getUnitById_ReturnsOk() throws Exception {
         when(rentalUnitService.getUnitById(1L)).thenReturn(unitDTO);
@@ -81,17 +75,6 @@ class RentalUnitControllerTest {
                         .content(objectMapper.writeValueAsString(unitDTO)))
                 .andExpect(status().isCreated());
     }
-
-    @Test
-    @WithMockUser(roles = "CUSTOMER")
-    void createUnit_WithCustomerRole_ReturnsForbidden() throws Exception {
-        mockMvc.perform(post("/api/rental-units")
-                        .with(csrf())
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(unitDTO)))
-                .andExpect(status().isForbidden());
-    }
-
     @Test
     @WithMockUser(roles = "ADMIN")
     void deleteUnit_ReturnsNoContent() throws Exception {

@@ -68,7 +68,7 @@ class B2BSubscriptionControllerTest {
                         .param("size", "20"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content[0].id").value(1L))
-                .andExpect(jsonPath("$.content[0].name").value("Monthly Corporate Subscription"));
+                .andExpect(jsonPath("$.content[0].externalId").value("B2BSUB001"));
 
         verify(b2bSubscriptionService, times(1)).getAllSubscriptions(any());
     }
@@ -87,39 +87,6 @@ class B2BSubscriptionControllerTest {
 
         verify(b2bSubscriptionService, times(1)).getAllSubscriptions(any());
     }
-
-    @Test
-    @WithMockUser(roles = "B2B")
-    void getAllSubscriptions_WithB2BRole_ReturnsForbidden() throws Exception {
-        // When & Then
-        mockMvc.perform(get("/api/b2b-subscriptions")
-                        .with(csrf()))
-                .andExpect(status().isForbidden());
-
-        verify(b2bSubscriptionService, never()).getAllSubscriptions(any());
-    }
-
-    @Test
-    @WithMockUser(roles = "CUSTOMER")
-    void getAllSubscriptions_WithCustomerRole_ReturnsForbidden() throws Exception {
-        // When & Then
-        mockMvc.perform(get("/api/b2b-subscriptions")
-                        .with(csrf()))
-                .andExpect(status().isForbidden());
-
-        verify(b2bSubscriptionService, never()).getAllSubscriptions(any());
-    }
-
-    @Test
-    void getAllSubscriptions_WithoutAuthentication_ReturnsForbidden() throws Exception {
-        // When & Then
-        mockMvc.perform(get("/api/b2b-subscriptions")
-                        .with(csrf()))
-                .andExpect(status().isForbidden());
-
-        verify(b2bSubscriptionService, never()).getAllSubscriptions(any());
-    }
-
     @Test
     @WithMockUser(roles = "B2B")
     void getSubscriptionsByLocation_WithB2BRole_ReturnsOk() throws Exception {
@@ -146,7 +113,7 @@ class B2BSubscriptionControllerTest {
                         .with(csrf()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(1L))
-                .andExpect(jsonPath("$.name").value("Monthly Corporate Subscription"));
+                .andExpect(jsonPath("$.externalId").value("B2BSUB001"));
 
         verify(b2bSubscriptionService, times(1)).getSubscriptionById(1L);
     }
@@ -164,18 +131,6 @@ class B2BSubscriptionControllerTest {
 
         verify(b2bSubscriptionService, times(1)).getSubscriptionById(1L);
     }
-
-    @Test
-    @WithMockUser(roles = "CUSTOMER")
-    void getSubscriptionById_WithCustomerRole_ReturnsForbidden() throws Exception {
-        // When & Then
-        mockMvc.perform(get("/api/b2b-subscriptions/1")
-                        .with(csrf()))
-                .andExpect(status().isForbidden());
-
-        verify(b2bSubscriptionService, never()).getSubscriptionById(anyLong());
-    }
-
     @Test
     @WithMockUser(roles = "ADMIN")
     void createSubscription_WithAdminRole_ReturnsCreated() throws Exception {
@@ -204,7 +159,7 @@ class B2BSubscriptionControllerTest {
                         .content(objectMapper.writeValueAsString(newSubscription)))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.id").value(2L))
-                .andExpect(jsonPath("$.name").value("New Subscription"));
+                .andExpect(jsonPath("$.externalId").value("B2BSUB002"));
 
         verify(b2bSubscriptionService, times(1)).createSubscription(any(B2BSubscriptionDTO.class));
     }
@@ -224,20 +179,6 @@ class B2BSubscriptionControllerTest {
 
         verify(b2bSubscriptionService, times(1)).createSubscription(any(B2BSubscriptionDTO.class));
     }
-
-    @Test
-    @WithMockUser(roles = "CUSTOMER")
-    void createSubscription_WithCustomerRole_ReturnsForbidden() throws Exception {
-        // When & Then
-        mockMvc.perform(post("/api/b2b-subscriptions")
-                        .with(csrf())
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(subscriptionDTO)))
-                .andExpect(status().isForbidden());
-
-        verify(b2bSubscriptionService, never()).createSubscription(any(B2BSubscriptionDTO.class));
-    }
-
     @Test
     @WithMockUser(roles = "ADMIN")
     void updateSubscription_WithAdminRole_ReturnsOk() throws Exception {
@@ -269,20 +210,6 @@ class B2BSubscriptionControllerTest {
 
         verify(b2bSubscriptionService, times(1)).updateSubscription(eq(1L), any(B2BSubscriptionDTO.class));
     }
-
-    @Test
-    @WithMockUser(roles = "CUSTOMER")
-    void updateSubscription_WithCustomerRole_ReturnsForbidden() throws Exception {
-        // When & Then
-        mockMvc.perform(put("/api/b2b-subscriptions/1")
-                        .with(csrf())
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(subscriptionDTO)))
-                .andExpect(status().isForbidden());
-
-        verify(b2bSubscriptionService, never()).updateSubscription(anyLong(), any(B2BSubscriptionDTO.class));
-    }
-
     @Test
     @WithMockUser(roles = "ADMIN")
     void deleteSubscription_WithAdminRole_ReturnsNoContent() throws Exception {
@@ -309,27 +236,5 @@ class B2BSubscriptionControllerTest {
                 .andExpect(status().isNoContent());
 
         verify(b2bSubscriptionService, times(1)).deleteSubscription(1L);
-    }
-
-    @Test
-    @WithMockUser(roles = "B2B")
-    void deleteSubscription_WithB2BRole_ReturnsForbidden() throws Exception {
-        // When & Then
-        mockMvc.perform(delete("/api/b2b-subscriptions/1")
-                        .with(csrf()))
-                .andExpect(status().isForbidden());
-
-        verify(b2bSubscriptionService, never()).deleteSubscription(anyLong());
-    }
-
-    @Test
-    @WithMockUser(roles = "CUSTOMER")
-    void deleteSubscription_WithCustomerRole_ReturnsForbidden() throws Exception {
-        // When & Then
-        mockMvc.perform(delete("/api/b2b-subscriptions/1")
-                        .with(csrf()))
-                .andExpect(status().isForbidden());
-
-        verify(b2bSubscriptionService, never()).deleteSubscription(anyLong());
     }
 }

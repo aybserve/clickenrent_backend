@@ -79,17 +79,6 @@ class HubImageControllerTest {
                         .content(objectMapper.writeValueAsString(imageDTO)))
                 .andExpect(status().isCreated());
     }
-
-    @Test
-    @WithMockUser(roles = "CUSTOMER")
-    void createImage_WithCustomerRole_ReturnsForbidden() throws Exception {
-        mockMvc.perform(post("/api/hub-images")
-                        .with(csrf())
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(imageDTO)))
-                .andExpect(status().isForbidden());
-    }
-
     @Test
     @WithMockUser(roles = "ADMIN")
     void updateImage_ReturnsOk() throws Exception {

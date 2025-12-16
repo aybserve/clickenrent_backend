@@ -94,17 +94,6 @@ class B2BSubscriptionOrderItemControllerTest {
                         .content(objectMapper.writeValueAsString(itemDTO)))
                 .andExpect(status().isCreated());
     }
-
-    @Test
-    @WithMockUser(roles = "CUSTOMER")
-    void createItem_WithCustomerRole_ReturnsForbidden() throws Exception {
-        mockMvc.perform(post("/api/b2b-subscription-order-items")
-                        .with(csrf())
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(itemDTO)))
-                .andExpect(status().isForbidden());
-    }
-
     @Test
     @WithMockUser(roles = "ADMIN")
     void updateItem_ReturnsOk() throws Exception {

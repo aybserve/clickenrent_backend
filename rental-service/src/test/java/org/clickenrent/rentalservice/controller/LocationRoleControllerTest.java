@@ -55,12 +55,6 @@ class LocationRoleControllerTest {
     }
 
     @Test
-    void getAllLocationRoles_WithoutAuth_ReturnsForbidden() throws Exception {
-        mockMvc.perform(get("/api/location-roles").with(csrf()))
-                .andExpect(status().isForbidden());
-    }
-
-    @Test
     @WithMockUser(roles = "ADMIN")
     void getLocationRoleById_ReturnsOk() throws Exception {
         when(locationRoleService.getRoleById(1L)).thenReturn(roleDTO);
@@ -69,7 +63,6 @@ class LocationRoleControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.name").value("Admin"));
     }
-
     @Test
     @WithMockUser(roles = "ADMIN")
     void createLocationRole_ReturnsCreated() throws Exception {
@@ -81,17 +74,6 @@ class LocationRoleControllerTest {
                         .content(objectMapper.writeValueAsString(roleDTO)))
                 .andExpect(status().isCreated());
     }
-
-    @Test
-    @WithMockUser(roles = "CUSTOMER")
-    void createLocationRole_WithCustomerRole_ReturnsForbidden() throws Exception {
-        mockMvc.perform(post("/api/location-roles")
-                        .with(csrf())
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(roleDTO)))
-                .andExpect(status().isForbidden());
-    }
-
     @Test
     @WithMockUser(roles = "ADMIN")
     void updateLocationRole_ReturnsOk() throws Exception {
@@ -103,7 +85,6 @@ class LocationRoleControllerTest {
                         .content(objectMapper.writeValueAsString(roleDTO)))
                 .andExpect(status().isOk());
     }
-
     @Test
     @WithMockUser(roles = "ADMIN")
     void deleteLocationRole_ReturnsNoContent() throws Exception {

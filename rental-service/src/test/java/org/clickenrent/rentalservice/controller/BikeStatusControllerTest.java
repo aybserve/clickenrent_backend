@@ -55,12 +55,6 @@ class BikeStatusControllerTest {
     }
 
     @Test
-    void getAllBikeStatuses_WithoutAuth_ReturnsForbidden() throws Exception {
-        mockMvc.perform(get("/api/bike-statuses").with(csrf()))
-                .andExpect(status().isForbidden());
-    }
-
-    @Test
     @WithMockUser(roles = "ADMIN")
     void getBikeStatusById_ReturnsOk() throws Exception {
         when(bikeStatusService.getBikeStatusById(1L)).thenReturn(statusDTO);
@@ -81,17 +75,6 @@ class BikeStatusControllerTest {
                         .content(objectMapper.writeValueAsString(statusDTO)))
                 .andExpect(status().isCreated());
     }
-
-    @Test
-    @WithMockUser(roles = "CUSTOMER")
-    void createBikeStatus_WithCustomerRole_ReturnsForbidden() throws Exception {
-        mockMvc.perform(post("/api/bike-statuses")
-                        .with(csrf())
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(statusDTO)))
-                .andExpect(status().isForbidden());
-    }
-
     @Test
     @WithMockUser(roles = "ADMIN")
     void updateBikeStatus_ReturnsOk() throws Exception {

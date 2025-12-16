@@ -32,6 +32,10 @@ class ServiceServiceTest {
     @Mock
     private ServiceMapper serviceMapper;
 
+    @Mock
+    private SecurityService securityService;
+
+
     @InjectMocks
     private ServiceService serviceService;
 
@@ -41,16 +45,16 @@ class ServiceServiceTest {
     @BeforeEach
     void setUp() {
         testService = org.clickenrent.rentalservice.entity.Service.builder()
-                .id(1L)
-                .name("Maintenance")
-                .b2bSubscriptionPrice(new BigDecimal("50.00"))
-                .build();
+        .id(1L)
+        .name("Maintenance")
+        .b2bSubscriptionPrice(new BigDecimal("50.00"))
+        .build();
 
         testServiceDTO = ServiceDTO.builder()
-                .id(1L)
-                .name("Maintenance")
-                .b2bSubscriptionPrice(new BigDecimal("50.00"))
-                .build();
+        .id(1L)
+        .name("Maintenance")
+        .b2bSubscriptionPrice(new BigDecimal("50.00"))
+        .build();
     }
 
     @Test
@@ -86,6 +90,7 @@ class ServiceServiceTest {
 
     @Test
     void createService_Success() {
+        when(securityService.isAdmin()).thenReturn(true);
         when(serviceMapper.toEntity(testServiceDTO)).thenReturn(testService);
         when(serviceRepository.save(any())).thenReturn(testService);
         when(serviceMapper.toDto(testService)).thenReturn(testServiceDTO);
@@ -97,6 +102,7 @@ class ServiceServiceTest {
 
     @Test
     void updateService_Success() {
+        when(securityService.isAdmin()).thenReturn(true);
         when(serviceRepository.findById(1L)).thenReturn(Optional.of(testService));
         when(serviceRepository.save(any())).thenReturn(testService);
         when(serviceMapper.toDto(testService)).thenReturn(testServiceDTO);
@@ -108,6 +114,7 @@ class ServiceServiceTest {
 
     @Test
     void deleteService_Success() {
+        when(securityService.isAdmin()).thenReturn(true);
         when(serviceRepository.findById(1L)).thenReturn(Optional.of(testService));
         doNothing().when(serviceRepository).delete(testService);
 

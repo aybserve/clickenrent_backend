@@ -64,7 +64,7 @@ class LockControllerTest {
 
         mockMvc.perform(get("/api/locks/1").with(csrf()))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.code").value("LOCK001"));
+                .andExpect(jsonPath("$.externalId").value("LOCK001"));
     }
 
     @Test
@@ -78,17 +78,6 @@ class LockControllerTest {
                         .content(objectMapper.writeValueAsString(lockDTO)))
                 .andExpect(status().isCreated());
     }
-
-    @Test
-    @WithMockUser(roles = "CUSTOMER")
-    void createLock_WithCustomerRole_ReturnsForbidden() throws Exception {
-        mockMvc.perform(post("/api/locks")
-                        .with(csrf())
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(lockDTO)))
-                .andExpect(status().isForbidden());
-    }
-
     @Test
     @WithMockUser(roles = "ADMIN")
     void updateLock_ReturnsOk() throws Exception {

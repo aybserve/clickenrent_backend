@@ -41,6 +41,7 @@ class RentalServiceTest {
     @Mock
     private SecurityService securityService;
 
+
     @InjectMocks
     private RentalService rentalService;
 
@@ -50,27 +51,27 @@ class RentalServiceTest {
     @BeforeEach
     void setUp() {
         testRental = Rental.builder()
-                .id(1L)
-                .externalId("RENT001")
-                .userId(1L)
-                .companyId(1L)
-                .build();
+        .id(1L)
+        .externalId("RENT001")
+        .userId(1L)
+        .companyId(1L)
+        .build();
 
         testRentalDTO = RentalDTO.builder()
-                .id(1L)
-                .externalId("RENT001")
-                .userId(1L)
-                .companyId(1L)
-                .rentalStatusId(2L)
-                .build();
+        .id(1L)
+        .externalId("RENT001")
+        .userId(1L)
+        .companyId(1L)
+        .rentalStatusId(2L)
+        .build();
     }
 
     @Test
     void getAllRentals_WithAdminRole_ReturnsAllRentals() {
         // Arrange
+        when(securityService.isAdmin()).thenReturn(true);
         Pageable pageable = PageRequest.of(0, 20);
         Page<Rental> rentalPage = new PageImpl<>(Collections.singletonList(testRental));
-        when(securityService.isAdmin()).thenReturn(true);
         when(rentalRepository.findAll(pageable)).thenReturn(rentalPage);
         when(rentalMapper.toDto(testRental)).thenReturn(testRentalDTO);
 
@@ -127,8 +128,6 @@ class RentalServiceTest {
         Pageable pageable = PageRequest.of(0, 20);
         when(securityService.isAdmin()).thenReturn(false);
         when(securityService.isB2B()).thenReturn(false);
-        when(securityService.isCustomer()).thenReturn(false);
-
         // Act & Assert
         assertThrows(UnauthorizedException.class, () -> rentalService.getAllRentals(pageable));
     }
@@ -136,8 +135,8 @@ class RentalServiceTest {
     @Test
     void getRentalById_WithAdminRole_Success() {
         // Arrange
-        when(rentalRepository.findById(1L)).thenReturn(Optional.of(testRental));
         when(securityService.isAdmin()).thenReturn(true);
+        when(rentalRepository.findById(1L)).thenReturn(Optional.of(testRental));
         when(rentalMapper.toDto(testRental)).thenReturn(testRentalDTO);
 
         // Act
@@ -164,14 +163,13 @@ class RentalServiceTest {
         when(rentalRepository.findById(1L)).thenReturn(Optional.of(testRental));
         when(securityService.isAdmin()).thenReturn(false);
         when(securityService.hasAccessToUser(1L)).thenReturn(false);
-        when(securityService.hasAccessToCompany(1L)).thenReturn(false);
-
         // Act & Assert
         assertThrows(UnauthorizedException.class, () -> rentalService.getRentalById(1L));
     }
 
     @Test
     void createRental_Success() {
+        when(securityService.hasAccessToUser(anyLong())).thenReturn(true);
         // Arrange
         when(rentalMapper.toEntity(testRentalDTO)).thenReturn(testRental);
         when(rentalRepository.save(any(Rental.class))).thenReturn(testRental);
@@ -188,9 +186,9 @@ class RentalServiceTest {
 
     @Test
     void updateRental_WithAdminRole_Success() {
+        when(securityService.isAdmin()).thenReturn(true);
         // Arrange
         when(rentalRepository.findById(1L)).thenReturn(Optional.of(testRental));
-        when(securityService.isAdmin()).thenReturn(true);
         when(rentalRepository.save(any(Rental.class))).thenReturn(testRental);
         when(rentalMapper.toDto(testRental)).thenReturn(testRentalDTO);
 
@@ -218,17 +216,15 @@ class RentalServiceTest {
         when(rentalRepository.findById(1L)).thenReturn(Optional.of(testRental));
         when(securityService.isAdmin()).thenReturn(false);
         when(securityService.hasAccessToUser(1L)).thenReturn(false);
-        when(securityService.hasAccessToCompany(1L)).thenReturn(false);
-
         // Act & Assert
         assertThrows(UnauthorizedException.class, () -> rentalService.updateRental(1L, testRentalDTO));
     }
 
     @Test
     void deleteRental_WithAdminRole_Success() {
+        when(securityService.isAdmin()).thenReturn(true);
         // Arrange
         when(rentalRepository.findById(1L)).thenReturn(Optional.of(testRental));
-        when(securityService.isAdmin()).thenReturn(true);
         doNothing().when(rentalRepository).delete(testRental);
 
         // Act
@@ -243,8 +239,6 @@ class RentalServiceTest {
     void deleteRental_WithoutAdminRole_ThrowsUnauthorizedException() {
         // Arrange
         when(rentalRepository.findById(1L)).thenReturn(Optional.of(testRental));
-        when(securityService.isAdmin()).thenReturn(false);
-
         // Act & Assert
         assertThrows(UnauthorizedException.class, () -> rentalService.deleteRental(1L));
         verify(rentalRepository, never()).delete(any(Rental.class));

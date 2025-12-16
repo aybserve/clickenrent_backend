@@ -28,6 +28,10 @@ class BikeTypeServiceTest {
     @Mock
     private BikeTypeMapper bikeTypeMapper;
 
+    @Mock
+    private SecurityService securityService;
+
+
     @InjectMocks
     private BikeTypeService bikeTypeService;
 
@@ -37,14 +41,14 @@ class BikeTypeServiceTest {
     @BeforeEach
     void setUp() {
         testType = BikeType.builder()
-                .id(1L)
-                .name("Electric bike")
-                .build();
+        .id(1L)
+        .name("Electric bike")
+        .build();
 
         testTypeDTO = BikeTypeDTO.builder()
-                .id(1L)
-                .name("Electric bike")
-                .build();
+        .id(1L)
+        .name("Electric bike")
+        .build();
     }
 
     @Test
@@ -80,6 +84,7 @@ class BikeTypeServiceTest {
 
     @Test
     void createBikeType_Success() {
+        when(securityService.isAdmin()).thenReturn(true);
         when(bikeTypeMapper.toEntity(testTypeDTO)).thenReturn(testType);
         when(bikeTypeRepository.save(any())).thenReturn(testType);
         when(bikeTypeMapper.toDto(testType)).thenReturn(testTypeDTO);
@@ -92,6 +97,7 @@ class BikeTypeServiceTest {
 
     @Test
     void updateBikeType_Success() {
+        when(securityService.isAdmin()).thenReturn(true);
         when(bikeTypeRepository.findById(1L)).thenReturn(Optional.of(testType));
         when(bikeTypeRepository.save(any())).thenReturn(testType);
         when(bikeTypeMapper.toDto(testType)).thenReturn(testTypeDTO);
@@ -104,6 +110,7 @@ class BikeTypeServiceTest {
 
     @Test
     void deleteBikeType_Success() {
+        when(securityService.isAdmin()).thenReturn(true);
         when(bikeTypeRepository.findById(1L)).thenReturn(Optional.of(testType));
         doNothing().when(bikeTypeRepository).delete(testType);
 

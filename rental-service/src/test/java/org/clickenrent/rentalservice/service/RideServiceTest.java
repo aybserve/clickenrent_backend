@@ -57,30 +57,29 @@ class RideServiceTest {
     @BeforeEach
     void setUp() {
         testRide = Ride.builder()
-                .id(1L)
-                .externalId("RIDE001")
-                .startDateTime(LocalDateTime.now())
-                .endDateTime(null)
-                .build();
+        .id(1L)
+        .externalId("RIDE001")
+        .startDateTime(LocalDateTime.now())
+        .endDateTime(null)
+        .build();
 
         testRideDTO = RideDTO.builder()
-                .id(1L)
-                .externalId("RIDE001")
-                .bikeRentalId(1L)
-                .startDateTime(LocalDateTime.now())
-                .endDateTime(null)
-                .startLocationId(1L)
-                .endLocationId(2L)
-                .coordinatesId(1L)
-                .rideStatusId(1L)
-                .build();
+        .id(1L)
+        .externalId("RIDE001")
+        .bikeRentalId(1L)
+        .startDateTime(LocalDateTime.now())
+        .endDateTime(null)
+        .startLocationId(1L)
+        .endLocationId(2L)
+        .coordinatesId(1L)
+        .rideStatusId(1L)
+        .build();
         
-        when(securityService.isAdmin()).thenReturn(true);
-        when(securityService.hasAccessToUser(anyLong())).thenReturn(true);
     }
 
     @Test
     void getAllRides_ReturnsAllRides() {
+        when(securityService.isAdmin()).thenReturn(true);
         Pageable pageable = PageRequest.of(0, 20);
         Page<Ride> ridePage = new PageImpl<>(Collections.singletonList(testRide));
         when(rideRepository.findAll(pageable)).thenReturn(ridePage);
@@ -95,6 +94,7 @@ class RideServiceTest {
 
     @Test
     void getRideById_Success() {
+        when(securityService.isAdmin()).thenReturn(true);
         BikeRental bikeRental = new BikeRental();
         Rental rental = new Rental();
         rental.setUserId(1L);
@@ -120,6 +120,7 @@ class RideServiceTest {
 
     @Test
     void getRidesByBikeRental_Success() {
+        when(securityService.isAdmin()).thenReturn(true);
         BikeRental bikeRental = new BikeRental();
         Rental rental = new Rental();
         rental.setUserId(1L);
@@ -138,6 +139,7 @@ class RideServiceTest {
 
     @Test
     void startRide_Success() {
+        when(securityService.isAdmin()).thenReturn(true);
         BikeRental bikeRental = new BikeRental();
         Rental rental = new Rental();
         rental.setUserId(1L);
@@ -160,6 +162,7 @@ class RideServiceTest {
 
     @Test
     void endRide_Success() {
+        when(securityService.isAdmin()).thenReturn(true);
         BikeRental bikeRental = new BikeRental();
         Rental rental = new Rental();
         rental.setUserId(1L);
@@ -182,6 +185,7 @@ class RideServiceTest {
 
     @Test
     void deleteRide_Success() {
+        when(securityService.isAdmin()).thenReturn(true);
         when(rideRepository.findById(1L)).thenReturn(Optional.of(testRide));
         doNothing().when(rideRepository).delete(testRide);
 

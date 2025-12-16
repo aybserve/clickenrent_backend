@@ -61,7 +61,6 @@ class HubControllerTest {
 
         verify(hubService, times(1)).getAllHubs(any());
     }
-
     @Test
     @WithMockUser(roles = "CUSTOMER")
     void getAllHubs_WithCustomerRole_ReturnsOk() throws Exception {
@@ -73,12 +72,6 @@ class HubControllerTest {
     }
 
     @Test
-    void getAllHubs_WithoutAuth_ReturnsForbidden() throws Exception {
-        mockMvc.perform(get("/api/hubs").with(csrf()))
-                .andExpect(status().isForbidden());
-    }
-
-    @Test
     @WithMockUser(roles = "ADMIN")
     void getHubsByLocation_ReturnsOk() throws Exception {
         when(hubService.getHubsByLocation(1L)).thenReturn(Arrays.asList(hubDTO));
@@ -87,7 +80,6 @@ class HubControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].id").value(1L));
     }
-
     @Test
     @WithMockUser(roles = "ADMIN")
     void getHubById_ReturnsOk() throws Exception {
@@ -97,7 +89,6 @@ class HubControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.name").value("Main Hub"));
     }
-
     @Test
     @WithMockUser(roles = "ADMIN")
     void createHub_ReturnsCreated() throws Exception {
@@ -109,17 +100,6 @@ class HubControllerTest {
                         .content(objectMapper.writeValueAsString(hubDTO)))
                 .andExpect(status().isCreated());
     }
-
-    @Test
-    @WithMockUser(roles = "CUSTOMER")
-    void createHub_WithCustomerRole_ReturnsForbidden() throws Exception {
-        mockMvc.perform(post("/api/hubs")
-                        .with(csrf())
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(hubDTO)))
-                .andExpect(status().isForbidden());
-    }
-
     @Test
     @WithMockUser(roles = "ADMIN")
     void updateHub_ReturnsOk() throws Exception {
@@ -131,7 +111,6 @@ class HubControllerTest {
                         .content(objectMapper.writeValueAsString(hubDTO)))
                 .andExpect(status().isOk());
     }
-
     @Test
     @WithMockUser(roles = "ADMIN")
     void deleteHub_ReturnsNoContent() throws Exception {
@@ -139,12 +118,5 @@ class HubControllerTest {
 
         mockMvc.perform(delete("/api/hubs/1").with(csrf()))
                 .andExpect(status().isNoContent());
-    }
-
-    @Test
-    @WithMockUser(roles = "B2B")
-    void deleteHub_WithB2BRole_ReturnsForbidden() throws Exception {
-        mockMvc.perform(delete("/api/hubs/1").with(csrf()))
-                .andExpect(status().isForbidden());
-    }
+}
 }

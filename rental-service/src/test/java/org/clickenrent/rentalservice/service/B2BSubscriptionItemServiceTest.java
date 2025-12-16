@@ -50,46 +50,46 @@ class B2BSubscriptionItemServiceTest {
     @BeforeEach
     void setUp() {
         testLocation = Location.builder()
-                .id(1L)
-                .companyId(1L)
-                .build();
+        .id(1L)
+        .companyId(1L)
+        .build();
 
         testSubscription = B2BSubscription.builder()
-                .id(1L)
-                .externalId("B2BSUB001")
-                .location(testLocation)
-                .build();
+        .id(1L)
+        .externalId("B2BSUB001")
+        .location(testLocation)
+        .build();
 
         testItem = B2BSubscriptionItem.builder()
-                .id(1L)
-                .externalId("BSUBI001")
-                .b2bSubscription(testSubscription)
-                .productId(1L)
-                .startDateTime(LocalDateTime.now())
-                .endDateTime(LocalDateTime.now().plusMonths(1))
-                .price(new BigDecimal("100.00"))
-                .totalPrice(new BigDecimal("3000.00"))
-                .build();
+        .id(1L)
+        .externalId("BSUBI001")
+        .b2bSubscription(testSubscription)
+        .productId(1L)
+        .startDateTime(LocalDateTime.now())
+        .endDateTime(LocalDateTime.now().plusMonths(1))
+        .price(new BigDecimal("100.00"))
+        .totalPrice(new BigDecimal("3000.00"))
+        .build();
 
         testItemDTO = B2BSubscriptionItemDTO.builder()
-                .id(1L)
-                .externalId("BSUBI001")
-                .b2bSubscriptionId(1L)
-                .productId(1L)
-                .startDateTime(LocalDateTime.now())
-                .endDateTime(LocalDateTime.now().plusMonths(1))
-                .price(new BigDecimal("100.00"))
-                .totalPrice(new BigDecimal("3000.00"))
-                .build();
+        .id(1L)
+        .externalId("BSUBI001")
+        .b2bSubscriptionId(1L)
+        .productId(1L)
+        .startDateTime(LocalDateTime.now())
+        .endDateTime(LocalDateTime.now().plusMonths(1))
+        .price(new BigDecimal("100.00"))
+        .totalPrice(new BigDecimal("3000.00"))
+        .build();
 
-        when(securityService.isAdmin()).thenReturn(true);
     }
 
     @Test
     void getItemsBySubscription_ReturnsAll() {
+        when(securityService.isAdmin()).thenReturn(true);
         when(b2bSubscriptionRepository.findById(1L)).thenReturn(Optional.of(testSubscription));
         when(b2bSubscriptionItemRepository.findByB2bSubscription(testSubscription))
-                .thenReturn(Collections.singletonList(testItem));
+        .thenReturn(Collections.singletonList(testItem));
         when(b2bSubscriptionItemMapper.toDto(testItem)).thenReturn(testItemDTO);
 
         List<B2BSubscriptionItemDTO> result = b2bSubscriptionItemService.getItemsBySubscription(1L);
@@ -117,6 +117,7 @@ class B2BSubscriptionItemServiceTest {
 
     @Test
     void createItem_Success() {
+        when(securityService.isAdmin()).thenReturn(true);
         when(b2bSubscriptionRepository.findById(1L)).thenReturn(Optional.of(testSubscription));
         when(b2bSubscriptionItemMapper.toEntity(testItemDTO)).thenReturn(testItem);
         when(b2bSubscriptionItemRepository.save(any())).thenReturn(testItem);
@@ -129,6 +130,7 @@ class B2BSubscriptionItemServiceTest {
 
     @Test
     void updateItem_Success() {
+        when(securityService.isAdmin()).thenReturn(true);
         when(b2bSubscriptionItemRepository.findById(1L)).thenReturn(Optional.of(testItem));
         doNothing().when(b2bSubscriptionItemMapper).updateEntityFromDto(testItemDTO, testItem);
         when(b2bSubscriptionItemRepository.save(any())).thenReturn(testItem);
@@ -141,6 +143,7 @@ class B2BSubscriptionItemServiceTest {
 
     @Test
     void deleteItem_Success() {
+        when(securityService.isAdmin()).thenReturn(true);
         when(b2bSubscriptionItemRepository.findById(1L)).thenReturn(Optional.of(testItem));
         doNothing().when(b2bSubscriptionItemRepository).delete(testItem);
 

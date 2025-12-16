@@ -68,7 +68,7 @@ class PartControllerTest {
 
         mockMvc.perform(get("/api/parts/1").with(csrf()))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.code").value("PART001"));
+                .andExpect(jsonPath("$.externalId").value("PART001"));
     }
 
     @Test

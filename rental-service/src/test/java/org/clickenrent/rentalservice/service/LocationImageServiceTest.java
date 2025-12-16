@@ -49,29 +49,28 @@ class LocationImageServiceTest {
         testLocation = Location.builder().id(1L).companyId(1L).build();
         
         testImage = LocationImage.builder()
-                .id(1L)
-                .externalId("IMG001")
-                .location(testLocation)
-                .imageUrl("https://example.com/location.jpg")
-                .sortOrder(1)
-                .isThumbnail(true)
-                .build();
+        .id(1L)
+        .externalId("IMG001")
+        .location(testLocation)
+        .imageUrl("https://example.com/location.jpg")
+        .sortOrder(1)
+        .isThumbnail(true)
+        .build();
 
         testImageDTO = LocationImageDTO.builder()
-                .id(1L)
-                .externalId("IMG001")
-                .locationId(1L)
-                .imageUrl("https://example.com/location.jpg")
-                .sortOrder(1)
-                .isThumbnail(true)
-                .build();
+        .id(1L)
+        .externalId("IMG001")
+        .locationId(1L)
+        .imageUrl("https://example.com/location.jpg")
+        .sortOrder(1)
+        .isThumbnail(true)
+        .build();
         
-        when(securityService.isAdmin()).thenReturn(true);
-        when(securityService.hasAccessToCompany(anyLong())).thenReturn(true);
-    }
+            }
 
     @Test
     void getImagesByLocation_ReturnsAll() {
+        when(securityService.isAdmin()).thenReturn(true);
         when(locationRepository.findById(1L)).thenReturn(Optional.of(testLocation));
         when(locationImageRepository.findByLocation(testLocation)).thenReturn(Arrays.asList(testImage));
         when(locationImageMapper.toDto(testImage)).thenReturn(testImageDTO);
@@ -86,6 +85,7 @@ class LocationImageServiceTest {
 
     @Test
     void getImageById_Success() {
+        when(securityService.isAdmin()).thenReturn(true);
         when(locationImageRepository.findById(1L)).thenReturn(Optional.of(testImage));
         when(locationImageMapper.toDto(testImage)).thenReturn(testImageDTO);
 
@@ -105,6 +105,7 @@ class LocationImageServiceTest {
 
     @Test
     void createImage_Success() {
+        when(securityService.isAdmin()).thenReturn(true);
         when(locationRepository.findById(1L)).thenReturn(Optional.of(testLocation));
         when(locationImageMapper.toEntity(testImageDTO)).thenReturn(testImage);
         when(locationImageRepository.save(any())).thenReturn(testImage);
@@ -119,6 +120,7 @@ class LocationImageServiceTest {
 
     @Test
     void updateImage_Success() {
+        when(securityService.isAdmin()).thenReturn(true);
         when(locationImageRepository.findById(1L)).thenReturn(Optional.of(testImage));
         doNothing().when(locationImageMapper).updateEntityFromDto(testImageDTO, testImage);
         when(locationImageRepository.save(any())).thenReturn(testImage);
@@ -133,6 +135,7 @@ class LocationImageServiceTest {
 
     @Test
     void deleteImage_Success() {
+        when(securityService.isAdmin()).thenReturn(true);
         when(locationImageRepository.findById(1L)).thenReturn(Optional.of(testImage));
         doNothing().when(locationImageRepository).delete(testImage);
 

@@ -32,6 +32,10 @@ class BikeEngineServiceTest {
     @Mock
     private BikeEngineMapper bikeEngineMapper;
 
+    @Mock
+    private SecurityService securityService;
+
+
     @InjectMocks
     private BikeEngineService bikeEngineService;
 
@@ -41,16 +45,16 @@ class BikeEngineServiceTest {
     @BeforeEach
     void setUp() {
         testEngine = BikeEngine.builder()
-                .id(1L)
-                .externalId("BE001")
-                .name("Bosch Performance Line")
-                .build();
+        .id(1L)
+        .externalId("BE001")
+        .name("Bosch Performance Line")
+        .build();
 
         testEngineDTO = BikeEngineDTO.builder()
-                .id(1L)
-                .externalId("BE001")
-                .name("Bosch Performance Line")
-                .build();
+        .id(1L)
+        .externalId("BE001")
+        .name("Bosch Performance Line")
+        .build();
     }
 
     @Test
@@ -88,6 +92,7 @@ class BikeEngineServiceTest {
 
     @Test
     void createBikeEngine_Success() {
+        when(securityService.isAdmin()).thenReturn(true);
         when(bikeEngineMapper.toEntity(testEngineDTO)).thenReturn(testEngine);
         when(bikeEngineRepository.save(any())).thenReturn(testEngine);
         when(bikeEngineMapper.toDto(testEngine)).thenReturn(testEngineDTO);
@@ -100,6 +105,7 @@ class BikeEngineServiceTest {
 
     @Test
     void updateBikeEngine_Success() {
+        when(securityService.isAdmin()).thenReturn(true);
         when(bikeEngineRepository.findById(1L)).thenReturn(Optional.of(testEngine));
         when(bikeEngineRepository.save(any())).thenReturn(testEngine);
         when(bikeEngineMapper.toDto(testEngine)).thenReturn(testEngineDTO);
@@ -112,6 +118,7 @@ class BikeEngineServiceTest {
 
     @Test
     void deleteBikeEngine_Success() {
+        when(securityService.isAdmin()).thenReturn(true);
         when(bikeEngineRepository.findById(1L)).thenReturn(Optional.of(testEngine));
         doNothing().when(bikeEngineRepository).delete(testEngine);
 

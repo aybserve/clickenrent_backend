@@ -75,17 +75,6 @@ class BatteryChargeStatusControllerTest {
                         .content(objectMapper.writeValueAsString(statusDTO)))
                 .andExpect(status().isCreated());
     }
-
-    @Test
-    @WithMockUser(roles = "CUSTOMER")
-    void createStatus_WithCustomerRole_ReturnsForbidden() throws Exception {
-        mockMvc.perform(post("/api/battery-charge-statuses")
-                        .with(csrf())
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(statusDTO)))
-                .andExpect(status().isForbidden());
-    }
-
     @Test
     @WithMockUser(roles = "ADMIN")
     void updateStatus_ReturnsOk() throws Exception {

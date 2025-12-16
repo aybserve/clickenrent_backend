@@ -40,14 +40,14 @@ class RentalUnitServiceTest {
     @BeforeEach
     void setUp() {
         testUnit = RentalUnit.builder()
-                .id(1L)
-                .name("Day")
-                .build();
+        .id(1L)
+        .name("Day")
+        .build();
 
         testUnitDTO = RentalUnitDTO.builder()
-                .id(1L)
-                .name("Day")
-                .build();
+        .id(1L)
+        .name("Day")
+        .build();
     }
 
     @Test

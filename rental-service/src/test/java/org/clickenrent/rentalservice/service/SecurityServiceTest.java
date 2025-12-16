@@ -45,7 +45,7 @@ class SecurityServiceTest {
         Map<String, Object> claims = new HashMap<>();
         claims.put("userId", 123);
         jwt = new Jwt("token", Instant.now(), Instant.now().plusSeconds(3600), 
-                      Map.of("alg", "HS256"), claims);
+              Map.of("alg", "HS256"), claims);
         
         when(securityContext.getAuthentication()).thenReturn(authentication);
         when(authentication.isAuthenticated()).thenReturn(true);
@@ -64,7 +64,7 @@ class SecurityServiceTest {
         Map<String, Object> claims = new HashMap<>();
         claims.put("userId", 123L);
         jwt = new Jwt("token", Instant.now(), Instant.now().plusSeconds(3600), 
-                      Map.of("alg", "HS256"), claims);
+              Map.of("alg", "HS256"), claims);
         
         when(securityContext.getAuthentication()).thenReturn(authentication);
         when(authentication.isAuthenticated()).thenReturn(true);
@@ -95,7 +95,7 @@ class SecurityServiceTest {
         Map<String, Object> claims = new HashMap<>();
         claims.put("companyIds", Arrays.asList(1, 2, 3));
         jwt = new Jwt("token", Instant.now(), Instant.now().plusSeconds(3600), 
-                      Map.of("alg", "HS256"), claims);
+              Map.of("alg", "HS256"), claims);
         
         when(securityContext.getAuthentication()).thenReturn(authentication);
         when(authentication.isAuthenticated()).thenReturn(true);
@@ -128,8 +128,8 @@ class SecurityServiceTest {
         // Arrange
         @SuppressWarnings("unchecked")
         Collection<GrantedAuthority> authorities = Arrays.asList(
-                new SimpleGrantedAuthority("ROLE_ADMIN"),
-                new SimpleGrantedAuthority("ROLE_SUPERADMIN")
+        new SimpleGrantedAuthority("ROLE_ADMIN"),
+        new SimpleGrantedAuthority("ROLE_SUPERADMIN")
         );
         
         when(securityContext.getAuthentication()).thenReturn(authentication);
@@ -161,7 +161,7 @@ class SecurityServiceTest {
         // Arrange
         @SuppressWarnings("unchecked")
         Collection<GrantedAuthority> authorities = Arrays.asList(
-                new SimpleGrantedAuthority("ROLE_SUPERADMIN")
+        new SimpleGrantedAuthority("ROLE_SUPERADMIN")
         );
         
         when(securityContext.getAuthentication()).thenReturn(authentication);
@@ -179,7 +179,7 @@ class SecurityServiceTest {
         // Arrange
         @SuppressWarnings("unchecked")
         Collection<GrantedAuthority> authorities = Arrays.asList(
-                new SimpleGrantedAuthority("ROLE_ADMIN")
+        new SimpleGrantedAuthority("ROLE_ADMIN")
         );
         
         when(securityContext.getAuthentication()).thenReturn(authentication);
@@ -197,7 +197,7 @@ class SecurityServiceTest {
         // Arrange
         @SuppressWarnings("unchecked")
         Collection<GrantedAuthority> authorities = Arrays.asList(
-                new SimpleGrantedAuthority("ROLE_CUSTOMER")
+        new SimpleGrantedAuthority("ROLE_CUSTOMER")
         );
         
         when(securityContext.getAuthentication()).thenReturn(authentication);
@@ -215,7 +215,7 @@ class SecurityServiceTest {
         // Arrange
         @SuppressWarnings("unchecked")
         Collection<GrantedAuthority> authorities = Arrays.asList(
-                new SimpleGrantedAuthority("ROLE_B2B")
+        new SimpleGrantedAuthority("ROLE_B2B")
         );
         
         when(securityContext.getAuthentication()).thenReturn(authentication);
@@ -233,7 +233,7 @@ class SecurityServiceTest {
         // Arrange
         @SuppressWarnings("unchecked")
         Collection<GrantedAuthority> authorities = Arrays.asList(
-                new SimpleGrantedAuthority("ROLE_CUSTOMER")
+        new SimpleGrantedAuthority("ROLE_CUSTOMER")
         );
         
         when(securityContext.getAuthentication()).thenReturn(authentication);
@@ -251,7 +251,7 @@ class SecurityServiceTest {
         // Arrange
         @SuppressWarnings("unchecked")
         Collection<GrantedAuthority> authorities = Arrays.asList(
-                new SimpleGrantedAuthority("ROLE_CUSTOMER")
+        new SimpleGrantedAuthority("ROLE_CUSTOMER")
         );
         
         when(securityContext.getAuthentication()).thenReturn(authentication);
@@ -269,7 +269,7 @@ class SecurityServiceTest {
         // Arrange
         @SuppressWarnings("unchecked")
         Collection<GrantedAuthority> authorities = Arrays.asList(
-                new SimpleGrantedAuthority("ROLE_ADMIN")
+        new SimpleGrantedAuthority("ROLE_ADMIN")
         );
         
         when(securityContext.getAuthentication()).thenReturn(authentication);
@@ -287,7 +287,7 @@ class SecurityServiceTest {
         // Arrange
         @SuppressWarnings("unchecked")
         Collection<GrantedAuthority> authorities = Arrays.asList(
-                new SimpleGrantedAuthority("ROLE_ADMIN")
+        new SimpleGrantedAuthority("ROLE_ADMIN")
         );
         
         when(securityContext.getAuthentication()).thenReturn(authentication);
@@ -305,12 +305,12 @@ class SecurityServiceTest {
         // Arrange
         @SuppressWarnings("unchecked")
         Collection<GrantedAuthority> authorities = Arrays.asList(
-                new SimpleGrantedAuthority("ROLE_B2B")
+        new SimpleGrantedAuthority("ROLE_B2B")
         );
         Map<String, Object> claims = new HashMap<>();
         claims.put("companyIds", Arrays.asList(1, 2));
         jwt = new Jwt("token", Instant.now(), Instant.now().plusSeconds(3600), 
-                      Map.of("alg", "HS256"), claims);
+              Map.of("alg", "HS256"), claims);
         
         when(securityContext.getAuthentication()).thenReturn(authentication);
         when(authentication.getAuthorities()).thenReturn((Collection) authorities);
@@ -329,12 +329,12 @@ class SecurityServiceTest {
         // Arrange
         @SuppressWarnings("unchecked")
         Collection<GrantedAuthority> authorities = Arrays.asList(
-                new SimpleGrantedAuthority("ROLE_B2B")
+        new SimpleGrantedAuthority("ROLE_B2B")
         );
         Map<String, Object> claims = new HashMap<>();
         claims.put("companyIds", Arrays.asList(2, 3));
         jwt = new Jwt("token", Instant.now(), Instant.now().plusSeconds(3600), 
-                      Map.of("alg", "HS256"), claims);
+              Map.of("alg", "HS256"), claims);
         
         when(securityContext.getAuthentication()).thenReturn(authentication);
         when(authentication.getAuthorities()).thenReturn((Collection) authorities);
@@ -353,7 +353,7 @@ class SecurityServiceTest {
         // Arrange
         @SuppressWarnings("unchecked")
         Collection<GrantedAuthority> authorities = Arrays.asList(
-                new SimpleGrantedAuthority("ROLE_ADMIN")
+        new SimpleGrantedAuthority("ROLE_ADMIN")
         );
         
         when(securityContext.getAuthentication()).thenReturn(authentication);
@@ -371,12 +371,12 @@ class SecurityServiceTest {
         // Arrange
         @SuppressWarnings("unchecked")
         Collection<GrantedAuthority> authorities = Arrays.asList(
-                new SimpleGrantedAuthority("ROLE_CUSTOMER")
+        new SimpleGrantedAuthority("ROLE_CUSTOMER")
         );
         Map<String, Object> claims = new HashMap<>();
         claims.put("userId", 123);
         jwt = new Jwt("token", Instant.now(), Instant.now().plusSeconds(3600), 
-                      Map.of("alg", "HS256"), claims);
+              Map.of("alg", "HS256"), claims);
         
         when(securityContext.getAuthentication()).thenReturn(authentication);
         when(authentication.getAuthorities()).thenReturn((Collection) authorities);
@@ -395,12 +395,12 @@ class SecurityServiceTest {
         // Arrange
         @SuppressWarnings("unchecked")
         Collection<GrantedAuthority> authorities = Arrays.asList(
-                new SimpleGrantedAuthority("ROLE_CUSTOMER")
+        new SimpleGrantedAuthority("ROLE_CUSTOMER")
         );
         Map<String, Object> claims = new HashMap<>();
         claims.put("userId", 123);
         jwt = new Jwt("token", Instant.now(), Instant.now().plusSeconds(3600), 
-                      Map.of("alg", "HS256"), claims);
+              Map.of("alg", "HS256"), claims);
         
         when(securityContext.getAuthentication()).thenReturn(authentication);
         when(authentication.getAuthorities()).thenReturn((Collection) authorities);

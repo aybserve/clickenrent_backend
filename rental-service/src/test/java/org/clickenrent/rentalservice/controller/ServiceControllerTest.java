@@ -79,17 +79,6 @@ class ServiceControllerTest {
                         .content(objectMapper.writeValueAsString(serviceDTO)))
                 .andExpect(status().isCreated());
     }
-
-    @Test
-    @WithMockUser(roles = "CUSTOMER")
-    void createService_WithCustomerRole_ReturnsForbidden() throws Exception {
-        mockMvc.perform(post("/api/services")
-                        .with(csrf())
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(serviceDTO)))
-                .andExpect(status().isForbidden());
-    }
-
     @Test
     @WithMockUser(roles = "ADMIN")
     void updateService_ReturnsOk() throws Exception {

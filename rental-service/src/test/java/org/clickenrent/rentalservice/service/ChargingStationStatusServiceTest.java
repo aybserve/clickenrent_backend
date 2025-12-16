@@ -29,6 +29,9 @@ class ChargingStationStatusServiceTest {
     @Mock
     private ChargingStationStatusMapper chargingStationStatusMapper;
 
+    @Mock
+    private SecurityService securityService;
+
     @InjectMocks
     private ChargingStationStatusService chargingStationStatusService;
 
@@ -38,14 +41,14 @@ class ChargingStationStatusServiceTest {
     @BeforeEach
     void setUp() {
         testStatus = ChargingStationStatus.builder()
-                .id(1L)
-                .name("Idle")
-                .build();
+        .id(1L)
+        .name("Idle")
+        .build();
 
         testStatusDTO = ChargingStationStatusDTO.builder()
-                .id(1L)
-                .name("Idle")
-                .build();
+        .id(1L)
+        .name("Idle")
+        .build();
     }
 
     @Test

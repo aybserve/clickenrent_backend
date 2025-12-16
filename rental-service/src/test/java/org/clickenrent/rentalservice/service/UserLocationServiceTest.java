@@ -46,28 +46,28 @@ class UserLocationServiceTest {
     @BeforeEach
     void setUp() {
         testLocation = Location.builder()
-                .id(1L)
-                .companyId(1L)
-                .build();
+        .id(1L)
+        .companyId(1L)
+        .build();
 
         testUserLocation = UserLocation.builder()
-                .id(1L)
-                .userId(1L)
-                .location(testLocation)
-                .build();
+        .id(1L)
+        .userId(1L)
+        .location(testLocation)
+        .build();
 
         testUserLocationDTO = UserLocationDTO.builder()
-                .id(1L)
-                .userId(1L)
-                .locationId(1L)
-                .locationRoleId(1L)
-                .build();
+        .id(1L)
+        .userId(1L)
+        .locationId(1L)
+        .locationRoleId(1L)
+        .build();
 
-        when(securityService.isAdmin()).thenReturn(true);
     }
 
     @Test
     void getUserLocationsByUser_Success() {
+        when(securityService.isAdmin()).thenReturn(true);
         when(userLocationRepository.findByUserId(1L)).thenReturn(Collections.singletonList(testUserLocation));
         when(userLocationMapper.toDto(testUserLocation)).thenReturn(testUserLocationDTO);
 
@@ -81,6 +81,7 @@ class UserLocationServiceTest {
 
     @Test
     void getUserLocationsByLocation_Success() {
+        when(securityService.isAdmin()).thenReturn(true);
         when(locationRepository.findById(1L)).thenReturn(Optional.of(testLocation));
         when(userLocationRepository.findByLocation(testLocation)).thenReturn(Collections.singletonList(testUserLocation));
         when(userLocationMapper.toDto(testUserLocation)).thenReturn(testUserLocationDTO);
@@ -95,6 +96,7 @@ class UserLocationServiceTest {
 
     @Test
     void assignUserToLocation_Success() {
+        when(securityService.isAdmin()).thenReturn(true);
         when(locationRepository.findById(1L)).thenReturn(Optional.of(testLocation));
         when(userLocationMapper.toEntity(testUserLocationDTO)).thenReturn(testUserLocation);
         when(userLocationRepository.save(any())).thenReturn(testUserLocation);
@@ -108,6 +110,7 @@ class UserLocationServiceTest {
 
     @Test
     void removeUserFromLocation_Success() {
+        when(securityService.isAdmin()).thenReturn(true);
         when(userLocationRepository.findById(1L)).thenReturn(Optional.of(testUserLocation));
         doNothing().when(userLocationRepository).delete(testUserLocation);
 

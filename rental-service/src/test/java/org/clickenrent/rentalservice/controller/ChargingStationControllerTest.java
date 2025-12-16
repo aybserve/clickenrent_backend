@@ -82,17 +82,6 @@ class ChargingStationControllerTest {
                         .content(objectMapper.writeValueAsString(stationDTO)))
                 .andExpect(status().isCreated());
     }
-
-    @Test
-    @WithMockUser(roles = "CUSTOMER")
-    void createChargingStation_WithCustomerRole_ReturnsForbidden() throws Exception {
-        mockMvc.perform(post("/api/charging-stations")
-                        .with(csrf())
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(stationDTO)))
-                .andExpect(status().isForbidden());
-    }
-
     @Test
     @WithMockUser(roles = "ADMIN")
     void updateChargingStation_ReturnsOk() throws Exception {

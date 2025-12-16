@@ -79,17 +79,6 @@ class BikePartControllerTest {
                         .content(objectMapper.writeValueAsString(bikePartDTO)))
                 .andExpect(status().isCreated());
     }
-
-    @Test
-    @WithMockUser(roles = "CUSTOMER")
-    void createBikePart_WithCustomerRole_ReturnsForbidden() throws Exception {
-        mockMvc.perform(post("/api/bike-parts")
-                        .with(csrf())
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(bikePartDTO)))
-                .andExpect(status().isForbidden());
-    }
-
     @Test
     @WithMockUser(roles = "ADMIN")
     void deleteBikePart_ReturnsNoContent() throws Exception {

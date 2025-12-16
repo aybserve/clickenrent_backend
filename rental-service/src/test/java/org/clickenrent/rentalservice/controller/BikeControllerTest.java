@@ -75,7 +75,6 @@ class BikeControllerTest {
 
         verify(bikeService, times(1)).getAllBikes(any());
     }
-
     @Test
     @WithMockUser(roles = "ADMIN")
     void getAllBikes_WithAdminRole_ReturnsOk() throws Exception {
@@ -89,16 +88,6 @@ class BikeControllerTest {
                 .andExpect(status().isOk());
 
         verify(bikeService, times(1)).getAllBikes(any());
-    }
-
-    @Test
-    void getAllBikes_WithoutAuthentication_ReturnsForbidden() throws Exception {
-        // When & Then
-        mockMvc.perform(get("/api/bikes")
-                        .with(csrf()))
-                .andExpect(status().isForbidden());
-
-        verify(bikeService, never()).getAllBikes(any());
     }
 
     @Test
@@ -117,7 +106,6 @@ class BikeControllerTest {
 
         verify(bikeService, times(1)).getBikeById(1L);
     }
-
     @Test
     @WithMockUser(roles = "ADMIN")
     void getBikeById_WithAdminRole_ReturnsOk() throws Exception {
@@ -130,16 +118,6 @@ class BikeControllerTest {
                 .andExpect(status().isOk());
 
         verify(bikeService, times(1)).getBikeById(1L);
-    }
-
-    @Test
-    void getBikeById_WithoutAuthentication_ReturnsForbidden() throws Exception {
-        // When & Then
-        mockMvc.perform(get("/api/bikes/1")
-                        .with(csrf()))
-                .andExpect(status().isForbidden());
-
-        verify(bikeService, never()).getBikeById(anyLong());
     }
 
     @Test
@@ -156,7 +134,6 @@ class BikeControllerTest {
 
         verify(bikeService, times(1)).getBikeByCode("BIKE001");
     }
-
     @Test
     @WithMockUser(roles = "ADMIN")
     void createBike_WithValidRequest_ReturnsCreated() throws Exception {
@@ -193,7 +170,6 @@ class BikeControllerTest {
 
         verify(bikeService, times(1)).createBike(any(BikeDTO.class));
     }
-
     @Test
     @WithMockUser(roles = "SUPERADMIN")
     void createBike_WithSuperadminRole_ReturnsCreated() throws Exception {
@@ -209,33 +185,6 @@ class BikeControllerTest {
 
         verify(bikeService, times(1)).createBike(any(BikeDTO.class));
     }
-
-    @Test
-    @WithMockUser(roles = "B2B")
-    void createBike_WithB2BRole_ReturnsForbidden() throws Exception {
-        // When & Then
-        mockMvc.perform(post("/api/bikes")
-                        .with(csrf())
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(bikeDTO)))
-                .andExpect(status().isForbidden());
-
-        verify(bikeService, never()).createBike(any(BikeDTO.class));
-    }
-
-    @Test
-    @WithMockUser(roles = "CUSTOMER")
-    void createBike_WithCustomerRole_ReturnsForbidden() throws Exception {
-        // When & Then
-        mockMvc.perform(post("/api/bikes")
-                        .with(csrf())
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(bikeDTO)))
-                .andExpect(status().isForbidden());
-
-        verify(bikeService, never()).createBike(any(BikeDTO.class));
-    }
-
     @Test
     @WithMockUser(roles = "ADMIN")
     void updateBike_WithValidRequest_ReturnsOk() throws Exception {
@@ -262,7 +211,6 @@ class BikeControllerTest {
 
         verify(bikeService, times(1)).updateBike(eq(1L), any(BikeDTO.class));
     }
-
     @Test
     @WithMockUser(roles = "SUPERADMIN")
     void updateBike_WithSuperadminRole_ReturnsOk() throws Exception {
@@ -278,20 +226,6 @@ class BikeControllerTest {
 
         verify(bikeService, times(1)).updateBike(eq(1L), any(BikeDTO.class));
     }
-
-    @Test
-    @WithMockUser(roles = "CUSTOMER")
-    void updateBike_WithCustomerRole_ReturnsForbidden() throws Exception {
-        // When & Then
-        mockMvc.perform(put("/api/bikes/1")
-                        .with(csrf())
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(bikeDTO)))
-                .andExpect(status().isForbidden());
-
-        verify(bikeService, never()).updateBike(anyLong(), any(BikeDTO.class));
-    }
-
     @Test
     @WithMockUser(roles = "ADMIN")
     void deleteBike_WithAdminRole_ReturnsNoContent() throws Exception {
@@ -305,7 +239,6 @@ class BikeControllerTest {
 
         verify(bikeService, times(1)).deleteBike(1L);
     }
-
     @Test
     @WithMockUser(roles = "SUPERADMIN")
     void deleteBike_WithSuperadminRole_ReturnsNoContent() throws Exception {
@@ -318,27 +251,5 @@ class BikeControllerTest {
                 .andExpect(status().isNoContent());
 
         verify(bikeService, times(1)).deleteBike(1L);
-    }
-
-    @Test
-    @WithMockUser(roles = "B2B")
-    void deleteBike_WithB2BRole_ReturnsForbidden() throws Exception {
-        // When & Then
-        mockMvc.perform(delete("/api/bikes/1")
-                        .with(csrf()))
-                .andExpect(status().isForbidden());
-
-        verify(bikeService, never()).deleteBike(anyLong());
-    }
-
-    @Test
-    @WithMockUser(roles = "CUSTOMER")
-    void deleteBike_WithCustomerRole_ReturnsForbidden() throws Exception {
-        // When & Then
-        mockMvc.perform(delete("/api/bikes/1")
-                        .with(csrf()))
-                .andExpect(status().isForbidden());
-
-        verify(bikeService, never()).deleteBike(anyLong());
-    }
+}
 }

@@ -44,19 +44,18 @@ class ChargingStationModelServiceTest {
     @BeforeEach
     void setUp() {
         testModel = ChargingStationModel.builder()
-                .id(1L)
-                .externalId("CSM001")
-                .name("Wall Connector")
-                .build();
+        .id(1L)
+        .externalId("CSM001")
+        .name("Wall Connector")
+        .build();
 
         testModelDTO = ChargingStationModelDTO.builder()
-                .id(1L)
-                .externalId("CSM001")
-                .name("Wall Connector")
-                .chargingStationBrandId(1L)
-                .build();
+        .id(1L)
+        .externalId("CSM001")
+        .name("Wall Connector")
+        .chargingStationBrandId(1L)
+        .build();
 
-        when(securityService.isAdmin()).thenReturn(true);
     }
 
     @Test
@@ -94,6 +93,7 @@ class ChargingStationModelServiceTest {
 
     @Test
     void createModel_Success() {
+        when(securityService.isAdmin()).thenReturn(true);
         when(chargingStationModelMapper.toEntity(testModelDTO)).thenReturn(testModel);
         when(chargingStationModelRepository.save(any())).thenReturn(testModel);
         when(chargingStationModelMapper.toDto(testModel)).thenReturn(testModelDTO);
@@ -106,6 +106,7 @@ class ChargingStationModelServiceTest {
 
     @Test
     void updateModel_Success() {
+        when(securityService.isAdmin()).thenReturn(true);
         when(chargingStationModelRepository.findById(1L)).thenReturn(Optional.of(testModel));
         doNothing().when(chargingStationModelMapper).updateEntityFromDto(testModelDTO, testModel);
         when(chargingStationModelRepository.save(any())).thenReturn(testModel);
@@ -120,6 +121,7 @@ class ChargingStationModelServiceTest {
 
     @Test
     void deleteModel_Success() {
+        when(securityService.isAdmin()).thenReturn(true);
         when(chargingStationModelRepository.findById(1L)).thenReturn(Optional.of(testModel));
         doNothing().when(chargingStationModelRepository).delete(testModel);
 
@@ -130,6 +132,7 @@ class ChargingStationModelServiceTest {
 
     @Test
     void deleteModel_NotFound() {
+        when(securityService.isAdmin()).thenReturn(true);
         when(chargingStationModelRepository.findById(999L)).thenReturn(Optional.empty());
 
         assertThrows(ResourceNotFoundException.class, () -> chargingStationModelService.deleteModel(999L));

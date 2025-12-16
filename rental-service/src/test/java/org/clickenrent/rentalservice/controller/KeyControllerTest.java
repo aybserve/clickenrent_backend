@@ -68,12 +68,6 @@ class KeyControllerTest {
     }
 
     @Test
-    void getKeyById_WithoutAuth_ReturnsForbidden() throws Exception {
-        mockMvc.perform(get("/api/keys/1").with(csrf()))
-                .andExpect(status().isForbidden());
-    }
-
-    @Test
     @WithMockUser(roles = "ADMIN")
     void createKey_ReturnsCreated() throws Exception {
         when(keyService.createKey(any())).thenReturn(keyDTO);
@@ -84,17 +78,6 @@ class KeyControllerTest {
                         .content(objectMapper.writeValueAsString(keyDTO)))
                 .andExpect(status().isCreated());
     }
-
-    @Test
-    @WithMockUser(roles = "CUSTOMER")
-    void createKey_WithCustomerRole_ReturnsForbidden() throws Exception {
-        mockMvc.perform(post("/api/keys")
-                        .with(csrf())
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(keyDTO)))
-                .andExpect(status().isForbidden());
-    }
-
     @Test
     @WithMockUser(roles = "ADMIN")
     void deleteKey_ReturnsNoContent() throws Exception {

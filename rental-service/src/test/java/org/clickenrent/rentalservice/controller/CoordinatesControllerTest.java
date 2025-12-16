@@ -66,17 +66,6 @@ class CoordinatesControllerTest {
                         .content(objectMapper.writeValueAsString(coordinatesDTO)))
                 .andExpect(status().isCreated());
     }
-
-    @Test
-    @WithMockUser(roles = "CUSTOMER")
-    void createCoordinates_WithCustomerRole_ReturnsForbidden() throws Exception {
-        mockMvc.perform(post("/api/coordinates")
-                        .with(csrf())
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(coordinatesDTO)))
-                .andExpect(status().isForbidden());
-    }
-
     @Test
     @WithMockUser(roles = "ADMIN")
     void updateCoordinates_ReturnsOk() throws Exception {

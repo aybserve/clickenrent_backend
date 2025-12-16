@@ -45,24 +45,24 @@ class ChargingStationServiceTest {
     @BeforeEach
     void setUp() {
         testStation = ChargingStation.builder()
-                .id(1L)
-                .code("CS001")
-                .build();
+        .id(1L)
+        .code("CS001")
+        .build();
 
         testStationDTO = ChargingStationDTO.builder()
-                .id(1L)
-                .code("CS001")
-                .chargingStationModelId(1L)
-                .chargingStationStatusId(1L)
-                .hubId(1L)
-                .build();
+        .id(1L)
+        .code("CS001")
+        .chargingStationModelId(1L)
+        .chargingStationStatusId(1L)
+        .hubId(1L)
+        .build();
     }
 
     @Test
     void getAllChargingStations_WithAdminRole_ReturnsAllStations() {
+        when(securityService.isAdmin()).thenReturn(true);
         Pageable pageable = PageRequest.of(0, 20);
         Page<ChargingStation> stationPage = new PageImpl<>(Collections.singletonList(testStation));
-        when(securityService.isAdmin()).thenReturn(true);
         when(chargingStationRepository.findAll(pageable)).thenReturn(stationPage);
         when(chargingStationMapper.toDto(testStation)).thenReturn(testStationDTO);
 
@@ -76,8 +76,6 @@ class ChargingStationServiceTest {
     @Test
     void getAllChargingStations_WithoutAdminRole_ThrowsUnauthorizedException() {
         Pageable pageable = PageRequest.of(0, 20);
-        when(securityService.isAdmin()).thenReturn(false);
-
         assertThrows(UnauthorizedException.class, () -> chargingStationService.getAllChargingStations(pageable));
     }
 
@@ -115,8 +113,6 @@ class ChargingStationServiceTest {
 
     @Test
     void createChargingStation_WithoutAdminRole_ThrowsUnauthorizedException() {
-        when(securityService.isAdmin()).thenReturn(false);
-
         assertThrows(UnauthorizedException.class, () -> chargingStationService.createChargingStation(testStationDTO));
     }
 

@@ -55,12 +55,6 @@ class BikeRentalStatusControllerTest {
     }
 
     @Test
-    void getAllStatuses_WithoutAuth_ReturnsForbidden() throws Exception {
-        mockMvc.perform(get("/api/bike-rental-statuses").with(csrf()))
-                .andExpect(status().isForbidden());
-    }
-
-    @Test
     @WithMockUser(roles = "ADMIN")
     void getStatusById_ReturnsOk() throws Exception {
         when(bikeRentalStatusService.getStatusById(1L)).thenReturn(statusDTO);

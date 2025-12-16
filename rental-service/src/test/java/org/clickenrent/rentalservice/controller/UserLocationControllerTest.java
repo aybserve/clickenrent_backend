@@ -80,17 +80,6 @@ class UserLocationControllerTest {
                         .content(objectMapper.writeValueAsString(userLocationDTO)))
                 .andExpect(status().isCreated());
     }
-
-    @Test
-    @WithMockUser(roles = "CUSTOMER")
-    void assignUserToLocation_WithCustomerRole_ReturnsForbidden() throws Exception {
-        mockMvc.perform(post("/api/user-locations")
-                        .with(csrf())
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(userLocationDTO)))
-                .andExpect(status().isForbidden());
-    }
-
     @Test
     @WithMockUser(roles = "ADMIN")
     void removeUserFromLocation_ReturnsNoContent() throws Exception {

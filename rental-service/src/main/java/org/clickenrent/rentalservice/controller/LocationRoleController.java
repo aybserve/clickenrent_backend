@@ -34,4 +34,26 @@ public class LocationRoleController {
     public ResponseEntity<LocationRoleDTO> getRoleById(@PathVariable Long id) {
         return ResponseEntity.ok(locationRoleService.getRoleById(id));
     }
+
+    @PostMapping
+    @PreAuthorize("hasRole('ADMIN')")
+    @Operation(summary = "Create a new location role")
+    public ResponseEntity<LocationRoleDTO> createLocationRole(@RequestBody LocationRoleDTO locationRoleDTO) {
+        return ResponseEntity.status(201).body(locationRoleService.createLocationRole(locationRoleDTO));
+    }
+
+    @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
+    @Operation(summary = "Update location role")
+    public ResponseEntity<LocationRoleDTO> updateLocationRole(@PathVariable Long id, @RequestBody LocationRoleDTO locationRoleDTO) {
+        return ResponseEntity.ok(locationRoleService.updateLocationRole(id, locationRoleDTO));
+    }
+
+    @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
+    @Operation(summary = "Delete location role")
+    public ResponseEntity<Void> deleteLocationRole(@PathVariable Long id) {
+        locationRoleService.deleteLocationRole(id);
+        return ResponseEntity.noContent().build();
+    }
 }

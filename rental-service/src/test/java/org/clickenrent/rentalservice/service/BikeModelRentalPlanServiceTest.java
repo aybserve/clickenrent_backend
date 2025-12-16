@@ -46,28 +46,27 @@ class BikeModelRentalPlanServiceTest {
     @BeforeEach
     void setUp() {
         testBikeModel = BikeModel.builder()
-                .id(1L)
-                .build();
+        .id(1L)
+        .build();
 
         testPlan = BikeModelRentalPlan.builder()
-                .id(1L)
-                .bikeModel(testBikeModel)
-                .build();
+        .id(1L)
+        .bikeModel(testBikeModel)
+        .build();
 
         testPlanDTO = BikeModelRentalPlanDTO.builder()
-                .id(1L)
-                .bikeModelId(1L)
-                .rentalPlanId(1L)
-                .build();
+        .id(1L)
+        .bikeModelId(1L)
+        .rentalPlanId(1L)
+        .build();
 
-        when(securityService.isAdmin()).thenReturn(true);
     }
 
     @Test
     void getPlansByBikeModel_Success() {
         when(bikeModelRepository.findById(1L)).thenReturn(Optional.of(testBikeModel));
         when(bikeModelRentalPlanRepository.findByBikeModel(testBikeModel))
-                .thenReturn(Collections.singletonList(testPlan));
+        .thenReturn(Collections.singletonList(testPlan));
         when(bikeModelRentalPlanMapper.toDto(testPlan)).thenReturn(testPlanDTO);
 
         List<BikeModelRentalPlanDTO> result = bikeModelRentalPlanService.getPlansByBikeModel(1L);
@@ -98,6 +97,7 @@ class BikeModelRentalPlanServiceTest {
 
     @Test
     void create_Success() {
+        when(securityService.isAdmin()).thenReturn(true);
         when(bikeModelRentalPlanMapper.toEntity(testPlanDTO)).thenReturn(testPlan);
         when(bikeModelRentalPlanRepository.save(any())).thenReturn(testPlan);
         when(bikeModelRentalPlanMapper.toDto(testPlan)).thenReturn(testPlanDTO);
@@ -110,6 +110,7 @@ class BikeModelRentalPlanServiceTest {
 
     @Test
     void update_Success() {
+        when(securityService.isAdmin()).thenReturn(true);
         when(bikeModelRentalPlanRepository.findById(1L)).thenReturn(Optional.of(testPlan));
         doNothing().when(bikeModelRentalPlanMapper).updateEntityFromDto(testPlanDTO, testPlan);
         when(bikeModelRentalPlanRepository.save(any())).thenReturn(testPlan);
@@ -123,6 +124,7 @@ class BikeModelRentalPlanServiceTest {
 
     @Test
     void delete_Success() {
+        when(securityService.isAdmin()).thenReturn(true);
         when(bikeModelRentalPlanRepository.findById(1L)).thenReturn(Optional.of(testPlan));
         doNothing().when(bikeModelRentalPlanRepository).delete(testPlan);
 
@@ -133,6 +135,7 @@ class BikeModelRentalPlanServiceTest {
 
     @Test
     void delete_NotFound() {
+        when(securityService.isAdmin()).thenReturn(true);
         when(bikeModelRentalPlanRepository.findById(999L)).thenReturn(Optional.empty());
 
         assertThrows(ResourceNotFoundException.class, () -> bikeModelRentalPlanService.delete(999L));

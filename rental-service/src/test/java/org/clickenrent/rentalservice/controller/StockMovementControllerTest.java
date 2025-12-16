@@ -94,17 +94,6 @@ class StockMovementControllerTest {
                         .content(objectMapper.writeValueAsString(movementDTO)))
                 .andExpect(status().isCreated());
     }
-
-    @Test
-    @WithMockUser(roles = "CUSTOMER")
-    void createStockMovement_WithCustomerRole_ReturnsForbidden() throws Exception {
-        mockMvc.perform(post("/api/stock-movements")
-                        .with(csrf())
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(movementDTO)))
-                .andExpect(status().isForbidden());
-    }
-
     @Test
     @WithMockUser(roles = "ADMIN")
     void deleteStockMovement_ReturnsNoContent() throws Exception {

@@ -57,36 +57,35 @@ class RentalPlanServiceTest {
     @BeforeEach
     void setUp() {
         testRentalUnit = RentalUnit.builder()
-                .id(1L)
-                .name("Hour")
-                .build();
+        .id(1L)
+        .name("Hour")
+        .build();
 
         testLocation = Location.builder()
-                .id(1L)
-                .companyId(1L)
-                .build();
+        .id(1L)
+        .companyId(1L)
+        .build();
 
         testPlan = RentalPlan.builder()
-                .id(1L)
-                .name("Daily Plan")
-                .rentalUnit(testRentalUnit)
-                .minUnit(1)
-                .maxUnit(24)
-                .location(testLocation)
-                .defaultPrice(new BigDecimal("25.00"))
-                .build();
+        .id(1L)
+        .name("Daily Plan")
+        .rentalUnit(testRentalUnit)
+        .minUnit(1)
+        .maxUnit(24)
+        .location(testLocation)
+        .defaultPrice(new BigDecimal("25.00"))
+        .build();
 
         testPlanDTO = RentalPlanDTO.builder()
-                .id(1L)
-                .name("Daily Plan")
-                .rentalUnitId(1L)
-                .minUnit(1)
-                .maxUnit(24)
-                .locationId(1L)
-                .defaultPrice(new BigDecimal("25.00"))
-                .build();
+        .id(1L)
+        .name("Daily Plan")
+        .rentalUnitId(1L)
+        .minUnit(1)
+        .maxUnit(24)
+        .locationId(1L)
+        .defaultPrice(new BigDecimal("25.00"))
+        .build();
 
-        when(securityService.isAdmin()).thenReturn(true);
     }
 
     @Test
@@ -122,6 +121,9 @@ class RentalPlanServiceTest {
 
     @Test
     void createRentalPlan_Success() {
+        when(securityService.isAdmin()).thenReturn(true);
+        when(locationRepository.findById(anyLong())).thenReturn(Optional.of(new Location()));
+        when(securityService.isAdmin()).thenReturn(true);
         when(rentalPlanMapper.toEntity(testPlanDTO)).thenReturn(testPlan);
         when(rentalPlanRepository.save(any())).thenReturn(testPlan);
         when(rentalPlanMapper.toDto(testPlan)).thenReturn(testPlanDTO);
@@ -133,6 +135,7 @@ class RentalPlanServiceTest {
 
     @Test
     void updateRentalPlan_Success() {
+        when(securityService.isAdmin()).thenReturn(true);
         when(rentalPlanRepository.findById(1L)).thenReturn(Optional.of(testPlan));
         doNothing().when(rentalPlanMapper).updateEntityFromDto(testPlanDTO, testPlan);
         when(rentalPlanRepository.save(any())).thenReturn(testPlan);
@@ -146,6 +149,7 @@ class RentalPlanServiceTest {
 
     @Test
     void deleteRentalPlan_Success() {
+        when(securityService.isAdmin()).thenReturn(true);
         when(rentalPlanRepository.findById(1L)).thenReturn(Optional.of(testPlan));
         doNothing().when(rentalPlanRepository).delete(testPlan);
 

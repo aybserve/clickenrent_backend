@@ -51,29 +51,28 @@ class HubImageServiceTest {
         testHub = Hub.builder().id(1L).location(testLocation).build();
         
         testImage = HubImage.builder()
-                .id(1L)
-                .externalId("HUBIMG001")
-                .hub(testHub)
-                .imageUrl("https://example.com/hub.jpg")
-                .sortOrder(1)
-                .isThumbnail(true)
-                .build();
+        .id(1L)
+        .externalId("HUBIMG001")
+        .hub(testHub)
+        .imageUrl("https://example.com/hub.jpg")
+        .sortOrder(1)
+        .isThumbnail(true)
+        .build();
 
         testImageDTO = HubImageDTO.builder()
-                .id(1L)
-                .externalId("HUBIMG001")
-                .hubId(1L)
-                .imageUrl("https://example.com/hub.jpg")
-                .sortOrder(1)
-                .isThumbnail(true)
-                .build();
+        .id(1L)
+        .externalId("HUBIMG001")
+        .hubId(1L)
+        .imageUrl("https://example.com/hub.jpg")
+        .sortOrder(1)
+        .isThumbnail(true)
+        .build();
         
-        when(securityService.isAdmin()).thenReturn(true);
-        when(securityService.hasAccessToCompany(anyLong())).thenReturn(true);
-    }
+            }
 
     @Test
     void getImagesByHub_ReturnsAll() {
+        when(securityService.isAdmin()).thenReturn(true);
         when(hubRepository.findById(1L)).thenReturn(Optional.of(testHub));
         when(hubImageRepository.findByHub(testHub)).thenReturn(Arrays.asList(testImage));
         when(hubImageMapper.toDto(testImage)).thenReturn(testImageDTO);
@@ -88,6 +87,7 @@ class HubImageServiceTest {
 
     @Test
     void getImageById_Success() {
+        when(securityService.isAdmin()).thenReturn(true);
         when(hubImageRepository.findById(1L)).thenReturn(Optional.of(testImage));
         when(hubImageMapper.toDto(testImage)).thenReturn(testImageDTO);
 
@@ -107,6 +107,7 @@ class HubImageServiceTest {
 
     @Test
     void createImage_Success() {
+        when(securityService.isAdmin()).thenReturn(true);
         when(hubRepository.findById(1L)).thenReturn(Optional.of(testHub));
         when(hubImageMapper.toEntity(testImageDTO)).thenReturn(testImage);
         when(hubImageRepository.save(any())).thenReturn(testImage);
@@ -121,6 +122,7 @@ class HubImageServiceTest {
 
     @Test
     void updateImage_Success() {
+        when(securityService.isAdmin()).thenReturn(true);
         when(hubImageRepository.findById(1L)).thenReturn(Optional.of(testImage));
         doNothing().when(hubImageMapper).updateEntityFromDto(testImageDTO, testImage);
         when(hubImageRepository.save(any())).thenReturn(testImage);
@@ -135,6 +137,7 @@ class HubImageServiceTest {
 
     @Test
     void deleteImage_Success() {
+        when(securityService.isAdmin()).thenReturn(true);
         when(hubImageRepository.findById(1L)).thenReturn(Optional.of(testImage));
         doNothing().when(hubImageRepository).delete(testImage);
 

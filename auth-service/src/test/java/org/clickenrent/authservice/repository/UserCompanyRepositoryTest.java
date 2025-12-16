@@ -1,11 +1,13 @@
 package org.clickenrent.authservice.repository;
 
+import org.clickenrent.authservice.config.TestJpaAuditingConfiguration;
 import org.clickenrent.authservice.entity.*;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.test.context.TestPropertySource;
 
 import java.util.List;
@@ -17,6 +19,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  * Repository tests for UserCompanyRepository.
  */
 @DataJpaTest
+@Import(TestJpaAuditingConfiguration.class)
 @TestPropertySource(locations = "classpath:application-test.properties")
 class UserCompanyRepositoryTest {
 
@@ -69,11 +72,13 @@ class UserCompanyRepositoryTest {
         company1 = Company.builder()
                 .externalId(UUID.randomUUID().toString())
                 .name("Company 1")
+                .isDeleted(false)
                 .build();
 
         company2 = Company.builder()
                 .externalId(UUID.randomUUID().toString())
                 .name("Company 2")
+                .isDeleted(false)
                 .build();
 
         companyRepository.save(company1);
@@ -90,12 +95,14 @@ class UserCompanyRepositoryTest {
                 .user(user1)
                 .company(company1)
                 .companyRole(ownerRole)
+                .isDeleted(false)
                 .build();
 
         userCompany2 = UserCompany.builder()
                 .user(user1)
                 .company(company2)
                 .companyRole(staffRole)
+                .isDeleted(false)
                 .build();
 
         userCompanyRepository.save(userCompany1);
@@ -166,6 +173,7 @@ class UserCompanyRepositoryTest {
                 .user(user2)
                 .company(company1)
                 .companyRole(staffRole)
+                .isDeleted(false)
                 .build();
 
         // When

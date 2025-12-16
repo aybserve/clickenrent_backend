@@ -28,6 +28,9 @@ class B2BSaleOrderStatusServiceTest {
     @Mock
     private B2BSaleOrderStatusMapper b2bSaleOrderStatusMapper;
 
+    @Mock
+    private SecurityService securityService;
+
     @InjectMocks
     private B2BSaleOrderStatusService b2bSaleOrderStatusService;
 
@@ -37,14 +40,14 @@ class B2BSaleOrderStatusServiceTest {
     @BeforeEach
     void setUp() {
         testStatus = B2BSaleOrderStatus.builder()
-                .id(1L)
-                .name("Processing")
-                .build();
+        .id(1L)
+        .name("Processing")
+        .build();
 
         testStatusDTO = B2BSaleOrderStatusDTO.builder()
-                .id(1L)
-                .name("Processing")
-                .build();
+        .id(1L)
+        .name("Processing")
+        .build();
     }
 
     @Test
@@ -56,7 +59,7 @@ class B2BSaleOrderStatusServiceTest {
 
         assertNotNull(result);
         assertEquals(1, result.size());
-        assertEquals("Pending", result.get(0).getName());
+        assertEquals("Processing", result.get(0).getName());
         verify(b2bSaleOrderStatusRepository, times(1)).findAll();
     }
 
@@ -68,7 +71,7 @@ class B2BSaleOrderStatusServiceTest {
         B2BSaleOrderStatusDTO result = b2bSaleOrderStatusService.getStatusById(1L);
 
         assertNotNull(result);
-        assertEquals("Pending", result.getName());
+        assertEquals("Processing", result.getName());
         verify(b2bSaleOrderStatusRepository, times(1)).findById(1L);
     }
 

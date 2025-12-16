@@ -1,5 +1,6 @@
 package org.clickenrent.authservice.repository;
 
+import org.clickenrent.authservice.config.TestJpaAuditingConfiguration;
 import org.clickenrent.authservice.entity.GlobalRole;
 import org.clickenrent.authservice.entity.User;
 import org.clickenrent.authservice.entity.UserGlobalRole;
@@ -8,6 +9,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.test.context.TestPropertySource;
 
 import java.util.List;
@@ -19,6 +21,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  * Repository tests for UserGlobalRoleRepository.
  */
 @DataJpaTest
+@Import(TestJpaAuditingConfiguration.class)
 @TestPropertySource(locations = "classpath:application-test.properties")
 class UserGlobalRoleRepositoryTest {
 
@@ -72,11 +75,13 @@ class UserGlobalRoleRepositoryTest {
         userGlobalRole1 = UserGlobalRole.builder()
                 .user(user1)
                 .globalRole(adminRole)
+                .isDeleted(false)
                 .build();
 
         userGlobalRole2 = UserGlobalRole.builder()
                 .user(user1)
                 .globalRole(userRole)
+                .isDeleted(false)
                 .build();
 
         userGlobalRoleRepository.save(userGlobalRole1);
@@ -145,6 +150,7 @@ class UserGlobalRoleRepositoryTest {
         UserGlobalRole newRole = UserGlobalRole.builder()
                 .user(user2)
                 .globalRole(userRole)
+                .isDeleted(false)
                 .build();
 
         // When

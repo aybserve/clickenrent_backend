@@ -44,16 +44,16 @@ class PartCategoryServiceTest {
     @BeforeEach
     void setUp() {
         testCategory = PartCategory.builder()
-                .id(1L)
-                .externalId("PC001")
-                .name("Battery")
-                .build();
+        .id(1L)
+        .externalId("PC001")
+        .name("Battery")
+        .build();
 
         testCategoryDTO = PartCategoryDTO.builder()
-                .id(1L)
-                .externalId("PC001")
-                .name("Battery")
-                .build();
+        .id(1L)
+        .externalId("PC001")
+        .name("Battery")
+        .build();
     }
 
     @Test

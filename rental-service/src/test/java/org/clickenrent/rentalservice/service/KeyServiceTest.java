@@ -48,22 +48,22 @@ class KeyServiceTest {
         testLock = Lock.builder().id(1L).externalId("LOCK001").build();
         
         testKey = Key.builder()
-                .id(1L)
-                .externalId("KEY001")
-                .lock(testLock)
-                .build();
+        .id(1L)
+        .externalId("KEY001")
+        .lock(testLock)
+        .build();
 
         testKeyDTO = KeyDTO.builder()
-                .id(1L)
-                .externalId("KEY001")
-                .lockId(1L)
-                .build();
+        .id(1L)
+        .externalId("KEY001")
+        .lockId(1L)
+        .build();
         
-        when(securityService.isAdmin()).thenReturn(true);
     }
 
     @Test
     void getKeysByLock_ReturnsAll() {
+        when(securityService.isAdmin()).thenReturn(true);
         when(lockRepository.findById(1L)).thenReturn(Optional.of(testLock));
         when(keyRepository.findByLock(testLock)).thenReturn(Collections.singletonList(testKey));
         when(keyMapper.toDto(testKey)).thenReturn(testKeyDTO);
@@ -78,6 +78,7 @@ class KeyServiceTest {
 
     @Test
     void getKeyById_Success() {
+        when(securityService.isAdmin()).thenReturn(true);
         when(keyRepository.findById(1L)).thenReturn(Optional.of(testKey));
         when(keyMapper.toDto(testKey)).thenReturn(testKeyDTO);
 
@@ -90,6 +91,7 @@ class KeyServiceTest {
 
     @Test
     void getKeyById_NotFound() {
+        when(securityService.isAdmin()).thenReturn(true);
         when(keyRepository.findById(999L)).thenReturn(Optional.empty());
 
         assertThrows(ResourceNotFoundException.class, () -> keyService.getKeyById(999L));
@@ -97,6 +99,7 @@ class KeyServiceTest {
 
     @Test
     void createKey_Success() {
+        when(securityService.isAdmin()).thenReturn(true);
         when(keyMapper.toEntity(testKeyDTO)).thenReturn(testKey);
         when(keyRepository.save(any())).thenReturn(testKey);
         when(keyMapper.toDto(testKey)).thenReturn(testKeyDTO);
@@ -110,6 +113,7 @@ class KeyServiceTest {
 
     @Test
     void deleteKey_Success() {
+        when(securityService.isAdmin()).thenReturn(true);
         when(keyRepository.findById(1L)).thenReturn(Optional.of(testKey));
         doNothing().when(keyRepository).delete(testKey);
 
@@ -120,6 +124,7 @@ class KeyServiceTest {
 
     @Test
     void deleteKey_NotFound() {
+        when(securityService.isAdmin()).thenReturn(true);
         when(keyRepository.findById(999L)).thenReturn(Optional.empty());
 
         assertThrows(ResourceNotFoundException.class, () -> keyService.deleteKey(999L));

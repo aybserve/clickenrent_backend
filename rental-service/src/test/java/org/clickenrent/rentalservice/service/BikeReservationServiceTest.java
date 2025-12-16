@@ -46,6 +46,7 @@ class BikeReservationServiceTest {
     @Mock
     private SecurityService securityService;
 
+
     @InjectMocks
     private BikeReservationService bikeReservationService;
 
@@ -56,35 +57,35 @@ class BikeReservationServiceTest {
     @BeforeEach
     void setUp() {
         testBike = Bike.builder()
-                .id(1L)
-                .code("BIKE001")
-                .build();
+        .id(1L)
+        .code("BIKE001")
+        .build();
 
         testReservation = BikeReservation.builder()
-                .id(1L)
-                .externalId("BRES001")
-                .userId(1L)
-                .bike(testBike)
-                .startDateTime(LocalDateTime.now().plusDays(1))
-                .endDateTime(LocalDateTime.now().plusDays(2))
-                .build();
+        .id(1L)
+        .externalId("BRES001")
+        .userId(1L)
+        .bike(testBike)
+        .startDateTime(LocalDateTime.now().plusDays(1))
+        .endDateTime(LocalDateTime.now().plusDays(2))
+        .build();
 
         testReservationDTO = BikeReservationDTO.builder()
-                .id(1L)
-                .externalId("BRES001")
-                .userId(1L)
-                .bikeId(1L)
-                .startDateTime(LocalDateTime.now().plusDays(1))
-                .endDateTime(LocalDateTime.now().plusDays(2))
-                .build();
+        .id(1L)
+        .externalId("BRES001")
+        .userId(1L)
+        .bikeId(1L)
+        .startDateTime(LocalDateTime.now().plusDays(1))
+        .endDateTime(LocalDateTime.now().plusDays(2))
+        .build();
     }
 
     @Test
     void getAllReservations_WithAdminRole_ReturnsAllReservations() {
         // Arrange
+        when(securityService.isAdmin()).thenReturn(true);
         Pageable pageable = PageRequest.of(0, 20);
         Page<BikeReservation> reservationPage = new PageImpl<>(Collections.singletonList(testReservation));
-        when(securityService.isAdmin()).thenReturn(true);
         when(bikeReservationRepository.findAll(pageable)).thenReturn(reservationPage);
         when(bikeReservationMapper.toDto(testReservation)).thenReturn(testReservationDTO);
 
@@ -101,8 +102,6 @@ class BikeReservationServiceTest {
     void getAllReservations_WithoutAdminRole_ThrowsUnauthorizedException() {
         // Arrange
         Pageable pageable = PageRequest.of(0, 20);
-        when(securityService.isAdmin()).thenReturn(false);
-
         // Act & Assert
         assertThrows(UnauthorizedException.class, () -> bikeReservationService.getAllReservations(pageable));
     }
@@ -143,8 +142,6 @@ class BikeReservationServiceTest {
     void getReservationsByUser_WithoutAccess_ThrowsUnauthorizedException() {
         // Arrange
         when(securityService.isAdmin()).thenReturn(false);
-        when(securityService.hasAccessToUser(1L)).thenReturn(false);
-
         // Act & Assert
         assertThrows(UnauthorizedException.class, () -> bikeReservationService.getReservationsByUser(1L));
     }
@@ -152,8 +149,8 @@ class BikeReservationServiceTest {
     @Test
     void getReservationById_WithAdminRole_Success() {
         // Arrange
-        when(bikeReservationRepository.findById(1L)).thenReturn(Optional.of(testReservation));
         when(securityService.isAdmin()).thenReturn(true);
+        when(bikeReservationRepository.findById(1L)).thenReturn(Optional.of(testReservation));
         when(bikeReservationMapper.toDto(testReservation)).thenReturn(testReservationDTO);
 
         // Act
@@ -179,8 +176,6 @@ class BikeReservationServiceTest {
         // Arrange
         when(bikeReservationRepository.findById(1L)).thenReturn(Optional.of(testReservation));
         when(securityService.isAdmin()).thenReturn(false);
-        when(securityService.hasAccessToUser(1L)).thenReturn(false);
-
         // Act & Assert
         assertThrows(UnauthorizedException.class, () -> bikeReservationService.getReservationById(1L));
     }
@@ -188,6 +183,7 @@ class BikeReservationServiceTest {
     @Test
     void createReservation_Success() {
         // Arrange
+        when(securityService.hasAccessToUser(anyLong())).thenReturn(true);
         when(bikeRepository.findById(1L)).thenReturn(Optional.of(testBike));
         when(bikeReservationMapper.toEntity(testReservationDTO)).thenReturn(testReservation);
         when(bikeReservationRepository.save(any(BikeReservation.class))).thenReturn(testReservation);
@@ -204,6 +200,7 @@ class BikeReservationServiceTest {
     @Test
     void createReservation_BikeNotFound() {
         // Arrange
+        when(securityService.isAdmin()).thenReturn(true);
         when(bikeRepository.findById(1L)).thenReturn(Optional.empty());
 
         // Act & Assert
@@ -213,8 +210,8 @@ class BikeReservationServiceTest {
     @Test
     void deleteReservation_WithAdminRole_Success() {
         // Arrange
-        when(bikeReservationRepository.findById(1L)).thenReturn(Optional.of(testReservation));
         when(securityService.isAdmin()).thenReturn(true);
+        when(bikeReservationRepository.findById(1L)).thenReturn(Optional.of(testReservation));
         doNothing().when(bikeReservationRepository).delete(testReservation);
 
         // Act
@@ -230,7 +227,7 @@ class BikeReservationServiceTest {
         // Arrange
         when(bikeReservationRepository.findById(1L)).thenReturn(Optional.of(testReservation));
         when(securityService.isAdmin()).thenReturn(false);
-        when(securityService.hasAccessToUser(1L)).thenReturn(true);
+        when(securityService.hasAccessToUser(anyLong())).thenReturn(true);
         doNothing().when(bikeReservationRepository).delete(testReservation);
 
         // Act
@@ -245,8 +242,6 @@ class BikeReservationServiceTest {
         // Arrange
         when(bikeReservationRepository.findById(1L)).thenReturn(Optional.of(testReservation));
         when(securityService.isAdmin()).thenReturn(false);
-        when(securityService.hasAccessToUser(1L)).thenReturn(false);
-
         // Act & Assert
         assertThrows(UnauthorizedException.class, () -> bikeReservationService.deleteReservation(1L));
         verify(bikeReservationRepository, never()).delete(any(BikeReservation.class));

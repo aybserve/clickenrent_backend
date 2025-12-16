@@ -33,6 +33,10 @@ class B2BSubscriptionServiceTest {
     @Mock
     private B2BSubscriptionMapper b2bSubscriptionMapper;
 
+    @Mock
+    private SecurityService securityService;
+
+
     @InjectMocks
     private B2BSubscriptionService b2bSubscriptionService;
 
@@ -42,22 +46,23 @@ class B2BSubscriptionServiceTest {
     @BeforeEach
     void setUp() {
         testSubscription = B2BSubscription.builder()
-                .id(1L)
-                .externalId("B2BSUB001")
-                .endDateTime(LocalDateTime.now().plusYears(1))
-                .build();
+        .id(1L)
+        .externalId("B2BSUB001")
+        .endDateTime(LocalDateTime.now().plusYears(1))
+        .build();
 
         testSubscriptionDTO = B2BSubscriptionDTO.builder()
-                .id(1L)
-                .externalId("B2BSUB001")
-                .locationId(1L)
-                .b2bSubscriptionStatusId(2L)
-                .endDateTime(LocalDateTime.now().plusYears(1))
-                .build();
+        .id(1L)
+        .externalId("B2BSUB001")
+        .locationId(1L)
+        .b2bSubscriptionStatusId(2L)
+        .endDateTime(LocalDateTime.now().plusYears(1))
+        .build();
     }
 
     @Test
     void getAllSubscriptions_ReturnsAllSubscriptions() {
+        when(securityService.isAdmin()).thenReturn(true);
         Pageable pageable = PageRequest.of(0, 20);
         Page<B2BSubscription> subscriptionPage = new PageImpl<>(Collections.singletonList(testSubscription));
         when(b2bSubscriptionRepository.findAll(pageable)).thenReturn(subscriptionPage);
@@ -71,6 +76,7 @@ class B2BSubscriptionServiceTest {
 
     @Test
     void getSubscriptionById_Success() {
+        when(securityService.isAdmin()).thenReturn(true);
         when(b2bSubscriptionRepository.findById(1L)).thenReturn(Optional.of(testSubscription));
         when(b2bSubscriptionMapper.toDto(testSubscription)).thenReturn(testSubscriptionDTO);
 
@@ -88,6 +94,7 @@ class B2BSubscriptionServiceTest {
 
     @Test
     void createSubscription_Success() {
+        when(securityService.isAdmin()).thenReturn(true);
         when(b2bSubscriptionMapper.toEntity(testSubscriptionDTO)).thenReturn(testSubscription);
         when(b2bSubscriptionRepository.save(any())).thenReturn(testSubscription);
         when(b2bSubscriptionMapper.toDto(testSubscription)).thenReturn(testSubscriptionDTO);
@@ -99,6 +106,7 @@ class B2BSubscriptionServiceTest {
 
     @Test
     void updateSubscription_Success() {
+        when(securityService.isAdmin()).thenReturn(true);
         when(b2bSubscriptionRepository.findById(1L)).thenReturn(Optional.of(testSubscription));
         when(b2bSubscriptionRepository.save(any())).thenReturn(testSubscription);
         when(b2bSubscriptionMapper.toDto(testSubscription)).thenReturn(testSubscriptionDTO);
@@ -110,6 +118,7 @@ class B2BSubscriptionServiceTest {
 
     @Test
     void deleteSubscription_Success() {
+        when(securityService.isAdmin()).thenReturn(true);
         when(b2bSubscriptionRepository.findById(1L)).thenReturn(Optional.of(testSubscription));
         doNothing().when(b2bSubscriptionRepository).delete(testSubscription);
 

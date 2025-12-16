@@ -27,6 +27,9 @@ class CoordinatesServiceTest {
     @Mock
     private CoordinatesMapper coordinatesMapper;
 
+    @Mock
+    private SecurityService securityService;
+
     @InjectMocks
     private CoordinatesService coordinatesService;
 
@@ -36,16 +39,16 @@ class CoordinatesServiceTest {
     @BeforeEach
     void setUp() {
         testCoordinates = Coordinates.builder()
-                .id(1L)
-                .latitude(new BigDecimal("52.370216"))
-                .longitude(new BigDecimal("4.895168"))
-                .build();
+        .id(1L)
+        .latitude(new BigDecimal("52.370216"))
+        .longitude(new BigDecimal("4.895168"))
+        .build();
 
         testCoordinatesDTO = CoordinatesDTO.builder()
-                .id(1L)
-                .latitude(new BigDecimal("52.370216"))
-                .longitude(new BigDecimal("4.895168"))
-                .build();
+        .id(1L)
+        .latitude(new BigDecimal("52.370216"))
+        .longitude(new BigDecimal("4.895168"))
+        .build();
     }
 
     @Test

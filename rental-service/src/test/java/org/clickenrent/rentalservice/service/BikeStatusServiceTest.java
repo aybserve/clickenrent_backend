@@ -28,6 +28,10 @@ class BikeStatusServiceTest {
     @Mock
     private BikeStatusMapper bikeStatusMapper;
 
+    @Mock
+    private SecurityService securityService;
+
+
     @InjectMocks
     private BikeStatusService bikeStatusService;
 
@@ -37,14 +41,14 @@ class BikeStatusServiceTest {
     @BeforeEach
     void setUp() {
         testStatus = BikeStatus.builder()
-                .id(1L)
-                .name("Available")
-                .build();
+        .id(1L)
+        .name("Available")
+        .build();
 
         testStatusDTO = BikeStatusDTO.builder()
-                .id(1L)
-                .name("Available")
-                .build();
+        .id(1L)
+        .name("Available")
+        .build();
     }
 
     @Test
@@ -80,6 +84,7 @@ class BikeStatusServiceTest {
 
     @Test
     void createBikeStatus_Success() {
+        when(securityService.isAdmin()).thenReturn(true);
         when(bikeStatusMapper.toEntity(testStatusDTO)).thenReturn(testStatus);
         when(bikeStatusRepository.save(any())).thenReturn(testStatus);
         when(bikeStatusMapper.toDto(testStatus)).thenReturn(testStatusDTO);
@@ -92,6 +97,7 @@ class BikeStatusServiceTest {
 
     @Test
     void updateBikeStatus_Success() {
+        when(securityService.isAdmin()).thenReturn(true);
         when(bikeStatusRepository.findById(1L)).thenReturn(Optional.of(testStatus));
         when(bikeStatusRepository.save(any())).thenReturn(testStatus);
         when(bikeStatusMapper.toDto(testStatus)).thenReturn(testStatusDTO);
@@ -104,6 +110,7 @@ class BikeStatusServiceTest {
 
     @Test
     void deleteBikeStatus_Success() {
+        when(securityService.isAdmin()).thenReturn(true);
         when(bikeStatusRepository.findById(1L)).thenReturn(Optional.of(testStatus));
         doNothing().when(bikeStatusRepository).delete(testStatus);
 

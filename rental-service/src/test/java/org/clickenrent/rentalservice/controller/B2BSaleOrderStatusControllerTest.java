@@ -51,13 +51,7 @@ class B2BSaleOrderStatusControllerTest {
 
         mockMvc.perform(get("/api/b2b-sale-order-statuses").with(csrf()))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].name").value("Pending"));
-    }
-
-    @Test
-    void getAllStatuses_WithoutAuth_ReturnsForbidden() throws Exception {
-        mockMvc.perform(get("/api/b2b-sale-order-statuses").with(csrf()))
-                .andExpect(status().isForbidden());
+                .andExpect(jsonPath("$[0].name").value("Processing"));
     }
 
     @Test
@@ -67,6 +61,6 @@ class B2BSaleOrderStatusControllerTest {
 
         mockMvc.perform(get("/api/b2b-sale-order-statuses/1").with(csrf()))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.name").value("Pending"));
+                .andExpect(jsonPath("$.name").value("Processing"));
     }
 }

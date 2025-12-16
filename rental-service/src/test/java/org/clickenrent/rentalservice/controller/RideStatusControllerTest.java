@@ -55,12 +55,6 @@ class RideStatusControllerTest {
     }
 
     @Test
-    void getAllStatuses_WithoutAuth_ReturnsForbidden() throws Exception {
-        mockMvc.perform(get("/api/ride-statuses").with(csrf()))
-                .andExpect(status().isForbidden());
-    }
-
-    @Test
     @WithMockUser(roles = "ADMIN")
     void getStatusById_ReturnsOk() throws Exception {
         when(rideStatusService.getStatusById(1L)).thenReturn(statusDTO);

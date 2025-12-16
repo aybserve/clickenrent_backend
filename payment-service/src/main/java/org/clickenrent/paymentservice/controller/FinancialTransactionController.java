@@ -8,6 +8,7 @@ import org.clickenrent.paymentservice.dto.FinancialTransactionDTO;
 import org.clickenrent.paymentservice.service.FinancialTransactionService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
@@ -47,6 +48,7 @@ public class FinancialTransactionController {
     }
 
     @PostMapping
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Create new financial transaction")
     public ResponseEntity<FinancialTransactionDTO> create(@Valid @RequestBody FinancialTransactionDTO dto) {
         return ResponseEntity.status(HttpStatus.CREATED).body(financialTransactionService.create(dto));

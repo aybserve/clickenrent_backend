@@ -28,6 +28,9 @@ class RideStatusServiceTest {
     @Mock
     private RideStatusMapper rideStatusMapper;
 
+    @Mock
+    private SecurityService securityService;
+
     @InjectMocks
     private RideStatusService rideStatusService;
 
@@ -37,14 +40,14 @@ class RideStatusServiceTest {
     @BeforeEach
     void setUp() {
         testStatus = RideStatus.builder()
-                .id(1L)
-                .name("Active")
-                .build();
+        .id(1L)
+        .name("Active")
+        .build();
 
         testStatusDTO = RideStatusDTO.builder()
-                .id(1L)
-                .name("Active")
-                .build();
+        .id(1L)
+        .name("Active")
+        .build();
     }
 
     @Test

@@ -36,6 +36,7 @@ class B2BSaleOrderProductModelServiceTest {
     @Mock
     private SecurityService securityService;
 
+
     @InjectMocks
     private B2BSaleOrderProductModelService b2bSaleOrderProductModelService;
 
@@ -45,17 +46,18 @@ class B2BSaleOrderProductModelServiceTest {
     @BeforeEach
     void setUp() {
         testProductModel = B2BSaleOrderProductModel.builder()
-                .id(1L)
-                .build();
+        .id(1L)
+        .build();
 
         testProductModelDTO = B2BSaleOrderProductModelDTO.builder()
-                .id(1L)
-                .b2bSaleOrderId(1L)
-                .build();
+        .id(1L)
+        .b2bSaleOrderId(1L)
+        .build();
     }
 
     @Test
     void getAllB2BSaleOrderProductModels_ReturnsAll() {
+        when(securityService.isAdmin()).thenReturn(true);
         Pageable pageable = PageRequest.of(0, 20);
         Page<B2BSaleOrderProductModel> productModelPage = new PageImpl<>(Collections.singletonList(testProductModel));
         when(b2bSaleOrderProductModelRepository.findAll(pageable)).thenReturn(productModelPage);
@@ -71,7 +73,7 @@ class B2BSaleOrderProductModelServiceTest {
     @Test
     void getProductModelsByOrderId_Success() {
         when(b2bSaleOrderProductModelRepository.findByB2bSaleOrderId(1L))
-                .thenReturn(Collections.singletonList(testProductModel));
+        .thenReturn(Collections.singletonList(testProductModel));
         when(b2bSaleOrderProductModelMapper.toDto(testProductModel)).thenReturn(testProductModelDTO);
 
         List<B2BSaleOrderProductModelDTO> result = b2bSaleOrderProductModelService.getProductModelsByOrderId(1L);
@@ -83,6 +85,7 @@ class B2BSaleOrderProductModelServiceTest {
 
     @Test
     void getProductModelById_Success() {
+        when(securityService.isAdmin()).thenReturn(true);
         when(b2bSaleOrderProductModelRepository.findById(1L)).thenReturn(Optional.of(testProductModel));
         when(b2bSaleOrderProductModelMapper.toDto(testProductModel)).thenReturn(testProductModelDTO);
 
@@ -101,6 +104,7 @@ class B2BSaleOrderProductModelServiceTest {
 
     @Test
     void createProductModel_Success() {
+        when(securityService.isAdmin()).thenReturn(true);
         when(b2bSaleOrderProductModelMapper.toEntity(testProductModelDTO)).thenReturn(testProductModel);
         when(b2bSaleOrderProductModelRepository.save(any())).thenReturn(testProductModel);
         when(b2bSaleOrderProductModelMapper.toDto(testProductModel)).thenReturn(testProductModelDTO);
@@ -113,6 +117,7 @@ class B2BSaleOrderProductModelServiceTest {
 
     @Test
     void updateProductModel_Success() {
+        when(securityService.isAdmin()).thenReturn(true);
         when(b2bSaleOrderProductModelRepository.findById(1L)).thenReturn(Optional.of(testProductModel));
         doNothing().when(b2bSaleOrderProductModelMapper).updateEntityFromDto(testProductModelDTO, testProductModel);
         when(b2bSaleOrderProductModelRepository.save(any())).thenReturn(testProductModel);
@@ -127,6 +132,7 @@ class B2BSaleOrderProductModelServiceTest {
 
     @Test
     void deleteProductModel_Success() {
+        when(securityService.isAdmin()).thenReturn(true);
         when(b2bSaleOrderProductModelRepository.findById(1L)).thenReturn(Optional.of(testProductModel));
         doNothing().when(b2bSaleOrderProductModelRepository).delete(testProductModel);
 
@@ -137,6 +143,7 @@ class B2BSaleOrderProductModelServiceTest {
 
     @Test
     void deleteProductModel_NotFound() {
+        when(securityService.isAdmin()).thenReturn(true);
         when(b2bSaleOrderProductModelRepository.findById(999L)).thenReturn(Optional.empty());
 
         assertThrows(ResourceNotFoundException.class, () -> b2bSaleOrderProductModelService.deleteProductModel(999L));

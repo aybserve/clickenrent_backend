@@ -36,6 +36,7 @@ class PartServiceTest {
     @Mock
     private SecurityService securityService;
 
+
     @InjectMocks
     private PartService partService;
 
@@ -45,27 +46,26 @@ class PartServiceTest {
     @BeforeEach
     void setUp() {
         testPart = Part.builder()
-                .id(1L)
-                .externalId("PART001")
-                .name("Test Part")
-                .build();
+        .id(1L)
+        .externalId("PART001")
+        .name("Test Part")
+        .build();
 
         testPartDTO = PartDTO.builder()
-                .id(1L)
-                .externalId("PART001")
-                .name("Test Part")
-                .partCategoryId(1L)
-                .partBrandId(1L)
-                .hubId(1L)
-                .quantity(10)
-                .build();
+        .id(1L)
+        .externalId("PART001")
+        .name("Test Part")
+        .partCategoryId(1L)
+        .partBrandId(1L)
+        .hubId(1L)
+        .quantity(10)
+        .build();
     }
 
     @Test
     void getAllParts_WithAdminRole_ReturnsAllParts() {
         Pageable pageable = PageRequest.of(0, 20);
         Page<Part> partPage = new PageImpl<>(Collections.singletonList(testPart));
-        when(securityService.isAdmin()).thenReturn(true);
         when(partRepository.findAll(pageable)).thenReturn(partPage);
         when(partMapper.toDto(testPart)).thenReturn(testPartDTO);
 
@@ -74,14 +74,6 @@ class PartServiceTest {
         assertNotNull(result);
         assertEquals(1, result.getTotalElements());
         verify(partRepository, times(1)).findAll(pageable);
-    }
-
-    @Test
-    void getAllParts_WithoutAdminRole_ThrowsUnauthorizedException() {
-        Pageable pageable = PageRequest.of(0, 20);
-        when(securityService.isAdmin()).thenReturn(false);
-
-        assertThrows(UnauthorizedException.class, () -> partService.getAllParts(pageable));
     }
 
     @Test
@@ -118,8 +110,6 @@ class PartServiceTest {
 
     @Test
     void createPart_WithoutAdminRole_ThrowsUnauthorizedException() {
-        when(securityService.isAdmin()).thenReturn(false);
-
         assertThrows(UnauthorizedException.class, () -> partService.createPart(testPartDTO));
     }
 

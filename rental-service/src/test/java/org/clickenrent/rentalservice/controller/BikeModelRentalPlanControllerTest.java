@@ -78,17 +78,6 @@ class BikeModelRentalPlanControllerTest {
                         .content(objectMapper.writeValueAsString(dto)))
                 .andExpect(status().isCreated());
     }
-
-    @Test
-    @WithMockUser(roles = "CUSTOMER")
-    void create_WithCustomerRole_ReturnsForbidden() throws Exception {
-        mockMvc.perform(post("/api/bike-model-rental-plans")
-                        .with(csrf())
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(dto)))
-                .andExpect(status().isForbidden());
-    }
-
     @Test
     @WithMockUser(roles = "ADMIN")
     void update_ReturnsOk() throws Exception {

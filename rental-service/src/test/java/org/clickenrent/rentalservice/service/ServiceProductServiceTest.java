@@ -32,6 +32,10 @@ class ServiceProductServiceTest {
     @Mock
     private ServiceProductMapper serviceProductMapper;
 
+    @Mock
+    private SecurityService securityService;
+
+
     @InjectMocks
     private ServiceProductService serviceProductService;
 
@@ -41,19 +45,19 @@ class ServiceProductServiceTest {
     @BeforeEach
     void setUp() {
         testServiceProduct = ServiceProduct.builder()
-                .id(1L)
-                .externalId("SP001")
-                .productId(1L)
-                .isB2BRentable(true)
-                .build();
+        .id(1L)
+        .externalId("SP001")
+        .productId(1L)
+        .isB2BRentable(true)
+        .build();
 
         testServiceProductDTO = ServiceProductDTO.builder()
-                .id(1L)
-                .externalId("SP001")
-                .serviceId(1L)
-                .productId(1L)
-                .isB2BRentable(true)
-                .build();
+        .id(1L)
+        .externalId("SP001")
+        .serviceId(1L)
+        .productId(1L)
+        .isB2BRentable(true)
+        .build();
     }
 
     @Test
@@ -88,6 +92,7 @@ class ServiceProductServiceTest {
 
     @Test
     void createServiceProduct_Success() {
+        when(securityService.isAdmin()).thenReturn(true);
         when(serviceProductMapper.toEntity(testServiceProductDTO)).thenReturn(testServiceProduct);
         when(serviceProductRepository.save(any())).thenReturn(testServiceProduct);
         when(serviceProductMapper.toDto(testServiceProduct)).thenReturn(testServiceProductDTO);
@@ -99,6 +104,7 @@ class ServiceProductServiceTest {
 
     @Test
     void deleteServiceProduct_Success() {
+        when(securityService.isAdmin()).thenReturn(true);
         when(serviceProductRepository.findById(1L)).thenReturn(Optional.of(testServiceProduct));
         doNothing().when(serviceProductRepository).delete(testServiceProduct);
 

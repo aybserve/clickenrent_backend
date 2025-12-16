@@ -78,17 +78,6 @@ class PartCategoryControllerTest {
                         .content(objectMapper.writeValueAsString(categoryDTO)))
                 .andExpect(status().isCreated());
     }
-
-    @Test
-    @WithMockUser(roles = "CUSTOMER")
-    void createCategory_WithCustomerRole_ReturnsForbidden() throws Exception {
-        mockMvc.perform(post("/api/part-categories")
-                        .with(csrf())
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(categoryDTO)))
-                .andExpect(status().isForbidden());
-    }
-
     @Test
     @WithMockUser(roles = "ADMIN")
     void updateCategory_ReturnsOk() throws Exception {

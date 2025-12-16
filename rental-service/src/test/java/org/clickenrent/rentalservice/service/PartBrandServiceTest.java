@@ -45,20 +45,18 @@ class PartBrandServiceTest {
     @BeforeEach
     void setUp() {
         testBrand = PartBrand.builder()
-                .id(1L)
-                .name("Samsung")
-                .companyId(1L)
-                .build();
+        .id(1L)
+        .name("Samsung")
+        .companyId(1L)
+        .build();
 
         testBrandDTO = PartBrandDTO.builder()
-                .id(1L)
-                .name("Samsung")
-                .companyId(1L)
-                .build();
+        .id(1L)
+        .name("Samsung")
+        .companyId(1L)
+        .build();
 
-        when(securityService.isAdmin()).thenReturn(true);
-        when(securityService.hasAccessToCompany(anyLong())).thenReturn(true);
-    }
+            }
 
     @Test
     void getAllBrands_ReturnsAllBrands() {
@@ -76,6 +74,7 @@ class PartBrandServiceTest {
 
     @Test
     void getBrandsByCompany_Success() {
+        when(securityService.isAdmin()).thenReturn(true);
         when(partBrandRepository.findByCompanyId(1L)).thenReturn(Collections.singletonList(testBrand));
         when(partBrandMapper.toDto(testBrand)).thenReturn(testBrandDTO);
 
@@ -108,6 +107,7 @@ class PartBrandServiceTest {
 
     @Test
     void createBrand_Success() {
+        when(securityService.isAdmin()).thenReturn(true);
         when(partBrandMapper.toEntity(testBrandDTO)).thenReturn(testBrand);
         when(partBrandRepository.save(any())).thenReturn(testBrand);
         when(partBrandMapper.toDto(testBrand)).thenReturn(testBrandDTO);
@@ -120,6 +120,7 @@ class PartBrandServiceTest {
 
     @Test
     void updateBrand_Success() {
+        when(securityService.isAdmin()).thenReturn(true);
         when(partBrandRepository.findById(1L)).thenReturn(Optional.of(testBrand));
         doNothing().when(partBrandMapper).updateEntityFromDto(testBrandDTO, testBrand);
         when(partBrandRepository.save(any())).thenReturn(testBrand);
@@ -134,6 +135,7 @@ class PartBrandServiceTest {
 
     @Test
     void deleteBrand_Success() {
+        when(securityService.isAdmin()).thenReturn(true);
         when(partBrandRepository.findById(1L)).thenReturn(Optional.of(testBrand));
         doNothing().when(partBrandRepository).delete(testBrand);
 
@@ -144,6 +146,7 @@ class PartBrandServiceTest {
 
     @Test
     void deleteBrand_NotFound() {
+        when(securityService.isAdmin()).thenReturn(true);
         when(partBrandRepository.findById(999L)).thenReturn(Optional.empty());
 
         assertThrows(ResourceNotFoundException.class, () -> partBrandService.deleteBrand(999L));

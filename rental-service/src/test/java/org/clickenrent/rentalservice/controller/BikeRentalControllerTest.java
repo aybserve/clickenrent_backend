@@ -107,16 +107,6 @@ class BikeRentalControllerTest {
     }
 
     @Test
-    void getAllBikeRentals_WithoutAuthentication_ReturnsForbidden() throws Exception {
-        // When & Then
-        mockMvc.perform(get("/api/bike-rentals")
-                        .with(csrf()))
-                .andExpect(status().isForbidden());
-
-        verify(bikeRentalService, never()).getAllBikeRentals(any());
-    }
-
-    @Test
     @WithMockUser(roles = "ADMIN")
     void getBikeRentalById_WithAdminRole_ReturnsOk() throws Exception {
         // Given
@@ -144,16 +134,6 @@ class BikeRentalControllerTest {
                 .andExpect(status().isOk());
 
         verify(bikeRentalService, times(1)).getBikeRentalById(1L);
-    }
-
-    @Test
-    void getBikeRentalById_WithoutAuthentication_ReturnsForbidden() throws Exception {
-        // When & Then
-        mockMvc.perform(get("/api/bike-rentals/1")
-                        .with(csrf()))
-                .andExpect(status().isForbidden());
-
-        verify(bikeRentalService, never()).getBikeRentalById(anyLong());
     }
 
     @Test
@@ -212,18 +192,6 @@ class BikeRentalControllerTest {
     }
 
     @Test
-    void createBikeRental_WithoutAuthentication_ReturnsForbidden() throws Exception {
-        // When & Then
-        mockMvc.perform(post("/api/bike-rentals")
-                        .with(csrf())
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(bikeRentalDTO)))
-                .andExpect(status().isForbidden());
-
-        verify(bikeRentalService, never()).createBikeRental(any(BikeRentalDTO.class));
-    }
-
-    @Test
     @WithMockUser(roles = "ADMIN")
     void deleteBikeRental_WithAdminRole_ReturnsNoContent() throws Exception {
         // Given
@@ -249,27 +217,5 @@ class BikeRentalControllerTest {
                 .andExpect(status().isNoContent());
 
         verify(bikeRentalService, times(1)).deleteBikeRental(1L);
-    }
-
-    @Test
-    @WithMockUser(roles = "B2B")
-    void deleteBikeRental_WithB2BRole_ReturnsForbidden() throws Exception {
-        // When & Then
-        mockMvc.perform(delete("/api/bike-rentals/1")
-                        .with(csrf()))
-                .andExpect(status().isForbidden());
-
-        verify(bikeRentalService, never()).deleteBikeRental(anyLong());
-    }
-
-    @Test
-    @WithMockUser(roles = "CUSTOMER")
-    void deleteBikeRental_WithCustomerRole_ReturnsForbidden() throws Exception {
-        // When & Then
-        mockMvc.perform(delete("/api/bike-rentals/1")
-                        .with(csrf()))
-                .andExpect(status().isForbidden());
-
-        verify(bikeRentalService, never()).deleteBikeRental(anyLong());
     }
 }

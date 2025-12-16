@@ -8,6 +8,7 @@ import org.clickenrent.paymentservice.dto.PaymentMethodDTO;
 import org.clickenrent.paymentservice.service.PaymentMethodService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -46,6 +47,7 @@ public class PaymentMethodController {
     }
 
     @PostMapping
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Create new payment method")
     public ResponseEntity<PaymentMethodDTO> create(@Valid @RequestBody PaymentMethodDTO dto) {
         return ResponseEntity.status(HttpStatus.CREATED).body(paymentMethodService.create(dto));

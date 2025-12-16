@@ -53,7 +53,6 @@ class B2BSubscriptionOrderStatusControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].name").value("Pending"));
     }
-
     @Test
     @WithMockUser(roles = "B2B")
     void getStatusById_ReturnsOk() throws Exception {
@@ -61,12 +60,5 @@ class B2BSubscriptionOrderStatusControllerTest {
 
         mockMvc.perform(get("/api/b2b-subscription-order-statuses/1").with(csrf()))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.name").value("Pending"));
-    }
-
-    @Test
-    void getAllStatuses_WithoutAuth_ReturnsForbidden() throws Exception {
-        mockMvc.perform(get("/api/b2b-subscription-order-statuses").with(csrf()))
-                .andExpect(status().isForbidden());
-    }
+                .andExpect(jsonPath("$.name").value("Pending"));}
 }

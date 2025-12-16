@@ -28,6 +28,9 @@ class B2BSaleStatusServiceTest {
     @Mock
     private B2BSaleStatusMapper b2bSaleStatusMapper;
 
+    @Mock
+    private SecurityService securityService;
+
     @InjectMocks
     private B2BSaleStatusService b2bSaleStatusService;
 
@@ -37,14 +40,14 @@ class B2BSaleStatusServiceTest {
     @BeforeEach
     void setUp() {
         testStatus = B2BSaleStatus.builder()
-                .id(1L)
-                .name("Ordered")
-                .build();
+        .id(1L)
+        .name("Ordered")
+        .build();
 
         testStatusDTO = B2BSaleStatusDTO.builder()
-                .id(1L)
-                .name("Ordered")
-                .build();
+        .id(1L)
+        .name("Ordered")
+        .build();
     }
 
     @Test

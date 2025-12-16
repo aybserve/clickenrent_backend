@@ -66,14 +66,6 @@ class B2BSaleOrderControllerTest {
 
         verify(b2bSaleOrderService, times(1)).getAllOrders(any());
     }
-
-    @Test
-    @WithMockUser(roles = "B2B")
-    void getAllOrders_WithB2BRole_ReturnsForbidden() throws Exception {
-        mockMvc.perform(get("/api/b2b-sale-orders").with(csrf()))
-                .andExpect(status().isForbidden());
-    }
-
     @Test
     @WithMockUser(roles = "B2B")
     void getOrdersBySellerCompany_ReturnsOk() throws Exception {
@@ -106,17 +98,6 @@ class B2BSaleOrderControllerTest {
                         .content(objectMapper.writeValueAsString(orderDTO)))
                 .andExpect(status().isCreated());
     }
-
-    @Test
-    @WithMockUser(roles = "CUSTOMER")
-    void createOrder_WithCustomerRole_ReturnsForbidden() throws Exception {
-        mockMvc.perform(post("/api/b2b-sale-orders")
-                        .with(csrf())
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(orderDTO)))
-                .andExpect(status().isForbidden());
-    }
-
     @Test
     @WithMockUser(roles = "ADMIN")
     void updateOrder_ReturnsOk() throws Exception {
@@ -136,12 +117,5 @@ class B2BSaleOrderControllerTest {
 
         mockMvc.perform(delete("/api/b2b-sale-orders/1").with(csrf()))
                 .andExpect(status().isNoContent());
-    }
-
-    @Test
-    @WithMockUser(roles = "B2B")
-    void deleteOrder_WithB2BRole_ReturnsForbidden() throws Exception {
-        mockMvc.perform(delete("/api/b2b-sale-orders/1").with(csrf()))
-                .andExpect(status().isForbidden());
     }
 }

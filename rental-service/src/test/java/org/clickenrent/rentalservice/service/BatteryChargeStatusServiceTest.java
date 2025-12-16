@@ -40,16 +40,15 @@ class BatteryChargeStatusServiceTest {
     @BeforeEach
     void setUp() {
         testStatus = BatteryChargeStatus.builder()
-                .id(1L)
-                .name("Charging")
-                .build();
+        .id(1L)
+        .name("Charging")
+        .build();
 
         testStatusDTO = BatteryChargeStatusDTO.builder()
-                .id(1L)
-                .name("Charging")
-                .build();
+        .id(1L)
+        .name("Charging")
+        .build();
 
-        when(securityService.isAdmin()).thenReturn(true);
     }
 
     @Test
@@ -85,6 +84,7 @@ class BatteryChargeStatusServiceTest {
 
     @Test
     void createStatus_Success() {
+        when(securityService.isAdmin()).thenReturn(true);
         when(batteryChargeStatusMapper.toEntity(testStatusDTO)).thenReturn(testStatus);
         when(batteryChargeStatusRepository.save(any())).thenReturn(testStatus);
         when(batteryChargeStatusMapper.toDto(testStatus)).thenReturn(testStatusDTO);
@@ -97,6 +97,7 @@ class BatteryChargeStatusServiceTest {
 
     @Test
     void updateStatus_Success() {
+        when(securityService.isAdmin()).thenReturn(true);
         when(batteryChargeStatusRepository.findById(1L)).thenReturn(Optional.of(testStatus));
         doNothing().when(batteryChargeStatusMapper).updateEntityFromDto(testStatusDTO, testStatus);
         when(batteryChargeStatusRepository.save(any())).thenReturn(testStatus);
@@ -111,6 +112,7 @@ class BatteryChargeStatusServiceTest {
 
     @Test
     void deleteStatus_Success() {
+        when(securityService.isAdmin()).thenReturn(true);
         when(batteryChargeStatusRepository.findById(1L)).thenReturn(Optional.of(testStatus));
         doNothing().when(batteryChargeStatusRepository).delete(testStatus);
 
@@ -121,6 +123,7 @@ class BatteryChargeStatusServiceTest {
 
     @Test
     void deleteStatus_NotFound() {
+        when(securityService.isAdmin()).thenReturn(true);
         when(batteryChargeStatusRepository.findById(999L)).thenReturn(Optional.empty());
 
         assertThrows(ResourceNotFoundException.class, () -> batteryChargeStatusService.deleteStatus(999L));

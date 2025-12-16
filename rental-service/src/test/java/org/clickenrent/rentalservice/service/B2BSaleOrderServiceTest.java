@@ -33,6 +33,10 @@ class B2BSaleOrderServiceTest {
     @Mock
     private B2BSaleOrderMapper b2bSaleOrderMapper;
 
+    @Mock
+    private SecurityService securityService;
+
+
     @InjectMocks
     private B2BSaleOrderService b2bSaleOrderService;
 
@@ -42,27 +46,28 @@ class B2BSaleOrderServiceTest {
     @BeforeEach
     void setUp() {
         testOrder = B2BSaleOrder.builder()
-                .id(1L)
-                .externalId("B2BSO001")
-                .sellerCompanyId(1L)
-                .buyerCompanyId(2L)
-                .dateTime(LocalDateTime.now())
-                .build();
+        .id(1L)
+        .externalId("B2BSO001")
+        .sellerCompanyId(1L)
+        .buyerCompanyId(2L)
+        .dateTime(LocalDateTime.now())
+        .build();
 
         testOrderDTO = B2BSaleOrderDTO.builder()
-                .id(1L)
-                .externalId("B2BSO001")
-                .sellerCompanyId(1L)
-                .buyerCompanyId(2L)
-                .b2bSaleOrderStatusId(2L)
-                .locationId(1L)
-                .b2bSaleId(1L)
-                .dateTime(LocalDateTime.now())
-                .build();
+        .id(1L)
+        .externalId("B2BSO001")
+        .sellerCompanyId(1L)
+        .buyerCompanyId(2L)
+        .b2bSaleOrderStatusId(2L)
+        .locationId(1L)
+        .b2bSaleId(1L)
+        .dateTime(LocalDateTime.now())
+        .build();
     }
 
     @Test
     void getAllOrders_ReturnsAllOrders() {
+        when(securityService.isAdmin()).thenReturn(true);
         Pageable pageable = PageRequest.of(0, 20);
         Page<B2BSaleOrder> orderPage = new PageImpl<>(Collections.singletonList(testOrder));
         when(b2bSaleOrderRepository.findAll(pageable)).thenReturn(orderPage);
@@ -76,6 +81,7 @@ class B2BSaleOrderServiceTest {
 
     @Test
     void getOrderById_Success() {
+        when(securityService.isAdmin()).thenReturn(true);
         when(b2bSaleOrderRepository.findById(1L)).thenReturn(Optional.of(testOrder));
         when(b2bSaleOrderMapper.toDto(testOrder)).thenReturn(testOrderDTO);
 
@@ -93,6 +99,7 @@ class B2BSaleOrderServiceTest {
 
     @Test
     void createOrder_Success() {
+        when(securityService.isAdmin()).thenReturn(true);
         when(b2bSaleOrderMapper.toEntity(testOrderDTO)).thenReturn(testOrder);
         when(b2bSaleOrderRepository.save(any())).thenReturn(testOrder);
         when(b2bSaleOrderMapper.toDto(testOrder)).thenReturn(testOrderDTO);
@@ -104,6 +111,7 @@ class B2BSaleOrderServiceTest {
 
     @Test
     void updateOrder_Success() {
+        when(securityService.isAdmin()).thenReturn(true);
         when(b2bSaleOrderRepository.findById(1L)).thenReturn(Optional.of(testOrder));
         when(b2bSaleOrderRepository.save(any())).thenReturn(testOrder);
         when(b2bSaleOrderMapper.toDto(testOrder)).thenReturn(testOrderDTO);
@@ -115,6 +123,7 @@ class B2BSaleOrderServiceTest {
 
     @Test
     void deleteOrder_Success() {
+        when(securityService.isAdmin()).thenReturn(true);
         when(b2bSaleOrderRepository.findById(1L)).thenReturn(Optional.of(testOrder));
         doNothing().when(b2bSaleOrderRepository).delete(testOrder);
 

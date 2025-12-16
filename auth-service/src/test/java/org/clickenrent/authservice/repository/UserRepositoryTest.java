@@ -1,11 +1,13 @@
 package org.clickenrent.authservice.repository;
 
 import org.clickenrent.authservice.entity.User;
+import org.clickenrent.authservice.config.TestJpaAuditingConfiguration;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.test.context.TestPropertySource;
 
 import java.util.Optional;
@@ -17,6 +19,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  * Repository tests for UserRepository.
  */
 @DataJpaTest
+@Import(TestJpaAuditingConfiguration.class)
 @TestPropertySource(locations = "classpath:application-test.properties")
 class UserRepositoryTest {
 
@@ -178,7 +181,9 @@ class UserRepositoryTest {
         Iterable<User> allUsers = userRepository.findAll();
 
         // Then
-        assertThat(allUsers).hasSize(2);
+        // Only returns non-deleted users due to @Where(clause = "is_deleted = false")
+        assertThat(allUsers).hasSize(1);
+        assertThat(allUsers).extracting(User::getUserName).containsExactly("testuser1");
     }
 
     @Test

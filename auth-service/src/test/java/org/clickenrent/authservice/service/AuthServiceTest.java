@@ -4,13 +4,16 @@ import org.clickenrent.authservice.dto.AuthResponse;
 import org.clickenrent.authservice.dto.LoginRequest;
 import org.clickenrent.authservice.dto.RefreshTokenRequest;
 import org.clickenrent.authservice.dto.RegisterRequest;
+import org.clickenrent.authservice.entity.GlobalRole;
 import org.clickenrent.authservice.entity.Language;
 import org.clickenrent.authservice.entity.User;
 import org.clickenrent.authservice.exception.DuplicateResourceException;
 import org.clickenrent.authservice.exception.InvalidTokenException;
 import org.clickenrent.authservice.exception.UnauthorizedException;
 import org.clickenrent.authservice.mapper.UserMapper;
+import org.clickenrent.authservice.repository.GlobalRoleRepository;
 import org.clickenrent.authservice.repository.LanguageRepository;
+import org.clickenrent.authservice.repository.UserGlobalRoleRepository;
 import org.clickenrent.authservice.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -41,6 +44,12 @@ class AuthServiceTest {
     private UserRepository userRepository;
 
     @Mock
+    private GlobalRoleRepository globalRoleRepository;
+
+    @Mock
+    private UserGlobalRoleRepository userGlobalRoleRepository;
+
+    @Mock
     private LanguageRepository languageRepository;
 
     @Mock
@@ -57,6 +66,9 @@ class AuthServiceTest {
 
     @Mock
     private UserMapper userMapper;
+
+    @Mock
+    private TokenBlacklistService tokenBlacklistService;
 
     @InjectMocks
     private AuthService authService;
@@ -105,9 +117,11 @@ class AuthServiceTest {
     @Test
     void register_Success() {
         // Given
+        GlobalRole customerRole = GlobalRole.builder().id(1L).name("CUSTOMER").build();
         when(userRepository.findByUserName(anyString())).thenReturn(Optional.empty());
         when(userRepository.findByEmail(anyString())).thenReturn(Optional.empty());
         when(passwordEncoder.encode(anyString())).thenReturn("encodedPassword");
+        when(globalRoleRepository.findByNameIgnoreCase("CUSTOMER")).thenReturn(Optional.of(customerRole));
         when(userRepository.save(any(User.class))).thenReturn(user);
         when(userDetailsService.loadUserByUsername(anyString())).thenReturn(userDetails);
         when(jwtService.generateToken(any(UserDetails.class))).thenReturn("accessToken");
@@ -150,6 +164,7 @@ class AuthServiceTest {
     @Test
     void register_WithLanguage_Success() {
         // Given
+        GlobalRole customerRole = GlobalRole.builder().id(1L).name("CUSTOMER").build();
         Language language = new Language();
         language.setId(1L);
         language.setName("English");
@@ -159,6 +174,7 @@ class AuthServiceTest {
         when(userRepository.findByUserName(anyString())).thenReturn(Optional.empty());
         when(userRepository.findByEmail(anyString())).thenReturn(Optional.empty());
         when(languageRepository.findById(1L)).thenReturn(Optional.of(language));
+        when(globalRoleRepository.findByNameIgnoreCase("CUSTOMER")).thenReturn(Optional.of(customerRole));
         when(passwordEncoder.encode(anyString())).thenReturn("encodedPassword");
         when(userRepository.save(any(User.class))).thenReturn(user);
         when(userDetailsService.loadUserByUsername(anyString())).thenReturn(userDetails);

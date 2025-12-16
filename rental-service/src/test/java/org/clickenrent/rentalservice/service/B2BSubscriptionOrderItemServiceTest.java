@@ -46,31 +46,31 @@ class B2BSubscriptionOrderItemServiceTest {
     @BeforeEach
     void setUp() {
         testItem = B2BSubscriptionOrderItem.builder()
-                .id(1L)
-                .externalId("BSOI001")
-                .productModelType("BikeModel")
-                .productModelId(1L)
-                .quantity(10)
-                .price(new BigDecimal("100.00"))
-                .totalPrice(new BigDecimal("1000.00"))
-                .build();
+        .id(1L)
+        .externalId("BSOI001")
+        .productModelType("BikeModel")
+        .productModelId(1L)
+        .quantity(10)
+        .price(new BigDecimal("100.00"))
+        .totalPrice(new BigDecimal("1000.00"))
+        .build();
 
         testItemDTO = B2BSubscriptionOrderItemDTO.builder()
-                .id(1L)
-                .externalId("BSOI001")
-                .b2bSubscriptionOrderId(1L)
-                .productModelType("BikeModel")
-                .productModelId(1L)
-                .quantity(10)
-                .price(new BigDecimal("100.00"))
-                .totalPrice(new BigDecimal("1000.00"))
-                .build();
+        .id(1L)
+        .externalId("BSOI001")
+        .b2bSubscriptionOrderId(1L)
+        .productModelType("BikeModel")
+        .productModelId(1L)
+        .quantity(10)
+        .price(new BigDecimal("100.00"))
+        .totalPrice(new BigDecimal("1000.00"))
+        .build();
 
-        when(securityService.isAdmin()).thenReturn(true);
     }
 
     @Test
     void getAllItems_ReturnsAll() {
+        when(securityService.isAdmin()).thenReturn(true);
         Pageable pageable = PageRequest.of(0, 20);
         Page<B2BSubscriptionOrderItem> itemPage = new PageImpl<>(Collections.singletonList(testItem));
         when(b2bSubscriptionOrderItemRepository.findAll(pageable)).thenReturn(itemPage);
@@ -85,7 +85,7 @@ class B2BSubscriptionOrderItemServiceTest {
     @Test
     void getItemsByOrderId_ReturnsAll() {
         when(b2bSubscriptionOrderItemRepository.findByB2bSubscriptionOrderId(1L))
-                .thenReturn(Collections.singletonList(testItem));
+        .thenReturn(Collections.singletonList(testItem));
         when(b2bSubscriptionOrderItemMapper.toDto(testItem)).thenReturn(testItemDTO);
 
         List<B2BSubscriptionOrderItemDTO> result = b2bSubscriptionOrderItemService.getItemsByOrderId(1L);
@@ -96,6 +96,7 @@ class B2BSubscriptionOrderItemServiceTest {
 
     @Test
     void getItemById_Success() {
+        when(securityService.isAdmin()).thenReturn(true);
         when(b2bSubscriptionOrderItemRepository.findById(1L)).thenReturn(Optional.of(testItem));
         when(b2bSubscriptionOrderItemMapper.toDto(testItem)).thenReturn(testItemDTO);
 
@@ -113,6 +114,7 @@ class B2BSubscriptionOrderItemServiceTest {
 
     @Test
     void createItem_Success() {
+        when(securityService.isAdmin()).thenReturn(true);
         when(b2bSubscriptionOrderItemMapper.toEntity(testItemDTO)).thenReturn(testItem);
         when(b2bSubscriptionOrderItemRepository.save(any())).thenReturn(testItem);
         when(b2bSubscriptionOrderItemMapper.toDto(testItem)).thenReturn(testItemDTO);
@@ -124,6 +126,7 @@ class B2BSubscriptionOrderItemServiceTest {
 
     @Test
     void updateItem_Success() {
+        when(securityService.isAdmin()).thenReturn(true);
         when(b2bSubscriptionOrderItemRepository.findById(1L)).thenReturn(Optional.of(testItem));
         doNothing().when(b2bSubscriptionOrderItemMapper).updateEntityFromDto(testItemDTO, testItem);
         when(b2bSubscriptionOrderItemRepository.save(any())).thenReturn(testItem);
@@ -136,6 +139,7 @@ class B2BSubscriptionOrderItemServiceTest {
 
     @Test
     void deleteItem_Success() {
+        when(securityService.isAdmin()).thenReturn(true);
         when(b2bSubscriptionOrderItemRepository.findById(1L)).thenReturn(Optional.of(testItem));
         doNothing().when(b2bSubscriptionOrderItemRepository).delete(testItem);
 

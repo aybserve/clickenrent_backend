@@ -28,6 +28,9 @@ class LocationRoleServiceTest {
     @Mock
     private LocationRoleMapper locationRoleMapper;
 
+    @Mock
+    private SecurityService securityService;
+
     @InjectMocks
     private LocationRoleService locationRoleService;
 
@@ -37,14 +40,14 @@ class LocationRoleServiceTest {
     @BeforeEach
     void setUp() {
         testRole = LocationRole.builder()
-                .id(1L)
-                .name("Admin")
-                .build();
+        .id(1L)
+        .name("Admin")
+        .build();
 
         testRoleDTO = LocationRoleDTO.builder()
-                .id(1L)
-                .name("Admin")
-                .build();
+        .id(1L)
+        .name("Admin")
+        .build();
     }
 
     @Test

@@ -1,10 +1,14 @@
 package org.clickenrent.rentalservice.service;
 
 import org.clickenrent.rentalservice.dto.BikePartDTO;
+import org.clickenrent.rentalservice.entity.Bike;
 import org.clickenrent.rentalservice.entity.BikePart;
+import org.clickenrent.rentalservice.entity.Part;
 import org.clickenrent.rentalservice.exception.ResourceNotFoundException;
 import org.clickenrent.rentalservice.mapper.BikePartMapper;
 import org.clickenrent.rentalservice.repository.BikePartRepository;
+import org.clickenrent.rentalservice.repository.BikeRepository;
+import org.clickenrent.rentalservice.repository.PartRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -31,7 +35,16 @@ class BikePartServiceTest {
     private BikePartRepository bikePartRepository;
 
     @Mock
+    private BikeRepository bikeRepository;
+
+    @Mock
+    private PartRepository partRepository;
+
+    @Mock
     private BikePartMapper bikePartMapper;
+
+    @Mock
+    private SecurityService securityService;
 
     @InjectMocks
     private BikePartService bikePartService;
@@ -42,18 +55,19 @@ class BikePartServiceTest {
     @BeforeEach
     void setUp() {
         testBikePart = BikePart.builder()
-                .id(1L)
-                .build();
+        .id(1L)
+        .build();
 
         testBikePartDTO = BikePartDTO.builder()
-                .id(1L)
-                .bikeId(1L)
-                .partId(1L)
-                .build();
+        .id(1L)
+        .bikeId(1L)
+        .partId(1L)
+        .build();
     }
 
     @Test
     void getAllBikeParts_ReturnsAll() {
+        when(securityService.isAdmin()).thenReturn(true);
         Pageable pageable = PageRequest.of(0, 20);
         Page<BikePart> bikePartPage = new PageImpl<>(Collections.singletonList(testBikePart));
         when(bikePartRepository.findAll(pageable)).thenReturn(bikePartPage);
@@ -67,6 +81,7 @@ class BikePartServiceTest {
 
     @Test
     void getBikePartById_Success() {
+        when(securityService.isAdmin()).thenReturn(true);
         when(bikePartRepository.findById(1L)).thenReturn(Optional.of(testBikePart));
         when(bikePartMapper.toDto(testBikePart)).thenReturn(testBikePartDTO);
 
@@ -84,6 +99,9 @@ class BikePartServiceTest {
 
     @Test
     void createBikePart_Success() {
+        when(securityService.isAdmin()).thenReturn(true);
+        when(bikeRepository.findById(anyLong())).thenReturn(Optional.of(new Bike()));
+        when(partRepository.findById(anyLong())).thenReturn(Optional.of(new Part()));
         when(bikePartMapper.toEntity(testBikePartDTO)).thenReturn(testBikePart);
         when(bikePartRepository.save(any())).thenReturn(testBikePart);
         when(bikePartMapper.toDto(testBikePart)).thenReturn(testBikePartDTO);
@@ -95,6 +113,7 @@ class BikePartServiceTest {
 
     @Test
     void deleteBikePart_Success() {
+        when(securityService.isAdmin()).thenReturn(true);
         when(bikePartRepository.findById(1L)).thenReturn(Optional.of(testBikePart));
         doNothing().when(bikePartRepository).delete(testBikePart);
 

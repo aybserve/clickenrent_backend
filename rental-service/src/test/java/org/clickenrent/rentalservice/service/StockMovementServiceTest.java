@@ -53,36 +53,36 @@ class StockMovementServiceTest {
     @BeforeEach
     void setUp() {
         testFromHub = Hub.builder()
-                .id(1L)
-                .build();
+        .id(1L)
+        .build();
 
         testToHub = Hub.builder()
-                .id(2L)
-                .build();
+        .id(2L)
+        .build();
 
         testMovement = StockMovement.builder()
-                .id(1L)
-                .externalId("SM001")
-                .productId(1L)
-                .fromHub(testFromHub)
-                .toHub(testToHub)
-                .dateTime(LocalDateTime.now())
-                .build();
+        .id(1L)
+        .externalId("SM001")
+        .productId(1L)
+        .fromHub(testFromHub)
+        .toHub(testToHub)
+        .dateTime(LocalDateTime.now())
+        .build();
 
         testMovementDTO = StockMovementDTO.builder()
-                .id(1L)
-                .externalId("SM001")
-                .productId(1L)
-                .fromHubId(1L)
-                .toHubId(2L)
-                .dateTime(LocalDateTime.now())
-                .build();
+        .id(1L)
+        .externalId("SM001")
+        .productId(1L)
+        .fromHubId(1L)
+        .toHubId(2L)
+        .dateTime(LocalDateTime.now())
+        .build();
 
-        when(securityService.isAdmin()).thenReturn(true);
     }
 
     @Test
     void getAllStockMovements_ReturnsAll() {
+        when(securityService.isAdmin()).thenReturn(true);
         Pageable pageable = PageRequest.of(0, 20);
         Page<StockMovement> movementPage = new PageImpl<>(Collections.singletonList(testMovement));
         when(stockMovementRepository.findAll(pageable)).thenReturn(movementPage);
@@ -97,6 +97,7 @@ class StockMovementServiceTest {
 
     @Test
     void getStockMovementsByProduct_Success() {
+        when(securityService.isAdmin()).thenReturn(true);
         when(stockMovementRepository.findByProductId(1L)).thenReturn(Collections.singletonList(testMovement));
         when(stockMovementMapper.toDto(testMovement)).thenReturn(testMovementDTO);
 
@@ -110,6 +111,7 @@ class StockMovementServiceTest {
 
     @Test
     void getStockMovementById_Success() {
+        when(securityService.isAdmin()).thenReturn(true);
         when(stockMovementRepository.findById(1L)).thenReturn(Optional.of(testMovement));
         when(stockMovementMapper.toDto(testMovement)).thenReturn(testMovementDTO);
 
@@ -122,6 +124,7 @@ class StockMovementServiceTest {
 
     @Test
     void getStockMovementById_NotFound() {
+        when(securityService.isAdmin()).thenReturn(true);
         when(stockMovementRepository.findById(999L)).thenReturn(Optional.empty());
 
         assertThrows(ResourceNotFoundException.class, () -> stockMovementService.getStockMovementById(999L));
@@ -129,6 +132,7 @@ class StockMovementServiceTest {
 
     @Test
     void createStockMovement_Success() {
+        when(securityService.isAdmin()).thenReturn(true);
         when(hubRepository.findById(1L)).thenReturn(Optional.of(testFromHub));
         when(hubRepository.findById(2L)).thenReturn(Optional.of(testToHub));
         when(stockMovementMapper.toEntity(testMovementDTO)).thenReturn(testMovement);
@@ -145,6 +149,7 @@ class StockMovementServiceTest {
 
     @Test
     void deleteStockMovement_Success() {
+        when(securityService.isAdmin()).thenReturn(true);
         when(stockMovementRepository.findById(1L)).thenReturn(Optional.of(testMovement));
         doNothing().when(stockMovementRepository).delete(testMovement);
 
@@ -155,6 +160,7 @@ class StockMovementServiceTest {
 
     @Test
     void deleteStockMovement_NotFound() {
+        when(securityService.isAdmin()).thenReturn(true);
         when(stockMovementRepository.findById(999L)).thenReturn(Optional.empty());
 
         assertThrows(ResourceNotFoundException.class, () -> stockMovementService.deleteStockMovement(999L));

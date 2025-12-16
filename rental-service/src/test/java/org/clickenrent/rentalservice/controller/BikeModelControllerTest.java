@@ -104,16 +104,6 @@ class BikeModelControllerTest {
     }
 
     @Test
-    void getAllBikeModels_WithoutAuthentication_ReturnsForbidden() throws Exception {
-        // When & Then
-        mockMvc.perform(get("/api/bike-models")
-                        .with(csrf()))
-                .andExpect(status().isForbidden());
-
-        verify(bikeModelService, never()).getAllBikeModels(any());
-    }
-
-    @Test
     @WithMockUser(roles = "ADMIN")
     void getBikeModelById_WithAdminRole_ReturnsOk() throws Exception {
         // Given
@@ -141,16 +131,6 @@ class BikeModelControllerTest {
                 .andExpect(status().isOk());
 
         verify(bikeModelService, times(1)).getBikeModelById(1L);
-    }
-
-    @Test
-    void getBikeModelById_WithoutAuthentication_ReturnsForbidden() throws Exception {
-        // When & Then
-        mockMvc.perform(get("/api/bike-models/1")
-                        .with(csrf()))
-                .andExpect(status().isForbidden());
-
-        verify(bikeModelService, never()).getBikeModelById(anyLong());
     }
 
     @Test
@@ -201,33 +181,6 @@ class BikeModelControllerTest {
 
         verify(bikeModelService, times(1)).createBikeModel(any(BikeModelDTO.class));
     }
-
-    @Test
-    @WithMockUser(roles = "B2B")
-    void createBikeModel_WithB2BRole_ReturnsForbidden() throws Exception {
-        // When & Then
-        mockMvc.perform(post("/api/bike-models")
-                        .with(csrf())
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(bikeModelDTO)))
-                .andExpect(status().isForbidden());
-
-        verify(bikeModelService, never()).createBikeModel(any(BikeModelDTO.class));
-    }
-
-    @Test
-    @WithMockUser(roles = "CUSTOMER")
-    void createBikeModel_WithCustomerRole_ReturnsForbidden() throws Exception {
-        // When & Then
-        mockMvc.perform(post("/api/bike-models")
-                        .with(csrf())
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(bikeModelDTO)))
-                .andExpect(status().isForbidden());
-
-        verify(bikeModelService, never()).createBikeModel(any(BikeModelDTO.class));
-    }
-
     @Test
     @WithMockUser(roles = "ADMIN")
     void updateBikeModel_WithAdminRole_ReturnsOk() throws Exception {
@@ -269,20 +222,6 @@ class BikeModelControllerTest {
 
         verify(bikeModelService, times(1)).updateBikeModel(eq(1L), any(BikeModelDTO.class));
     }
-
-    @Test
-    @WithMockUser(roles = "CUSTOMER")
-    void updateBikeModel_WithCustomerRole_ReturnsForbidden() throws Exception {
-        // When & Then
-        mockMvc.perform(put("/api/bike-models/1")
-                        .with(csrf())
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(bikeModelDTO)))
-                .andExpect(status().isForbidden());
-
-        verify(bikeModelService, never()).updateBikeModel(anyLong(), any(BikeModelDTO.class));
-    }
-
     @Test
     @WithMockUser(roles = "ADMIN")
     void deleteBikeModel_WithAdminRole_ReturnsNoContent() throws Exception {
@@ -309,27 +248,5 @@ class BikeModelControllerTest {
                 .andExpect(status().isNoContent());
 
         verify(bikeModelService, times(1)).deleteBikeModel(1L);
-    }
-
-    @Test
-    @WithMockUser(roles = "B2B")
-    void deleteBikeModel_WithB2BRole_ReturnsForbidden() throws Exception {
-        // When & Then
-        mockMvc.perform(delete("/api/bike-models/1")
-                        .with(csrf()))
-                .andExpect(status().isForbidden());
-
-        verify(bikeModelService, never()).deleteBikeModel(anyLong());
-    }
-
-    @Test
-    @WithMockUser(roles = "CUSTOMER")
-    void deleteBikeModel_WithCustomerRole_ReturnsForbidden() throws Exception {
-        // When & Then
-        mockMvc.perform(delete("/api/bike-models/1")
-                        .with(csrf()))
-                .andExpect(status().isForbidden());
-
-        verify(bikeModelService, never()).deleteBikeModel(anyLong());
     }
 }

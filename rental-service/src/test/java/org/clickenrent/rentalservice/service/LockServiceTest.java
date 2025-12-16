@@ -44,22 +44,22 @@ class LockServiceTest {
     @BeforeEach
     void setUp() {
         testLock = Lock.builder()
-                .id(1L)
-                .externalId("LOCK001")
-                .macAddress("AA:BB:CC:DD:EE:FF")
-                .build();
+        .id(1L)
+        .externalId("LOCK001")
+        .macAddress("AA:BB:CC:DD:EE:FF")
+        .build();
 
         testLockDTO = LockDTO.builder()
-                .id(1L)
-                .externalId("LOCK001")
-                .macAddress("AA:BB:CC:DD:EE:FF")
-                .build();
+        .id(1L)
+        .externalId("LOCK001")
+        .macAddress("AA:BB:CC:DD:EE:FF")
+        .build();
         
-        when(securityService.isAdmin()).thenReturn(true);
     }
 
     @Test
     void getAllLocks_ReturnsAllLocks() {
+        when(securityService.isAdmin()).thenReturn(true);
         Pageable pageable = PageRequest.of(0, 20);
         Page<Lock> lockPage = new PageImpl<>(Collections.singletonList(testLock));
         when(lockRepository.findAll(pageable)).thenReturn(lockPage);
@@ -74,6 +74,7 @@ class LockServiceTest {
 
     @Test
     void getLockById_Success() {
+        when(securityService.isAdmin()).thenReturn(true);
         when(lockRepository.findById(1L)).thenReturn(Optional.of(testLock));
         when(lockMapper.toDto(testLock)).thenReturn(testLockDTO);
 
@@ -86,6 +87,7 @@ class LockServiceTest {
 
     @Test
     void getLockById_NotFound() {
+        when(securityService.isAdmin()).thenReturn(true);
         when(lockRepository.findById(999L)).thenReturn(Optional.empty());
 
         assertThrows(ResourceNotFoundException.class, () -> lockService.getLockById(999L));
@@ -93,6 +95,7 @@ class LockServiceTest {
 
     @Test
     void createLock_Success() {
+        when(securityService.isAdmin()).thenReturn(true);
         when(lockMapper.toEntity(testLockDTO)).thenReturn(testLock);
         when(lockRepository.save(any())).thenReturn(testLock);
         when(lockMapper.toDto(testLock)).thenReturn(testLockDTO);
@@ -105,6 +108,7 @@ class LockServiceTest {
 
     @Test
     void updateLock_Success() {
+        when(securityService.isAdmin()).thenReturn(true);
         when(lockRepository.findById(1L)).thenReturn(Optional.of(testLock));
         when(lockRepository.save(any())).thenReturn(testLock);
         when(lockMapper.toDto(testLock)).thenReturn(testLockDTO);
@@ -117,6 +121,7 @@ class LockServiceTest {
 
     @Test
     void deleteLock_Success() {
+        when(securityService.isAdmin()).thenReturn(true);
         when(lockRepository.findById(1L)).thenReturn(Optional.of(testLock));
         doNothing().when(lockRepository).delete(testLock);
 

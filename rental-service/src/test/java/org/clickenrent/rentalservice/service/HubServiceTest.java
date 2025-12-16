@@ -54,25 +54,24 @@ class HubServiceTest {
         testLocation = Location.builder().id(1L).companyId(1L).build();
         
         testHub = Hub.builder()
-                .id(1L)
-                .externalId("HUB001")
-                .name("Main Hub")
-                .location(testLocation)
-                .build();
+        .id(1L)
+        .externalId("HUB001")
+        .name("Main Hub")
+        .location(testLocation)
+        .build();
 
         testHubDTO = HubDTO.builder()
-                .id(1L)
-                .externalId("HUB001")
-                .name("Main Hub")
-                .locationId(1L)
-                .build();
+        .id(1L)
+        .externalId("HUB001")
+        .name("Main Hub")
+        .locationId(1L)
+        .build();
         
-        when(securityService.isAdmin()).thenReturn(true);
-        when(securityService.hasAccessToCompany(anyLong())).thenReturn(true);
-    }
+            }
 
     @Test
     void getAllHubs_ReturnsAllHubs() {
+        when(securityService.isAdmin()).thenReturn(true);
         Pageable pageable = PageRequest.of(0, 20);
         Page<Hub> hubPage = new PageImpl<>(Collections.singletonList(testHub));
         when(hubRepository.findAll(pageable)).thenReturn(hubPage);
@@ -87,6 +86,7 @@ class HubServiceTest {
 
     @Test
     void getHubsByLocation_ReturnsLocationHubs() {
+        when(securityService.isAdmin()).thenReturn(true);
         when(locationRepository.findById(1L)).thenReturn(Optional.of(testLocation));
         when(hubRepository.findByLocation(testLocation)).thenReturn(Arrays.asList(testHub));
         when(hubMapper.toDto(testHub)).thenReturn(testHubDTO);
@@ -102,6 +102,7 @@ class HubServiceTest {
 
     @Test
     void getHubById_Success() {
+        when(securityService.isAdmin()).thenReturn(true);
         when(hubRepository.findById(1L)).thenReturn(Optional.of(testHub));
         when(hubMapper.toDto(testHub)).thenReturn(testHubDTO);
 
@@ -121,6 +122,7 @@ class HubServiceTest {
 
     @Test
     void createHub_Success() {
+        when(securityService.isAdmin()).thenReturn(true);
         when(locationRepository.findById(1L)).thenReturn(Optional.of(testLocation));
         when(hubMapper.toEntity(testHubDTO)).thenReturn(testHub);
         when(hubRepository.save(any(Hub.class))).thenReturn(testHub);
@@ -136,6 +138,7 @@ class HubServiceTest {
 
     @Test
     void updateHub_Success() {
+        when(securityService.isAdmin()).thenReturn(true);
         when(hubRepository.findById(1L)).thenReturn(Optional.of(testHub));
         doNothing().when(hubMapper).updateEntityFromDto(testHubDTO, testHub);
         when(hubRepository.save(any(Hub.class))).thenReturn(testHub);
@@ -159,6 +162,7 @@ class HubServiceTest {
 
     @Test
     void deleteHub_Success() {
+        when(securityService.isAdmin()).thenReturn(true);
         when(hubRepository.findById(1L)).thenReturn(Optional.of(testHub));
         doNothing().when(hubRepository).delete(testHub);
 

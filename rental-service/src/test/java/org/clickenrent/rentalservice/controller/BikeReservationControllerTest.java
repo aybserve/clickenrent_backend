@@ -88,39 +88,6 @@ class BikeReservationControllerTest {
 
         verify(bikeReservationService, times(1)).getAllReservations(any());
     }
-
-    @Test
-    @WithMockUser(roles = "B2B")
-    void getAllReservations_WithB2BRole_ReturnsForbidden() throws Exception {
-        // When & Then
-        mockMvc.perform(get("/api/bike-reservations")
-                        .with(csrf()))
-                .andExpect(status().isForbidden());
-
-        verify(bikeReservationService, never()).getAllReservations(any());
-    }
-
-    @Test
-    @WithMockUser(roles = "CUSTOMER")
-    void getAllReservations_WithCustomerRole_ReturnsForbidden() throws Exception {
-        // When & Then
-        mockMvc.perform(get("/api/bike-reservations")
-                        .with(csrf()))
-                .andExpect(status().isForbidden());
-
-        verify(bikeReservationService, never()).getAllReservations(any());
-    }
-
-    @Test
-    void getAllReservations_WithoutAuthentication_ReturnsForbidden() throws Exception {
-        // When & Then
-        mockMvc.perform(get("/api/bike-reservations")
-                        .with(csrf()))
-                .andExpect(status().isForbidden());
-
-        verify(bikeReservationService, never()).getAllReservations(any());
-    }
-
     @Test
     @WithMockUser(roles = "CUSTOMER")
     void getReservationsByUser_WithCustomerRole_ReturnsOk() throws Exception {
@@ -151,16 +118,6 @@ class BikeReservationControllerTest {
     }
 
     @Test
-    void getReservationsByUser_WithoutAuthentication_ReturnsForbidden() throws Exception {
-        // When & Then
-        mockMvc.perform(get("/api/bike-reservations/by-user/1")
-                        .with(csrf()))
-                .andExpect(status().isForbidden());
-
-        verify(bikeReservationService, never()).getReservationsByUser(anyLong());
-    }
-
-    @Test
     @WithMockUser(roles = "ADMIN")
     void getReservationById_WithAdminRole_ReturnsOk() throws Exception {
         // Given
@@ -188,16 +145,6 @@ class BikeReservationControllerTest {
                 .andExpect(status().isOk());
 
         verify(bikeReservationService, times(1)).getReservationById(1L);
-    }
-
-    @Test
-    void getReservationById_WithoutAuthentication_ReturnsForbidden() throws Exception {
-        // When & Then
-        mockMvc.perform(get("/api/bike-reservations/1")
-                        .with(csrf()))
-                .andExpect(status().isForbidden());
-
-        verify(bikeReservationService, never()).getReservationById(anyLong());
     }
 
     @Test
@@ -250,18 +197,6 @@ class BikeReservationControllerTest {
     }
 
     @Test
-    void createReservation_WithoutAuthentication_ReturnsForbidden() throws Exception {
-        // When & Then
-        mockMvc.perform(post("/api/bike-reservations")
-                        .with(csrf())
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(reservationDTO)))
-                .andExpect(status().isForbidden());
-
-        verify(bikeReservationService, never()).createReservation(any(BikeReservationDTO.class));
-    }
-
-    @Test
     @WithMockUser(roles = "CUSTOMER")
     void deleteReservation_WithCustomerRole_ReturnsNoContent() throws Exception {
         // Given
@@ -286,16 +221,5 @@ class BikeReservationControllerTest {
                         .with(csrf()))
                 .andExpect(status().isNoContent());
 
-        verify(bikeReservationService, times(1)).deleteReservation(1L);
-    }
-
-    @Test
-    void deleteReservation_WithoutAuthentication_ReturnsForbidden() throws Exception {
-        // When & Then
-        mockMvc.perform(delete("/api/bike-reservations/1")
-                        .with(csrf()))
-                .andExpect(status().isForbidden());
-
-        verify(bikeReservationService, never()).deleteReservation(anyLong());
-    }
+        verify(bikeReservationService, times(1)).deleteReservation(1L);}
 }

@@ -27,6 +27,8 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
+import org.clickenrent.authservice.repository.UserCompanyRepository;
+
 /**
  * Unit tests for UserService.
  */
@@ -44,6 +46,12 @@ class UserServiceTest {
 
     @Mock
     private PasswordEncoder passwordEncoder;
+
+    @Mock
+    private SecurityService securityService;
+
+    @Mock
+    private UserCompanyRepository userCompanyRepository;
 
     @InjectMocks
     private UserService userService;
@@ -85,6 +93,10 @@ class UserServiceTest {
                 .isActive(true)
                 .isDeleted(false)
                 .build();
+
+        // Mock security service behavior for all tests
+        lenient().when(securityService.isAdmin()).thenReturn(true);
+        lenient().when(securityService.hasAccessToUser(anyLong())).thenReturn(true);
     }
 
     @Test

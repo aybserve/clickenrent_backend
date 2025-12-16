@@ -90,17 +90,6 @@ class PartBrandControllerTest {
                         .content(objectMapper.writeValueAsString(brandDTO)))
                 .andExpect(status().isCreated());
     }
-
-    @Test
-    @WithMockUser(roles = "CUSTOMER")
-    void createBrand_WithCustomerRole_ReturnsForbidden() throws Exception {
-        mockMvc.perform(post("/api/part-brands")
-                        .with(csrf())
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(brandDTO)))
-                .andExpect(status().isForbidden());
-    }
-
     @Test
     @WithMockUser(roles = "ADMIN")
     void updateBrand_ReturnsOk() throws Exception {

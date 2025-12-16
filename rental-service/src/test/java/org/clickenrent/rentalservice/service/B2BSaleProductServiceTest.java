@@ -49,44 +49,44 @@ class B2BSaleProductServiceTest {
     @BeforeEach
     void setUp() {
         testLocation = Location.builder()
-                .id(1L)
-                .companyId(1L)
-                .build();
+        .id(1L)
+        .companyId(1L)
+        .build();
 
         testSale = B2BSale.builder()
-                .id(1L)
-                .externalId("B2BS001")
-                .location(testLocation)
-                .build();
+        .id(1L)
+        .externalId("B2BS001")
+        .location(testLocation)
+        .build();
 
         testProduct = B2BSaleProduct.builder()
-                .id(1L)
-                .externalId("B2BSP001")
-                .b2bSale(testSale)
-                .productId(1L)
-                .quantity(10)
-                .price(new BigDecimal("250.00"))
-                .totalPrice(new BigDecimal("2500.00"))
-                .build();
+        .id(1L)
+        .externalId("B2BSP001")
+        .b2bSale(testSale)
+        .productId(1L)
+        .quantity(10)
+        .price(new BigDecimal("250.00"))
+        .totalPrice(new BigDecimal("2500.00"))
+        .build();
 
         testProductDTO = B2BSaleProductDTO.builder()
-                .id(1L)
-                .externalId("B2BSP001")
-                .b2bSaleId(1L)
-                .productId(1L)
-                .quantity(10)
-                .price(new BigDecimal("250.00"))
-                .totalPrice(new BigDecimal("2500.00"))
-                .build();
+        .id(1L)
+        .externalId("B2BSP001")
+        .b2bSaleId(1L)
+        .productId(1L)
+        .quantity(10)
+        .price(new BigDecimal("250.00"))
+        .totalPrice(new BigDecimal("2500.00"))
+        .build();
 
-        when(securityService.isAdmin()).thenReturn(true);
     }
 
     @Test
     void getProductsBySale_ReturnsAllProducts() {
+        when(securityService.isAdmin()).thenReturn(true);
         when(b2bSaleRepository.findById(1L)).thenReturn(Optional.of(testSale));
         when(b2bSaleProductRepository.findByB2bSale(testSale))
-                .thenReturn(Collections.singletonList(testProduct));
+        .thenReturn(Collections.singletonList(testProduct));
         when(b2bSaleProductMapper.toDto(testProduct)).thenReturn(testProductDTO);
 
         List<B2BSaleProductDTO> result = b2bSaleProductService.getProductsBySale(1L);
@@ -114,6 +114,7 @@ class B2BSaleProductServiceTest {
 
     @Test
     void createProduct_Success() {
+        when(securityService.isAdmin()).thenReturn(true);
         when(b2bSaleRepository.findById(1L)).thenReturn(Optional.of(testSale));
         when(b2bSaleProductMapper.toEntity(testProductDTO)).thenReturn(testProduct);
         when(b2bSaleProductRepository.save(any())).thenReturn(testProduct);
@@ -126,6 +127,7 @@ class B2BSaleProductServiceTest {
 
     @Test
     void updateProduct_Success() {
+        when(securityService.isAdmin()).thenReturn(true);
         when(b2bSaleProductRepository.findById(1L)).thenReturn(Optional.of(testProduct));
         doNothing().when(b2bSaleProductMapper).updateEntityFromDto(testProductDTO, testProduct);
         when(b2bSaleProductRepository.save(any())).thenReturn(testProduct);
@@ -138,6 +140,7 @@ class B2BSaleProductServiceTest {
 
     @Test
     void deleteProduct_Success() {
+        when(securityService.isAdmin()).thenReturn(true);
         when(b2bSaleProductRepository.findById(1L)).thenReturn(Optional.of(testProduct));
         doNothing().when(b2bSaleProductRepository).delete(testProduct);
 

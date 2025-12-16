@@ -8,6 +8,7 @@ import org.clickenrent.paymentservice.dto.UserPaymentMethodDTO;
 import org.clickenrent.paymentservice.service.UserPaymentMethodService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -22,6 +23,7 @@ public class UserPaymentMethodController {
     private final UserPaymentMethodService userPaymentMethodService;
 
     @GetMapping
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Get all user payment methods")
     public ResponseEntity<List<UserPaymentMethodDTO>> getAll() {
         return ResponseEntity.ok(userPaymentMethodService.findAll());

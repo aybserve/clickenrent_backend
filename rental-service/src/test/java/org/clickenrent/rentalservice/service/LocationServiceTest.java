@@ -53,30 +53,30 @@ class LocationServiceTest {
     @BeforeEach
     void setUp() {
         testLocation = Location.builder()
-                .id(1L)
-                .externalId("LOC001")
-                .name("Amsterdam Central")
-                .address("Stationsplein 1, Amsterdam")
-                .companyId(1L)
-                .isPublic(true)
-                .build();
+        .id(1L)
+        .externalId("LOC001")
+        .name("Amsterdam Central")
+        .address("Stationsplein 1, Amsterdam")
+        .companyId(1L)
+        .isPublic(true)
+        .build();
 
         testLocationDTO = LocationDTO.builder()
-                .id(1L)
-                .externalId("LOC001")
-                .name("Amsterdam Central")
-                .address("Stationsplein 1, Amsterdam")
-                .companyId(1L)
-                .isPublic(true)
-                .build();
+        .id(1L)
+        .externalId("LOC001")
+        .name("Amsterdam Central")
+        .address("Stationsplein 1, Amsterdam")
+        .companyId(1L)
+        .isPublic(true)
+        .build();
     }
 
     @Test
     void getAllLocations_WithAdminRole_ReturnsAllLocations() {
         // Arrange
+        when(securityService.isAdmin()).thenReturn(true);
         Pageable pageable = PageRequest.of(0, 20);
         Page<Location> locationPage = new PageImpl<>(Collections.singletonList(testLocation));
-        when(securityService.isAdmin()).thenReturn(true);
         when(locationRepository.findAll(pageable)).thenReturn(locationPage);
         when(locationMapper.toDto(testLocation)).thenReturn(testLocationDTO);
 
@@ -94,8 +94,6 @@ class LocationServiceTest {
     void getAllLocations_WithoutAdminRole_ThrowsUnauthorizedException() {
         // Arrange
         Pageable pageable = PageRequest.of(0, 20);
-        when(securityService.isAdmin()).thenReturn(false);
-
         // Act & Assert
         assertThrows(UnauthorizedException.class, () -> locationService.getAllLocations(pageable));
     }
@@ -103,8 +101,8 @@ class LocationServiceTest {
     @Test
     void getLocationById_WithAdminRole_Success() {
         // Arrange
-        when(locationRepository.findById(1L)).thenReturn(Optional.of(testLocation));
         when(securityService.isAdmin()).thenReturn(true);
+        when(locationRepository.findById(1L)).thenReturn(Optional.of(testLocation));
         when(locationMapper.toDto(testLocation)).thenReturn(testLocationDTO);
 
         // Act
@@ -130,8 +128,6 @@ class LocationServiceTest {
         // Arrange
         when(locationRepository.findById(1L)).thenReturn(Optional.of(testLocation));
         when(securityService.isAdmin()).thenReturn(false);
-        when(securityService.hasAccessToCompany(1L)).thenReturn(false);
-
         // Act & Assert
         assertThrows(UnauthorizedException.class, () -> locationService.getLocationById(1L));
     }
@@ -183,7 +179,7 @@ class LocationServiceTest {
     void createLocation_WithCompanyAccess_Success() {
         // Arrange
         when(securityService.isAdmin()).thenReturn(false);
-        when(securityService.hasAccessToCompany(1L)).thenReturn(true);
+        when(securityService.hasAccessToCompany(anyLong())).thenReturn(true);
         when(locationMapper.toEntity(testLocationDTO)).thenReturn(testLocation);
         when(locationRepository.save(any(Location.class))).thenReturn(testLocation);
         when(hubRepository.save(any(Hub.class))).thenReturn(new Hub());
@@ -202,8 +198,6 @@ class LocationServiceTest {
     void createLocation_WithoutAccess_ThrowsUnauthorizedException() {
         // Arrange
         when(securityService.isAdmin()).thenReturn(false);
-        when(securityService.hasAccessToCompany(1L)).thenReturn(false);
-
         // Act & Assert
         assertThrows(UnauthorizedException.class, () -> locationService.createLocation(testLocationDTO));
         verify(locationRepository, never()).save(any(Location.class));
@@ -212,8 +206,8 @@ class LocationServiceTest {
     @Test
     void updateLocation_WithAdminRole_Success() {
         // Arrange
-        when(locationRepository.findById(1L)).thenReturn(Optional.of(testLocation));
         when(securityService.isAdmin()).thenReturn(true);
+        when(locationRepository.findById(1L)).thenReturn(Optional.of(testLocation));
         when(locationRepository.save(any(Location.class))).thenReturn(testLocation);
         when(locationMapper.toDto(testLocation)).thenReturn(testLocationDTO);
 
@@ -238,8 +232,8 @@ class LocationServiceTest {
     @Test
     void deleteLocation_WithAdminRole_Success() {
         // Arrange
-        when(locationRepository.findById(1L)).thenReturn(Optional.of(testLocation));
         when(securityService.isAdmin()).thenReturn(true);
+        when(locationRepository.findById(1L)).thenReturn(Optional.of(testLocation));
         doNothing().when(locationRepository).delete(testLocation);
 
         // Act
@@ -254,8 +248,6 @@ class LocationServiceTest {
     void deleteLocation_WithoutAdminRole_ThrowsUnauthorizedException() {
         // Arrange
         when(locationRepository.findById(1L)).thenReturn(Optional.of(testLocation));
-        when(securityService.isAdmin()).thenReturn(false);
-
         // Act & Assert
         assertThrows(UnauthorizedException.class, () -> locationService.deleteLocation(1L));
         verify(locationRepository, never()).delete(any(Location.class));

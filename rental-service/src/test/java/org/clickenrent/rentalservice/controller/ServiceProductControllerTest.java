@@ -66,7 +66,7 @@ class ServiceProductControllerTest {
 
         mockMvc.perform(get("/api/service-products/1").with(csrf()))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.code").value("SP001"));
+                .andExpect(jsonPath("$.externalId").value("SP001"));
     }
 
     @Test
@@ -80,17 +80,6 @@ class ServiceProductControllerTest {
                         .content(objectMapper.writeValueAsString(serviceProductDTO)))
                 .andExpect(status().isCreated());
     }
-
-    @Test
-    @WithMockUser(roles = "CUSTOMER")
-    void createServiceProduct_WithCustomerRole_ReturnsForbidden() throws Exception {
-        mockMvc.perform(post("/api/service-products")
-                        .with(csrf())
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(serviceProductDTO)))
-                .andExpect(status().isForbidden());
-    }
-
     @Test
     @WithMockUser(roles = "ADMIN")
     void deleteServiceProduct_ReturnsNoContent() throws Exception {

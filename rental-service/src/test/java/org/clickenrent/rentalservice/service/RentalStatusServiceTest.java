@@ -40,14 +40,14 @@ class RentalStatusServiceTest {
     @BeforeEach
     void setUp() {
         testStatus = RentalStatus.builder()
-                .id(1L)
-                .name("Active")
-                .build();
+        .id(1L)
+        .name("Active")
+        .build();
 
         testStatusDTO = RentalStatusDTO.builder()
-                .id(1L)
-                .name("Active")
-                .build();
+        .id(1L)
+        .name("Active")
+        .build();
     }
 
     @Test
