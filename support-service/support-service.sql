@@ -1,0 +1,463 @@
+-- =====================================================================================================================
+-- SUPPORT SERVICE - DATABASE SCHEMA
+-- =====================================================================================================================
+-- Module: support-service
+-- Database: PostgreSQL
+-- Description: Complete database schema for the customer support and feedback service.
+--              Handles support requests, bike issues, error codes, feedback, and troubleshooting guides.
+-- 
+-- Usage:
+--   1. Create database: CREATE DATABASE clickenrent_support;
+--   2. Import schema: psql -U postgres -d clickenrent_support -f support-service.sql
+--
+-- Author: Vitaliy Shvetsov
+-- =====================================================================================================================
+
+-- Drop existing tables if they exist (in correct order to handle foreign key dependencies)
+DROP TABLE IF EXISTS support_request_guide_item CASCADE;
+DROP TABLE IF EXISTS support_request_bike_issue CASCADE;
+DROP TABLE IF EXISTS bike_type_bike_issue CASCADE;
+DROP TABLE IF EXISTS support_request CASCADE;
+DROP TABLE IF EXISTS bike_rental_feedback CASCADE;
+DROP TABLE IF EXISTS feedback CASCADE;
+DROP TABLE IF EXISTS bike_issue CASCADE;
+DROP TABLE IF EXISTS error_code CASCADE;
+DROP TABLE IF EXISTS support_request_status CASCADE;
+DROP TABLE IF EXISTS responsible_person CASCADE;
+
+-- =====================================================================================================================
+-- SECTION 1: LOOKUP & STATUS TABLES
+-- =====================================================================================================================
+
+-- ---------------------------------------------------------------------------------------------------------------------
+-- Table: support_request_status
+-- Description: Status values for support requests (OPEN, IN_PROGRESS, RESOLVED, CLOSED)
+-- ---------------------------------------------------------------------------------------------------------------------
+CREATE TABLE support_request_status (
+    id                      BIGSERIAL PRIMARY KEY,
+    name                    VARCHAR(100) NOT NULL UNIQUE,
+    
+    -- Audit fields
+    date_created            TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    last_date_modified      TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    created_by              VARCHAR(255),
+    last_modified_by        VARCHAR(255),
+    is_deleted              BOOLEAN NOT NULL DEFAULT false,
+    
+    CONSTRAINT chk_support_request_status_name_not_empty CHECK (name <> '')
+);
+
+-- ---------------------------------------------------------------------------------------------------------------------
+-- Table: responsible_person
+-- Description: Personnel responsible for handling specific bike issues
+-- ---------------------------------------------------------------------------------------------------------------------
+CREATE TABLE responsible_person (
+    id                      BIGSERIAL PRIMARY KEY,
+    name                    VARCHAR(255) NOT NULL,
+    
+    -- Audit fields
+    date_created            TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    last_date_modified      TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    created_by              VARCHAR(255),
+    last_modified_by        VARCHAR(255),
+    is_deleted              BOOLEAN NOT NULL DEFAULT false,
+    
+    CONSTRAINT chk_responsible_person_name_not_empty CHECK (name <> '')
+);
+
+-- =====================================================================================================================
+-- SECTION 2: ISSUE MANAGEMENT TABLES
+-- =====================================================================================================================
+
+-- ---------------------------------------------------------------------------------------------------------------------
+-- Table: error_code
+-- Description: Diagnostic error codes linked to bike engines with troubleshooting information
+-- ---------------------------------------------------------------------------------------------------------------------
+CREATE TABLE error_code (
+    id                      BIGSERIAL PRIMARY KEY,
+    external_id             VARCHAR(100) UNIQUE,
+    name                    VARCHAR(255) NOT NULL,
+    bike_engine_id          BIGINT,
+    description             VARCHAR(1000),
+    common_cause            VARCHAR(1000),
+    diagnostic_steps        VARCHAR(2000),
+    recommended_fix         VARCHAR(1000),
+    notes                   VARCHAR(2000),
+    is_fixable_by_client    BOOLEAN NOT NULL DEFAULT false,
+    
+    -- Audit fields
+    date_created            TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    last_date_modified      TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    created_by              VARCHAR(255),
+    last_modified_by        VARCHAR(255),
+    is_deleted              BOOLEAN NOT NULL DEFAULT false,
+    
+    CONSTRAINT chk_error_code_name_not_empty CHECK (name <> '')
+);
+
+-- ---------------------------------------------------------------------------------------------------------------------
+-- Table: bike_issue
+-- Description: Hierarchical bike issues with parent-child relationships
+-- ---------------------------------------------------------------------------------------------------------------------
+CREATE TABLE bike_issue (
+    id                      BIGSERIAL PRIMARY KEY,
+    external_id             VARCHAR(100) UNIQUE,
+    name                    VARCHAR(255) NOT NULL,
+    description             VARCHAR(1000),
+    parent_bike_issue_id    BIGINT,
+    is_fixable_by_client    BOOLEAN NOT NULL DEFAULT false,
+    responsible_person_id   BIGINT,
+    
+    -- Audit fields
+    date_created            TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    last_date_modified      TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    created_by              VARCHAR(255),
+    last_modified_by        VARCHAR(255),
+    is_deleted              BOOLEAN NOT NULL DEFAULT false,
+    
+    CONSTRAINT fk_bike_issue_parent FOREIGN KEY (parent_bike_issue_id) 
+        REFERENCES bike_issue(id) ON DELETE SET NULL,
+    CONSTRAINT fk_bike_issue_responsible_person FOREIGN KEY (responsible_person_id) 
+        REFERENCES responsible_person(id) ON DELETE SET NULL,
+    CONSTRAINT chk_bike_issue_name_not_empty CHECK (name <> '')
+);
+
+-- =====================================================================================================================
+-- SECTION 3: FEEDBACK TABLES
+-- =====================================================================================================================
+
+-- ---------------------------------------------------------------------------------------------------------------------
+-- Table: feedback
+-- Description: General user feedback with ratings (1-5) and comments
+-- ---------------------------------------------------------------------------------------------------------------------
+CREATE TABLE feedback (
+    id                      BIGSERIAL PRIMARY KEY,
+    external_id             VARCHAR(100) UNIQUE,
+    user_id                 BIGINT NOT NULL,
+    rate                    INTEGER NOT NULL,
+    comment                 VARCHAR(2000),
+    date_time               TIMESTAMP NOT NULL,
+    
+    -- Audit fields
+    date_created            TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    last_date_modified      TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    created_by              VARCHAR(255),
+    last_modified_by        VARCHAR(255),
+    is_deleted              BOOLEAN NOT NULL DEFAULT false,
+    
+    CONSTRAINT chk_feedback_user_id CHECK (user_id > 0),
+    CONSTRAINT chk_feedback_rate CHECK (rate >= 1 AND rate <= 5)
+);
+
+-- ---------------------------------------------------------------------------------------------------------------------
+-- Table: bike_rental_feedback
+-- Description: Feedback specific to bike rentals with ratings (1-5) and comments
+-- ---------------------------------------------------------------------------------------------------------------------
+CREATE TABLE bike_rental_feedback (
+    id                      BIGSERIAL PRIMARY KEY,
+    user_id                 BIGINT NOT NULL,
+    bike_rental_id          BIGINT NOT NULL,
+    rate                    INTEGER NOT NULL,
+    comment                 VARCHAR(2000),
+    date_time               TIMESTAMP NOT NULL,
+    
+    -- Audit fields
+    date_created            TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    last_date_modified      TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    created_by              VARCHAR(255),
+    last_modified_by        VARCHAR(255),
+    is_deleted              BOOLEAN NOT NULL DEFAULT false,
+    
+    CONSTRAINT chk_bike_rental_feedback_user_id CHECK (user_id > 0),
+    CONSTRAINT chk_bike_rental_feedback_bike_rental_id CHECK (bike_rental_id > 0),
+    CONSTRAINT chk_bike_rental_feedback_rate CHECK (rate >= 1 AND rate <= 5)
+);
+
+-- =====================================================================================================================
+-- SECTION 4: SUPPORT REQUEST TABLES
+-- =====================================================================================================================
+
+-- ---------------------------------------------------------------------------------------------------------------------
+-- Table: support_request
+-- Description: Main customer support requests
+-- ---------------------------------------------------------------------------------------------------------------------
+CREATE TABLE support_request (
+    id                          BIGSERIAL PRIMARY KEY,
+    external_id                 VARCHAR(100) UNIQUE,
+    user_id                     BIGINT NOT NULL,
+    bike_id                     BIGINT,
+    is_near_location            BOOLEAN NOT NULL DEFAULT false,
+    photo_url                   VARCHAR(500),
+    error_code_id               BIGINT,
+    support_request_status_id   BIGINT NOT NULL,
+    
+    -- Audit fields
+    date_created                TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    last_date_modified          TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    created_by                  VARCHAR(255),
+    last_modified_by            VARCHAR(255),
+    is_deleted                  BOOLEAN NOT NULL DEFAULT false,
+    
+    CONSTRAINT fk_support_request_error_code FOREIGN KEY (error_code_id) 
+        REFERENCES error_code(id) ON DELETE SET NULL,
+    CONSTRAINT fk_support_request_status FOREIGN KEY (support_request_status_id) 
+        REFERENCES support_request_status(id) ON DELETE RESTRICT,
+    CONSTRAINT chk_support_request_user_id CHECK (user_id > 0)
+);
+
+-- ---------------------------------------------------------------------------------------------------------------------
+-- Table: support_request_guide_item
+-- Description: Step-by-step troubleshooting guide items
+-- ---------------------------------------------------------------------------------------------------------------------
+CREATE TABLE support_request_guide_item (
+    id                          BIGSERIAL PRIMARY KEY,
+    item_index                  INTEGER NOT NULL,
+    description                 VARCHAR(2000) NOT NULL,
+    bike_issue_id               BIGINT NOT NULL,
+    support_request_status_id   BIGINT NOT NULL,
+    
+    -- Audit fields
+    date_created                TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    last_date_modified          TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    created_by                  VARCHAR(255),
+    last_modified_by            VARCHAR(255),
+    is_deleted                  BOOLEAN NOT NULL DEFAULT false,
+    
+    CONSTRAINT fk_support_request_guide_item_bike_issue FOREIGN KEY (bike_issue_id) 
+        REFERENCES bike_issue(id) ON DELETE CASCADE,
+    CONSTRAINT fk_support_request_guide_item_status FOREIGN KEY (support_request_status_id) 
+        REFERENCES support_request_status(id) ON DELETE RESTRICT,
+    CONSTRAINT chk_support_request_guide_item_description_not_empty CHECK (description <> '')
+);
+
+-- =====================================================================================================================
+-- SECTION 5: JUNCTION TABLES
+-- =====================================================================================================================
+
+-- ---------------------------------------------------------------------------------------------------------------------
+-- Table: support_request_bike_issue
+-- Description: Junction table linking support requests to multiple bike issues
+-- ---------------------------------------------------------------------------------------------------------------------
+CREATE TABLE support_request_bike_issue (
+    id                      BIGSERIAL PRIMARY KEY,
+    support_request_id      BIGINT NOT NULL,
+    bike_issue_id           BIGINT NOT NULL,
+    
+    CONSTRAINT fk_support_request_bike_issue_request FOREIGN KEY (support_request_id) 
+        REFERENCES support_request(id) ON DELETE CASCADE,
+    CONSTRAINT fk_support_request_bike_issue_issue FOREIGN KEY (bike_issue_id) 
+        REFERENCES bike_issue(id) ON DELETE CASCADE,
+    CONSTRAINT uk_support_request_bike_issue UNIQUE (support_request_id, bike_issue_id)
+);
+
+-- ---------------------------------------------------------------------------------------------------------------------
+-- Table: bike_type_bike_issue
+-- Description: Junction table linking bike types to their common issues
+-- ---------------------------------------------------------------------------------------------------------------------
+CREATE TABLE bike_type_bike_issue (
+    id                      BIGSERIAL PRIMARY KEY,
+    bike_type_id            BIGINT NOT NULL,
+    bike_issue_id           BIGINT NOT NULL,
+    
+    CONSTRAINT fk_bike_type_bike_issue_issue FOREIGN KEY (bike_issue_id) 
+        REFERENCES bike_issue(id) ON DELETE CASCADE,
+    CONSTRAINT chk_bike_type_bike_issue_bike_type_id CHECK (bike_type_id > 0),
+    CONSTRAINT uk_bike_type_bike_issue UNIQUE (bike_type_id, bike_issue_id)
+);
+
+-- =====================================================================================================================
+-- SECTION 6: INDEXES
+-- =====================================================================================================================
+-- Indexes for improved query performance
+
+-- Error Code indexes
+CREATE INDEX idx_error_code_external_id ON error_code(external_id);
+CREATE INDEX idx_error_code_bike_engine_id ON error_code(bike_engine_id);
+
+-- Bike Issue indexes
+CREATE INDEX idx_bike_issue_external_id ON bike_issue(external_id);
+CREATE INDEX idx_bike_issue_parent ON bike_issue(parent_bike_issue_id);
+CREATE INDEX idx_bike_issue_responsible_person ON bike_issue(responsible_person_id);
+
+-- Feedback indexes
+CREATE INDEX idx_feedback_external_id ON feedback(external_id);
+CREATE INDEX idx_feedback_user_id ON feedback(user_id);
+
+-- Bike Rental Feedback indexes
+CREATE INDEX idx_bike_rental_feedback_user_id ON bike_rental_feedback(user_id);
+CREATE INDEX idx_bike_rental_feedback_bike_rental_id ON bike_rental_feedback(bike_rental_id);
+
+-- Support Request indexes
+CREATE INDEX idx_support_request_external_id ON support_request(external_id);
+CREATE INDEX idx_support_request_user_id ON support_request(user_id);
+CREATE INDEX idx_support_request_bike_id ON support_request(bike_id);
+CREATE INDEX idx_support_request_error_code ON support_request(error_code_id);
+CREATE INDEX idx_support_request_status ON support_request(support_request_status_id);
+
+-- Support Request Guide Item indexes
+CREATE INDEX idx_support_request_guide_item_bike_issue ON support_request_guide_item(bike_issue_id);
+CREATE INDEX idx_support_request_guide_item_status ON support_request_guide_item(support_request_status_id);
+
+-- Junction table indexes
+CREATE INDEX idx_support_request_bike_issue_request ON support_request_bike_issue(support_request_id);
+CREATE INDEX idx_support_request_bike_issue_issue ON support_request_bike_issue(bike_issue_id);
+CREATE INDEX idx_bike_type_bike_issue_bike_type ON bike_type_bike_issue(bike_type_id);
+CREATE INDEX idx_bike_type_bike_issue_bike_issue ON bike_type_bike_issue(bike_issue_id);
+
+-- =====================================================================================================================
+-- SECTION 7: TEST/MOCKUP DATA (OPTIONAL)
+-- =====================================================================================================================
+-- This section contains sample data for testing and development purposes.
+-- Comment out or remove this section before deploying to production if you don't want test data.
+
+-- ---------------------------------------------------------------------------------------------------------------------
+-- 7.1 RESPONSIBLE PERSON
+-- ---------------------------------------------------------------------------------------------------------------------
+INSERT INTO responsible_person (id, name, date_created, last_date_modified, created_by, last_modified_by, is_deleted) VALUES
+(1, 'John Mechanic', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(2, 'Sarah Electrician', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(3, 'Mike Support Staff', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false)
+ON CONFLICT (id) DO NOTHING;
+
+-- ---------------------------------------------------------------------------------------------------------------------
+-- 7.2 SUPPORT REQUEST STATUS
+-- ---------------------------------------------------------------------------------------------------------------------
+INSERT INTO support_request_status (id, name, date_created, last_date_modified, created_by, last_modified_by, is_deleted) VALUES
+(1, 'OPEN', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(2, 'IN_PROGRESS', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(3, 'RESOLVED', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(4, 'CLOSED', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false)
+ON CONFLICT (id) DO NOTHING;
+
+-- ---------------------------------------------------------------------------------------------------------------------
+-- 7.3 BIKE ISSUE (Hierarchical Structure)
+-- ---------------------------------------------------------------------------------------------------------------------
+-- Root Issues
+INSERT INTO bike_issue (id, external_id, name, description, parent_bike_issue_id, is_fixable_by_client, responsible_person_id, date_created, last_date_modified, created_by, last_modified_by, is_deleted) VALUES
+(1, '550e8400-e29b-41d4-a716-446655440101', 'Battery Issues', 'Problems related to bike battery', NULL, false, 2, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(2, '550e8400-e29b-41d4-a716-446655440102', 'Brake Issues', 'Problems with bike braking system', NULL, false, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(3, '550e8400-e29b-41d4-a716-446655440103', 'Motor Issues', 'Problems with electric motor', NULL, false, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false)
+ON CONFLICT (id) DO NOTHING;
+
+-- Sub Issues (Battery)
+INSERT INTO bike_issue (id, external_id, name, description, parent_bike_issue_id, is_fixable_by_client, responsible_person_id, date_created, last_date_modified, created_by, last_modified_by, is_deleted) VALUES
+(4, '550e8400-e29b-41d4-a716-446655440104', 'Battery Dead', 'Battery completely discharged', 1, true, 2, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(5, '550e8400-e29b-41d4-a716-446655440105', 'Battery Connection Loose', 'Battery connector not properly attached', 1, true, 2, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false)
+ON CONFLICT (id) DO NOTHING;
+
+-- Sub Issues (Brakes)
+INSERT INTO bike_issue (id, external_id, name, description, parent_bike_issue_id, is_fixable_by_client, responsible_person_id, date_created, last_date_modified, created_by, last_modified_by, is_deleted) VALUES
+(6, '550e8400-e29b-41d4-a716-446655440106', 'Brake Pads Worn', 'Brake pads need replacement', 2, false, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(7, '550e8400-e29b-41d4-a716-446655440107', 'Brake Cable Loose', 'Brake cable needs adjustment', 2, false, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false)
+ON CONFLICT (id) DO NOTHING;
+
+-- Sub Issues (Motor)
+INSERT INTO bike_issue (id, external_id, name, description, parent_bike_issue_id, is_fixable_by_client, responsible_person_id, date_created, last_date_modified, created_by, last_modified_by, is_deleted) VALUES
+(8, '550e8400-e29b-41d4-a716-446655440108', 'Motor Not Starting', 'Electric motor fails to start', 3, false, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false)
+ON CONFLICT (id) DO NOTHING;
+
+-- ---------------------------------------------------------------------------------------------------------------------
+-- 7.4 ERROR CODE
+-- ---------------------------------------------------------------------------------------------------------------------
+INSERT INTO error_code (id, external_id, name, bike_engine_id, description, common_cause, diagnostic_steps, recommended_fix, notes, is_fixable_by_client, date_created, last_date_modified, created_by, last_modified_by, is_deleted) VALUES
+(1, '550e8400-e29b-41d4-a716-446655440201', 'E001', 1, 'Battery Low Voltage', 'Battery discharged or faulty cell', 'Check battery voltage with multimeter', 'Charge or replace battery', 'Common error in cold weather', false, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(2, '550e8400-e29b-41d4-a716-446655440202', 'E002', 1, 'Motor Controller Error', 'Faulty controller or wiring', 'Inspect controller connections', 'Replace motor controller', 'May require professional service', false, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(3, '550e8400-e29b-41d4-a716-446655440203', 'E003', 2, 'Throttle Sensor Fault', 'Throttle sensor disconnected or damaged', 'Check throttle sensor connection', 'Reconnect or replace sensor', 'Client can check connection', true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(4, '550e8400-e29b-41d4-a716-446655440204', 'E004', 2, 'Brake Sensor Active', 'Brake lever engaged or sensor stuck', 'Check brake lever and sensor', 'Adjust or clean brake sensor', 'Usually easy fix', true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(5, '550e8400-e29b-41d4-a716-446655440205', 'E005', 3, 'Overheat Protection', 'Motor or controller overheating', 'Let bike cool down for 30 minutes', 'Avoid steep hills or heavy loads', 'Temporary error', true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false)
+ON CONFLICT (id) DO NOTHING;
+
+-- ---------------------------------------------------------------------------------------------------------------------
+-- 7.5 FEEDBACK
+-- ---------------------------------------------------------------------------------------------------------------------
+INSERT INTO feedback (id, external_id, user_id, rate, comment, date_time, date_created, last_date_modified, created_by, last_modified_by, is_deleted) VALUES
+(1, '550e8400-e29b-41d4-a716-446655440301', 1, 5, 'Excellent service, very responsive support team!', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(2, '550e8400-e29b-41d4-a716-446655440302', 2, 4, 'Good overall experience, minor delay in response.', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(3, '550e8400-e29b-41d4-a716-446655440303', 3, 3, 'Average service, could be improved.', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(4, '550e8400-e29b-41d4-a716-446655440304', 1, 2, 'Not satisfied, took too long to resolve issue.', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false)
+ON CONFLICT (id) DO NOTHING;
+
+-- ---------------------------------------------------------------------------------------------------------------------
+-- 7.6 BIKE RENTAL FEEDBACK
+-- ---------------------------------------------------------------------------------------------------------------------
+INSERT INTO bike_rental_feedback (id, user_id, bike_rental_id, rate, comment, date_time, date_created, last_date_modified, created_by, last_modified_by, is_deleted) VALUES
+(1, 1, 101, 5, 'Great bike, smooth ride!', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(2, 2, 102, 4, 'Good bike, but battery could last longer.', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(3, 3, 103, 3, 'Average experience, brakes were squeaky.', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(4, 1, 104, 2, 'Poor condition, motor had issues.', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false)
+ON CONFLICT (id) DO NOTHING;
+
+-- ---------------------------------------------------------------------------------------------------------------------
+-- 7.7 SUPPORT REQUEST
+-- ---------------------------------------------------------------------------------------------------------------------
+INSERT INTO support_request (id, external_id, user_id, bike_id, is_near_location, photo_url, error_code_id, support_request_status_id, date_created, last_date_modified, created_by, last_modified_by, is_deleted) VALUES
+(1, '550e8400-e29b-41d4-a716-446655440401', 1, 201, true, 'https://example.com/photos/issue1.jpg', 1, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(2, '550e8400-e29b-41d4-a716-446655440402', 2, 202, false, NULL, 2, 2, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(3, '550e8400-e29b-41d4-a716-446655440403', 3, 203, true, 'https://example.com/photos/issue3.jpg', NULL, 3, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(4, '550e8400-e29b-41d4-a716-446655440404', 1, NULL, false, NULL, 3, 4, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(5, '550e8400-e29b-41d4-a716-446655440405', 2, 204, true, 'https://example.com/photos/issue5.jpg', 4, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false)
+ON CONFLICT (id) DO NOTHING;
+
+-- ---------------------------------------------------------------------------------------------------------------------
+-- 7.8 BIKE TYPE BIKE ISSUE (Junction Table)
+-- ---------------------------------------------------------------------------------------------------------------------
+INSERT INTO bike_type_bike_issue (id, bike_type_id, bike_issue_id) VALUES
+(1, 1, 1),
+(2, 1, 2),
+(3, 2, 1),
+(4, 2, 3),
+(5, 3, 2),
+(6, 3, 3)
+ON CONFLICT (id) DO NOTHING;
+
+-- ---------------------------------------------------------------------------------------------------------------------
+-- 7.9 SUPPORT REQUEST BIKE ISSUE (Junction Table)
+-- ---------------------------------------------------------------------------------------------------------------------
+INSERT INTO support_request_bike_issue (id, support_request_id, bike_issue_id) VALUES
+(1, 1, 1),
+(2, 1, 4),
+(3, 2, 3),
+(4, 2, 8),
+(5, 3, 2),
+(6, 4, 5),
+(7, 5, 6)
+ON CONFLICT (id) DO NOTHING;
+
+-- ---------------------------------------------------------------------------------------------------------------------
+-- 7.10 SUPPORT REQUEST GUIDE ITEM
+-- ---------------------------------------------------------------------------------------------------------------------
+INSERT INTO support_request_guide_item (id, item_index, description, bike_issue_id, support_request_status_id, date_created, last_date_modified, created_by, last_modified_by, is_deleted) VALUES
+(1, 1, 'Check if battery is properly connected', 1, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(2, 2, 'Verify battery charge level on display', 1, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(3, 3, 'Try charging battery for at least 2 hours', 1, 2, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(4, 1, 'Test brake lever responsiveness', 2, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(5, 2, 'Check brake pads for wear and alignment', 2, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(6, 3, 'Adjust brake cable tension if needed', 2, 2, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(7, 1, 'Power cycle the bike (turn off and on)', 3, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(8, 2, 'Check for error codes on display', 3, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false)
+ON CONFLICT (id) DO NOTHING;
+
+-- =====================================================================================================================
+-- SECTION 8: SEQUENCE RESET
+-- =====================================================================================================================
+-- Reset sequences to the correct values after inserting test data
+
+SELECT setval('responsible_person_id_seq', (SELECT COALESCE(MAX(id), 1) FROM responsible_person));
+SELECT setval('support_request_status_id_seq', (SELECT COALESCE(MAX(id), 1) FROM support_request_status));
+SELECT setval('error_code_id_seq', (SELECT COALESCE(MAX(id), 1) FROM error_code));
+SELECT setval('bike_issue_id_seq', (SELECT COALESCE(MAX(id), 1) FROM bike_issue));
+SELECT setval('feedback_id_seq', (SELECT COALESCE(MAX(id), 1) FROM feedback));
+SELECT setval('bike_rental_feedback_id_seq', (SELECT COALESCE(MAX(id), 1) FROM bike_rental_feedback));
+SELECT setval('support_request_id_seq', (SELECT COALESCE(MAX(id), 1) FROM support_request));
+SELECT setval('support_request_guide_item_id_seq', (SELECT COALESCE(MAX(id), 1) FROM support_request_guide_item));
+SELECT setval('support_request_bike_issue_id_seq', (SELECT COALESCE(MAX(id), 1) FROM support_request_bike_issue));
+SELECT setval('bike_type_bike_issue_id_seq', (SELECT COALESCE(MAX(id), 1) FROM bike_type_bike_issue));
+
+-- =====================================================================================================================
+-- END OF SCHEMA
+-- =====================================================================================================================
+-- Schema created successfully!
+-- Total tables: 10
+-- Hierarchical structure: BikeIssue with parent-child relationships
+-- Test data: Comprehensive support requests, issues, feedback, and troubleshooting guides
+-- =====================================================================================================================
