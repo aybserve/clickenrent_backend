@@ -5,7 +5,7 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.clickenrent.rentalservice.dto.BikeRentalDTO;
+import org.clickenrent.rentalservice.dto.*;
 import org.clickenrent.rentalservice.service.BikeRentalService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -53,5 +53,31 @@ public class BikeRentalController {
     public ResponseEntity<Void> deleteBikeRental(@PathVariable Long id) {
         bikeRentalService.deleteBikeRental(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/{id}/unlock")
+    @PreAuthorize("isAuthenticated()")
+    @Operation(
+            summary = "Unlock bike",
+            description = "Generate unlock token for BLE communication. User must have an active rental for this bike."
+    )
+    public ResponseEntity<UnlockResponseDTO> unlockBike(
+            @PathVariable Long id,
+            @Valid @RequestBody UnlockRequestDTO request) {
+        UnlockResponseDTO response = bikeRentalService.unlockBike(id, request);
+        return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/{id}/lock")
+    @PreAuthorize("isAuthenticated()")
+    @Operation(
+            summary = "Lock bike",
+            description = "Confirm bike is locked and update rental status. Updates bike location if coordinates provided."
+    )
+    public ResponseEntity<LockResponseDTO> lockBike(
+            @PathVariable Long id,
+            @Valid @RequestBody LockRequestDTO request) {
+        LockResponseDTO response = bikeRentalService.lockBike(id, request);
+        return ResponseEntity.ok(response);
     }
 }

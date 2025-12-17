@@ -48,6 +48,7 @@ public class AuthService {
     private final AuthenticationManager authenticationManager;
     private final UserMapper userMapper;
     private final TokenBlacklistService tokenBlacklistService;
+    private final EmailVerificationService emailVerificationService;
     
     /**
      * Register a new user in the system.
@@ -95,6 +96,9 @@ public class AuthService {
                     .build();
             userGlobalRoleRepository.save(userGlobalRole);
         });
+        
+        // Generate and send email verification code
+        emailVerificationService.generateAndSendCode(savedUser);
         
         // Generate tokens with custom claims
         UserDetails userDetails = userDetailsService.loadUserByUsername(savedUser.getUserName());
@@ -278,6 +282,39 @@ public class AuthService {
             // If token is invalid, we don't need to blacklist it
             // Just log the attempt
         }
+    }
+    
+    /**
+     * Verify email and generate new tokens with updated user info.
+     * 
+     * @param email User's email address
+     * @param code Verification code
+     * @return VerifyEmailResponse with new tokens and updated user
+     */
+    @Transactional
+    public VerifyEmailResponse verifyEmailAndGenerateTokens(String email, String code) {
+        // Delegate to EmailVerificationService for verification
+        User user = emailVerificationService.verifyEmail(email, code);
+        
+        // Generate new tokens with updated user info
+        UserDetails userDetails = userDetailsService.loadUserByUsername(user.getUserName());
+        
+        Map<String, Object> claims = new HashMap<>();
+        claims.put("userId", user.getId());
+        claims.put("email", user.getEmail());
+        claims.put("roles", userDetails.getAuthorities().stream()
+                .map(GrantedAuthority::getAuthority)
+                .collect(Collectors.toList()));
+        
+        String accessToken = jwtService.generateToken(claims, userDetails);
+        String refreshToken = jwtService.generateRefreshToken(userDetails);
+        
+        return VerifyEmailResponse.builder()
+                .verified(true)
+                .accessToken(accessToken)
+                .refreshToken(refreshToken)
+                .user(userMapper.toDto(user))
+                .build();
     }
 }
 

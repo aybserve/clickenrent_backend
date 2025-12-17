@@ -1,20 +1,21 @@
 package org.clickenrent.rentalservice.service;
 
 import lombok.RequiredArgsConstructor;
-import org.clickenrent.rentalservice.dto.BikeRentalDTO;
-import org.clickenrent.rentalservice.entity.Bike;
-import org.clickenrent.rentalservice.entity.BikeRental;
-import org.clickenrent.rentalservice.entity.Rental;
+import org.clickenrent.rentalservice.dto.*;
+import org.clickenrent.rentalservice.entity.*;
 import org.clickenrent.rentalservice.exception.ResourceNotFoundException;
 import org.clickenrent.rentalservice.exception.UnauthorizedException;
 import org.clickenrent.rentalservice.mapper.BikeRentalMapper;
 import org.clickenrent.rentalservice.repository.BikeRentalRepository;
 import org.clickenrent.rentalservice.repository.BikeRepository;
+import org.clickenrent.rentalservice.repository.LockRepository;
 import org.clickenrent.rentalservice.repository.RentalRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDateTime;
 
 @Service
 @RequiredArgsConstructor
@@ -23,8 +24,12 @@ public class BikeRentalService {
     private final BikeRentalRepository bikeRentalRepository;
     private final BikeRepository bikeRepository;
     private final RentalRepository rentalRepository;
+    private final LockRepository lockRepository;
     private final BikeRentalMapper bikeRentalMapper;
     private final SecurityService securityService;
+    private final LockEncryptionService lockEncryptionService;
+    private final LockStatusService lockStatusService;
+    private final CoordinatesService coordinatesService;
 
     @Transactional(readOnly = true)
     public Page<BikeRentalDTO> getAllBikeRentals(Pageable pageable) {
@@ -83,5 +88,104 @@ public class BikeRentalService {
         }
 
         bikeRentalRepository.delete(bikeRental);
+    }
+
+    @Transactional
+    public UnlockResponseDTO unlockBike(Long bikeRentalId, UnlockRequestDTO request) {
+        // Fetch bike rental with bike and lock
+        BikeRental bikeRental = bikeRentalRepository.findById(bikeRentalId)
+                .orElseThrow(() -> new ResourceNotFoundException("BikeRental", "id", bikeRentalId));
+
+        // Verify user authorization
+        if (!securityService.isAdmin() && !securityService.hasAccessToUser(bikeRental.getRental().getUserId())) {
+            throw new UnauthorizedException("You don't have permission to unlock this bike");
+        }
+
+        // Verify bike matches request
+        if (!bikeRental.getBike().getId().equals(request.getBikeId())) {
+            throw new IllegalArgumentException("Bike ID does not match the rental");
+        }
+
+        // Check if bike has a lock
+        Lock lock = bikeRental.getBike().getLock();
+        if (lock == null) {
+            throw new IllegalStateException("This bike does not have a lock assigned");
+        }
+
+        // Check if lock has a provider
+        if (lock.getLockProvider() == null) {
+            throw new IllegalStateException("Lock does not have a provider configured");
+        }
+
+        // Generate unlock token
+        String unlockToken = lockEncryptionService.generateUnlockToken(bikeRental, lock);
+
+        // Update lock status and last seen
+        LockStatus unlockedStatus = lockStatusService.getLockStatusByName("unlocked");
+        lock.setLockStatus(unlockedStatus);
+        lock.setLastSeenAt(LocalDateTime.now());
+        lockRepository.save(lock);
+
+        // Return response
+        return UnlockResponseDTO.builder()
+                .unlockToken(unlockToken)
+                .lockId(lock.getExternalId() != null ? lock.getExternalId() : lock.getId().toString())
+                .expiresIn(lockEncryptionService.getTokenExpirationSeconds())
+                .algorithm("AES-256")
+                .build();
+    }
+
+    @Transactional
+    public LockResponseDTO lockBike(Long bikeRentalId, LockRequestDTO request) {
+        // Fetch bike rental
+        BikeRental bikeRental = bikeRentalRepository.findById(bikeRentalId)
+                .orElseThrow(() -> new ResourceNotFoundException("BikeRental", "id", bikeRentalId));
+
+        // Verify user authorization
+        if (!securityService.isAdmin() && !securityService.hasAccessToUser(bikeRental.getRental().getUserId())) {
+            throw new UnauthorizedException("You don't have permission to lock this bike");
+        }
+
+        // Verify bike matches request
+        if (!bikeRental.getBike().getId().equals(request.getBikeId())) {
+            throw new IllegalArgumentException("Bike ID does not match the rental");
+        }
+
+        // Verify lock confirmation
+        if (!request.getLockConfirmed()) {
+            throw new IllegalArgumentException("Lock must be confirmed");
+        }
+
+        // Get lock
+        Lock lock = bikeRental.getBike().getLock();
+        if (lock == null) {
+            throw new IllegalStateException("This bike does not have a lock assigned");
+        }
+
+        // Update lock status and last seen
+        LockStatus lockedStatus = lockStatusService.getLockStatusByName("locked");
+        lock.setLockStatus(lockedStatus);
+        lock.setLastSeenAt(LocalDateTime.now());
+        lockRepository.save(lock);
+
+        // Update bike coordinates if provided
+        if (request.getCoordinates() != null) {
+            Coordinates coordinates = coordinatesService.createOrUpdateCoordinates(
+                    bikeRental.getBike().getCoordinates(),
+                    request.getCoordinates()
+            );
+            bikeRental.getBike().setCoordinates(coordinates);
+            bikeRepository.save(bikeRental.getBike());
+        }
+
+        // Get rental status (could be "paused" if applicable)
+        String rentalStatus = bikeRental.getBikeRentalStatus() != null 
+                ? bikeRental.getBikeRentalStatus().getName() 
+                : "active";
+
+        return LockResponseDTO.builder()
+                .success(true)
+                .rentalStatus(rentalStatus)
+                .build();
     }
 }

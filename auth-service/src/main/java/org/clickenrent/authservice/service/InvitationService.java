@@ -166,6 +166,7 @@ public class InvitationService {
                 .lastName(request.getLastName())
                 .phone(request.getPhone())
                 .isActive(true)
+                .isEmailVerified(true)  // Email verified via invitation token
                 .build();
         
         // Set language if provided

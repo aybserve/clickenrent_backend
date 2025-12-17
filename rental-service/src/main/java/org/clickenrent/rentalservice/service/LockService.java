@@ -2,6 +2,7 @@ package org.clickenrent.rentalservice.service;
 
 import lombok.RequiredArgsConstructor;
 import org.clickenrent.rentalservice.dto.LockDTO;
+import org.clickenrent.rentalservice.dto.LockStatusResponseDTO;
 import org.clickenrent.rentalservice.entity.Lock;
 import org.clickenrent.rentalservice.exception.ResourceNotFoundException;
 import org.clickenrent.rentalservice.exception.UnauthorizedException;
@@ -75,5 +76,22 @@ public class LockService {
         Lock lock = lockRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Lock", "id", id));
         lockRepository.delete(lock);
+    }
+
+    @Transactional(readOnly = true)
+    public LockStatusResponseDTO getLockStatus(Long lockId) {
+        Lock lock = lockRepository.findById(lockId)
+                .orElseThrow(() -> new ResourceNotFoundException("Lock", "id", lockId));
+
+        // Check if user has access (admins can see any lock, users can only see locks on their active rentals)
+        // For now, we'll allow authenticated users to check lock status
+        // TODO: Add more granular permission check based on active rentals
+
+        return LockStatusResponseDTO.builder()
+                .lockId(lock.getExternalId() != null ? lock.getExternalId() : lock.getId().toString())
+                .status(lock.getLockStatus() != null ? lock.getLockStatus().getName() : "unknown")
+                .batteryLevel(lock.getBatteryLevel())
+                .lastSeen(lock.getLastSeenAt())
+                .build();
     }
 }

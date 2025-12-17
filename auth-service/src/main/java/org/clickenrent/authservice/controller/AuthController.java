@@ -12,6 +12,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.clickenrent.authservice.dto.*;
 import org.clickenrent.authservice.service.AuthService;
+import org.clickenrent.authservice.service.EmailVerificationService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -30,6 +31,7 @@ import org.springframework.web.bind.annotation.*;
 public class AuthController {
     
     private final AuthService authService;
+    private final EmailVerificationService emailVerificationService;
     
     /**
      * Register a new user (Public endpoint).
@@ -181,6 +183,56 @@ public class AuthController {
             authService.logout(token);
         }
         
+        return ResponseEntity.noContent().build();
+    }
+    
+    /**
+     * Verify email address with 6-digit code.
+     * POST /api/auth/verify-email
+     * 
+     * Security: Public access - no authentication required.
+     * Returns new JWT tokens with updated user info (isEmailVerified=true).
+     */
+    @PostMapping("/verify-email")
+    @Operation(
+            summary = "Verify email address",
+            description = "Verifies user email with 6-digit code. Returns new tokens with updated user info. Public endpoint."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Email verified successfully",
+                    content = @Content(schema = @Schema(implementation = VerifyEmailResponse.class))),
+            @ApiResponse(responseCode = "400", description = "Invalid or expired code"),
+            @ApiResponse(responseCode = "404", description = "User not found")
+    })
+    @SecurityRequirement(name = "") // No authentication required
+    public ResponseEntity<VerifyEmailResponse> verifyEmail(@Valid @RequestBody VerifyEmailRequest request) {
+        VerifyEmailResponse response = authService.verifyEmailAndGenerateTokens(
+                request.getEmail(), 
+                request.getCode()
+        );
+        return ResponseEntity.ok(response);
+    }
+    
+    /**
+     * Send or resend verification code to user's email.
+     * POST /api/auth/send-verification-code
+     * 
+     * Security: Public access - no authentication required.
+     * Invalidates any existing unused codes and generates a new one.
+     */
+    @PostMapping("/send-verification-code")
+    @Operation(
+            summary = "Send/resend verification code",
+            description = "Sends a new 6-digit verification code to user's email. Invalidates previous unused codes. Public endpoint."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "Verification code sent successfully"),
+            @ApiResponse(responseCode = "400", description = "Email already verified"),
+            @ApiResponse(responseCode = "404", description = "User not found")
+    })
+    @SecurityRequirement(name = "") // No authentication required
+    public ResponseEntity<Void> sendVerificationCode(@Valid @RequestBody SendVerificationCodeRequest request) {
+        emailVerificationService.resendVerificationCode(request.getEmail());
         return ResponseEntity.noContent().build();
     }
 }

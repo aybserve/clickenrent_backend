@@ -49,4 +49,18 @@ public class CoordinatesService {
                 .orElseThrow(() -> new ResourceNotFoundException("Coordinates", "id", id));
         coordinatesRepository.delete(coordinates);
     }
+
+    @Transactional
+    public Coordinates createOrUpdateCoordinates(Coordinates existing, CoordinatesDTO dto) {
+        if (existing != null) {
+            // Update existing coordinates
+            existing.setLatitude(dto.getLatitude());
+            existing.setLongitude(dto.getLongitude());
+            return coordinatesRepository.save(existing);
+        } else {
+            // Create new coordinates
+            Coordinates newCoordinates = coordinatesMapper.toEntity(dto);
+            return coordinatesRepository.save(newCoordinates);
+        }
+    }
 }
