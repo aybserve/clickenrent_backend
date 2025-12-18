@@ -16,3 +16,4 @@ public interface LocationRepository extends JpaRepository<Location, Long> {
     List<Location> findByCompanyId(Long companyId);
     Optional<Location> findByErpPartnerId(String erpPartnerId);
 }
+

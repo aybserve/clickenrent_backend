@@ -19,3 +19,4 @@ public interface UserPaymentProfileRepository extends JpaRepository<UserPaymentP
     
     Optional<UserPaymentProfile> findByExternalId(UUID externalId);
 }
+

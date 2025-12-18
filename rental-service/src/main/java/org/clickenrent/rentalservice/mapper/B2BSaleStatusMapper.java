@@ -22,3 +22,4 @@ public class B2BSaleStatusMapper {
         if (dto.getName() != null) status.setName(dto.getName());
     }
 }
+

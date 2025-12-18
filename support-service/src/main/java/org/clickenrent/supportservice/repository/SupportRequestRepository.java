@@ -23,3 +23,4 @@ public interface SupportRequestRepository extends JpaRepository<SupportRequest, 
     
     List<SupportRequest> findByErrorCodeId(Long errorCodeId);
 }
+

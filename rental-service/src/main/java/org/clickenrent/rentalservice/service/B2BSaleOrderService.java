@@ -106,3 +106,4 @@ public class B2BSaleOrderService {
         b2bSaleOrderRepository.delete(order);
     }
 }
+

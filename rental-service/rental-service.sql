@@ -1378,3 +1378,4 @@ SELECT setval('rental_plan_id_seq', (SELECT COALESCE(MAX(id), 1) FROM rental_pla
 -- Product inheritance: SINGLE_TABLE strategy with discriminator column
 -- Test data: Sample locations, hubs, bikes, and rental plans
 -- =====================================================================================================================
+

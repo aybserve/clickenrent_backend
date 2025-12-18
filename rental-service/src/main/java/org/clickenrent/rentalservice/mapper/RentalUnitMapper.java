@@ -22,3 +22,4 @@ public class RentalUnitMapper {
         if (dto.getName() != null) unit.setName(dto.getName());
     }
 }
+

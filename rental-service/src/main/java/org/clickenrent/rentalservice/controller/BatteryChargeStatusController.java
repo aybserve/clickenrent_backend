@@ -59,3 +59,4 @@ public class BatteryChargeStatusController {
         return ResponseEntity.noContent().build();
     }
 }
+

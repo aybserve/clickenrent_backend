@@ -62,3 +62,4 @@ public class ResponsiblePersonController {
         return ResponseEntity.noContent().build();
     }
 }
+

@@ -103,3 +103,4 @@ class B2BSubscriptionOrderControllerTest {
                 .andExpect(status().isNoContent());
     }
 }
+

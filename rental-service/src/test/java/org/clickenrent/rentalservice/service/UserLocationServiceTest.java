@@ -126,3 +126,4 @@ class UserLocationServiceTest {
         assertThrows(ResourceNotFoundException.class, () -> userLocationService.removeUserFromLocation(999L));
     }
 }
+

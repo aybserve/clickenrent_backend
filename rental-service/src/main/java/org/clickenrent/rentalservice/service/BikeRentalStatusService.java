@@ -32,3 +32,4 @@ public class BikeRentalStatusService {
         return bikeRentalStatusMapper.toDto(status);
     }
 }
+

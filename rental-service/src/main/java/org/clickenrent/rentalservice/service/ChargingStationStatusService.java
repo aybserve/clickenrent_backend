@@ -32,3 +32,4 @@ public class ChargingStationStatusService {
         return chargingStationStatusMapper.toDto(status);
     }
 }
+

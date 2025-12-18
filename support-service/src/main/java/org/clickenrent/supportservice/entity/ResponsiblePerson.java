@@ -32,3 +32,4 @@ public class ResponsiblePerson extends BaseAuditEntity {
     @Column(name = "name", nullable = false, length = 255)
     private String name;
 }
+

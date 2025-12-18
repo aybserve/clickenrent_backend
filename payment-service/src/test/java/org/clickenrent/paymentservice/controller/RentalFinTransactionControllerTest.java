@@ -67,3 +67,4 @@ class RentalFinTransactionControllerTest {
                 .andExpect(status().isCreated());
     }
 }
+

@@ -27,3 +27,4 @@ public class RentalFinTransactionDTO {
     @NotNull(message = "Financial transaction is required")
     private FinancialTransactionDTO financialTransaction;
 }
+

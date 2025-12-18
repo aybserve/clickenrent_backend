@@ -129,3 +129,4 @@ class BatteryChargeStatusServiceTest {
         assertThrows(ResourceNotFoundException.class, () -> batteryChargeStatusService.deleteStatus(999L));
     }
 }
+

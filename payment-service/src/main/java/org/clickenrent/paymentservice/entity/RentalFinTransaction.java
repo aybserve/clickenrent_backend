@@ -73,3 +73,4 @@ public class RentalFinTransaction {
         return getClass().hashCode();
     }
 }
+

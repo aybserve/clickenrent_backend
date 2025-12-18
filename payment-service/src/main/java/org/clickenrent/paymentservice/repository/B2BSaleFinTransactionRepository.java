@@ -17,3 +17,4 @@ public interface B2BSaleFinTransactionRepository extends JpaRepository<B2BSaleFi
     
     Optional<B2BSaleFinTransaction> findByExternalId(UUID externalId);
 }
+

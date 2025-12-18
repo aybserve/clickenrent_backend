@@ -52,3 +52,4 @@ public class UserLocationController {
         return ResponseEntity.noContent().build();
     }
 }
+

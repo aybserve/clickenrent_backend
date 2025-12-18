@@ -208,3 +208,4 @@ class ServiceProviderServiceTest {
         verify(serviceProviderRepository, never()).deleteById(anyLong());
     }
 }
+

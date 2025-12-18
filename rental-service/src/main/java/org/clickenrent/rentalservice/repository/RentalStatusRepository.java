@@ -13,3 +13,4 @@ import java.util.Optional;
 public interface RentalStatusRepository extends JpaRepository<RentalStatus, Long> {
     Optional<RentalStatus> findByName(String name);
 }
+

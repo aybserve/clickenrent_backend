@@ -14,3 +14,4 @@ public interface LockRepository extends JpaRepository<Lock, Long> {
     Optional<Lock> findByExternalId(String externalId);
     Optional<Lock> findByMacAddress(String macAddress);
 }
+

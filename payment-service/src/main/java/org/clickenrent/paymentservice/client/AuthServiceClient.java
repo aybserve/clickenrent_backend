@@ -25,3 +25,4 @@ public interface AuthServiceClient {
     @GetMapping("/companies/{id}")
     CompanyDTO getCompanyById(@PathVariable("id") Long id);
 }
+

@@ -22,3 +22,4 @@ public class BikeTypeMapper {
         if (dto.getName() != null) bikeType.setName(dto.getName());
     }
 }
+

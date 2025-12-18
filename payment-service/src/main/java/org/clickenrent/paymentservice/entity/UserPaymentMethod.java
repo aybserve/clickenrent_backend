@@ -83,3 +83,4 @@ public class UserPaymentMethod {
         return getClass().hashCode();
     }
 }
+

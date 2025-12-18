@@ -25,3 +25,4 @@ public class EmailVerificationDTO {
     private Boolean isUsed;
     private LocalDateTime usedAt;
 }
+

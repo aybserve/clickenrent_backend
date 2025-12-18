@@ -120,3 +120,4 @@ public class HubController {
         return ResponseEntity.noContent().build();
     }
 }
+

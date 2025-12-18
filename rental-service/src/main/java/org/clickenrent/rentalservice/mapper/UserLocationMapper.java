@@ -49,3 +49,4 @@ public class UserLocationMapper {
         return builder.build();
     }
 }
+

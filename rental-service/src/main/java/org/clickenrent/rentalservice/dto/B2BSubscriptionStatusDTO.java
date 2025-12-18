@@ -17,3 +17,4 @@ public class B2BSubscriptionStatusDTO {
     private Long id;
     private String name;
 }
+

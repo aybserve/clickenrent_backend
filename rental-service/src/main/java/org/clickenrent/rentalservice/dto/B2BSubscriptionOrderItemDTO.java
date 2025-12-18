@@ -25,3 +25,4 @@ public class B2BSubscriptionOrderItemDTO {
     private BigDecimal price;
     private BigDecimal totalPrice;
 }
+

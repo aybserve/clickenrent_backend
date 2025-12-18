@@ -60,3 +60,4 @@ public class LocationImageController {
         return ResponseEntity.noContent().build();
     }
 }
+

@@ -14,3 +14,4 @@ public interface BikePartRepository extends JpaRepository<BikePart, Long> {
     List<BikePart> findByBikeId(Long bikeId);
     List<BikePart> findByPartId(Long partId);
 }
+

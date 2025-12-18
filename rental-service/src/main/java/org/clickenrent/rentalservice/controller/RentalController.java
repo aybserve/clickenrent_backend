@@ -146,3 +146,4 @@ public class RentalController {
         return ResponseEntity.noContent().build();
     }
 }
+

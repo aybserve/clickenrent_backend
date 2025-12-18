@@ -138,3 +138,4 @@ class ChargingStationModelServiceTest {
         assertThrows(ResourceNotFoundException.class, () -> chargingStationModelService.deleteModel(999L));
     }
 }
+

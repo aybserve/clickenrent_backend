@@ -46,3 +46,4 @@ public class OpenApiConfig {
                         .addList(SECURITY_SCHEME_NAME));
     }
 }
+

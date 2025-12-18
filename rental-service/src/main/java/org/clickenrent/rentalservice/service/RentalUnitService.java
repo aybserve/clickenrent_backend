@@ -56,3 +56,4 @@ public class RentalUnitService {
         rentalUnitRepository.delete(unit);
     }
 }
+

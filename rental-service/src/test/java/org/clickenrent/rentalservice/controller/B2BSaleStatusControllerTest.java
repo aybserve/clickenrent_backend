@@ -62,3 +62,4 @@ class B2BSaleStatusControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.name").value("Ordered"));}
 }
+

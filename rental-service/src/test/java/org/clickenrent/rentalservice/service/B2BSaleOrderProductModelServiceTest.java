@@ -149,3 +149,4 @@ class B2BSaleOrderProductModelServiceTest {
         assertThrows(ResourceNotFoundException.class, () -> b2bSaleOrderProductModelService.deleteProductModel(999L));
     }
 }
+

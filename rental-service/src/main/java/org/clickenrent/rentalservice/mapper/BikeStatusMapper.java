@@ -22,3 +22,4 @@ public class BikeStatusMapper {
         if (dto.getName() != null) bikeStatus.setName(dto.getName());
     }
 }
+

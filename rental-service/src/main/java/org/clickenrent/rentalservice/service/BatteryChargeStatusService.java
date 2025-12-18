@@ -70,3 +70,4 @@ public class BatteryChargeStatusService {
         batteryChargeStatusRepository.delete(status);
     }
 }
+

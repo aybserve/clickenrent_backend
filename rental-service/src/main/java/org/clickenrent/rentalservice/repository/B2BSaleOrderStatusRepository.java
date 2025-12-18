@@ -13,3 +13,4 @@ import java.util.Optional;
 public interface B2BSaleOrderStatusRepository extends JpaRepository<B2BSaleOrderStatus, Long> {
     Optional<B2BSaleOrderStatus> findByName(String name);
 }
+

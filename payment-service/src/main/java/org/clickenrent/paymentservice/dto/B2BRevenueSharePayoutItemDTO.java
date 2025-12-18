@@ -32,3 +32,4 @@ public class B2BRevenueSharePayoutItemDTO {
     @Positive(message = "Amount must be positive")
     private BigDecimal amount;
 }
+

@@ -21,3 +21,4 @@ public class LockProviderDTO {
     private String encryptionKey;
     private Boolean isActive;
 }
+

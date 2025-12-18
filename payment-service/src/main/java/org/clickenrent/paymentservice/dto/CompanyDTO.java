@@ -19,3 +19,4 @@ public class CompanyDTO {
     private String registrationNumber;
     private String vatNumber;
 }
+

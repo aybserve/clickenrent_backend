@@ -50,3 +50,4 @@ class B2BRevenueSharePayoutItemControllerTest {
                 .andExpect(status().isOk());
     }
 }
+

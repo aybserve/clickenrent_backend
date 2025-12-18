@@ -20,3 +20,4 @@ public class UnlockRequestDTO {
 
     private CoordinatesDTO coordinates;
 }
+

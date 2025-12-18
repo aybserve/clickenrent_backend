@@ -23,3 +23,4 @@ public class StockMovementDTO {
     private Long toHubId;
     private LocalDateTime dateTime;
 }
+

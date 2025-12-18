@@ -98,3 +98,4 @@ class SupportRequestStatusControllerTest {
                 .andExpect(status().isNoContent());
     }
 }
+

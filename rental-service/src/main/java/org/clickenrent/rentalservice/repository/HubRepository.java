@@ -16,3 +16,4 @@ public interface HubRepository extends JpaRepository<Hub, Long> {
     Optional<Hub> findByExternalId(String externalId);
     List<Hub> findByLocation(Location location);
 }
+

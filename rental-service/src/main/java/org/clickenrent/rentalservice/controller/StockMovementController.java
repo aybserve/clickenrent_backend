@@ -64,3 +64,4 @@ public class StockMovementController {
         return ResponseEntity.noContent().build();
     }
 }
+

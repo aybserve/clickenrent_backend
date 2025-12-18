@@ -132,3 +132,4 @@ class B2BSaleOrderServiceTest {
         verify(b2bSaleOrderRepository, times(1)).delete(testOrder);
     }
 }
+

@@ -272,3 +272,4 @@ class LocationControllerTest {
         verify(locationService, times(1)).deleteLocation(1L);
 }
 }
+

@@ -17,3 +17,4 @@ public class RentalStatusDTO {
     private Long id;
     private String name;
 }
+

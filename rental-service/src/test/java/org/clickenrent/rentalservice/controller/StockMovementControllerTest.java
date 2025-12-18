@@ -103,3 +103,4 @@ class StockMovementControllerTest {
                 .andExpect(status().isNoContent());
     }
 }
+

@@ -148,3 +148,4 @@ class B2BSubscriptionOrderItemServiceTest {
         verify(b2bSubscriptionOrderItemRepository, times(1)).delete(testItem);
     }
 }
+

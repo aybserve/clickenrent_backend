@@ -17,3 +17,4 @@ public interface RentalFinTransactionRepository extends JpaRepository<RentalFinT
     
     Optional<RentalFinTransaction> findByExternalId(UUID externalId);
 }
+

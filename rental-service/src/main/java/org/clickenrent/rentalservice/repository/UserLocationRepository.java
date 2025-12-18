@@ -15,3 +15,4 @@ public interface UserLocationRepository extends JpaRepository<UserLocation, Long
     List<UserLocation> findByUserId(Long userId);
     List<UserLocation> findByLocation(Location location);
 }
+

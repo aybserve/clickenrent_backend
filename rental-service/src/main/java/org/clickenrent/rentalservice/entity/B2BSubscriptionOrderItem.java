@@ -63,3 +63,4 @@ public class B2BSubscriptionOrderItem extends BaseAuditEntity {
     @Column(name = "total_price", nullable = false, precision = 10, scale = 2)
     private BigDecimal totalPrice;
 }
+

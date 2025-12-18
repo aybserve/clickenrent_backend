@@ -42,3 +42,4 @@ public class BikeBrand {
     @Column(name = "company_id", nullable = false)
     private Long companyId;
 }
+

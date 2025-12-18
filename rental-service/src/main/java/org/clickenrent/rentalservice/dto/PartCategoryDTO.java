@@ -19,3 +19,4 @@ public class PartCategoryDTO {
     private String name;
     private Long parentCategoryId;
 }
+

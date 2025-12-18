@@ -51,3 +51,4 @@ public class B2BRevenueSharePayoutItemMapper {
                 .collect(Collectors.toList());
     }
 }
+

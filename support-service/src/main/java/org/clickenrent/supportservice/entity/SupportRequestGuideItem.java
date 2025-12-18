@@ -53,3 +53,4 @@ public class SupportRequestGuideItem extends BaseAuditEntity {
     @JoinColumn(name = "support_request_status_id", nullable = false)
     private SupportRequestStatus supportRequestStatus;
 }
+

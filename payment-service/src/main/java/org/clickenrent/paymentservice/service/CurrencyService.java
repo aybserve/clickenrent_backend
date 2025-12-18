@@ -88,3 +88,4 @@ public class CurrencyService {
         currencyRepository.deleteById(id);
     }
 }
+

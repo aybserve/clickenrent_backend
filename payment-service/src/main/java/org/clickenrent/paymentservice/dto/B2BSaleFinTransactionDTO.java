@@ -27,3 +27,4 @@ public class B2BSaleFinTransactionDTO {
     @NotNull(message = "Financial transaction is required")
     private FinancialTransactionDTO financialTransaction;
 }
+

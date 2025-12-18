@@ -50,3 +50,4 @@ public class CoordinatesController {
         return ResponseEntity.noContent().build();
     }
 }
+

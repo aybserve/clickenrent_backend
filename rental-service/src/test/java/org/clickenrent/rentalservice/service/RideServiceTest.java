@@ -201,3 +201,4 @@ class RideServiceTest {
         assertThrows(ResourceNotFoundException.class, () -> rideService.deleteRide(999L));
     }
 }
+

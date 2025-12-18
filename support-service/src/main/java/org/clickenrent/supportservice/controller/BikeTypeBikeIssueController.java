@@ -76,3 +76,4 @@ public class BikeTypeBikeIssueController {
         return ResponseEntity.noContent().build();
     }
 }
+

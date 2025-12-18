@@ -72,3 +72,4 @@ public class Currency {
         return getClass().hashCode();
     }
 }
+

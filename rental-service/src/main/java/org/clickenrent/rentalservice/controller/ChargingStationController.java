@@ -62,3 +62,4 @@ public class ChargingStationController {
         return ResponseEntity.noContent().build();
     }
 }
+

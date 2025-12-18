@@ -13,3 +13,4 @@ import java.util.Optional;
 public interface RideStatusRepository extends JpaRepository<RideStatus, Long> {
     Optional<RideStatus> findByName(String name);
 }
+

@@ -17,3 +17,4 @@ public class BikeTypeDTO {
     private Long id;
     private String name;
 }
+

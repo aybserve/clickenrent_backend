@@ -41,3 +41,4 @@ public class PartCategory {
     @JoinColumn(name = "parent_category_id")
     private PartCategory parentCategory;
 }
+

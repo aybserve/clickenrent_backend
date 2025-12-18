@@ -21,3 +21,4 @@ public class LockStatusResponseDTO {
     private Integer batteryLevel;
     private LocalDateTime lastSeen;
 }
+

@@ -22,3 +22,4 @@ public class BatteryChargeStatusMapper {
         if (dto.getName() != null) status.setName(dto.getName());
     }
 }
+

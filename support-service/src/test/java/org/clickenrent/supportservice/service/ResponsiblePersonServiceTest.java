@@ -168,3 +168,4 @@ class ResponsiblePersonServiceTest {
         verify(responsiblePersonRepository, never()).findById(anyLong());
     }
 }
+

@@ -208,3 +208,4 @@ class CurrencyServiceTest {
         verify(currencyRepository, never()).deleteById(anyLong());
     }
 }
+

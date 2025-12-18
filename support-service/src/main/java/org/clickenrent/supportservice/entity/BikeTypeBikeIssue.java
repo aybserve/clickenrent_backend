@@ -37,3 +37,4 @@ public class BikeTypeBikeIssue {
     @JoinColumn(name = "bike_issue_id", nullable = false)
     private BikeIssue bikeIssue;
 }
+

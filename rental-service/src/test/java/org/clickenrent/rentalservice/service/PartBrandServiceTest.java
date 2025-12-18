@@ -152,3 +152,4 @@ class PartBrandServiceTest {
         assertThrows(ResourceNotFoundException.class, () -> partBrandService.deleteBrand(999L));
     }
 }
+

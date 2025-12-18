@@ -75,3 +75,4 @@ public class UserPaymentProfile {
         return getClass().hashCode();
     }
 }
+

@@ -95,3 +95,4 @@ public class B2BSaleFinTransactionService {
         b2bSaleFinTransactionRepository.deleteById(id);
     }
 }
+

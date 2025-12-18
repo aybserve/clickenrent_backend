@@ -54,3 +54,4 @@ public class B2BSubscriptionOrder extends BaseAuditEntity {
     @JoinColumn(name = "b2b_subscription_id")
     private B2BSubscription b2bSubscription;
 }
+

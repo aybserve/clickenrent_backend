@@ -78,3 +78,4 @@ public class B2BRevenueSharePayoutMapper {
                 .collect(Collectors.toList());
     }
 }
+

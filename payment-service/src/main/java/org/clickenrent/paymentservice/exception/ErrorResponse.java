@@ -23,3 +23,4 @@ public class ErrorResponse {
     private String path;
     private List<String> details;
 }
+

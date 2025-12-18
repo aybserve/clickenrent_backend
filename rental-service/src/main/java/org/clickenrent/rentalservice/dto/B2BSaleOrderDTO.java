@@ -25,3 +25,4 @@ public class B2BSaleOrderDTO {
     private Long b2bSaleId;
     private LocalDateTime dateTime;
 }
+

@@ -107,3 +107,4 @@ class CoordinatesServiceTest {
         verify(coordinatesRepository, times(1)).delete(testCoordinates);
     }
 }
+

@@ -17,3 +17,4 @@ public interface B2BSaleProductRepository extends JpaRepository<B2BSaleProduct, 
     List<B2BSaleProduct> findByB2bSale(B2BSale b2bSale);
     List<B2BSaleProduct> findByProductId(Long productId);
 }
+

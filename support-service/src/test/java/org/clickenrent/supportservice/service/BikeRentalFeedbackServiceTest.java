@@ -261,3 +261,4 @@ class BikeRentalFeedbackServiceTest {
         assertThrows(UnauthorizedException.class, () -> bikeRentalFeedbackService.delete(1L));
     }
 }
+

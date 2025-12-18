@@ -81,3 +81,4 @@ public class B2BRevenueSharePayoutController {
         return ResponseEntity.noContent().build();
     }
 }
+

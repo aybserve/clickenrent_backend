@@ -63,3 +63,4 @@ class B2BSubscriptionStatusControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.name").value("Active"));}
 }
+

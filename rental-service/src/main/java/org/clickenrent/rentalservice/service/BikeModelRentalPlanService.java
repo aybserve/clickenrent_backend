@@ -76,3 +76,4 @@ public class BikeModelRentalPlanService {
         bikeModelRentalPlanRepository.delete(plan);
     }
 }
+

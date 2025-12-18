@@ -179,3 +179,4 @@ class HubServiceTest {
         assertThrows(ResourceNotFoundException.class, () -> hubService.deleteHub(999L));
     }
 }
+

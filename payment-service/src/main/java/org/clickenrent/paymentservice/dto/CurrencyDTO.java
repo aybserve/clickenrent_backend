@@ -29,3 +29,4 @@ public class CurrencyDTO {
     @NotBlank(message = "Currency name is required")
     private String name;
 }
+

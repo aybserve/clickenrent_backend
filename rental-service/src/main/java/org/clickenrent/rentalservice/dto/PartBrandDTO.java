@@ -18,3 +18,4 @@ public class PartBrandDTO {
     private String name;
     private Long companyId;
 }
+

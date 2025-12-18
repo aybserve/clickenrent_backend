@@ -17,3 +17,4 @@ public class B2BSaleDTO {
     private Long id;
     private String externalId;
 }
+

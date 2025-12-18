@@ -33,3 +33,4 @@ public class SupportRequestStatus extends BaseAuditEntity {
     @Column(name = "name", nullable = false, unique = true, length = 100)
     private String name;
 }
+

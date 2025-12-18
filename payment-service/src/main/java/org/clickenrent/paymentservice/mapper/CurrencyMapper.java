@@ -49,3 +49,4 @@ public class CurrencyMapper {
                 .collect(Collectors.toList());
     }
 }
+

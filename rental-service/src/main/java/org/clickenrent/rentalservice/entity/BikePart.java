@@ -44,3 +44,4 @@ public class BikePart extends BaseAuditEntity {
     @JoinColumn(name = "part_id", nullable = false)
     private Part part;
 }
+

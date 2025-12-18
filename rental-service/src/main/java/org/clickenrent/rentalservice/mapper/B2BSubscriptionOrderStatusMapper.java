@@ -28,3 +28,4 @@ public class B2BSubscriptionOrderStatusMapper {
         if (dto.getName() != null) status.setName(dto.getName());
     }
 }
+

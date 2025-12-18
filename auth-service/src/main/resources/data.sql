@@ -1,7 +1,7 @@
 -- =====================================================
 -- Mockup Data for Auth Service PostgreSQL Database
--- Password for all users: Test123!
--- Bcrypt hash: $2a$10$xn3LI/AjqicFYZFruSwve.FGW6a7Rr1m3.1kpn.5F5HJTU.E/aXGC
+-- Password for all users: Test123
+-- Bcrypt hash: $2a$10$59i5SxRWkbcxt2rfTyjJ2.dZrlXFchPqyw1p56D/Ltp6jvYGVh2YK
 -- =====================================================
 
 -- =====================================================
@@ -75,7 +75,7 @@ ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO users (id, external_id, user_name, email, password, first_name, last_name, phone, city, address, zipcode, language_id, is_active, is_email_verified, is_accepted_terms, is_accepted_privacy_policy, date_created, last_date_modified, created_by, last_modified_by, is_deleted) VALUES
 -- SUPERADMIN
-(1, 'usr-ext-00001', 'superadmin', 'superadmin@clickenrent.com', '$2a$10$xn3LI/AjqicFYZFruSwve.FGW6a7Rr1m3.1kpn.5F5HJTU.E/aXGC', 'Super', 'Admin', '+49-30-12345001', 'Berlin', 'Admin Street 1', '10115', 1, true, true, true, true, NOW(), NOW(), 'system', 'system', false),
+(1, 'usr-ext-00001', 'superadmin', 'superadmin@clickenrent.com', '$2a$10$59i5SxRWkbcxt2rfTyjJ2.dZrlXFchPqyw1p56D/Ltp6jvYGVh2YK', 'Super', 'Admin', '+49-30-12345001', 'Berlin', 'Admin Street 1', '10115', 1, true, true, true, true, NOW(), NOW(), 'system', 'system', false),
 
 -- ADMIN Users
 (2, 'usr-ext-00002', 'admin_john', 'john.admin@clickenrent.com', '$2a$10$xn3LI/AjqicFYZFruSwve.FGW6a7Rr1m3.1kpn.5F5HJTU.E/aXGC', 'John', 'Administrator', '+49-89-12345002', 'Munich', 'Admin Plaza 5', '80331', 1, true, true, true, true, NOW(), NOW(), 'system', 'system', false),
@@ -228,3 +228,4 @@ SELECT setval('user_company_id_seq', (SELECT MAX(id) FROM user_company));
 SELECT setval('address_id_seq', (SELECT MAX(id) FROM address));
 SELECT setval('user_address_id_seq', (SELECT MAX(id) FROM user_address));
 SELECT setval('invitation_id_seq', (SELECT MAX(id) FROM invitation));
+

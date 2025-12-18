@@ -32,3 +32,4 @@ public class B2BSubscriptionOrderStatusService {
         return b2bSubscriptionOrderStatusMapper.toDto(status);
     }
 }
+

@@ -88,3 +88,4 @@ public class BikeTypeBikeIssueService {
         bikeTypeBikeIssueRepository.delete(entity);
     }
 }
+

@@ -35,3 +35,4 @@ public class RideStatusController {
         return ResponseEntity.ok(rideStatusService.getStatusById(id));
     }
 }
+

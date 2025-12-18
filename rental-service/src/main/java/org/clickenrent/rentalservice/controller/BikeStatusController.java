@@ -59,3 +59,4 @@ public class BikeStatusController {
         return ResponseEntity.noContent().build();
     }
 }
+

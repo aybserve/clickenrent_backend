@@ -35,3 +35,4 @@ public class B2BSubscriptionStatusController {
         return ResponseEntity.ok(b2bSubscriptionStatusService.getStatusById(id));
     }
 }
+

@@ -19,3 +19,4 @@ public interface FeedbackRepository extends JpaRepository<Feedback, Long> {
     
     List<Feedback> findByRate(Integer rate);
 }
+

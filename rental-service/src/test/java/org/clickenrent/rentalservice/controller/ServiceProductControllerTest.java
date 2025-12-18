@@ -89,3 +89,4 @@ class ServiceProductControllerTest {
                 .andExpect(status().isNoContent());
     }
 }
+

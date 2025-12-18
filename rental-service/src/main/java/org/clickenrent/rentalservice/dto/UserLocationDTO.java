@@ -19,3 +19,4 @@ public class UserLocationDTO {
     private Long locationId;
     private Long locationRoleId;
 }
+

@@ -64,3 +64,4 @@ public interface InvitationRepository extends JpaRepository<Invitation, Long> {
     Optional<Invitation> findByEmailAndCompanyIdAndStatus(String email, Long companyId, InvitationStatus status);
 }
 
+

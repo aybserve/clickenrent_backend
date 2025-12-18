@@ -96,3 +96,4 @@ class B2BSaleOrderProductModelControllerTest {
                 .andExpect(status().isNoContent());
     }
 }
+

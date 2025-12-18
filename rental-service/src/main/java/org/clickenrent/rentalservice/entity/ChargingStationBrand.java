@@ -38,3 +38,4 @@ public class ChargingStationBrand {
     @Column(name = "company_id", nullable = false)
     private Long companyId;
 }
+

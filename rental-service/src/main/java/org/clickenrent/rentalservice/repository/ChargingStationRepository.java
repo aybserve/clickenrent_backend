@@ -13,3 +13,4 @@ import java.util.Optional;
 public interface ChargingStationRepository extends JpaRepository<ChargingStation, Long> {
     Optional<ChargingStation> findByExternalId(String externalId);
 }
+

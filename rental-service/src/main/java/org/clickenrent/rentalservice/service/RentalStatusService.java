@@ -70,3 +70,4 @@ public class RentalStatusService {
         rentalStatusRepository.delete(status);
     }
 }
+

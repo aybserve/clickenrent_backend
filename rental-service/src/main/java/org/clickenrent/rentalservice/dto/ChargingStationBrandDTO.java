@@ -18,3 +18,4 @@ public class ChargingStationBrandDTO {
     private String name;
     private Long companyId;
 }
+

@@ -153,3 +153,4 @@ class HubImageServiceTest {
         assertThrows(ResourceNotFoundException.class, () -> hubImageService.deleteImage(999L));
     }
 }
+

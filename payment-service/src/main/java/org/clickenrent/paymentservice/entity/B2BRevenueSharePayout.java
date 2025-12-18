@@ -93,3 +93,4 @@ public class B2BRevenueSharePayout {
         return getClass().hashCode();
     }
 }
+

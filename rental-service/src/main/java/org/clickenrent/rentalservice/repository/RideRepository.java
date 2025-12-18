@@ -16,3 +16,4 @@ public interface RideRepository extends JpaRepository<Ride, Long> {
     Optional<Ride> findByExternalId(String externalId);
     List<Ride> findByBikeRental(BikeRental bikeRental);
 }
+

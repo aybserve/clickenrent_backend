@@ -32,3 +32,4 @@ public class B2BSaleStatusService {
         return b2bSaleStatusMapper.toDto(status);
     }
 }
+

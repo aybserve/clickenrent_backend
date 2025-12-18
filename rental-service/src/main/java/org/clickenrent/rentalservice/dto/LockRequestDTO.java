@@ -23,3 +23,4 @@ public class LockRequestDTO {
 
     private CoordinatesDTO coordinates;
 }
+

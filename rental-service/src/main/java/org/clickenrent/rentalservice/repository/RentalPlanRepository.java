@@ -14,3 +14,4 @@ import java.util.List;
 public interface RentalPlanRepository extends JpaRepository<RentalPlan, Long> {
     List<RentalPlan> findByLocation(Location location);
 }
+

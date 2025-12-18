@@ -115,3 +115,4 @@ class LockStatusControllerTest {
                 .andExpect(status().isNoContent());
     }
 }
+

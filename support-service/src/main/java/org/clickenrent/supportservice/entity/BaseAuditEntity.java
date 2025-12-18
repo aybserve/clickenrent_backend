@@ -46,3 +46,4 @@ public abstract class BaseAuditEntity {
     @Column(name = "is_deleted", nullable = false)
     private Boolean isDeleted = false;
 }
+

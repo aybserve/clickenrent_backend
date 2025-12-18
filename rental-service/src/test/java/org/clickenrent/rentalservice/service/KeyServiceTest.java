@@ -130,3 +130,4 @@ class KeyServiceTest {
         assertThrows(ResourceNotFoundException.class, () -> keyService.deleteKey(999L));
     }
 }
+

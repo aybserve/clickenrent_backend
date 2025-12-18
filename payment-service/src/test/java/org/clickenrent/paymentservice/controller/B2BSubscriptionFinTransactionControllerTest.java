@@ -49,3 +49,4 @@ class B2BSubscriptionFinTransactionControllerTest {
                 .andExpect(status().isOk());
     }
 }
+

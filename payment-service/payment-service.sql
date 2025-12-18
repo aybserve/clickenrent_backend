@@ -583,3 +583,4 @@ SELECT setval('payout_fin_transactions_id_seq', (SELECT COALESCE(MAX(id), 1) FRO
 -- Stripe integration: Fully configured with payment intents, charges, refunds, and customer IDs
 -- Test data: Sample currencies, payment methods, users, and transactions
 -- =====================================================================================================================
+

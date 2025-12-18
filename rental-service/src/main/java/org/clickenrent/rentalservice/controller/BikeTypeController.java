@@ -59,3 +59,4 @@ public class BikeTypeController {
         return ResponseEntity.noContent().build();
     }
 }
+

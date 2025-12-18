@@ -13,3 +13,4 @@ import java.util.Optional;
 public interface RentalUnitRepository extends JpaRepository<RentalUnit, Long> {
     Optional<RentalUnit> findByName(String name);
 }
+

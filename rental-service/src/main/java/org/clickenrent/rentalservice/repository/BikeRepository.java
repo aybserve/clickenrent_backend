@@ -14,3 +14,4 @@ public interface BikeRepository extends JpaRepository<Bike, Long> {
     Optional<Bike> findByExternalId(String externalId);
     Optional<Bike> findByCode(String code);
 }
+

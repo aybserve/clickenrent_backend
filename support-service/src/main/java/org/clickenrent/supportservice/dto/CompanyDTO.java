@@ -24,3 +24,4 @@ public class CompanyDTO {
     private String erpPartnerId;
     private Long companyTypeId;
 }
+

@@ -60,3 +60,4 @@ public class UserPaymentMethodMapper {
                 .collect(Collectors.toList());
     }
 }
+

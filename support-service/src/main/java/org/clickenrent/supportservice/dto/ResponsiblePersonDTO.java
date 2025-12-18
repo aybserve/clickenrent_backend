@@ -25,3 +25,4 @@ public class ResponsiblePersonDTO {
     private String createdBy;
     private String lastModifiedBy;
 }
+

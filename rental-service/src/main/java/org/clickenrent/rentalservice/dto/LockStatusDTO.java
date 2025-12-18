@@ -17,3 +17,4 @@ public class LockStatusDTO {
     private Long id;
     private String name;
 }
+

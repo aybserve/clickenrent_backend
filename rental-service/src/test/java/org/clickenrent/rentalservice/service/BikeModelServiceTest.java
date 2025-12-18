@@ -199,3 +199,4 @@ class BikeModelServiceTest {
         verify(bikeModelRepository, never()).delete(any(BikeModel.class));
     }
 }
+

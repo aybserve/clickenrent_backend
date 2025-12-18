@@ -214,3 +214,4 @@ class SecurityServiceTest {
         assertTrue(securityService.hasAccessToUser(1L));
     }
 }
+

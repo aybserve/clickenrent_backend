@@ -59,3 +59,4 @@ public class RentalStatusController {
         return ResponseEntity.noContent().build();
     }
 }
+

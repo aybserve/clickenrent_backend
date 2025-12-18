@@ -17,3 +17,4 @@ public interface CurrencyRepository extends JpaRepository<Currency, Long> {
     
     Optional<Currency> findByExternalId(UUID externalId);
 }
+

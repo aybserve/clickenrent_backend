@@ -53,3 +53,4 @@ public class B2BSubscriptionFinTransactionMapper {
                 .collect(Collectors.toList());
     }
 }
+

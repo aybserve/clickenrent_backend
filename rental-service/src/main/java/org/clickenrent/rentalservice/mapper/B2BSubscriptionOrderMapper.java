@@ -75,3 +75,4 @@ public class B2BSubscriptionOrderMapper {
         }
     }
 }
+

@@ -261,3 +261,4 @@ class FeedbackServiceTest {
         assertThrows(UnauthorizedException.class, () -> feedbackService.delete(1L));
     }
 }
+

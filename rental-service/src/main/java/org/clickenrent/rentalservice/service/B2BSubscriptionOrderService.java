@@ -80,3 +80,4 @@ public class B2BSubscriptionOrderService {
         b2bSubscriptionOrderRepository.delete(order);
     }
 }
+

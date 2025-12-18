@@ -35,3 +35,4 @@ public class BikeRentalStatusController {
         return ResponseEntity.ok(bikeRentalStatusService.getStatusById(id));
     }
 }
+

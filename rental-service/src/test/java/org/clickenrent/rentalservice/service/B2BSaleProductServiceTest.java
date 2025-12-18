@@ -149,3 +149,4 @@ class B2BSaleProductServiceTest {
         verify(b2bSaleProductRepository, times(1)).delete(testProduct);
     }
 }
+

@@ -21,3 +21,4 @@ public interface B2BRevenueSharePayoutRepository extends JpaRepository<B2BRevenu
     
     Optional<B2BRevenueSharePayout> findByExternalId(UUID externalId);
 }
+

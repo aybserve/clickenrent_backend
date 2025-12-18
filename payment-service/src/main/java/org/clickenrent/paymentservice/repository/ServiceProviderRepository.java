@@ -17,3 +17,4 @@ public interface ServiceProviderRepository extends JpaRepository<ServiceProvider
     
     Optional<ServiceProvider> findByExternalId(UUID externalId);
 }
+

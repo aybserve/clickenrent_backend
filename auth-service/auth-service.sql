@@ -346,8 +346,8 @@ CREATE INDEX idx_invitation_status ON invitation(status);
 -- =====================================================================================================================
 -- This section contains sample data for testing and development purposes.
 -- Comment out or remove this section before deploying to production if you don't want test data.
--- All user passwords are: Test123!
--- Bcrypt hash: $2a$10$xn3LI/AjqicFYZFruSwve.FGW6a7Rr1m3.1kpn.5F5HJTU.E/aXGC
+-- All user passwords are: Test123
+-- Bcrypt hash: $2a$10$59i5SxRWkbcxt2rfTyjJ2.dZrlXFchPqyw1p56D/Ltp6jvYGVh2YK
 
 -- ---------------------------------------------------------------------------------------------------------------------
 -- 5.1 LOOKUP TABLE DATA
@@ -420,25 +420,25 @@ ON CONFLICT (id) DO NOTHING;
 
 INSERT INTO users (id, external_id, user_name, email, password, first_name, last_name, phone, city, address, zipcode, language_id, is_active, is_email_verified, is_accepted_terms, is_accepted_privacy_policy, date_created, last_date_modified, created_by, last_modified_by, is_deleted) VALUES
 -- SUPERADMIN
-(1, 'usr-ext-00001', 'superadmin', 'superadmin@clickenrent.com', '$2a$10$xn3LI/AjqicFYZFruSwve.FGW6a7Rr1m3.1kpn.5F5HJTU.E/aXGC', 'Super', 'Admin', '+49-30-12345001', 'Berlin', 'Admin Street 1', '10115', 1, true, true, true, true, NOW(), NOW(), 'system', 'system', false),
+(1, 'usr-ext-00001', 'superadmin', 'superadmin@clickenrent.com', '$2a$10$59i5SxRWkbcxt2rfTyjJ2.dZrlXFchPqyw1p56D/Ltp6jvYGVh2YK', 'Super', 'Admin', '+49-30-12345001', 'Berlin', 'Admin Street 1', '10115', 1, true, true, true, true, NOW(), NOW(), 'system', 'system', false),
 
 -- ADMIN Users
-(2, 'usr-ext-00002', 'admin_john', 'john.admin@clickenrent.com', '$2a$10$xn3LI/AjqicFYZFruSwve.FGW6a7Rr1m3.1kpn.5F5HJTU.E/aXGC', 'John', 'Administrator', '+49-89-12345002', 'Munich', 'Admin Plaza 5', '80331', 1, true, true, true, true, NOW(), NOW(), 'system', 'system', false),
-(3, 'usr-ext-00003', 'admin_sarah', 'sarah.admin@clickenrent.com', '$2a$10$xn3LI/AjqicFYZFruSwve.FGW6a7Rr1m3.1kpn.5F5HJTU.E/aXGC', 'Sarah', 'Manager', '+41-44-12345003', 'Zurich', 'Management Ave 12', '8001', 2, true, true, true, true, NOW(), NOW(), 'system', 'system', false),
+(2, 'usr-ext-00002', 'admin_john', 'john.admin@clickenrent.com', '$2a$10$59i5SxRWkbcxt2rfTyjJ2.dZrlXFchPqyw1p56D/Ltp6jvYGVh2YK', 'John', 'Administrator', '+49-89-12345002', 'Munich', 'Admin Plaza 5', '80331', 1, true, true, true, true, NOW(), NOW(), 'system', 'system', false),
+(3, 'usr-ext-00003', 'admin_sarah', 'sarah.admin@clickenrent.com', '$2a$10$59i5SxRWkbcxt2rfTyjJ2.dZrlXFchPqyw1p56D/Ltp6jvYGVh2YK', 'Sarah', 'Manager', '+41-44-12345003', 'Zurich', 'Management Ave 12', '8001', 2, true, true, true, true, NOW(), NOW(), 'system', 'system', false),
 
 -- B2B Users (Hotel/Company Owners/Managers)
-(4, 'usr-ext-00004', 'hotelowner_max', 'max.mueller@grandhotel.de', '$2a$10$xn3LI/AjqicFYZFruSwve.FGW6a7Rr1m3.1kpn.5F5HJTU.E/aXGC', 'Max', 'Mueller', '+49-30-55512001', 'Berlin', 'Friedrichstrasse 100', '10117', 2, true, true, true, true, NOW(), NOW(), 'system', 'system', false),
-(5, 'usr-ext-00005', 'hotelowner_anna', 'anna.schmidt@alpineresort.at', '$2a$10$xn3LI/AjqicFYZFruSwve.FGW6a7Rr1m3.1kpn.5F5HJTU.E/aXGC', 'Anna', 'Schmidt', '+43-662-88800001', 'Salzburg', 'Getreidegasse 25', '5020', 2, true, true, true, true, NOW(), NOW(), 'system', 'system', false),
-(6, 'usr-ext-00006', 'campingowner_pierre', 'pierre.dubois@camping-provence.fr', '$2a$10$xn3LI/AjqicFYZFruSwve.FGW6a7Rr1m3.1kpn.5F5HJTU.E/aXGC', 'Pierre', 'Dubois', '+33-4-90-123456', 'Lyon', 'Route de Camping 15', '69001', 3, true, true, true, true, NOW(), NOW(), 'system', 'system', false),
+(4, 'usr-ext-00004', 'hotelowner_max', 'max.mueller@grandhotel.de', '$2a$10$59i5SxRWkbcxt2rfTyjJ2.dZrlXFchPqyw1p56D/Ltp6jvYGVh2YK', 'Max', 'Mueller', '+49-30-55512001', 'Berlin', 'Friedrichstrasse 100', '10117', 2, true, true, true, true, NOW(), NOW(), 'system', 'system', false),
+(5, 'usr-ext-00005', 'hotelowner_anna', 'anna.schmidt@alpineresort.at', '$2a$10$59i5SxRWkbcxt2rfTyjJ2.dZrlXFchPqyw1p56D/Ltp6jvYGVh2YK', 'Anna', 'Schmidt', '+43-662-88800001', 'Salzburg', 'Getreidegasse 25', '5020', 2, true, true, true, true, NOW(), NOW(), 'system', 'system', false),
+(6, 'usr-ext-00006', 'campingowner_pierre', 'pierre.dubois@camping-provence.fr', '$2a$10$59i5SxRWkbcxt2rfTyjJ2.dZrlXFchPqyw1p56D/Ltp6jvYGVh2YK', 'Pierre', 'Dubois', '+33-4-90-123456', 'Lyon', 'Route de Camping 15', '69001', 3, true, true, true, true, NOW(), NOW(), 'system', 'system', false),
 
 -- CUSTOMER Users
-(7, 'usr-ext-00007', 'customer_tom', 'tom.wilson@email.com', '$2a$10$xn3LI/AjqicFYZFruSwve.FGW6a7Rr1m3.1kpn.5F5HJTU.E/aXGC', 'Tom', 'Wilson', '+1-212-555-0101', 'New York', '123 Broadway', '10001', 1, true, true, true, true, NOW(), NOW(), 'system', 'system', false),
-(8, 'usr-ext-00008', 'customer_emma', 'emma.johnson@email.com', '$2a$10$xn3LI/AjqicFYZFruSwve.FGW6a7Rr1m3.1kpn.5F5HJTU.E/aXGC', 'Emma', 'Johnson', '+49-40-555-0102', 'Hamburg', 'Reeperbahn 50', '20359', 2, true, true, true, true, NOW(), NOW(), 'system', 'system', false),
-(9, 'usr-ext-00009', 'customer_luca', 'luca.rossi@email.it', '$2a$10$xn3LI/AjqicFYZFruSwve.FGW6a7Rr1m3.1kpn.5F5HJTU.E/aXGC', 'Luca', 'Rossi', '+39-06-555-0103', 'Rome', 'Via del Corso 120', '00186', 5, true, true, true, true, NOW(), NOW(), 'system', 'system', false),
-(10, 'usr-ext-00010', 'customer_marie', 'marie.blanc@email.fr', '$2a$10$xn3LI/AjqicFYZFruSwve.FGW6a7Rr1m3.1kpn.5F5HJTU.E/aXGC', 'Marie', 'Blanc', '+33-1-555-0104', 'Paris', 'Champs-Élysées 88', '75008', 3, true, true, true, true, NOW(), NOW(), 'system', 'system', false),
-(11, 'usr-ext-00011', 'customer_hans', 'hans.weber@email.de', '$2a$10$xn3LI/AjqicFYZFruSwve.FGW6a7Rr1m3.1kpn.5F5HJTU.E/aXGC', 'Hans', 'Weber', '+49-89-555-0105', 'Munich', 'Marienplatz 8', '80331', 2, true, true, true, true, NOW(), NOW(), 'system', 'system', false),
-(12, 'usr-ext-00012', 'customer_sophia', 'sophia.martin@email.com', '$2a$10$xn3LI/AjqicFYZFruSwve.FGW6a7Rr1m3.1kpn.5F5HJTU.E/aXGC', 'Sophia', 'Martin', '+41-22-555-0106', 'Geneva', 'Rue du Rhône 42', '1204', 1, true, true, true, true, NOW(), NOW(), 'system', 'system', false),
-(13, 'usr-ext-00013', 'customer_oliver', 'oliver.brown@email.com', '$2a$10$xn3LI/AjqicFYZFruSwve.FGW6a7Rr1m3.1kpn.5F5HJTU.E/aXGC', 'Oliver', 'Brown', '+1-310-555-0107', 'Los Angeles', 'Sunset Blvd 500', '90028', 1, true, false, true, true, NOW(), NOW(), 'system', 'system', false)
+(7, 'usr-ext-00007', 'customer_tom', 'tom.wilson@email.com', '$2a$10$59i5SxRWkbcxt2rfTyjJ2.dZrlXFchPqyw1p56D/Ltp6jvYGVh2YK', 'Tom', 'Wilson', '+1-212-555-0101', 'New York', '123 Broadway', '10001', 1, true, true, true, true, NOW(), NOW(), 'system', 'system', false),
+(8, 'usr-ext-00008', 'customer_emma', 'emma.johnson@email.com', '$2a$10$59i5SxRWkbcxt2rfTyjJ2.dZrlXFchPqyw1p56D/Ltp6jvYGVh2YK', 'Emma', 'Johnson', '+49-40-555-0102', 'Hamburg', 'Reeperbahn 50', '20359', 2, true, true, true, true, NOW(), NOW(), 'system', 'system', false),
+(9, 'usr-ext-00009', 'customer_luca', 'luca.rossi@email.it', '$2a$10$59i5SxRWkbcxt2rfTyjJ2.dZrlXFchPqyw1p56D/Ltp6jvYGVh2YK', 'Luca', 'Rossi', '+39-06-555-0103', 'Rome', 'Via del Corso 120', '00186', 5, true, true, true, true, NOW(), NOW(), 'system', 'system', false),
+(10, 'usr-ext-00010', 'customer_marie', 'marie.blanc@email.fr', '$2a$10$59i5SxRWkbcxt2rfTyjJ2.dZrlXFchPqyw1p56D/Ltp6jvYGVh2YK', 'Marie', 'Blanc', '+33-1-555-0104', 'Paris', 'Champs-Élysées 88', '75008', 3, true, true, true, true, NOW(), NOW(), 'system', 'system', false),
+(11, 'usr-ext-00011', 'customer_hans', 'hans.weber@email.de', '$2a$10$59i5SxRWkbcxt2rfTyjJ2.dZrlXFchPqyw1p56D/Ltp6jvYGVh2YK', 'Hans', 'Weber', '+49-89-555-0105', 'Munich', 'Marienplatz 8', '80331', 2, true, true, true, true, NOW(), NOW(), 'system', 'system', false),
+(12, 'usr-ext-00012', 'customer_sophia', 'sophia.martin@email.com', '$2a$10$59i5SxRWkbcxt2rfTyjJ2.dZrlXFchPqyw1p56D/Ltp6jvYGVh2YK', 'Sophia', 'Martin', '+41-22-555-0106', 'Geneva', 'Rue du Rhône 42', '1204', 1, true, true, true, true, NOW(), NOW(), 'system', 'system', false),
+(13, 'usr-ext-00013', 'customer_oliver', 'oliver.brown@email.com', '$2a$10$59i5SxRWkbcxt2rfTyjJ2.dZrlXFchPqyw1p56D/Ltp6jvYGVh2YK', 'Oliver', 'Brown', '+1-310-555-0107', 'Los Angeles', 'Sunset Blvd 500', '90028', 1, true, false, true, true, NOW(), NOW(), 'system', 'system', false)
 ON CONFLICT (id) DO NOTHING;
 
 -- ---------------------------------------------------------------------------------------------------------------------
@@ -584,3 +584,4 @@ SELECT setval('invitation_id_seq', (SELECT COALESCE(MAX(id), 1) FROM invitation)
 -- Test users: 13 (password: Test123!)
 -- Test companies: 6
 -- =====================================================================================================================
+

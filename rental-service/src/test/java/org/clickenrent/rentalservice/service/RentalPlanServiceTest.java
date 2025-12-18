@@ -158,3 +158,4 @@ class RentalPlanServiceTest {
         verify(rentalPlanRepository, times(1)).delete(testPlan);
     }
 }
+

@@ -98,3 +98,4 @@ class ResponsiblePersonControllerTest {
                 .andExpect(status().isNoContent());
     }
 }
+

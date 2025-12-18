@@ -17,3 +17,4 @@ public class B2BSubscriptionDTO {
     private Long id;
     private String externalId;
 }
+

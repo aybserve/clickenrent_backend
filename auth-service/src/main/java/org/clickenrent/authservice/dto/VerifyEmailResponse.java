@@ -19,3 +19,4 @@ public class VerifyEmailResponse {
     private String refreshToken;
     private UserDTO user;
 }
+

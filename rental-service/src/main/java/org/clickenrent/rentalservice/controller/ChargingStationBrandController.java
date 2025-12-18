@@ -71,3 +71,4 @@ public class ChargingStationBrandController {
         return ResponseEntity.noContent().build();
     }
 }
+

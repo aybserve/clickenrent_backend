@@ -29,3 +29,4 @@ public class B2BSubscriptionOrderStatus {
     @Column(name = "name", nullable = false, unique = true, length = 50)
     private String name;
 }
+

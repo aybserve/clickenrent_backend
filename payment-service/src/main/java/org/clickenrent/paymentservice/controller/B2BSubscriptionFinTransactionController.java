@@ -58,3 +58,4 @@ public class B2BSubscriptionFinTransactionController {
         return ResponseEntity.noContent().build();
     }
 }
+

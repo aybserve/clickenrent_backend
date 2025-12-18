@@ -76,3 +76,4 @@ public class ErrorCodeController {
         return ResponseEntity.noContent().build();
     }
 }
+

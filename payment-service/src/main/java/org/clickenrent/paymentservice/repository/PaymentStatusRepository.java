@@ -17,3 +17,4 @@ public interface PaymentStatusRepository extends JpaRepository<PaymentStatus, Lo
     
     Optional<PaymentStatus> findByExternalId(UUID externalId);
 }
+

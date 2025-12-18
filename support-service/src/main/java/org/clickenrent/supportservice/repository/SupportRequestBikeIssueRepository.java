@@ -19,3 +19,4 @@ public interface SupportRequestBikeIssueRepository extends JpaRepository<Support
     
     Optional<SupportRequestBikeIssue> findBySupportRequestIdAndBikeIssueId(Long supportRequestId, Long bikeIssueId);
 }
+

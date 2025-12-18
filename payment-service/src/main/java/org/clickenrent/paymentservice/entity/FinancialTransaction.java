@@ -110,3 +110,4 @@ public class FinancialTransaction {
         return getClass().hashCode();
     }
 }
+

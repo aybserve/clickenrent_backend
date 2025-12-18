@@ -111,3 +111,4 @@ class ChargingStationBrandControllerTest {
                 .andExpect(status().isNoContent());
     }
 }
+

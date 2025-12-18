@@ -70,3 +70,4 @@ public class BikeStatusService {
         bikeStatusRepository.delete(bikeStatus);
     }
 }
+

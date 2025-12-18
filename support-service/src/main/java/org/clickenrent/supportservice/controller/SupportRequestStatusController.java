@@ -69,3 +69,4 @@ public class SupportRequestStatusController {
         return ResponseEntity.noContent().build();
     }
 }
+

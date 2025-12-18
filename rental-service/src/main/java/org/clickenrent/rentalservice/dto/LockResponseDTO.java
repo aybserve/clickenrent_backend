@@ -17,3 +17,4 @@ public class LockResponseDTO {
     private Boolean success;
     private String rentalStatus;
 }
+

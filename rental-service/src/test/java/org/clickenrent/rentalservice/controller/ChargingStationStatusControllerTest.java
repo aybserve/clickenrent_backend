@@ -63,3 +63,4 @@ class ChargingStationStatusControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.name").value("Idle"));}
 }
+

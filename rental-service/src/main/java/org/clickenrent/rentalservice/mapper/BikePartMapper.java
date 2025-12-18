@@ -51,3 +51,4 @@ public class BikePartMapper {
         return builder.build();
     }
 }
+

@@ -17,3 +17,4 @@ public interface PayoutFinTransactionRepository extends JpaRepository<PayoutFinT
     
     Optional<PayoutFinTransaction> findByExternalId(UUID externalId);
 }
+

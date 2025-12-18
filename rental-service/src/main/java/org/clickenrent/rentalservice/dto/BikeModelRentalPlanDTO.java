@@ -21,3 +21,4 @@ public class BikeModelRentalPlanDTO {
     private Long rentalPlanId;
     private BigDecimal price;
 }
+

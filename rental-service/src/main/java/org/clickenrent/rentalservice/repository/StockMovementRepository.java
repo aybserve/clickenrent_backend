@@ -15,3 +15,4 @@ public interface StockMovementRepository extends JpaRepository<StockMovement, Lo
     Optional<StockMovement> findByExternalId(String externalId);
     List<StockMovement> findByProductId(Long productId);
 }
+

@@ -151,3 +151,4 @@ class LocationImageServiceTest {
         assertThrows(ResourceNotFoundException.class, () -> locationImageService.deleteImage(999L));
     }
 }
+

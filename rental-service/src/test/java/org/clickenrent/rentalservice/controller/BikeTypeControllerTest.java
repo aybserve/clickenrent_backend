@@ -96,3 +96,4 @@ class BikeTypeControllerTest {
                 .andExpect(status().isNoContent());
     }
 }
+

@@ -22,3 +22,4 @@ public class RentalStatusMapper {
         if (dto.getName() != null) status.setName(dto.getName());
     }
 }
+

@@ -119,3 +119,4 @@ class BikeStatusServiceTest {
         verify(bikeStatusRepository, times(1)).delete(testStatus);
     }
 }
+

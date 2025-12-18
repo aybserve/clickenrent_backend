@@ -14,3 +14,4 @@ public interface SupportRequestStatusRepository extends JpaRepository<SupportReq
     
     Optional<SupportRequestStatus> findByName(String name);
 }
+

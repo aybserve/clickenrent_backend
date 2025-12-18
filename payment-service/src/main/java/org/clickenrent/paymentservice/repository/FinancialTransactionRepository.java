@@ -25,3 +25,4 @@ public interface FinancialTransactionRepository extends JpaRepository<FinancialT
     
     List<FinancialTransaction> findByPaymentStatus(PaymentStatus status);
 }
+

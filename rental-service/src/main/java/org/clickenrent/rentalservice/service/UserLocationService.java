@@ -78,3 +78,4 @@ public class UserLocationService {
         userLocationRepository.delete(userLocation);
     }
 }
+

@@ -19,3 +19,4 @@ public interface SupportRequestGuideItemRepository extends JpaRepository<Support
     List<SupportRequestGuideItem> findByBikeIssueIdAndSupportRequestStatusIdOrderByItemIndexAsc(
         Long bikeIssueId, Long supportRequestStatusId);
 }
+

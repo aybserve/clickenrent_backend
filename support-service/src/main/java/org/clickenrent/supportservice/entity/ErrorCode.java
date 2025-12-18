@@ -68,3 +68,4 @@ public class ErrorCode extends BaseAuditEntity {
     @Column(name = "is_fixable_by_client", nullable = false)
     private Boolean isFixableByClient = false;
 }
+

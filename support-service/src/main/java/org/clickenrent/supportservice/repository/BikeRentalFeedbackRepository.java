@@ -19,3 +19,4 @@ public interface BikeRentalFeedbackRepository extends JpaRepository<BikeRentalFe
     
     List<BikeRentalFeedback> findByRate(Integer rate);
 }
+

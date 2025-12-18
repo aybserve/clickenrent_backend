@@ -13,3 +13,4 @@ import java.util.List;
 public interface PartBrandRepository extends JpaRepository<PartBrand, Long> {
     List<PartBrand> findByCompanyId(Long companyId);
 }
+

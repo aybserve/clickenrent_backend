@@ -16,3 +16,4 @@ public interface LocationImageRepository extends JpaRepository<LocationImage, Lo
     Optional<LocationImage> findByExternalId(String externalId);
     List<LocationImage> findByLocation(Location location);
 }
+

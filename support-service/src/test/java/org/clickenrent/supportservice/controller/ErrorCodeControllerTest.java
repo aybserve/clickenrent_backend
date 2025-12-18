@@ -102,3 +102,4 @@ class ErrorCodeControllerTest {
                 .andExpect(status().isNoContent());
     }
 }
+

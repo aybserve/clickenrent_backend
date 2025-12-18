@@ -29,3 +29,4 @@ public class LocationImageDTO {
     private String createdBy;
     private String lastModifiedBy;
 }
+

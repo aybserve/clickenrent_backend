@@ -62,3 +62,4 @@ public class B2BSubscriptionOrderController {
         return ResponseEntity.noContent().build();
     }
 }
+

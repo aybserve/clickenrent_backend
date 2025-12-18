@@ -96,3 +96,4 @@ class BatteryChargeStatusControllerTest {
                 .andExpect(status().isNoContent());
     }
 }
+

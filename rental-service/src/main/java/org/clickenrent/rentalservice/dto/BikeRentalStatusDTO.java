@@ -17,3 +17,4 @@ public class BikeRentalStatusDTO {
     private Long id;
     private String name;
 }
+

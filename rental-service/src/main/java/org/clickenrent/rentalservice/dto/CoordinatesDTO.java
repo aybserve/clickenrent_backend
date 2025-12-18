@@ -20,3 +20,4 @@ public class CoordinatesDTO {
     private BigDecimal latitude;
     private BigDecimal longitude;
 }
+

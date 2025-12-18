@@ -69,3 +69,4 @@ public class PartService {
         partRepository.delete(part);
     }
 }
+

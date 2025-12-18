@@ -120,3 +120,4 @@ class RideControllerTest {
                 .andExpect(status().isNoContent());
     }
 }
+

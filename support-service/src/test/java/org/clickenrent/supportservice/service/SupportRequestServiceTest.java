@@ -262,3 +262,4 @@ class SupportRequestServiceTest {
         assertThrows(UnauthorizedException.class, () -> supportRequestService.delete(1L));
     }
 }
+

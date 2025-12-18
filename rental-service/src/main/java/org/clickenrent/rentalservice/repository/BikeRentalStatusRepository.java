@@ -13,3 +13,4 @@ import java.util.Optional;
 public interface BikeRentalStatusRepository extends JpaRepository<BikeRentalStatus, Long> {
     Optional<BikeRentalStatus> findByName(String name);
 }
+

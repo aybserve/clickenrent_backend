@@ -32,3 +32,4 @@ public class RideStatusService {
         return rideStatusMapper.toDto(status);
     }
 }
+

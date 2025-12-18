@@ -127,3 +127,4 @@ class BikeEngineServiceTest {
         verify(bikeEngineRepository, times(1)).delete(testEngine);
     }
 }
+

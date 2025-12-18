@@ -20,3 +20,4 @@ public class SendVerificationCodeRequest {
     @Email(message = "Email must be valid")
     private String email;
 }
+

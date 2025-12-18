@@ -49,3 +49,4 @@ class B2BSaleFinTransactionControllerTest {
                 .andExpect(status().isOk());
     }
 }
+

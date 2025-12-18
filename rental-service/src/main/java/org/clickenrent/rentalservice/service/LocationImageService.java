@@ -92,3 +92,4 @@ public class LocationImageService {
         locationImageRepository.delete(locationImage);
     }
 }
+

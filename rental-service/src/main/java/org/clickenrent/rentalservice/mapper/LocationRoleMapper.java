@@ -22,3 +22,4 @@ public class LocationRoleMapper {
         if (dto.getName() != null) role.setName(dto.getName());
     }
 }
+

@@ -19,3 +19,4 @@ public interface ErrorCodeRepository extends JpaRepository<ErrorCode, Long> {
     
     List<ErrorCode> findByName(String name);
 }
+

@@ -130,3 +130,4 @@ class LockServiceTest {
         verify(lockRepository, times(1)).delete(testLock);
     }
 }
+

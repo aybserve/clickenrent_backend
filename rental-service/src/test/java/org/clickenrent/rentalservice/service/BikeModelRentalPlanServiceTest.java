@@ -141,3 +141,4 @@ class BikeModelRentalPlanServiceTest {
         assertThrows(ResourceNotFoundException.class, () -> bikeModelRentalPlanService.delete(999L));
     }
 }
+

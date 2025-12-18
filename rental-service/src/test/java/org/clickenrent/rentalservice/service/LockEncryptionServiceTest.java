@@ -120,3 +120,4 @@ class LockEncryptionServiceTest {
         assertEquals(300, expirationSeconds);
     }
 }
+

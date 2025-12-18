@@ -206,3 +206,4 @@ class ErrorCodeServiceTest {
         assertThrows(UnauthorizedException.class, () -> errorCodeService.delete(1L));
     }
 }
+

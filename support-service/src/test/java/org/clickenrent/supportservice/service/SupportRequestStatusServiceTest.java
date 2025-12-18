@@ -180,3 +180,4 @@ class SupportRequestStatusServiceTest {
         assertThrows(UnauthorizedException.class, () -> supportRequestStatusService.delete(1L));
     }
 }
+

@@ -49,3 +49,4 @@ public class BikeReservationMapper {
         return builder.build();
     }
 }
+

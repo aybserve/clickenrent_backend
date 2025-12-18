@@ -82,3 +82,4 @@ public class ChargingStationBrandService {
         chargingStationBrandRepository.delete(brand);
     }
 }
+

@@ -13,3 +13,4 @@ public class StripeIntegrationException extends RuntimeException {
         super(message, cause);
     }
 }
+

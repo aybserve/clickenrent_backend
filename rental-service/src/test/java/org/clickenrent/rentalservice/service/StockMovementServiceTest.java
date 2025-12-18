@@ -166,3 +166,4 @@ class StockMovementServiceTest {
         assertThrows(ResourceNotFoundException.class, () -> stockMovementService.deleteStockMovement(999L));
     }
 }
+

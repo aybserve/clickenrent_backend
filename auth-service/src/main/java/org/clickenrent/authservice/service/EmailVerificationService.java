@@ -197,3 +197,4 @@ public class EmailVerificationService {
         return Math.max(0, maxAttempts - verification.getAttempts());
     }
 }
+

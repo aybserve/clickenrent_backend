@@ -90,3 +90,4 @@ public class PayoutFinTransactionService {
         payoutFinTransactionRepository.deleteById(id);
     }
 }
+

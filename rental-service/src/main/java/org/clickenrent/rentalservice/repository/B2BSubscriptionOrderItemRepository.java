@@ -15,3 +15,4 @@ public interface B2BSubscriptionOrderItemRepository extends JpaRepository<B2BSub
     Optional<B2BSubscriptionOrderItem> findByExternalId(String externalId);
     List<B2BSubscriptionOrderItem> findByB2bSubscriptionOrderId(Long b2bSubscriptionOrderId);
 }
+

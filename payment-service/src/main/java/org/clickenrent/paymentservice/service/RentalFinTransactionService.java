@@ -95,3 +95,4 @@ public class RentalFinTransactionService {
         rentalFinTransactionRepository.deleteById(id);
     }
 }
+

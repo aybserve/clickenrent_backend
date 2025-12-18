@@ -17,3 +17,4 @@ public interface B2BSubscriptionItemRepository extends JpaRepository<B2BSubscrip
     List<B2BSubscriptionItem> findByB2bSubscription(B2BSubscription b2bSubscription);
     List<B2BSubscriptionItem> findByProductId(Long productId);
 }
+

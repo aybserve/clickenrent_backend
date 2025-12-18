@@ -119,3 +119,4 @@ class BikeTypeServiceTest {
         verify(bikeTypeRepository, times(1)).delete(testType);
     }
 }
+

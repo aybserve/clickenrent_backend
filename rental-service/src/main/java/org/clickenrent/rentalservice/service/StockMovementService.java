@@ -94,3 +94,4 @@ public class StockMovementService {
         stockMovementRepository.delete(stockMovement);
     }
 }
+

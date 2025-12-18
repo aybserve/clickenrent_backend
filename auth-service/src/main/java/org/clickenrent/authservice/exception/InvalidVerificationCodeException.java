@@ -20,3 +20,4 @@ public class InvalidVerificationCodeException extends RuntimeException {
         this.attemptsRemaining = 0;
     }
 }
+

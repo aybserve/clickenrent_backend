@@ -35,3 +35,4 @@ public class ChargingStationStatusController {
         return ResponseEntity.ok(chargingStationStatusService.getStatusById(id));
     }
 }
+

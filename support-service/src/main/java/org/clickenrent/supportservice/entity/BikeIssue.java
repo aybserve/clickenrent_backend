@@ -57,3 +57,4 @@ public class BikeIssue extends BaseAuditEntity {
     @JoinColumn(name = "responsible_person_id")
     private ResponsiblePerson responsiblePerson;
 }
+

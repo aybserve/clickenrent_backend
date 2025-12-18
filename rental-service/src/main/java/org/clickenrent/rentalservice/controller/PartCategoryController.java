@@ -62,3 +62,4 @@ public class PartCategoryController {
         return ResponseEntity.noContent().build();
     }
 }
+

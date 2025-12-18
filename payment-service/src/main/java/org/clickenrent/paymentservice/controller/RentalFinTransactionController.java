@@ -58,3 +58,4 @@ public class RentalFinTransactionController {
         return ResponseEntity.noContent().build();
     }
 }
+

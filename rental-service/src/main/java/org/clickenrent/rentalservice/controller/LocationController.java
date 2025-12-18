@@ -163,3 +163,4 @@ public class LocationController {
         return ResponseEntity.noContent().build();
     }
 }
+

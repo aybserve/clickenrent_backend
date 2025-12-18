@@ -88,3 +88,4 @@ public class ErrorCodeService {
         errorCodeRepository.delete(entity);
     }
 }
+

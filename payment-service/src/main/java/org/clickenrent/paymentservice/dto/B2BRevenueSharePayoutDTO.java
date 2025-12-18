@@ -50,3 +50,4 @@ public class B2BRevenueSharePayoutDTO {
     @Builder.Default
     private List<B2BRevenueSharePayoutItemDTO> payoutItems = new ArrayList<>();
 }
+

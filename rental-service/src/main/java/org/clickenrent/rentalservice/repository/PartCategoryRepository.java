@@ -13,3 +13,4 @@ import java.util.Optional;
 public interface PartCategoryRepository extends JpaRepository<PartCategory, Long> {
     Optional<PartCategory> findByExternalId(String externalId);
 }
+

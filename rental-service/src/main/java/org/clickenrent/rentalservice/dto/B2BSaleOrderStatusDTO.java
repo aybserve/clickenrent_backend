@@ -17,3 +17,4 @@ public class B2BSaleOrderStatusDTO {
     private Long id;
     private String name;
 }
+

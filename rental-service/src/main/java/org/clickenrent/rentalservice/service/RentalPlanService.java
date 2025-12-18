@@ -88,3 +88,4 @@ public class RentalPlanService {
         rentalPlanRepository.delete(rentalPlan);
     }
 }
+

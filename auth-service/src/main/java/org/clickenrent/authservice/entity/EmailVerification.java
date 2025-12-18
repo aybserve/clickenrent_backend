@@ -68,3 +68,4 @@ public class EmailVerification extends BaseAuditEntity {
     @Column(name = "used_at")
     private LocalDateTime usedAt;
 }
+

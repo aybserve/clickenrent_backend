@@ -41,3 +41,4 @@ public class UserLocation {
     @JoinColumn(name = "location_role_id", nullable = false)
     private LocationRole locationRole;
 }
+

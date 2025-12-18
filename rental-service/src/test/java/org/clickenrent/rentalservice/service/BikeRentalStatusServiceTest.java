@@ -82,3 +82,4 @@ class BikeRentalStatusServiceTest {
         assertThrows(ResourceNotFoundException.class, () -> bikeRentalStatusService.getStatusById(999L));
     }
 }
+

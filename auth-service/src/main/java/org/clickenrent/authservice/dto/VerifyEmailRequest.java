@@ -25,3 +25,4 @@ public class VerifyEmailRequest {
     @Size(min = 6, max = 6, message = "Verification code must be 6 digits")
     private String code;
 }
+

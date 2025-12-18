@@ -58,3 +58,4 @@ public class Feedback extends BaseAuditEntity {
     @Column(name = "date_time", nullable = false)
     private LocalDateTime dateTime;
 }
+

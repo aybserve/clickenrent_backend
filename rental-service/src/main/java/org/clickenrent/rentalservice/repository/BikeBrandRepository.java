@@ -15,3 +15,4 @@ public interface BikeBrandRepository extends JpaRepository<BikeBrand, Long> {
     Optional<BikeBrand> findByExternalId(String externalId);
     List<BikeBrand> findByCompanyId(Long companyId);
 }
+

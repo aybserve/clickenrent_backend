@@ -13,3 +13,4 @@ import java.util.List;
 public interface ChargingStationBrandRepository extends JpaRepository<ChargingStationBrand, Long> {
     List<ChargingStationBrand> findByCompanyId(Long companyId);
 }
+

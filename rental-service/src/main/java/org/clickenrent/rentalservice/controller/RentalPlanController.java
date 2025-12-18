@@ -71,3 +71,4 @@ public class RentalPlanController {
         return ResponseEntity.noContent().build();
     }
 }
+

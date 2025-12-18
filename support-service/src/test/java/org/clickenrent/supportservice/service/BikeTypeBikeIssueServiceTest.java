@@ -192,3 +192,4 @@ class BikeTypeBikeIssueServiceTest {
         assertThrows(UnauthorizedException.class, () -> bikeTypeBikeIssueService.delete(1L));
     }
 }
+

@@ -121,3 +121,4 @@ public class RentalService {
         rentalRepository.delete(rental);
     }
 }
+

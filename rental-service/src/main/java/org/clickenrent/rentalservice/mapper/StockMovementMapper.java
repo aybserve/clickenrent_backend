@@ -51,3 +51,4 @@ public class StockMovementMapper {
         return builder.build();
     }
 }
+

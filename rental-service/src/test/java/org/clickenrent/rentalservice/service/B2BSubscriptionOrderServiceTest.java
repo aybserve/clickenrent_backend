@@ -145,3 +145,4 @@ class B2BSubscriptionOrderServiceTest {
         assertThrows(ResourceNotFoundException.class, () -> b2bSubscriptionOrderService.deleteOrder(999L));
     }
 }
+

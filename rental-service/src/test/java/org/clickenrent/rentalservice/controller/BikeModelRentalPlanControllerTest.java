@@ -99,3 +99,4 @@ class BikeModelRentalPlanControllerTest {
                 .andExpect(status().isNoContent());
     }
 }
+

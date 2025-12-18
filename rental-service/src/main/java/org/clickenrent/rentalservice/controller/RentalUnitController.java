@@ -52,3 +52,4 @@ public class RentalUnitController {
         return ResponseEntity.noContent().build();
     }
 }
+

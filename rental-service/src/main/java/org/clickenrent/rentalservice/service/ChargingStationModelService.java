@@ -69,3 +69,4 @@ public class ChargingStationModelService {
         chargingStationModelRepository.delete(model);
     }
 }
+

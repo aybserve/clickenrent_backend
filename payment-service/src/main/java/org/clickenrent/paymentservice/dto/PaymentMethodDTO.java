@@ -31,3 +31,4 @@ public class PaymentMethodDTO {
     @NotNull(message = "Active status is required")
     private Boolean isActive;
 }
+

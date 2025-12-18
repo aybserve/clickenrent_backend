@@ -13,3 +13,4 @@ import java.util.Optional;
 public interface ServiceProductRepository extends JpaRepository<ServiceProduct, Long> {
     Optional<ServiceProduct> findByExternalId(String externalId);
 }
+

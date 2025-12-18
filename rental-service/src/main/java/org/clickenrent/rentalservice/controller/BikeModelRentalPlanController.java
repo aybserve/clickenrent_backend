@@ -59,3 +59,4 @@ public class BikeModelRentalPlanController {
         return ResponseEntity.noContent().build();
     }
 }
+

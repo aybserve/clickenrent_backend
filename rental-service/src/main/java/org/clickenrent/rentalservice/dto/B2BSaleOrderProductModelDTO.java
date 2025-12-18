@@ -25,3 +25,4 @@ public class B2BSaleOrderProductModelDTO {
     private BigDecimal price;
     private BigDecimal totalPrice;
 }
+

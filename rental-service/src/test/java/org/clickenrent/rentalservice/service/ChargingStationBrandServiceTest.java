@@ -150,3 +150,4 @@ class ChargingStationBrandServiceTest {
         assertThrows(ResourceNotFoundException.class, () -> chargingStationBrandService.deleteBrand(999L));
     }
 }
+

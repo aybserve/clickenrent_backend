@@ -128,3 +128,4 @@ class BikeBrandServiceTest {
         verify(bikeBrandRepository, times(1)).delete(testBrand);
     }
 }
+

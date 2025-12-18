@@ -19,3 +19,4 @@ public class BikeBrandDTO {
     private String name;
     private Long companyId;
 }
+

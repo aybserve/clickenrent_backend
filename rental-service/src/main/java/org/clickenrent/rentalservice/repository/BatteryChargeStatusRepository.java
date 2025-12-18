@@ -13,3 +13,4 @@ import java.util.Optional;
 public interface BatteryChargeStatusRepository extends JpaRepository<BatteryChargeStatus, Long> {
     Optional<BatteryChargeStatus> findByName(String name);
 }
+

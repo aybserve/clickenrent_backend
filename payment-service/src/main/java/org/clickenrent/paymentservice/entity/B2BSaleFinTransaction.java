@@ -73,3 +73,4 @@ public class B2BSaleFinTransaction {
         return getClass().hashCode();
     }
 }
+

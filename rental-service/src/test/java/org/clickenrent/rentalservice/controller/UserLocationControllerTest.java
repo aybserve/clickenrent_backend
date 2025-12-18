@@ -89,3 +89,4 @@ class UserLocationControllerTest {
                 .andExpect(status().isNoContent());
     }
 }
+

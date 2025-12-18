@@ -215,3 +215,4 @@ class SupportRequestBikeIssueServiceTest {
         assertThrows(UnauthorizedException.class, () -> supportRequestBikeIssueService.delete(1L));
     }
 }
+

@@ -128,3 +128,4 @@ public class RideService {
         rideRepository.delete(ride);
     }
 }
+

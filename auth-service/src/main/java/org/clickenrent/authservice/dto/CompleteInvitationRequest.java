@@ -40,3 +40,4 @@ public class CompleteInvitationRequest {
     private Long languageId;
 }
 
+

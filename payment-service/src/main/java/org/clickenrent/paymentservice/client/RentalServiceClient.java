@@ -35,3 +35,4 @@ public interface RentalServiceClient {
     @GetMapping("/b2b-subscriptions/{id}/exists")
     Boolean checkB2BSubscriptionExists(@PathVariable("id") Long subscriptionId);
 }
+

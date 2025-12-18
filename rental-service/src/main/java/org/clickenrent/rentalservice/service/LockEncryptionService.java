@@ -146,3 +146,4 @@ public class LockEncryptionService {
         return tokenExpirationSeconds;
     }
 }
+

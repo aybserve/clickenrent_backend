@@ -85,3 +85,4 @@ class SupportRequestBikeIssueControllerTest {
                 .andExpect(status().isNoContent());
     }
 }
+

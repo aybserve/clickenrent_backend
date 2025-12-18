@@ -74,3 +74,4 @@ public class ResponsiblePersonService {
         responsiblePersonRepository.delete(entity);
     }
 }
+
