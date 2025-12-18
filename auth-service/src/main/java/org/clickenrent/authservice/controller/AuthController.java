@@ -141,6 +141,7 @@ public class AuthController {
      * Available to all roles: SUPERADMIN, ADMIN, B2B, CUSTOMER.
      */
     @GetMapping("/me")
+    @PreAuthorize("isAuthenticated()")
     @Operation(
             summary = "Get current user profile",
             description = "Returns the profile information of the currently authenticated user. Requires authentication."
@@ -166,6 +167,7 @@ public class AuthController {
      * Available to all roles: SUPERADMIN, ADMIN, B2B, CUSTOMER.
      */
     @PostMapping("/logout")
+    @PreAuthorize("isAuthenticated()")
     @Operation(
             summary = "Logout user",
             description = "Invalidates the current access token by blacklisting it. Requires authentication."
@@ -206,6 +208,12 @@ public class AuthController {
     })
     @SecurityRequirement(name = "") // No authentication required
     public ResponseEntity<VerifyEmailResponse> verifyEmail(@Valid @RequestBody VerifyEmailRequest request) {
+        System.out.println("===========================================");
+        System.out.println("=== AuthController.verifyEmail() CALLED");
+        System.out.println("=== Email: " + request.getEmail());
+        System.out.println("=== Code: " + request.getCode());
+        System.out.println("===========================================");
+        
         VerifyEmailResponse response = authService.verifyEmailAndGenerateTokens(
                 request.getEmail(), 
                 request.getCode()

@@ -28,6 +28,7 @@ public class EmailVerificationService {
     private final EmailVerificationRepository emailVerificationRepository;
     private final UserRepository userRepository;
     private final EmailService emailService;
+    private final AttemptTrackingService attemptTrackingService;
 
     @Value("${email.verification.code-length:6}")
     private int codeLength;
@@ -48,17 +49,31 @@ public class EmailVerificationService {
      */
     @Transactional
     public void generateAndSendCode(User user) {
+        log.debug("Starting generateAndSendCode for user ID: {}, email: {}", user.getId(), user.getEmail());
+        
         // Invalidate any existing unused codes for this user
         Optional<EmailVerification> existingVerification = 
                 emailVerificationRepository.findByUserIdAndIsUsedFalseAndIsDeletedFalse(user.getId());
         
-        existingVerification.ifPresent(verification -> {
-            verification.setIsDeleted(true);
-            emailVerificationRepository.save(verification);
-        });
+        if (existingVerification.isPresent()) {
+            log.debug("Found existing verification (ID: {}) for user ID: {}, soft-deleting it", 
+                    existingVerification.get().getId(), user.getId());
+            try {
+                // Use repository.delete() which triggers @SQLDelete annotation
+                emailVerificationRepository.delete(existingVerification.get());
+                log.debug("Successfully soft-deleted existing verification ID: {}", existingVerification.get().getId());
+            } catch (Exception e) {
+                log.error("Failed to soft-delete existing verification ID: {} for user ID: {}", 
+                        existingVerification.get().getId(), user.getId(), e);
+                throw e;
+            }
+        } else {
+            log.debug("No existing verification found for user ID: {}", user.getId());
+        }
 
         // Generate new 6-digit code
         String code = generateCode();
+        log.debug("Generated verification code for user ID: {}", user.getId());
 
         // Create new verification record
         EmailVerification verification = EmailVerification.builder()
@@ -70,7 +85,18 @@ public class EmailVerificationService {
                 .isUsed(false)
                 .build();
 
-        emailVerificationRepository.save(verification);
+        log.debug("Attempting to save new verification record for user ID: {}, email: {}", 
+                user.getId(), user.getEmail());
+        
+        try {
+            emailVerificationRepository.save(verification);
+            log.debug("Successfully saved verification record ID: {} for user ID: {}", 
+                    verification.getId(), user.getId());
+        } catch (Exception e) {
+            log.error("Failed to save verification record for user ID: {}, email: {}", 
+                    user.getId(), user.getEmail(), e);
+            throw e;
+        }
 
         // Send email with code
         emailService.sendVerificationEmail(user.getEmail(), code);
@@ -89,41 +115,97 @@ public class EmailVerificationService {
      */
     @Transactional
     public User verifyEmail(String email, String code) {
+        log.info("===========================================");
+        log.info("=== EmailVerificationService.verifyEmail() CALLED");
+        log.info("=== Email: {}", email);
+        log.info("=== Code: {}", code);
+        log.info("===========================================");
+        
         // Find user by email
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new ResourceNotFoundException("User", "email", email));
 
         // Check if already verified
         if (Boolean.TRUE.equals(user.getIsEmailVerified())) {
+            log.warn("Email verification attempted for already verified user: {}", email);
             throw new InvalidVerificationCodeException("Email is already verified");
         }
 
-        // Find active verification
+        // Find active verification BY EMAIL ONLY (not by code)
         EmailVerification verification = emailVerificationRepository
-                .findByEmailAndCodeAndIsUsedFalseAndIsDeletedFalse(email, code)
+                .findByEmailAndIsUsedFalseAndIsDeletedFalse(email)
                 .orElseThrow(() -> new InvalidVerificationCodeException(
-                        "Verification code is invalid or expired", 0));
+                        "No verification code found. Please request a new code.", 0));
+
+        log.info("=== FOUND verification record ID: {} for email: {}", verification.getId(), email);
+        log.info("=== Stored code: {}, Provided code: {}", verification.getCode(), code);
+        log.info("=== Current attempts: {}/{}", verification.getAttempts(), maxAttempts);
+        log.info("=== Codes match: {}", verification.getCode().equals(code));
 
         // Check if code is expired
         if (isCodeExpired(verification)) {
+            log.warn("Verification code expired for email: {}", email);
             throw new InvalidVerificationCodeException(
                     "Verification code has expired. Please request a new code.", 0);
         }
 
-        // Check if max attempts reached
+        // Check if max attempts reached BEFORE comparing codes
         if (verification.getAttempts() >= maxAttempts) {
+            log.warn("Max verification attempts ({}) reached for email: {}", maxAttempts, email);
             throw new InvalidVerificationCodeException(
                     "Too many failed attempts. Please request a new code.", 0);
         }
+
+        // Validate code format and compare with stored code
+        // We check AFTER loading verification so we can track ALL failed attempts
+        boolean codeIsValid = code != null && 
+                              code.length() == 6 && 
+                              code.matches("\\d{6}") && 
+                              verification.getCode().equals(code);
+        
+        if (!codeIsValid) {
+            // Determine specific error message
+            String errorMessage;
+            if (code == null || code.isEmpty()) {
+                errorMessage = "Verification code is required";
+            } else if (code.length() != 6) {
+                errorMessage = "Verification code must be exactly 6 digits (received " + code.length() + " characters)";
+            } else if (!code.matches("\\d{6}")) {
+                errorMessage = "Verification code must contain only digits";
+            } else {
+                errorMessage = "Invalid verification code. Please try again.";
+            }
+            
+            log.warn("Invalid verification code provided for email: {}, attempts: {}/{}, reason: {}", 
+                    email, verification.getAttempts() + 1, maxAttempts, errorMessage);
+            
+            // Increment failed attempts in a separate transaction
+            // This tracks ALL failed attempts, regardless of code format
+            Long verificationId = verification.getId();
+            int currentAttempts = verification.getAttempts();
+            
+            log.info("=== BEFORE calling attemptTrackingService.incrementAttempts() for verification ID: {}, current attempts: {}", 
+                    verificationId, currentAttempts);
+            attemptTrackingService.incrementAttempts(verificationId);
+            log.info("=== AFTER calling attemptTrackingService.incrementAttempts() for verification ID: {}", verificationId);
+            
+            // Calculate remaining attempts (current + 1 because we just incremented)
+            int remaining = Math.max(0, maxAttempts - (currentAttempts + 1));
+            throw new InvalidVerificationCodeException(errorMessage, remaining);
+        }
+
+        log.debug("Verification code matched for email: {}", email);
 
         // Code is valid - mark as used
         verification.setIsUsed(true);
         verification.setUsedAt(LocalDateTime.now());
         emailVerificationRepository.save(verification);
+        log.debug("Verification record marked as used for email: {}", email);
 
         // Update user email verification status
         user.setIsEmailVerified(true);
         user = userRepository.save(user);
+        log.debug("User email verification status updated for user: {}", user.getUserName());
 
         // Send welcome email
         emailService.sendWelcomeEmail(user.getEmail(), user.getFirstName());
@@ -158,13 +240,12 @@ public class EmailVerificationService {
 
     /**
      * Increment failed attempt counter.
+     * Delegates to AttemptTrackingService which uses REQUIRES_NEW propagation.
      * 
-     * @param verification Email verification record
+     * @param verificationId Email verification record ID
      */
-    @Transactional
-    public void incrementAttempts(EmailVerification verification) {
-        verification.setAttempts(verification.getAttempts() + 1);
-        emailVerificationRepository.save(verification);
+    public void incrementAttempts(Long verificationId) {
+        attemptTrackingService.incrementAttempts(verificationId);
     }
 
     /**

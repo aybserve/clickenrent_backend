@@ -1,6 +1,7 @@
 package org.clickenrent.authservice.exception;
 
 import jakarta.validation.ConstraintViolationException;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,6 +22,7 @@ import java.util.stream.Collectors;
  * Global exception handler for all REST controllers.
  * Provides consistent error responses across the application.
  */
+@Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
@@ -176,9 +178,36 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleDataIntegrityViolationException(
             DataIntegrityViolationException ex, WebRequest request) {
         
+        // Log detailed error information for debugging
+        log.error("DataIntegrityViolationException occurred at path: {}", 
+                request.getDescription(false).replace("uri=", ""));
+        log.error("Exception message: {}", ex.getMessage());
+        log.error("Root cause: {}", ex.getRootCause() != null ? ex.getRootCause().getMessage() : "None");
+        log.error("Full stack trace:", ex);
+        
         String message = "Database constraint violation";
-        if (ex.getMessage().contains("unique") || ex.getMessage().contains("duplicate")) {
+        String details = null;
+        
+        // Extract more specific error information
+        String exceptionMessage = ex.getMessage() != null ? ex.getMessage().toLowerCase() : "";
+        String rootCauseMessage = ex.getRootCause() != null && ex.getRootCause().getMessage() != null 
+                ? ex.getRootCause().getMessage().toLowerCase() : "";
+        
+        if (exceptionMessage.contains("unique") || exceptionMessage.contains("duplicate") ||
+            rootCauseMessage.contains("unique") || rootCauseMessage.contains("duplicate")) {
             message = "Resource already exists with the provided unique field(s)";
+        } else if (exceptionMessage.contains("foreign key") || rootCauseMessage.contains("foreign key")) {
+            message = "Foreign key constraint violation - referenced entity does not exist";
+            details = "Please ensure all referenced entities exist before creating this record";
+        } else if (exceptionMessage.contains("not-null") || rootCauseMessage.contains("not-null") ||
+                   exceptionMessage.contains("null value") || rootCauseMessage.contains("null value")) {
+            message = "Required field is missing (NOT NULL constraint violation)";
+            details = "Please provide all required fields";
+        }
+        
+        // Include root cause message in details if available and not already set
+        if (details == null && ex.getRootCause() != null && ex.getRootCause().getMessage() != null) {
+            details = ex.getRootCause().getMessage();
         }
         
         ErrorResponse errorResponse = ErrorResponse.builder()
@@ -187,6 +216,7 @@ public class GlobalExceptionHandler {
                 .error(HttpStatus.CONFLICT.getReasonPhrase())
                 .message(message)
                 .path(request.getDescription(false).replace("uri=", ""))
+                .details(details != null ? List.of(details) : null)
                 .build();
         
         return new ResponseEntity<>(errorResponse, HttpStatus.CONFLICT);
@@ -195,6 +225,13 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleGlobalException(
             Exception ex, WebRequest request) {
+        
+        // Log detailed error information for debugging
+        log.error("Unhandled exception occurred at path: {}", 
+                request.getDescription(false).replace("uri=", ""));
+        log.error("Exception type: {}", ex.getClass().getName());
+        log.error("Exception message: {}", ex.getMessage());
+        log.error("Full stack trace:", ex);
         
         ErrorResponse errorResponse = ErrorResponse.builder()
                 .timestamp(LocalDateTime.now())

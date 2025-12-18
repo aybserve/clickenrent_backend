@@ -1,6 +1,7 @@
 package org.clickenrent.authservice.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.clickenrent.authservice.dto.*;
 import org.clickenrent.authservice.entity.GlobalRole;
 import org.clickenrent.authservice.entity.Language;
@@ -34,6 +35,7 @@ import java.util.stream.Collectors;
  * Service for handling authentication operations.
  * Includes registration, login, token refresh, and logout.
  */
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class AuthService {
@@ -293,28 +295,59 @@ public class AuthService {
      */
     @Transactional
     public VerifyEmailResponse verifyEmailAndGenerateTokens(String email, String code) {
-        // Delegate to EmailVerificationService for verification
-        User user = emailVerificationService.verifyEmail(email, code);
+        System.out.println("===========================================");
+        System.out.println("=== AuthService.verifyEmailAndGenerateTokens() CALLED");
+        System.out.println("=== Email: " + email);
+        System.out.println("=== Code: " + code);
+        System.out.println("===========================================");
         
-        // Generate new tokens with updated user info
-        UserDetails userDetails = userDetailsService.loadUserByUsername(user.getUserName());
-        
-        Map<String, Object> claims = new HashMap<>();
-        claims.put("userId", user.getId());
-        claims.put("email", user.getEmail());
-        claims.put("roles", userDetails.getAuthorities().stream()
-                .map(GrantedAuthority::getAuthority)
-                .collect(Collectors.toList()));
-        
-        String accessToken = jwtService.generateToken(claims, userDetails);
-        String refreshToken = jwtService.generateRefreshToken(userDetails);
-        
-        return VerifyEmailResponse.builder()
-                .verified(true)
-                .accessToken(accessToken)
-                .refreshToken(refreshToken)
-                .user(userMapper.toDto(user))
-                .build();
+        try {
+            // Delegate to EmailVerificationService for verification
+            System.out.println("=== About to call emailVerificationService.verifyEmail()");
+            User user = emailVerificationService.verifyEmail(email, code);
+            System.out.println("=== emailVerificationService.verifyEmail() returned successfully");
+            log.debug("Email verified successfully for user ID: {}, username: {}", user.getId(), user.getUserName());
+            
+            // Generate new tokens with updated user info
+            log.debug("Loading user details for username: {}", user.getUserName());
+            UserDetails userDetails = userDetailsService.loadUserByUsername(user.getUserName());
+            log.debug("User details loaded successfully, authorities count: {}", 
+                    userDetails.getAuthorities() != null ? userDetails.getAuthorities().size() : 0);
+            
+            log.debug("Building JWT claims");
+            Map<String, Object> claims = new HashMap<>();
+            claims.put("userId", user.getId());
+            claims.put("email", user.getEmail());
+            claims.put("roles", userDetails.getAuthorities().stream()
+                    .map(GrantedAuthority::getAuthority)
+                    .collect(Collectors.toList()));
+            log.debug("JWT claims built: userId={}, email={}, roles={}", 
+                    user.getId(), user.getEmail(), claims.get("roles"));
+            
+            log.debug("Generating access token");
+            String accessToken = jwtService.generateToken(claims, userDetails);
+            log.debug("Access token generated successfully");
+            
+            log.debug("Generating refresh token");
+            String refreshToken = jwtService.generateRefreshToken(userDetails);
+            log.debug("Refresh token generated successfully");
+            
+            log.debug("Mapping user to DTO");
+            UserDTO userDto = userMapper.toDto(user);
+            log.debug("User mapped to DTO successfully");
+            
+            log.info("Email verification completed successfully for user: {} ({})", user.getUserName(), user.getEmail());
+            
+            return VerifyEmailResponse.builder()
+                    .verified(true)
+                    .accessToken(accessToken)
+                    .refreshToken(refreshToken)
+                    .user(userDto)
+                    .build();
+        } catch (Exception e) {
+            log.error("Error during email verification for email: {}", email, e);
+            throw e;
+        }
     }
 }
 

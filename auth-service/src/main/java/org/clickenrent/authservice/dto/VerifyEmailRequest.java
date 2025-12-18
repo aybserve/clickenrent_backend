@@ -2,7 +2,6 @@ package org.clickenrent.authservice.dto;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -22,7 +21,7 @@ public class VerifyEmailRequest {
     private String email;
 
     @NotBlank(message = "Verification code is required")
-    @Size(min = 6, max = 6, message = "Verification code must be 6 digits")
+    // Removed @Size validation - we want to track attempts even for invalid lengths
     private String code;
 }
 
