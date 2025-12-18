@@ -26,3 +26,4 @@ public class ResponsiblePersonDTO {
     private String lastModifiedBy;
 }
 
+

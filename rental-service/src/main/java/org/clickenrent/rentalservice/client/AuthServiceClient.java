@@ -26,3 +26,4 @@ public interface AuthServiceClient {
     CompanyDTO getCompanyById(@PathVariable("id") Long id);
 }
 
+

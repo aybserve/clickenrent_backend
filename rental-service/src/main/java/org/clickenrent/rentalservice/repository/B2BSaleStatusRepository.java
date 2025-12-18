@@ -14,3 +14,4 @@ public interface B2BSaleStatusRepository extends JpaRepository<B2BSaleStatus, Lo
     Optional<B2BSaleStatus> findByName(String name);
 }
 
+

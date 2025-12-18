@@ -17,3 +17,4 @@ public interface RideRepository extends JpaRepository<Ride, Long> {
     List<Ride> findByBikeRental(BikeRental bikeRental);
 }
 
+

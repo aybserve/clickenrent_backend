@@ -36,3 +36,4 @@ public interface RentalServiceClient {
     Boolean checkB2BSubscriptionExists(@PathVariable("id") Long subscriptionId);
 }
 
+

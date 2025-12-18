@@ -30,3 +30,4 @@ public class B2BSaleStatus {
     private String name;
 }
 
+

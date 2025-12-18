@@ -64,3 +64,4 @@ public class B2BSubscriptionOrderItem extends BaseAuditEntity {
     private BigDecimal totalPrice;
 }
 
+

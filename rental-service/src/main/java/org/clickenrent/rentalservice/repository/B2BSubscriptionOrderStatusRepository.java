@@ -14,3 +14,4 @@ public interface B2BSubscriptionOrderStatusRepository extends JpaRepository<B2BS
     Optional<B2BSubscriptionOrderStatus> findByName(String name);
 }
 
+

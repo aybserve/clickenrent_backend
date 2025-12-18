@@ -55,3 +55,4 @@ public class B2BSubscriptionOrder extends BaseAuditEntity {
     private B2BSubscription b2bSubscription;
 }
 
+

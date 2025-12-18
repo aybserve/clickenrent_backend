@@ -22,3 +22,4 @@ public interface BikeIssueRepository extends JpaRepository<BikeIssue, Long> {
     List<BikeIssue> findByResponsiblePersonId(Long responsiblePersonId);
 }
 
+

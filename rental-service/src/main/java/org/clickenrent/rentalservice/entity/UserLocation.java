@@ -42,3 +42,4 @@ public class UserLocation {
     private LocationRole locationRole;
 }
 
+

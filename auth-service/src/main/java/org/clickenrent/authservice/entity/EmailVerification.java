@@ -69,3 +69,4 @@ public class EmailVerification extends BaseAuditEntity {
     private LocalDateTime usedAt;
 }
 
+

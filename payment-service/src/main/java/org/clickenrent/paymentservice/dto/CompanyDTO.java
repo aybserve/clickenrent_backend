@@ -20,3 +20,4 @@ public class CompanyDTO {
     private String vatNumber;
 }
 
+

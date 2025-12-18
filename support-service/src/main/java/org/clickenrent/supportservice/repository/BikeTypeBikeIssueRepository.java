@@ -20,3 +20,4 @@ public interface BikeTypeBikeIssueRepository extends JpaRepository<BikeTypeBikeI
     Optional<BikeTypeBikeIssue> findByBikeTypeIdAndBikeIssueId(Long bikeTypeId, Long bikeIssueId);
 }
 
+

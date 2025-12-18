@@ -17,3 +17,4 @@ public interface HubImageRepository extends JpaRepository<HubImage, Long> {
     List<HubImage> findByHub(Hub hub);
 }
 
+

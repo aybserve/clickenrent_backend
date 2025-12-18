@@ -14,3 +14,4 @@ public interface B2BSubscriptionStatusRepository extends JpaRepository<B2BSubscr
     Optional<B2BSubscriptionStatus> findByName(String name);
 }
 
+

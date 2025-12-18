@@ -64,3 +64,4 @@ public class B2BSaleOrderProductModel extends BaseAuditEntity {
     private BigDecimal totalPrice;
 }
 
+

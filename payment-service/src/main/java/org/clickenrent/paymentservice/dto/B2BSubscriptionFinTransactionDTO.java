@@ -28,3 +28,4 @@ public class B2BSubscriptionFinTransactionDTO {
     private FinancialTransactionDTO financialTransaction;
 }
 
+

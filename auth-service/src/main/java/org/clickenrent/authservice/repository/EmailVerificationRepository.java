@@ -36,3 +36,4 @@ public interface EmailVerificationRepository extends JpaRepository<EmailVerifica
     Optional<EmailVerification> findByEmailAndIsUsedFalseAndIsDeletedFalse(String email);
 }
 
+

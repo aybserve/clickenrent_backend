@@ -18,3 +18,4 @@ public class B2BSubscriptionDTO {
     private String externalId;
 }
 
+

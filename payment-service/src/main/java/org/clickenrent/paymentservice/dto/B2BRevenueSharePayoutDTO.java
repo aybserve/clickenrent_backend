@@ -51,3 +51,4 @@ public class B2BRevenueSharePayoutDTO {
     private List<B2BRevenueSharePayoutItemDTO> payoutItems = new ArrayList<>();
 }
 
+

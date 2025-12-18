@@ -229,3 +229,4 @@ SELECT setval('address_id_seq', (SELECT MAX(id) FROM address));
 SELECT setval('user_address_id_seq', (SELECT MAX(id) FROM user_address));
 SELECT setval('invitation_id_seq', (SELECT MAX(id) FROM invitation));
 
+

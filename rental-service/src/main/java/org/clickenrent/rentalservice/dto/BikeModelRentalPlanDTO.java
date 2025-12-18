@@ -22,3 +22,4 @@ public class BikeModelRentalPlanDTO {
     private BigDecimal price;
 }
 
+

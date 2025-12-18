@@ -69,3 +69,4 @@ public class ErrorCode extends BaseAuditEntity {
     private Boolean isFixableByClient = false;
 }
 
+

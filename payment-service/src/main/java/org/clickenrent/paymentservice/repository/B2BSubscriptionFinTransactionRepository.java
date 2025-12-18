@@ -18,3 +18,4 @@ public interface B2BSubscriptionFinTransactionRepository extends JpaRepository<B
     Optional<B2BSubscriptionFinTransaction> findByExternalId(UUID externalId);
 }
 
+

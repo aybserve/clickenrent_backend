@@ -198,3 +198,4 @@ VALUES (7, 1, 'Power cycle the bike (turn off and on)', 3, 1, false, CURRENT_TIM
 INSERT INTO support_request_guide_item (id, item_index, description, bike_issue_id, support_request_status_id, is_deleted, created_at, updated_at, created_by, last_modified_by)
 VALUES (8, 2, 'Check for error codes on display', 3, 1, false, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system');
 
+

@@ -11,3 +11,4 @@ import org.springframework.stereotype.Repository;
 public interface CoordinatesRepository extends JpaRepository<Coordinates, Long> {
 }
 
+

@@ -17,3 +17,4 @@ public interface BikeModelRentalPlanRepository extends JpaRepository<BikeModelRe
     List<BikeModelRentalPlan> findByRentalPlan(RentalPlan rentalPlan);
 }
 
+

@@ -30,3 +30,4 @@ public class BatteryChargeStatus {
     private String name;
 }
 
+

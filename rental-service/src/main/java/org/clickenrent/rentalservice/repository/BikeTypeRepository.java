@@ -14,3 +14,4 @@ public interface BikeTypeRepository extends JpaRepository<BikeType, Long> {
     Optional<BikeType> findByName(String name);
 }
 
+

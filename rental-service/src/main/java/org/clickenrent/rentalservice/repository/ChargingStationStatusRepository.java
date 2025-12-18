@@ -14,3 +14,4 @@ public interface ChargingStationStatusRepository extends JpaRepository<ChargingS
     Optional<ChargingStationStatus> findByName(String name);
 }
 
+

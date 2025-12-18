@@ -15,3 +15,4 @@ public interface BikeRepository extends JpaRepository<Bike, Long> {
     Optional<Bike> findByCode(String code);
 }
 
+

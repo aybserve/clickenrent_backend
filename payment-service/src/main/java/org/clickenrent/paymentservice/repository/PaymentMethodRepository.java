@@ -21,3 +21,4 @@ public interface PaymentMethodRepository extends JpaRepository<PaymentMethod, Lo
     Optional<PaymentMethod> findByExternalId(UUID externalId);
 }
 
+

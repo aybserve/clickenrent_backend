@@ -24,3 +24,4 @@ public class StockMovementDTO {
     private LocalDateTime dateTime;
 }
 
+

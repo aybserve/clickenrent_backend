@@ -17,3 +17,4 @@ public interface LocationRepository extends JpaRepository<Location, Long> {
     Optional<Location> findByErpPartnerId(String erpPartnerId);
 }
 
+

@@ -22,3 +22,4 @@ public class HubDTO {
     private Long coordinatesId;
 }
 
+

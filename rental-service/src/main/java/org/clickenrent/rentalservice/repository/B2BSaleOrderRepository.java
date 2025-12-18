@@ -17,3 +17,4 @@ public interface B2BSaleOrderRepository extends JpaRepository<B2BSaleOrder, Long
     List<B2BSaleOrder> findByBuyerCompanyId(Long buyerCompanyId);
 }
 
+

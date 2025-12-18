@@ -14,3 +14,4 @@ public interface BikeRentalStatusRepository extends JpaRepository<BikeRentalStat
     Optional<BikeRentalStatus> findByName(String name);
 }
 
+

@@ -14,3 +14,4 @@ public interface ChargingStationRepository extends JpaRepository<ChargingStation
     Optional<ChargingStation> findByExternalId(String externalId);
 }
 
+

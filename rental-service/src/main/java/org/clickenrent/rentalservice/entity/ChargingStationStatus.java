@@ -30,3 +30,4 @@ public class ChargingStationStatus {
     private String name;
 }
 
+

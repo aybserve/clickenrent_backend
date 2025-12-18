@@ -15,3 +15,4 @@ public interface LockRepository extends JpaRepository<Lock, Long> {
     Optional<Lock> findByMacAddress(String macAddress);
 }
 
+

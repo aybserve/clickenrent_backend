@@ -33,3 +33,4 @@ public class B2BRevenueSharePayoutItemDTO {
     private BigDecimal amount;
 }
 
+

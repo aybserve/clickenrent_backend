@@ -14,3 +14,4 @@ public interface ChargingStationBrandRepository extends JpaRepository<ChargingSt
     List<ChargingStationBrand> findByCompanyId(Long companyId);
 }
 
+

@@ -18,3 +18,4 @@ public class B2BSaleDTO {
     private String externalId;
 }
 
+

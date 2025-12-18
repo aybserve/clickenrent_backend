@@ -45,3 +45,4 @@ public class BikePart extends BaseAuditEntity {
     private Part part;
 }
 
+

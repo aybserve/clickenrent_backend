@@ -14,3 +14,4 @@ public interface ServiceProductRepository extends JpaRepository<ServiceProduct, 
     Optional<ServiceProduct> findByExternalId(String externalId);
 }
 
+

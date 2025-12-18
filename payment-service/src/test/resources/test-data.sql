@@ -155,3 +155,4 @@ VALUES (3, '550e8400-e29b-41d4-a716-446655440113', 2, 1, 125.00, CURRENT_TIMESTA
 INSERT INTO payout_fin_transactions (id, external_id, b2b_revenue_share_payout_id, financial_transaction_id, created_at, updated_at, created_by, last_modified_by)
 VALUES (1, '550e8400-e29b-41d4-a716-446655440121', 2, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system');
 
+

@@ -18,3 +18,4 @@ public interface RentalRepository extends JpaRepository<Rental, Long> {
     Optional<Rental> findByErpRentalOrderId(String erpRentalOrderId);
 }
 
+

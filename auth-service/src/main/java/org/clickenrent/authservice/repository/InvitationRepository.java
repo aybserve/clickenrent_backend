@@ -65,3 +65,4 @@ public interface InvitationRepository extends JpaRepository<Invitation, Long> {
 }
 
 
+

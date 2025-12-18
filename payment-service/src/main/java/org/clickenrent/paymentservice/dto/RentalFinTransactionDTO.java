@@ -28,3 +28,4 @@ public class RentalFinTransactionDTO {
     private FinancialTransactionDTO financialTransaction;
 }
 
+

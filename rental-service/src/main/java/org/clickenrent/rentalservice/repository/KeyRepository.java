@@ -17,3 +17,4 @@ public interface KeyRepository extends JpaRepository<Key, Long> {
     List<Key> findByLock(Lock lock);
 }
 
+

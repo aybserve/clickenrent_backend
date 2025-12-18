@@ -584,3 +584,4 @@ SELECT setval('payout_fin_transactions_id_seq', (SELECT COALESCE(MAX(id), 1) FRO
 -- Test data: Sample currencies, payment methods, users, and transactions
 -- =====================================================================================================================
 
+

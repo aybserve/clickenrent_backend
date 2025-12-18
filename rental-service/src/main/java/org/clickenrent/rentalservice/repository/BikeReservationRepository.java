@@ -18,3 +18,4 @@ public interface BikeReservationRepository extends JpaRepository<BikeReservation
     List<BikeReservation> findByBike(Bike bike);
 }
 
+

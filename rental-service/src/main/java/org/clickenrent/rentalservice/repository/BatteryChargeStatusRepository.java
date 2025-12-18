@@ -14,3 +14,4 @@ public interface BatteryChargeStatusRepository extends JpaRepository<BatteryChar
     Optional<BatteryChargeStatus> findByName(String name);
 }
 
+

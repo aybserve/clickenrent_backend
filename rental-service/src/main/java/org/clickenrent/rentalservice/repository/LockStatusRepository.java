@@ -11,3 +11,4 @@ public interface LockStatusRepository extends JpaRepository<LockStatus, Long> {
     Optional<LockStatus> findByName(String name);
 }
 
+

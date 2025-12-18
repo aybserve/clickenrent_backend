@@ -14,3 +14,4 @@ public interface LocationRoleRepository extends JpaRepository<LocationRole, Long
     Optional<LocationRole> findByName(String name);
 }
 
+
