@@ -7,7 +7,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.UUID;
 
 /**
  * DTO for PaymentMethod entity
@@ -20,7 +19,7 @@ public class PaymentMethodDTO {
     
     private Long id;
     
-    private UUID externalId;
+    private String externalId;
     
     @NotBlank(message = "Payment method code is required")
     private String code;

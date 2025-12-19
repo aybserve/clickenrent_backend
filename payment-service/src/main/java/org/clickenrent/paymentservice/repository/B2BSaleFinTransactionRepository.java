@@ -5,7 +5,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
-import java.util.UUID;
 
 /**
  * Repository for B2BSaleFinTransaction entity
@@ -15,7 +14,7 @@ public interface B2BSaleFinTransactionRepository extends JpaRepository<B2BSaleFi
     
     Optional<B2BSaleFinTransaction> findByB2bSaleId(Long b2bSaleId);
     
-    Optional<B2BSaleFinTransaction> findByExternalId(UUID externalId);
+    Optional<B2BSaleFinTransaction> findByExternalId(String externalId);
 }
 
 

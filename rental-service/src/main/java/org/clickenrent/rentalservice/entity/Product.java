@@ -6,6 +6,8 @@ import lombok.experimental.SuperBuilder;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
 
+import java.util.UUID;
+
 /**
  * Abstract base class for all product types.
  * Uses SINGLE_TABLE inheritance strategy for best performance.
@@ -42,5 +44,12 @@ public abstract class Product extends BaseAuditEntity {
     @Builder.Default
     @Column(name = "is_b2b_rentable", nullable = false)
     private Boolean isB2BRentable = false;
+
+    @PrePersist
+    public void prePersist() {
+        if (externalId == null || externalId.isEmpty()) {
+            externalId = UUID.randomUUID().toString();
+        }
+    }
 }
 

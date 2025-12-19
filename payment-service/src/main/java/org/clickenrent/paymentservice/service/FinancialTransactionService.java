@@ -2,6 +2,8 @@ package org.clickenrent.paymentservice.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.clickenrent.contracts.auth.UserDTO;
+import org.clickenrent.paymentservice.client.AuthServiceClient;
 import org.clickenrent.paymentservice.dto.FinancialTransactionDTO;
 import org.clickenrent.paymentservice.entity.FinancialTransaction;
 import org.clickenrent.paymentservice.exception.ResourceNotFoundException;
@@ -14,7 +16,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.List;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 /**
@@ -30,6 +31,7 @@ public class FinancialTransactionService {
     private final PaymentStatusRepository paymentStatusRepository;
     private final SecurityService securityService;
     private final StripeService stripeService;
+    private final AuthServiceClient authServiceClient;
 
     @Transactional(readOnly = true)
     public List<FinancialTransactionDTO> findAll() {
@@ -58,7 +60,7 @@ public class FinancialTransactionService {
     }
 
     @Transactional(readOnly = true)
-    public FinancialTransactionDTO findByExternalId(UUID externalId) {
+    public FinancialTransactionDTO findByExternalId(String externalId) {
         FinancialTransaction transaction = financialTransactionRepository.findByExternalId(externalId)
                 .orElseThrow(() -> new ResourceNotFoundException("FinancialTransaction", "externalId", externalId));
         
@@ -81,6 +83,32 @@ public class FinancialTransactionService {
     @Transactional
     public FinancialTransactionDTO create(FinancialTransactionDTO dto) {
         FinancialTransaction transaction = financialTransactionMapper.toEntity(dto);
+        
+        // DUAL-WRITE: Populate payer and recipient externalIds
+        if (dto.getPayerId() != null) {
+            try {
+                UserDTO payer = authServiceClient.getUserById(dto.getPayerId());
+                transaction.setPayerId(dto.getPayerId());
+                transaction.setPayerExternalId(payer.getExternalId());
+                log.debug("Populated payerExternalId: {} for transaction", payer.getExternalId());
+            } catch (Exception e) {
+                log.error("Failed to fetch payer external ID for payerId: {}", dto.getPayerId(), e);
+                throw new RuntimeException("Failed to fetch payer details", e);
+            }
+        }
+        
+        if (dto.getRecipientId() != null) {
+            try {
+                UserDTO recipient = authServiceClient.getUserById(dto.getRecipientId());
+                transaction.setRecipientId(dto.getRecipientId());
+                transaction.setRecipientExternalId(recipient.getExternalId());
+                log.debug("Populated recipientExternalId: {} for transaction", recipient.getExternalId());
+            } catch (Exception e) {
+                log.error("Failed to fetch recipient external ID for recipientId: {}", dto.getRecipientId(), e);
+                throw new RuntimeException("Failed to fetch recipient details", e);
+            }
+        }
+        
         FinancialTransaction savedTransaction = financialTransactionRepository.save(transaction);
         return financialTransactionMapper.toDTO(savedTransaction);
     }
@@ -211,6 +239,39 @@ public class FinancialTransactionService {
             throw new ResourceNotFoundException("FinancialTransaction", "id", id);
         }
         financialTransactionRepository.deleteById(id);
+    }
+
+    @Transactional
+    public FinancialTransactionDTO updateByExternalId(String externalId, FinancialTransactionDTO dto) {
+        FinancialTransaction transaction = financialTransactionRepository.findByExternalId(externalId)
+                .orElseThrow(() -> new ResourceNotFoundException("FinancialTransaction", "externalId", externalId));
+        
+        if (!securityService.isAdmin()) {
+            throw new UnauthorizedException("Only admins can update financial transactions");
+        }
+        
+        // Update only specific fields (financial transactions are sensitive)
+        if (dto.getPaymentStatus() != null) {
+            transaction.setPaymentStatus(financialTransactionMapper.toEntity(dto).getPaymentStatus());
+        }
+        
+        transaction = financialTransactionRepository.save(transaction);
+        log.info("Updated financial transaction by externalId: {}", externalId);
+        return financialTransactionMapper.toDTO(transaction);
+    }
+
+    @Transactional
+    public void deleteByExternalId(String externalId) {
+        FinancialTransaction transaction = financialTransactionRepository.findByExternalId(externalId)
+                .orElseThrow(() -> new ResourceNotFoundException("FinancialTransaction", "externalId", externalId));
+        
+        if (!securityService.isAdmin()) {
+            throw new UnauthorizedException("Only admins can delete financial transactions");
+        }
+        
+        financialTransactionRepository.delete(transaction);
+        log.warn("AUDIT: Financial transaction deleted by externalId: {} by user: {}", 
+                externalId, securityService.getCurrentUserId());
     }
 
     private void checkTransactionAccess(FinancialTransaction transaction) {

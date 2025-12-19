@@ -1,6 +1,7 @@
 package org.clickenrent.supportservice.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.clickenrent.supportservice.dto.BikeRentalFeedbackDTO;
 import org.clickenrent.supportservice.entity.BikeRentalFeedback;
 import org.clickenrent.supportservice.exception.ResourceNotFoundException;
@@ -16,6 +17,7 @@ import java.util.stream.Collectors;
 /**
  * Service for managing BikeRentalFeedback entities.
  */
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class BikeRentalFeedbackService {
@@ -31,8 +33,12 @@ public class BikeRentalFeedbackService {
                     .map(bikeRentalFeedbackMapper::toDto)
                     .collect(Collectors.toList());
         } else {
-            Long userId = securityService.getCurrentUserId();
-            return bikeRentalFeedbackRepository.findByUserId(userId).stream()
+            String userExternalId = securityService.getCurrentUserExternalId();
+            if (userExternalId == null) {
+                log.error("Failed to get current user external ID from JWT");
+                return List.of();
+            }
+            return bikeRentalFeedbackRepository.findByUserExternalId(userExternalId).stream()
                     .map(bikeRentalFeedbackMapper::toDto)
                     .collect(Collectors.toList());
         }
@@ -43,42 +49,56 @@ public class BikeRentalFeedbackService {
         BikeRentalFeedback entity = bikeRentalFeedbackRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("BikeRentalFeedback", "id", id));
         
-        if (!securityService.isAdmin() && !securityService.hasAccessToUser(entity.getUserId())) {
-            throw new UnauthorizedException("You don't have permission to access this feedback");
+        if (!securityService.isAdmin()) {
+            String currentUserExternalId = securityService.getCurrentUserExternalId();
+            if (currentUserExternalId == null || !currentUserExternalId.equals(entity.getUserExternalId())) {
+                throw new UnauthorizedException("You don't have permission to access this feedback");
+            }
         }
         
         return bikeRentalFeedbackMapper.toDto(entity);
     }
 
     @Transactional(readOnly = true)
-    public BikeRentalFeedbackDTO getByBikeRentalId(Long bikeRentalId) {
-        BikeRentalFeedback entity = bikeRentalFeedbackRepository.findByBikeRentalId(bikeRentalId)
-                .orElseThrow(() -> new ResourceNotFoundException("BikeRentalFeedback", "bikeRentalId", bikeRentalId));
+    public BikeRentalFeedbackDTO getByBikeRentalExternalId(String bikeRentalExternalId) {
+        BikeRentalFeedback entity = bikeRentalFeedbackRepository.findByBikeRentalExternalId(bikeRentalExternalId)
+                .orElseThrow(() -> new ResourceNotFoundException("BikeRentalFeedback", "bikeRentalExternalId", bikeRentalExternalId));
         
-        if (!securityService.isAdmin() && !securityService.hasAccessToUser(entity.getUserId())) {
-            throw new UnauthorizedException("You don't have permission to access this feedback");
+        if (!securityService.isAdmin()) {
+            String currentUserExternalId = securityService.getCurrentUserExternalId();
+            if (currentUserExternalId == null || !currentUserExternalId.equals(entity.getUserExternalId())) {
+                throw new UnauthorizedException("You don't have permission to access this feedback");
+            }
         }
         
         return bikeRentalFeedbackMapper.toDto(entity);
     }
 
     @Transactional(readOnly = true)
-    public List<BikeRentalFeedbackDTO> getByUserId(Long userId) {
-        if (!securityService.isAdmin() && !securityService.hasAccessToUser(userId)) {
-            throw new UnauthorizedException("You don't have permission to access this user's feedback");
+    public List<BikeRentalFeedbackDTO> getByUserExternalId(String userExternalId) {
+        if (!securityService.isAdmin()) {
+            String currentUserExternalId = securityService.getCurrentUserExternalId();
+            if (currentUserExternalId == null || !currentUserExternalId.equals(userExternalId)) {
+                throw new UnauthorizedException("You don't have permission to access this user's feedback");
+            }
         }
         
-        return bikeRentalFeedbackRepository.findByUserId(userId).stream()
+        return bikeRentalFeedbackRepository.findByUserExternalId(userExternalId).stream()
                 .map(bikeRentalFeedbackMapper::toDto)
                 .collect(Collectors.toList());
     }
 
     @Transactional
     public BikeRentalFeedbackDTO create(BikeRentalFeedbackDTO dto) {
-        Long currentUserId = securityService.getCurrentUserId();
-        if (dto.getUserId() == null) {
-            dto.setUserId(currentUserId);
-        } else if (!securityService.isAdmin() && !currentUserId.equals(dto.getUserId())) {
+        String currentUserExternalId = securityService.getCurrentUserExternalId();
+        if (currentUserExternalId == null) {
+            throw new RuntimeException("Failed to get current user external ID from JWT");
+        }
+        
+        // Set userExternalId if not provided or verify if provided
+        if (dto.getUserExternalId() == null) {
+            dto.setUserExternalId(currentUserExternalId);
+        } else if (!securityService.isAdmin() && !currentUserExternalId.equals(dto.getUserExternalId())) {
             throw new UnauthorizedException("You can only create feedback for yourself");
         }
 
@@ -92,8 +112,11 @@ public class BikeRentalFeedbackService {
         BikeRentalFeedback entity = bikeRentalFeedbackRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("BikeRentalFeedback", "id", id));
 
-        if (!securityService.isAdmin() && !securityService.hasAccessToUser(entity.getUserId())) {
-            throw new UnauthorizedException("You don't have permission to update this feedback");
+        if (!securityService.isAdmin()) {
+            String currentUserExternalId = securityService.getCurrentUserExternalId();
+            if (currentUserExternalId == null || !currentUserExternalId.equals(entity.getUserExternalId())) {
+                throw new UnauthorizedException("You don't have permission to update this feedback");
+            }
         }
 
         bikeRentalFeedbackMapper.updateEntityFromDto(dto, entity);
@@ -106,8 +129,11 @@ public class BikeRentalFeedbackService {
         BikeRentalFeedback entity = bikeRentalFeedbackRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("BikeRentalFeedback", "id", id));
 
-        if (!securityService.isAdmin() && !securityService.hasAccessToUser(entity.getUserId())) {
-            throw new UnauthorizedException("You don't have permission to delete this feedback");
+        if (!securityService.isAdmin()) {
+            String currentUserExternalId = securityService.getCurrentUserExternalId();
+            if (currentUserExternalId == null || !currentUserExternalId.equals(entity.getUserExternalId())) {
+                throw new UnauthorizedException("You don't have permission to delete this feedback");
+            }
         }
 
         bikeRentalFeedbackRepository.delete(entity);

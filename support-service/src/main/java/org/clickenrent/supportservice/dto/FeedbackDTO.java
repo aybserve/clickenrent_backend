@@ -18,10 +18,12 @@ public class FeedbackDTO {
 
     private Long id;
     private String externalId;
-    private Long userId;
     private Integer rate;
     private String comment;
     private LocalDateTime dateTime;
+
+    // Cross-service externalId reference
+    private String userExternalId;
 
     // Audit fields
     private LocalDateTime dateCreated;

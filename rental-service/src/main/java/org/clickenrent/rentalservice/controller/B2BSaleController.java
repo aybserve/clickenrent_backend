@@ -49,6 +49,28 @@ public class B2BSaleController {
         return ResponseEntity.ok(b2bSaleService.getSaleById(id));
     }
 
+    @GetMapping("/{id}/exists")
+    @PreAuthorize("isAuthenticated()")
+    @Operation(summary = "Check if B2B sale exists by ID")
+    public ResponseEntity<Boolean> checkSaleExists(@PathVariable Long id) {
+        boolean exists = b2bSaleService.getSaleById(id) != null;
+        return ResponseEntity.ok(exists);
+    }
+
+    @GetMapping("/external/{externalId}")
+    @PreAuthorize("hasAnyRole('SUPERADMIN', 'ADMIN', 'B2B')")
+    @Operation(summary = "Get B2B sale by external ID")
+    public ResponseEntity<B2BSaleDTO> getSaleByExternalId(@PathVariable String externalId) {
+        return ResponseEntity.ok(b2bSaleService.findByExternalId(externalId));
+    }
+
+    @GetMapping("/external/{externalId}/exists")
+    @PreAuthorize("isAuthenticated()")
+    @Operation(summary = "Check if B2B sale exists by external ID")
+    public ResponseEntity<Boolean> checkSaleExistsByExternalId(@PathVariable String externalId) {
+        return ResponseEntity.ok(b2bSaleService.existsByExternalId(externalId));
+    }
+
     @PostMapping
     @PreAuthorize("hasAnyRole('SUPERADMIN', 'ADMIN', 'B2B')")
     @Operation(summary = "Create B2B sale")

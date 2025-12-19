@@ -46,8 +46,8 @@ public class ErrorCodeService {
     }
 
     @Transactional(readOnly = true)
-    public List<ErrorCodeDTO> getByBikeEngineId(Long bikeEngineId) {
-        return errorCodeRepository.findByBikeEngineId(bikeEngineId).stream()
+    public List<ErrorCodeDTO> getByBikeEngineExternalId(String bikeEngineExternalId) {
+        return errorCodeRepository.findByBikeEngineExternalId(bikeEngineExternalId).stream()
                 .map(errorCodeMapper::toDto)
                 .collect(Collectors.toList());
     }

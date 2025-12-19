@@ -19,7 +19,7 @@ public class ErrorCodeMapper {
                 .id(entity.getId())
                 .externalId(entity.getExternalId())
                 .name(entity.getName())
-                .bikeEngineId(entity.getBikeEngineId())
+                .bikeEngineExternalId(entity.getBikeEngineExternalId())
                 .description(entity.getDescription())
                 .commonCause(entity.getCommonCause())
                 .diagnosticSteps(entity.getDiagnosticSteps())
@@ -42,7 +42,7 @@ public class ErrorCodeMapper {
                 .id(dto.getId())
                 .externalId(dto.getExternalId())
                 .name(dto.getName())
-                .bikeEngineId(dto.getBikeEngineId())
+                .bikeEngineExternalId(dto.getBikeEngineExternalId())
                 .description(dto.getDescription())
                 .commonCause(dto.getCommonCause())
                 .diagnosticSteps(dto.getDiagnosticSteps())
@@ -60,8 +60,8 @@ public class ErrorCodeMapper {
         if (dto.getName() != null) {
             entity.setName(dto.getName());
         }
-        if (dto.getBikeEngineId() != null) {
-            entity.setBikeEngineId(dto.getBikeEngineId());
+        if (dto.getBikeEngineExternalId() != null) {
+            entity.setBikeEngineExternalId(dto.getBikeEngineExternalId());
         }
         if (dto.getDescription() != null) {
             entity.setDescription(dto.getDescription());

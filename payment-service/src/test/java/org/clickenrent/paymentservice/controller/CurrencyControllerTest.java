@@ -47,7 +47,7 @@ class CurrencyControllerTest {
     void setUp() {
         currencyDTO = CurrencyDTO.builder()
                 .id(1L)
-                .externalId(UUID.randomUUID())
+                .externalId(UUID.randomUUID().toString())
                 .code("USD")
                 .name("US Dollar")
                 .build();

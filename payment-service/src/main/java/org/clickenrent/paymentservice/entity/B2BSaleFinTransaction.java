@@ -28,8 +28,8 @@ public class B2BSaleFinTransaction {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(unique = true, nullable = false, updatable = false)
-    private UUID externalId;
+    @Column(name = "external_id", unique = true, length = 100)
+    private String externalId;
 
     @Column(nullable = false)
     private Long b2bSaleId; // References B2B sale in rental-service
@@ -55,8 +55,8 @@ public class B2BSaleFinTransaction {
 
     @PrePersist
     public void prePersist() {
-        if (externalId == null) {
-            externalId = UUID.randomUUID();
+        if (externalId == null || externalId.isEmpty()) {
+            externalId = UUID.randomUUID().toString();
         }
     }
 

@@ -12,7 +12,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/user-payment-profiles")
@@ -30,14 +29,16 @@ public class UserPaymentProfileController {
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Get payment profile by ID")
     public ResponseEntity<UserPaymentProfileDTO> getById(@PathVariable Long id) {
         return ResponseEntity.ok(userPaymentProfileService.findById(id));
     }
 
     @GetMapping("/external/{externalId}")
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Get payment profile by external ID")
-    public ResponseEntity<UserPaymentProfileDTO> getByExternalId(@PathVariable UUID externalId) {
+    public ResponseEntity<UserPaymentProfileDTO> getByExternalId(@PathVariable String externalId) {
         return ResponseEntity.ok(userPaymentProfileService.findByExternalId(externalId));
     }
 

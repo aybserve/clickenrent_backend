@@ -1,6 +1,7 @@
 package org.clickenrent.supportservice.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.clickenrent.supportservice.dto.FeedbackDTO;
 import org.clickenrent.supportservice.entity.Feedback;
 import org.clickenrent.supportservice.exception.ResourceNotFoundException;
@@ -16,6 +17,7 @@ import java.util.stream.Collectors;
 /**
  * Service for managing Feedback entities.
  */
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class FeedbackService {
@@ -31,8 +33,12 @@ public class FeedbackService {
                     .map(feedbackMapper::toDto)
                     .collect(Collectors.toList());
         } else {
-            Long userId = securityService.getCurrentUserId();
-            return feedbackRepository.findByUserId(userId).stream()
+            String userExternalId = securityService.getCurrentUserExternalId();
+            if (userExternalId == null) {
+                log.error("Failed to get current user external ID from JWT");
+                return List.of();
+            }
+            return feedbackRepository.findByUserExternalId(userExternalId).stream()
                     .map(feedbackMapper::toDto)
                     .collect(Collectors.toList());
         }
@@ -43,8 +49,11 @@ public class FeedbackService {
         Feedback entity = feedbackRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Feedback", "id", id));
         
-        if (!securityService.isAdmin() && !securityService.hasAccessToUser(entity.getUserId())) {
-            throw new UnauthorizedException("You don't have permission to access this feedback");
+        if (!securityService.isAdmin()) {
+            String currentUserExternalId = securityService.getCurrentUserExternalId();
+            if (currentUserExternalId == null || !currentUserExternalId.equals(entity.getUserExternalId())) {
+                throw new UnauthorizedException("You don't have permission to access this feedback");
+            }
         }
         
         return feedbackMapper.toDto(entity);
@@ -55,30 +64,41 @@ public class FeedbackService {
         Feedback entity = feedbackRepository.findByExternalId(externalId)
                 .orElseThrow(() -> new ResourceNotFoundException("Feedback", "externalId", externalId));
         
-        if (!securityService.isAdmin() && !securityService.hasAccessToUser(entity.getUserId())) {
-            throw new UnauthorizedException("You don't have permission to access this feedback");
+        if (!securityService.isAdmin()) {
+            String currentUserExternalId = securityService.getCurrentUserExternalId();
+            if (currentUserExternalId == null || !currentUserExternalId.equals(entity.getUserExternalId())) {
+                throw new UnauthorizedException("You don't have permission to access this feedback");
+            }
         }
         
         return feedbackMapper.toDto(entity);
     }
 
     @Transactional(readOnly = true)
-    public List<FeedbackDTO> getByUserId(Long userId) {
-        if (!securityService.isAdmin() && !securityService.hasAccessToUser(userId)) {
-            throw new UnauthorizedException("You don't have permission to access this user's feedback");
+    public List<FeedbackDTO> getByUserExternalId(String userExternalId) {
+        if (!securityService.isAdmin()) {
+            String currentUserExternalId = securityService.getCurrentUserExternalId();
+            if (currentUserExternalId == null || !currentUserExternalId.equals(userExternalId)) {
+                throw new UnauthorizedException("You don't have permission to access this user's feedback");
+            }
         }
         
-        return feedbackRepository.findByUserId(userId).stream()
+        return feedbackRepository.findByUserExternalId(userExternalId).stream()
                 .map(feedbackMapper::toDto)
                 .collect(Collectors.toList());
     }
 
     @Transactional
     public FeedbackDTO create(FeedbackDTO dto) {
-        Long currentUserId = securityService.getCurrentUserId();
-        if (dto.getUserId() == null) {
-            dto.setUserId(currentUserId);
-        } else if (!securityService.isAdmin() && !currentUserId.equals(dto.getUserId())) {
+        String currentUserExternalId = securityService.getCurrentUserExternalId();
+        if (currentUserExternalId == null) {
+            throw new RuntimeException("Failed to get current user external ID from JWT");
+        }
+        
+        // Set userExternalId if not provided or verify if provided
+        if (dto.getUserExternalId() == null) {
+            dto.setUserExternalId(currentUserExternalId);
+        } else if (!securityService.isAdmin() && !currentUserExternalId.equals(dto.getUserExternalId())) {
             throw new UnauthorizedException("You can only create feedback for yourself");
         }
 
@@ -92,8 +112,11 @@ public class FeedbackService {
         Feedback entity = feedbackRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Feedback", "id", id));
 
-        if (!securityService.isAdmin() && !securityService.hasAccessToUser(entity.getUserId())) {
-            throw new UnauthorizedException("You don't have permission to update this feedback");
+        if (!securityService.isAdmin()) {
+            String currentUserExternalId = securityService.getCurrentUserExternalId();
+            if (currentUserExternalId == null || !currentUserExternalId.equals(entity.getUserExternalId())) {
+                throw new UnauthorizedException("You don't have permission to update this feedback");
+            }
         }
 
         feedbackMapper.updateEntityFromDto(dto, entity);
@@ -106,8 +129,11 @@ public class FeedbackService {
         Feedback entity = feedbackRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Feedback", "id", id));
 
-        if (!securityService.isAdmin() && !securityService.hasAccessToUser(entity.getUserId())) {
-            throw new UnauthorizedException("You don't have permission to delete this feedback");
+        if (!securityService.isAdmin()) {
+            String currentUserExternalId = securityService.getCurrentUserExternalId();
+            if (currentUserExternalId == null || !currentUserExternalId.equals(entity.getUserExternalId())) {
+                throw new UnauthorizedException("You don't have permission to delete this feedback");
+            }
         }
 
         feedbackRepository.delete(entity);

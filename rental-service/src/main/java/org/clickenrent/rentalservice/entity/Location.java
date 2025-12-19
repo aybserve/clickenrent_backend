@@ -9,6 +9,8 @@ import lombok.experimental.SuperBuilder;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
 
+import java.util.UUID;
+
 /**
  * Entity representing a rental location.
  * Auto-creates "Default" location when a company is created.
@@ -19,6 +21,7 @@ import org.hibernate.annotations.Where;
     indexes = {
         @Index(name = "idx_location_external_id", columnList = "external_id"),
         @Index(name = "idx_location_company_id", columnList = "company_id"),
+        @Index(name = "idx_location_company_external_id", columnList = "company_external_id"),
         @Index(name = "idx_location_erp_partner_id", columnList = "erp_partner_id")
     }
 )
@@ -61,6 +64,10 @@ public class Location extends BaseAuditEntity {
     @Column(name = "company_id", nullable = false)
     private Long companyId;
 
+    // Cross-service reference field using externalId
+    @Column(name = "company_external_id", length = 100)
+    private String companyExternalId;
+
     @Builder.Default
     @Column(name = "is_public", nullable = false)
     private Boolean isPublic = true;
@@ -72,4 +79,11 @@ public class Location extends BaseAuditEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "coordinates_id")
     private Coordinates coordinates;
+
+    @PrePersist
+    public void prePersist() {
+        if (externalId == null || externalId.isEmpty()) {
+            externalId = UUID.randomUUID().toString();
+        }
+    }
 }

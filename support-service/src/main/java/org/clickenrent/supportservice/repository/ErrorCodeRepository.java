@@ -15,7 +15,7 @@ public interface ErrorCodeRepository extends JpaRepository<ErrorCode, Long> {
     
     Optional<ErrorCode> findByExternalId(String externalId);
     
-    List<ErrorCode> findByBikeEngineId(Long bikeEngineId);
+    List<ErrorCode> findByBikeEngineExternalId(String bikeEngineExternalId);
     
     List<ErrorCode> findByName(String name);
 }

@@ -27,6 +27,8 @@ public class RentalMapper {
                 .companyId(rental.getCompanyId())
                 .rentalStatusId(rental.getRentalStatus() != null ? rental.getRentalStatus().getId() : null)
                 .erpRentalOrderId(rental.getErpRentalOrderId())
+                .userExternalId(rental.getUserExternalId())
+                .companyExternalId(rental.getCompanyExternalId())
                 .dateCreated(rental.getDateCreated())
                 .lastDateModified(rental.getLastDateModified())
                 .createdBy(rental.getCreatedBy())

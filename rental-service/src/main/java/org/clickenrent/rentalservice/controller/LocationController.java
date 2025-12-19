@@ -83,7 +83,7 @@ public class LocationController {
      * GET /api/locations/external/{externalId}
      */
     @GetMapping("/external/{externalId}")
-    @PreAuthorize("hasAnyRole('SUPERADMIN', 'ADMIN')")
+    @PreAuthorize("isAuthenticated()")
     @Operation(
             summary = "Get location by external ID",
             description = "Returns location details by external ID"

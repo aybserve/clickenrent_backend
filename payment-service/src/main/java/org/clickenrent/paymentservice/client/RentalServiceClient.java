@@ -1,5 +1,8 @@
 package org.clickenrent.paymentservice.client;
 
+import org.clickenrent.contracts.rental.BikeDTO;
+import org.clickenrent.contracts.rental.BikeRentalDTO;
+import org.clickenrent.contracts.rental.RentalDTO;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -12,10 +15,22 @@ import org.springframework.web.bind.annotation.PathVariable;
 public interface RentalServiceClient {
 
     /**
+     * Get rental by ID
+     */
+    @GetMapping("/rentals/{id}")
+    RentalDTO getRentalById(@PathVariable("id") Long rentalId);
+
+    /**
      * Check if rental exists by ID
      */
     @GetMapping("/rentals/{id}/exists")
     Boolean checkRentalExists(@PathVariable("id") Long rentalId);
+
+    /**
+     * Get bike rental by ID
+     */
+    @GetMapping("/bike-rentals/{id}")
+    BikeRentalDTO getBikeRentalById(@PathVariable("id") Long bikeRentalId);
 
     /**
      * Check if bike rental exists by ID
@@ -34,6 +49,24 @@ public interface RentalServiceClient {
      */
     @GetMapping("/b2b-subscriptions/{id}/exists")
     Boolean checkB2BSubscriptionExists(@PathVariable("id") Long subscriptionId);
+
+    /**
+     * Get rental by external ID (for cross-service communication)
+     */
+    @GetMapping("/rentals/external/{externalId}")
+    RentalDTO getRentalByExternalId(@PathVariable("externalId") String externalId);
+
+    /**
+     * Check if rental exists by external ID
+     */
+    @GetMapping("/rentals/external/{externalId}/exists")
+    Boolean checkRentalExistsByExternalId(@PathVariable("externalId") String externalId);
+
+    /**
+     * Get bike by external ID (for cross-service communication)
+     */
+    @GetMapping("/bikes/external/{externalId}")
+    BikeDTO getBikeByExternalId(@PathVariable("externalId") String externalId);
 }
 
 

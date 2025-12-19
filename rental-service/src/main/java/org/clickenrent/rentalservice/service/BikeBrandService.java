@@ -1,6 +1,9 @@
 package org.clickenrent.rentalservice.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.clickenrent.contracts.auth.CompanyDTO;
+import org.clickenrent.rentalservice.client.AuthServiceClient;
 import org.clickenrent.rentalservice.dto.BikeBrandDTO;
 import org.clickenrent.rentalservice.entity.BikeBrand;
 import org.clickenrent.rentalservice.exception.ResourceNotFoundException;
@@ -14,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class BikeBrandService {
@@ -21,6 +25,7 @@ public class BikeBrandService {
     private final BikeBrandRepository bikeBrandRepository;
     private final BikeBrandMapper bikeBrandMapper;
     private final SecurityService securityService;
+    private final AuthServiceClient authServiceClient;
 
     @Transactional(readOnly = true)
     public Page<BikeBrandDTO> getAllBikeBrands(Pageable pageable) {
@@ -53,6 +58,20 @@ public class BikeBrandService {
         }
 
         BikeBrand bikeBrand = bikeBrandMapper.toEntity(dto);
+        
+        // DUAL-WRITE: Populate companyExternalId
+        if (dto.getCompanyId() != null) {
+            try {
+                CompanyDTO company = authServiceClient.getCompanyById(dto.getCompanyId());
+                bikeBrand.setCompanyId(dto.getCompanyId());
+                bikeBrand.setCompanyExternalId(company.getExternalId());
+                log.debug("Populated companyExternalId: {} for bike brand", company.getExternalId());
+            } catch (Exception e) {
+                log.error("Failed to fetch company external ID for companyId: {}", dto.getCompanyId(), e);
+                throw new RuntimeException("Failed to fetch company details", e);
+            }
+        }
+        
         bikeBrand = bikeBrandRepository.save(bikeBrand);
         return bikeBrandMapper.toDto(bikeBrand);
     }

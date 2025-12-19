@@ -1,6 +1,9 @@
 package org.clickenrent.rentalservice.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.clickenrent.contracts.auth.CompanyDTO;
+import org.clickenrent.rentalservice.client.AuthServiceClient;
 import org.clickenrent.rentalservice.dto.LocationDTO;
 import org.clickenrent.rentalservice.entity.Hub;
 import org.clickenrent.rentalservice.entity.Location;
@@ -19,12 +22,14 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class LocationService {
 
     private final LocationRepository locationRepository;
     private final HubRepository hubRepository;
     private final LocationMapper locationMapper;
     private final SecurityService securityService;
+    private final AuthServiceClient authServiceClient;
 
     @Transactional(readOnly = true)
     public Page<LocationDTO> getAllLocations(Pageable pageable) {
@@ -67,6 +72,20 @@ public class LocationService {
         }
 
         Location location = locationMapper.toEntity(locationDTO);
+        
+        // DUAL-WRITE: Populate companyExternalId
+        if (locationDTO.getCompanyId() != null) {
+            try {
+                CompanyDTO company = authServiceClient.getCompanyById(locationDTO.getCompanyId());
+                location.setCompanyId(locationDTO.getCompanyId());
+                location.setCompanyExternalId(company.getExternalId());
+                log.debug("Populated companyExternalId: {} for location", company.getExternalId());
+            } catch (Exception e) {
+                log.error("Failed to fetch company external ID for companyId: {}", locationDTO.getCompanyId(), e);
+                throw new RuntimeException("Failed to fetch company details", e);
+            }
+        }
+        
         location = locationRepository.save(location);
 
         // Auto-create "Main" hub for this location
@@ -105,6 +124,11 @@ public class LocationService {
         }
 
         locationRepository.delete(location);
+    }
+
+    @Transactional(readOnly = true)
+    public boolean existsByExternalId(String externalId) {
+        return locationRepository.existsByExternalId(externalId);
     }
 }
 

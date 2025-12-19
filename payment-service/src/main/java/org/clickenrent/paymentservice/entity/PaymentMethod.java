@@ -28,8 +28,8 @@ public class PaymentMethod {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(unique = true, nullable = false, updatable = false)
-    private UUID externalId;
+    @Column(name = "external_id", unique = true, length = 100)
+    private String externalId;
 
     @Column(unique = true, nullable = false, length = 50)
     private String code; // CREDIT_CARD, DEBIT_CARD, BANK_TRANSFER, etc.
@@ -57,8 +57,8 @@ public class PaymentMethod {
 
     @PrePersist
     public void prePersist() {
-        if (externalId == null) {
-            externalId = UUID.randomUUID();
+        if (externalId == null || externalId.isEmpty()) {
+            externalId = UUID.randomUUID().toString();
         }
     }
 

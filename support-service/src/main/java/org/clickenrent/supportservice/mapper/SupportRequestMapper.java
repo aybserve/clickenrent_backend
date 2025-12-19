@@ -25,8 +25,8 @@ public class SupportRequestMapper {
         return SupportRequestDTO.builder()
                 .id(entity.getId())
                 .externalId(entity.getExternalId())
-                .userId(entity.getUserId())
-                .bikeId(entity.getBikeId())
+                .userExternalId(entity.getUserExternalId())
+                .bikeExternalId(entity.getBikeExternalId())
                 .isNearLocation(entity.getIsNearLocation())
                 .photoUrl(entity.getPhotoUrl())
                 .errorCodeId(entity.getErrorCode() != null ? entity.getErrorCode().getId() : null)
@@ -48,8 +48,8 @@ public class SupportRequestMapper {
         SupportRequest.SupportRequestBuilder<?, ?> builder = SupportRequest.builder()
                 .id(dto.getId())
                 .externalId(dto.getExternalId())
-                .userId(dto.getUserId())
-                .bikeId(dto.getBikeId())
+                .userExternalId(dto.getUserExternalId())
+                .bikeExternalId(dto.getBikeExternalId())
                 .isNearLocation(dto.getIsNearLocation())
                 .photoUrl(dto.getPhotoUrl());
 
@@ -68,11 +68,11 @@ public class SupportRequestMapper {
             return;
         }
 
-        if (dto.getUserId() != null) {
-            entity.setUserId(dto.getUserId());
+        if (dto.getUserExternalId() != null) {
+            entity.setUserExternalId(dto.getUserExternalId());
         }
-        if (dto.getBikeId() != null) {
-            entity.setBikeId(dto.getBikeId());
+        if (dto.getBikeExternalId() != null) {
+            entity.setBikeExternalId(dto.getBikeExternalId());
         }
         if (dto.getIsNearLocation() != null) {
             entity.setIsNearLocation(dto.getIsNearLocation());

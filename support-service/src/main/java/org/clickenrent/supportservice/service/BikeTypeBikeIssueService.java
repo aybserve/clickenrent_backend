@@ -39,8 +39,8 @@ public class BikeTypeBikeIssueService {
     }
 
     @Transactional(readOnly = true)
-    public List<BikeTypeBikeIssueDTO> getByBikeTypeId(Long bikeTypeId) {
-        return bikeTypeBikeIssueRepository.findByBikeTypeId(bikeTypeId).stream()
+    public List<BikeTypeBikeIssueDTO> getByBikeTypeExternalId(String bikeTypeExternalId) {
+        return bikeTypeBikeIssueRepository.findByBikeTypeExternalId(bikeTypeExternalId).stream()
                 .map(bikeTypeBikeIssueMapper::toDto)
                 .collect(Collectors.toList());
     }

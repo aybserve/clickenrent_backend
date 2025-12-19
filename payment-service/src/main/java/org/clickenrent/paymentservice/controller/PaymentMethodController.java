@@ -12,7 +12,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/payment-methods")
@@ -35,14 +34,16 @@ public class PaymentMethodController {
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Get payment method by ID")
     public ResponseEntity<PaymentMethodDTO> getById(@PathVariable Long id) {
         return ResponseEntity.ok(paymentMethodService.findById(id));
     }
 
     @GetMapping("/external/{externalId}")
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Get payment method by external ID")
-    public ResponseEntity<PaymentMethodDTO> getByExternalId(@PathVariable UUID externalId) {
+    public ResponseEntity<PaymentMethodDTO> getByExternalId(@PathVariable String externalId) {
         return ResponseEntity.ok(paymentMethodService.findByExternalId(externalId));
     }
 

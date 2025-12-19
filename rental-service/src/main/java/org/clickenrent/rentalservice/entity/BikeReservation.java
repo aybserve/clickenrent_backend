@@ -8,6 +8,7 @@ import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 /**
  * Entity representing bike reservations.
@@ -17,7 +18,8 @@ import java.time.LocalDateTime;
     name = "bike_reservation",
     indexes = {
         @Index(name = "idx_bike_reservation_external_id", columnList = "external_id"),
-        @Index(name = "idx_bike_reservation_user_id", columnList = "user_id")
+        @Index(name = "idx_bike_reservation_user_id", columnList = "user_id"),
+        @Index(name = "idx_bike_reservation_user_external_id", columnList = "user_external_id")
     }
 )
 @SQLDelete(sql = "UPDATE bike_reservation SET is_deleted = true WHERE id = ?")
@@ -49,8 +51,19 @@ public class BikeReservation extends BaseAuditEntity {
     @Column(name = "user_id", nullable = false)
     private Long userId;
 
+    // Cross-service reference field using externalId
+    @Column(name = "user_external_id", length = 100)
+    private String userExternalId;
+
     @NotNull(message = "Bike is required")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "bike_id", nullable = false)
     private Bike bike;
+
+    @PrePersist
+    public void prePersist() {
+        if (externalId == null || externalId.isEmpty()) {
+            externalId = UUID.randomUUID().toString();
+        }
+    }
 }

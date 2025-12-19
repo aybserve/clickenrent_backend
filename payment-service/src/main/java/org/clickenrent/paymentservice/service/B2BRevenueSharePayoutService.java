@@ -2,6 +2,8 @@ package org.clickenrent.paymentservice.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.clickenrent.contracts.auth.CompanyDTO;
+import org.clickenrent.paymentservice.client.AuthServiceClient;
 import org.clickenrent.paymentservice.dto.B2BRevenueSharePayoutDTO;
 import org.clickenrent.paymentservice.entity.B2BRevenueSharePayout;
 import org.clickenrent.paymentservice.exception.ResourceNotFoundException;
@@ -14,7 +16,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 /**
@@ -28,6 +29,7 @@ public class B2BRevenueSharePayoutService {
     private final B2BRevenueSharePayoutRepository b2bRevenueSharePayoutRepository;
     private final B2BRevenueSharePayoutMapper b2bRevenueSharePayoutMapper;
     private final SecurityService securityService;
+    private final AuthServiceClient authServiceClient;
 
     @Transactional(readOnly = true)
     public List<B2BRevenueSharePayoutDTO> findAll() {
@@ -55,7 +57,7 @@ public class B2BRevenueSharePayoutService {
     }
 
     @Transactional(readOnly = true)
-    public B2BRevenueSharePayoutDTO findByExternalId(UUID externalId) {
+    public B2BRevenueSharePayoutDTO findByExternalId(String externalId) {
         B2BRevenueSharePayout payout = b2bRevenueSharePayoutRepository.findByExternalId(externalId)
                 .orElseThrow(() -> new ResourceNotFoundException("B2BRevenueSharePayout", "externalId", externalId));
         
@@ -83,6 +85,20 @@ public class B2BRevenueSharePayoutService {
         }
         
         B2BRevenueSharePayout payout = b2bRevenueSharePayoutMapper.toEntity(dto);
+        
+        // DUAL-WRITE: Populate companyExternalId
+        if (dto.getCompanyId() != null) {
+            try {
+                CompanyDTO company = authServiceClient.getCompanyById(dto.getCompanyId());
+                payout.setCompanyId(dto.getCompanyId());
+                payout.setCompanyExternalId(company.getExternalId());
+                log.debug("Populated companyExternalId: {} for B2B revenue share payout", company.getExternalId());
+            } catch (Exception e) {
+                log.error("Failed to fetch company external ID for companyId: {}", dto.getCompanyId(), e);
+                throw new RuntimeException("Failed to fetch company details", e);
+            }
+        }
+        
         B2BRevenueSharePayout savedPayout = b2bRevenueSharePayoutRepository.save(payout);
         return b2bRevenueSharePayoutMapper.toDTO(savedPayout);
     }

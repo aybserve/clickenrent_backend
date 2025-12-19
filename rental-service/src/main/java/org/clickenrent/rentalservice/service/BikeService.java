@@ -1,6 +1,7 @@
 package org.clickenrent.rentalservice.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.clickenrent.rentalservice.dto.BikeDTO;
 import org.clickenrent.rentalservice.entity.Bike;
 import org.clickenrent.rentalservice.exception.ResourceNotFoundException;
@@ -17,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
  */
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class BikeService {
 
     private final BikeRepository bikeRepository;
@@ -39,6 +41,16 @@ public class BikeService {
     public BikeDTO getBikeById(Long id) {
         Bike bike = bikeRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Bike", "id", id));
+        return bikeMapper.toDto(bike);
+    }
+
+    /**
+     * Find bike by externalId for cross-service communication
+     */
+    @Transactional(readOnly = true)
+    public BikeDTO findByExternalId(String externalId) {
+        Bike bike = bikeRepository.findByExternalId(externalId)
+                .orElseThrow(() -> new ResourceNotFoundException("Bike", "externalId", externalId));
         return bikeMapper.toDto(bike);
     }
 
@@ -77,6 +89,23 @@ public class BikeService {
     }
 
     @Transactional
+    public BikeDTO updateByExternalId(String externalId, BikeDTO dto) {
+        Bike bike = bikeRepository.findByExternalId(externalId)
+                .orElseThrow(() -> new ResourceNotFoundException("Bike", "externalId", externalId));
+        
+        // Only admins can update bikes
+        if (!securityService.isAdmin()) {
+            throw new UnauthorizedException("Only administrators can update bikes");
+        }
+        
+        // Update fields (use existing pattern from ID-based update)
+        bikeMapper.updateEntityFromDto(dto, bike);
+        bike = bikeRepository.save(bike);
+        log.info("Updated bike by externalId: {}", externalId);
+        return bikeMapper.toDto(bike);
+    }
+
+    @Transactional
     public void deleteBike(Long id) {
         Bike bike = bikeRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Bike", "id", id));
@@ -87,6 +116,19 @@ public class BikeService {
         }
 
         bikeRepository.delete(bike);
+    }
+
+    @Transactional
+    public void deleteByExternalId(String externalId) {
+        Bike bike = bikeRepository.findByExternalId(externalId)
+                .orElseThrow(() -> new ResourceNotFoundException("Bike", "externalId", externalId));
+        
+        if (!securityService.isAdmin()) {
+            throw new UnauthorizedException("Only admins can delete bikes");
+        }
+        
+        bikeRepository.delete(bike);
+        log.info("Deleted bike by externalId: {}", externalId);
     }
 }
 

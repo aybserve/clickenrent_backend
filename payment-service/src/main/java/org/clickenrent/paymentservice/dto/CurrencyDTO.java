@@ -7,7 +7,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.UUID;
 
 /**
  * DTO for Currency entity
@@ -20,7 +19,7 @@ public class CurrencyDTO {
     
     private Long id;
     
-    private UUID externalId;
+    private String externalId;
     
     @NotBlank(message = "Currency code is required")
     @Size(min = 3, max = 3, message = "Currency code must be exactly 3 characters")

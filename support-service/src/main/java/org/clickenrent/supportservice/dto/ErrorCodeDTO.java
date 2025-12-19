@@ -19,7 +19,7 @@ public class ErrorCodeDTO {
     private Long id;
     private String externalId;
     private String name;
-    private Long bikeEngineId;
+    private String bikeEngineExternalId;
     private String description;
     private String commonCause;
     private String diagnosticSteps;

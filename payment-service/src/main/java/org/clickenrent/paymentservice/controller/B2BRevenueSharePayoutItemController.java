@@ -8,10 +8,10 @@ import org.clickenrent.paymentservice.dto.B2BRevenueSharePayoutItemDTO;
 import org.clickenrent.paymentservice.service.B2BRevenueSharePayoutItemService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/b2b-revenue-share-payout-items")
@@ -28,14 +28,16 @@ public class B2BRevenueSharePayoutItemController {
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Get payout item by ID")
     public ResponseEntity<B2BRevenueSharePayoutItemDTO> getById(@PathVariable Long id) {
         return ResponseEntity.ok(payoutItemService.findById(id));
     }
 
     @GetMapping("/external/{externalId}")
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Get payout item by external ID")
-    public ResponseEntity<B2BRevenueSharePayoutItemDTO> getByExternalId(@PathVariable UUID externalId) {
+    public ResponseEntity<B2BRevenueSharePayoutItemDTO> getByExternalId(@PathVariable String externalId) {
         return ResponseEntity.ok(payoutItemService.findByExternalId(externalId));
     }
 

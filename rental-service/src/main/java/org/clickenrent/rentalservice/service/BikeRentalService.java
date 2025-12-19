@@ -1,6 +1,7 @@
 package org.clickenrent.rentalservice.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.clickenrent.rentalservice.dto.*;
 import org.clickenrent.rentalservice.entity.*;
 import org.clickenrent.rentalservice.exception.ResourceNotFoundException;
@@ -19,6 +20,7 @@ import java.time.LocalDateTime;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class BikeRentalService {
 
     private final BikeRentalRepository bikeRentalRepository;
@@ -52,6 +54,57 @@ public class BikeRentalService {
         }
 
         return bikeRentalMapper.toDto(bikeRental);
+    }
+
+    @Transactional(readOnly = true)
+    public BikeRentalDTO findByExternalId(String externalId) {
+        BikeRental bikeRental = bikeRentalRepository.findByExternalId(externalId)
+                .orElseThrow(() -> new ResourceNotFoundException("BikeRental", "externalId", externalId));
+        
+        // Security check - verify access through rental
+        if (bikeRental.getRental() != null) {
+            if (!securityService.isAdmin() && !securityService.hasAccessToUser(bikeRental.getRental().getUserId())) {
+                throw new UnauthorizedException("You don't have permission to view this bike rental");
+            }
+        }
+        
+        return bikeRentalMapper.toDto(bikeRental);
+    }
+
+    @Transactional
+    public BikeRentalDTO updateByExternalId(String externalId, BikeRentalDTO dto) {
+        BikeRental bikeRental = bikeRentalRepository.findByExternalId(externalId)
+                .orElseThrow(() -> new ResourceNotFoundException("BikeRental", "externalId", externalId));
+        
+        // Security check
+        if (bikeRental.getRental() != null) {
+            if (!securityService.isAdmin() && !securityService.hasAccessToUser(bikeRental.getRental().getUserId())) {
+                throw new UnauthorizedException("You don't have permission to update this bike rental");
+            }
+        }
+        
+        // Update fields
+        if (dto.getStartDateTime() != null) bikeRental.setStartDateTime(dto.getStartDateTime());
+        if (dto.getEndDateTime() != null) bikeRental.setEndDateTime(dto.getEndDateTime());
+        if (dto.getPrice() != null) bikeRental.setPrice(dto.getPrice());
+        if (dto.getTotalPrice() != null) bikeRental.setTotalPrice(dto.getTotalPrice());
+        
+        bikeRental = bikeRentalRepository.save(bikeRental);
+        log.info("Updated bike rental by externalId: {}", externalId);
+        return bikeRentalMapper.toDto(bikeRental);
+    }
+
+    @Transactional
+    public void deleteByExternalId(String externalId) {
+        BikeRental bikeRental = bikeRentalRepository.findByExternalId(externalId)
+                .orElseThrow(() -> new ResourceNotFoundException("BikeRental", "externalId", externalId));
+        
+        if (!securityService.isAdmin()) {
+            throw new UnauthorizedException("Only admins can delete bike rentals");
+        }
+        
+        bikeRentalRepository.delete(bikeRental);
+        log.info("Deleted bike rental by externalId: {}", externalId);
     }
 
     @Transactional
@@ -187,5 +240,10 @@ public class BikeRentalService {
                 .success(true)
                 .rentalStatus(rentalStatus)
                 .build();
+    }
+
+    @Transactional(readOnly = true)
+    public boolean existsByExternalId(String externalId) {
+        return bikeRentalRepository.existsByExternalId(externalId);
     }
 }

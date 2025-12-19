@@ -6,7 +6,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.UUID;
 
 /**
  * DTO for RentalFinTransaction entity
@@ -19,10 +18,16 @@ public class RentalFinTransactionDTO {
     
     private Long id;
     
-    private UUID externalId;
+    private String externalId;
     
     @NotNull(message = "Rental ID is required")
     private Long rentalId;
+    
+    private Long bikeRentalId; // Optional: References specific bike rental within the rental
+    
+    // Cross-service externalId references
+    private String rentalExternalId;
+    private String bikeRentalExternalId;
     
     @NotNull(message = "Financial transaction is required")
     private FinancialTransactionDTO financialTransaction;

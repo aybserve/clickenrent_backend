@@ -5,7 +5,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
-import java.util.UUID;
 
 /**
  * Repository for UserPaymentProfile entity
@@ -17,7 +16,7 @@ public interface UserPaymentProfileRepository extends JpaRepository<UserPaymentP
     
     Optional<UserPaymentProfile> findByStripeCustomerId(String stripeCustomerId);
     
-    Optional<UserPaymentProfile> findByExternalId(UUID externalId);
+    Optional<UserPaymentProfile> findByExternalId(String externalId);
 }
 
 

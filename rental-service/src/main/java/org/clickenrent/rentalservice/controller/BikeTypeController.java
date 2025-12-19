@@ -37,6 +37,13 @@ public class BikeTypeController {
         return ResponseEntity.ok(bikeTypeService.getBikeTypeById(id));
     }
 
+    @GetMapping("/external/{externalId}")
+    @PreAuthorize("isAuthenticated()")
+    @Operation(summary = "Get bike type by external ID")
+    public ResponseEntity<BikeTypeDTO> getBikeTypeByExternalId(@PathVariable String externalId) {
+        return ResponseEntity.ok(bikeTypeService.getBikeTypeByExternalId(externalId));
+    }
+
     @PostMapping
     @PreAuthorize("hasAnyRole('SUPERADMIN', 'ADMIN')")
     @Operation(summary = "Create bike type")

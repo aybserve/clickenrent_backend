@@ -47,8 +47,8 @@ class BikeRentalFeedbackServiceTest {
 
         testFeedback = BikeRentalFeedback.builder()
                 .id(1L)
-                .userId(1L)
-                .bikeRentalId(101L)
+                .userExternalId("user-uuid-1")
+                .bikeRentalExternalId("bike-rental-uuid-101")
                 .rate(5)
                 .comment("Great bike!")
                 .dateTime(testDateTime)
@@ -56,8 +56,8 @@ class BikeRentalFeedbackServiceTest {
 
         testFeedbackDTO = BikeRentalFeedbackDTO.builder()
                 .id(1L)
-                .userId(1L)
-                .bikeRentalId(101L)
+                .userExternalId("user-uuid-1")
+                .bikeRentalExternalId("bike-rental-uuid-101")
                 .rate(5)
                 .comment("Great bike!")
                 .dateTime(testDateTime)
@@ -81,15 +81,15 @@ class BikeRentalFeedbackServiceTest {
     @Test
     void getAll_AsNonAdmin_ReturnsUserFeedback() {
         when(securityService.isAdmin()).thenReturn(false);
-        when(securityService.getCurrentUserId()).thenReturn(1L);
-        when(bikeRentalFeedbackRepository.findByUserId(1L)).thenReturn(Arrays.asList(testFeedback));
+        when(securityService.getCurrentUserExternalId()).thenReturn("user-uuid-1");
+        when(bikeRentalFeedbackRepository.findByUserExternalId("user-uuid-1")).thenReturn(Arrays.asList(testFeedback));
         when(bikeRentalFeedbackMapper.toDto(testFeedback)).thenReturn(testFeedbackDTO);
 
         List<BikeRentalFeedbackDTO> result = bikeRentalFeedbackService.getAll();
 
         assertNotNull(result);
         assertEquals(1, result.size());
-        verify(bikeRentalFeedbackRepository, times(1)).findByUserId(1L);
+        verify(bikeRentalFeedbackRepository, times(1)).findByUserExternalId("user-uuid-1");
     }
 
     @Test
@@ -115,55 +115,34 @@ class BikeRentalFeedbackServiceTest {
     @Test
     void getById_Unauthorized() {
         when(securityService.isAdmin()).thenReturn(false);
-        when(securityService.hasAccessToUser(1L)).thenReturn(false);
+        when(securityService.getCurrentUserExternalId()).thenReturn("user-uuid-2");
         when(bikeRentalFeedbackRepository.findById(1L)).thenReturn(Optional.of(testFeedback));
 
         assertThrows(UnauthorizedException.class, () -> bikeRentalFeedbackService.getById(1L));
     }
 
     @Test
-    void getByBikeRentalId_Success() {
+    void getByBikeRentalExternalId_Success() {
         when(securityService.isAdmin()).thenReturn(true);
-        when(bikeRentalFeedbackRepository.findByBikeRentalId(101L)).thenReturn(Optional.of(testFeedback));
+        when(bikeRentalFeedbackRepository.findByBikeRentalExternalId("bike-rental-uuid-101")).thenReturn(Optional.of(testFeedback));
         when(bikeRentalFeedbackMapper.toDto(testFeedback)).thenReturn(testFeedbackDTO);
 
-        BikeRentalFeedbackDTO result = bikeRentalFeedbackService.getByBikeRentalId(101L);
+        BikeRentalFeedbackDTO result = bikeRentalFeedbackService.getByBikeRentalExternalId("bike-rental-uuid-101");
 
         assertNotNull(result);
-        assertEquals(101L, result.getBikeRentalId());
+        assertEquals("bike-rental-uuid-101", result.getBikeRentalExternalId());
     }
 
     @Test
-    void getByBikeRentalId_NotFound() {
-        when(bikeRentalFeedbackRepository.findByBikeRentalId(999L)).thenReturn(Optional.empty());
+    void getByBikeRentalExternalId_NotFound() {
+        when(bikeRentalFeedbackRepository.findByBikeRentalExternalId("unknown-uuid")).thenReturn(Optional.empty());
 
-        assertThrows(ResourceNotFoundException.class, () -> bikeRentalFeedbackService.getByBikeRentalId(999L));
-    }
-
-    @Test
-    void getByUserId_Success() {
-        when(securityService.isAdmin()).thenReturn(true);
-        when(bikeRentalFeedbackRepository.findByUserId(1L)).thenReturn(Arrays.asList(testFeedback));
-        when(bikeRentalFeedbackMapper.toDto(testFeedback)).thenReturn(testFeedbackDTO);
-
-        List<BikeRentalFeedbackDTO> result = bikeRentalFeedbackService.getByUserId(1L);
-
-        assertNotNull(result);
-        assertEquals(1, result.size());
-        verify(bikeRentalFeedbackRepository, times(1)).findByUserId(1L);
-    }
-
-    @Test
-    void getByUserId_Unauthorized() {
-        when(securityService.isAdmin()).thenReturn(false);
-        when(securityService.hasAccessToUser(2L)).thenReturn(false);
-
-        assertThrows(UnauthorizedException.class, () -> bikeRentalFeedbackService.getByUserId(2L));
+        assertThrows(ResourceNotFoundException.class, () -> bikeRentalFeedbackService.getByBikeRentalExternalId("unknown-uuid"));
     }
 
     @Test
     void create_Success() {
-        when(securityService.getCurrentUserId()).thenReturn(1L);
+        when(securityService.getCurrentUserExternalId()).thenReturn("user-uuid-1");
         when(bikeRentalFeedbackMapper.toEntity(testFeedbackDTO)).thenReturn(testFeedback);
         when(bikeRentalFeedbackRepository.save(any(BikeRentalFeedback.class))).thenReturn(testFeedback);
         when(bikeRentalFeedbackMapper.toDto(testFeedback)).thenReturn(testFeedbackDTO);
@@ -176,30 +155,30 @@ class BikeRentalFeedbackServiceTest {
     }
 
     @Test
-    void create_WithoutUserId_SetsCurrentUser() {
-        BikeRentalFeedbackDTO dtoWithoutUserId = BikeRentalFeedbackDTO.builder()
-                .bikeRentalId(101L)
+    void create_WithoutUserExternalId_SetsCurrentUser() {
+        BikeRentalFeedbackDTO dtoWithoutUserExternalId = BikeRentalFeedbackDTO.builder()
+                .bikeRentalExternalId("bike-rental-uuid-101")
                 .rate(5)
                 .comment("Test")
                 .dateTime(testDateTime)
                 .build();
         
-        when(securityService.getCurrentUserId()).thenReturn(1L);
+        when(securityService.getCurrentUserExternalId()).thenReturn("user-uuid-1");
         when(bikeRentalFeedbackMapper.toEntity(any(BikeRentalFeedbackDTO.class))).thenReturn(testFeedback);
         when(bikeRentalFeedbackRepository.save(any(BikeRentalFeedback.class))).thenReturn(testFeedback);
         when(bikeRentalFeedbackMapper.toDto(testFeedback)).thenReturn(testFeedbackDTO);
 
-        BikeRentalFeedbackDTO result = bikeRentalFeedbackService.create(dtoWithoutUserId);
+        BikeRentalFeedbackDTO result = bikeRentalFeedbackService.create(dtoWithoutUserExternalId);
 
         assertNotNull(result);
-        assertEquals(1L, dtoWithoutUserId.getUserId());
+        assertEquals("user-uuid-1", dtoWithoutUserExternalId.getUserExternalId());
     }
 
     @Test
     void create_Unauthorized() {
         when(securityService.isAdmin()).thenReturn(false);
-        when(securityService.getCurrentUserId()).thenReturn(1L);
-        testFeedbackDTO.setUserId(2L);
+        when(securityService.getCurrentUserExternalId()).thenReturn("user-uuid-2");
+        testFeedbackDTO.setUserExternalId("user-uuid-1");
 
         assertThrows(UnauthorizedException.class, () -> bikeRentalFeedbackService.create(testFeedbackDTO));
     }
@@ -228,7 +207,7 @@ class BikeRentalFeedbackServiceTest {
     @Test
     void update_Unauthorized() {
         when(securityService.isAdmin()).thenReturn(false);
-        when(securityService.hasAccessToUser(1L)).thenReturn(false);
+        when(securityService.getCurrentUserExternalId()).thenReturn("user-uuid-2");
         when(bikeRentalFeedbackRepository.findById(1L)).thenReturn(Optional.of(testFeedback));
 
         assertThrows(UnauthorizedException.class, () -> bikeRentalFeedbackService.update(1L, testFeedbackDTO));
@@ -255,7 +234,7 @@ class BikeRentalFeedbackServiceTest {
     @Test
     void delete_Unauthorized() {
         when(securityService.isAdmin()).thenReturn(false);
-        when(securityService.hasAccessToUser(1L)).thenReturn(false);
+        when(securityService.getCurrentUserExternalId()).thenReturn("user-uuid-2");
         when(bikeRentalFeedbackRepository.findById(1L)).thenReturn(Optional.of(testFeedback));
 
         assertThrows(UnauthorizedException.class, () -> bikeRentalFeedbackService.delete(1L));

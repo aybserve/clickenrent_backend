@@ -45,7 +45,7 @@ class ErrorCodeServiceTest {
                 .id(1L)
                 .externalId("550e8400-e29b-41d4-a716-446655440201")
                 .name("E001")
-                .bikeEngineId(1L)
+                .bikeEngineExternalId("bike-engine-uuid-1")
                 .description("Battery Low Voltage")
                 .commonCause("Battery discharged or faulty cell")
                 .diagnosticSteps("Check battery voltage with multimeter")
@@ -58,7 +58,7 @@ class ErrorCodeServiceTest {
                 .id(1L)
                 .externalId("550e8400-e29b-41d4-a716-446655440201")
                 .name("E001")
-                .bikeEngineId(1L)
+                .bikeEngineExternalId("bike-engine-uuid-1")
                 .description("Battery Low Voltage")
                 .commonCause("Battery discharged or faulty cell")
                 .isFixableByClient(false)
@@ -117,16 +117,16 @@ class ErrorCodeServiceTest {
     }
 
     @Test
-    void getByBikeEngineId_Success() {
-        when(errorCodeRepository.findByBikeEngineId(1L)).thenReturn(Arrays.asList(testErrorCode));
+    void getByBikeEngineExternalId_Success() {
+        when(errorCodeRepository.findByBikeEngineExternalId("bike-engine-uuid-1")).thenReturn(Arrays.asList(testErrorCode));
         when(errorCodeMapper.toDto(testErrorCode)).thenReturn(testErrorCodeDTO);
 
-        List<ErrorCodeDTO> result = errorCodeService.getByBikeEngineId(1L);
+        List<ErrorCodeDTO> result = errorCodeService.getByBikeEngineExternalId("bike-engine-uuid-1");
 
         assertNotNull(result);
         assertEquals(1, result.size());
         assertEquals("E001", result.get(0).getName());
-        verify(errorCodeRepository, times(1)).findByBikeEngineId(1L);
+        verify(errorCodeRepository, times(1)).findByBikeEngineExternalId("bike-engine-uuid-1");
     }
 
     @Test

@@ -65,6 +65,12 @@
             <scope>test</scope>
         </dependency>
 
+        <!-- Shared contracts for cross-service communication -->
+        <dependency>
+            <groupId>org.clickenrent</groupId>
+            <artifactId>shared-contracts</artifactId>
+        </dependency>
+
         <!-- Utils -->
         <dependency>
             <groupId>org.projectlombok</groupId>

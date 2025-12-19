@@ -49,6 +49,30 @@ public class BikeReservationController {
         return ResponseEntity.ok(bikeReservationService.getReservationById(id));
     }
 
+    @GetMapping("/external/{externalId}")
+    @PreAuthorize("isAuthenticated()")
+    @Operation(summary = "Get bike reservation by external ID", description = "Used for cross-service communication")
+    public ResponseEntity<BikeReservationDTO> getByExternalId(@PathVariable String externalId) {
+        return ResponseEntity.ok(bikeReservationService.findByExternalId(externalId));
+    }
+
+    @PutMapping("/external/{externalId}")
+    @PreAuthorize("isAuthenticated()")
+    @Operation(summary = "Update bike reservation by external ID", description = "Used for cross-service updates")
+    public ResponseEntity<BikeReservationDTO> updateByExternalId(
+            @PathVariable String externalId,
+            @Valid @RequestBody BikeReservationDTO dto) {
+        return ResponseEntity.ok(bikeReservationService.updateByExternalId(externalId, dto));
+    }
+
+    @DeleteMapping("/external/{externalId}")
+    @PreAuthorize("isAuthenticated()")
+    @Operation(summary = "Delete bike reservation by external ID", description = "Used for cross-service deletion")
+    public ResponseEntity<Void> deleteByExternalId(@PathVariable String externalId) {
+        bikeReservationService.deleteByExternalId(externalId);
+        return ResponseEntity.noContent().build();
+    }
+
     @PostMapping
     @PreAuthorize("isAuthenticated()")
     @Operation(summary = "Create bike reservation", description = "Users can only reserve bikes for themselves")

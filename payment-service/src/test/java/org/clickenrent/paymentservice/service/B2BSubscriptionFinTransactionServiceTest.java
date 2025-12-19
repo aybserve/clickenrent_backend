@@ -47,11 +47,11 @@ class B2BSubscriptionFinTransactionServiceTest {
 
     private B2BSubscriptionFinTransaction testB2BSubscriptionFinTransaction;
     private B2BSubscriptionFinTransactionDTO testB2BSubscriptionFinTransactionDTO;
-    private UUID testExternalId;
+    private String testExternalId;
 
     @BeforeEach
     void setUp() {
-        testExternalId = UUID.randomUUID();
+        testExternalId = UUID.randomUUID().toString();
 
         FinancialTransaction financialTransaction = FinancialTransaction.builder()
                 .id(1L)
@@ -147,7 +147,7 @@ class B2BSubscriptionFinTransactionServiceTest {
 
     @Test
     void findByExternalId_NotFound() {
-        UUID randomId = UUID.randomUUID();
+        String randomId = UUID.randomUUID().toString();
         when(b2bSubscriptionFinTransactionRepository.findByExternalId(randomId)).thenReturn(Optional.empty());
 
         assertThrows(ResourceNotFoundException.class, () -> b2bSubscriptionFinTransactionService.findByExternalId(randomId));

@@ -29,14 +29,21 @@ public class FinancialTransaction {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(unique = true, nullable = false, updatable = false)
-    private UUID externalId;
+    @Column(name = "external_id", unique = true, length = 100)
+    private String externalId;
 
     @Column(nullable = false)
     private Long payerId; // References user in auth-service
 
     @Column(nullable = false)
     private Long recipientId; // References user/company
+
+    // Cross-service reference fields using externalId
+    @Column(name = "payer_external_id", length = 100)
+    private String payerExternalId;
+
+    @Column(name = "recipient_external_id", length = 100)
+    private String recipientExternalId;
 
     @Column(nullable = false, precision = 19, scale = 2)
     private BigDecimal amount;
@@ -89,8 +96,8 @@ public class FinancialTransaction {
 
     @PrePersist
     public void prePersist() {
-        if (externalId == null) {
-            externalId = UUID.randomUUID();
+        if (externalId == null || externalId.isEmpty()) {
+            externalId = UUID.randomUUID().toString();
         }
         if (dateTime == null) {
             dateTime = LocalDateTime.now();

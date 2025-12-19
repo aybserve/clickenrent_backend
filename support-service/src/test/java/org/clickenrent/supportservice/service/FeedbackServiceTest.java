@@ -48,7 +48,7 @@ class FeedbackServiceTest {
         testFeedback = Feedback.builder()
                 .id(1L)
                 .externalId("550e8400-e29b-41d4-a716-446655440301")
-                .userId(1L)
+                .userExternalId("user-uuid-1")
                 .rate(5)
                 .comment("Excellent service")
                 .dateTime(testDateTime)
@@ -57,7 +57,7 @@ class FeedbackServiceTest {
         testFeedbackDTO = FeedbackDTO.builder()
                 .id(1L)
                 .externalId("550e8400-e29b-41d4-a716-446655440301")
-                .userId(1L)
+                .userExternalId("user-uuid-1")
                 .rate(5)
                 .comment("Excellent service")
                 .dateTime(testDateTime)
@@ -81,15 +81,15 @@ class FeedbackServiceTest {
     @Test
     void getAll_AsNonAdmin_ReturnsUserFeedback() {
         when(securityService.isAdmin()).thenReturn(false);
-        when(securityService.getCurrentUserId()).thenReturn(1L);
-        when(feedbackRepository.findByUserId(1L)).thenReturn(Arrays.asList(testFeedback));
+        when(securityService.getCurrentUserExternalId()).thenReturn("user-uuid-1");
+        when(feedbackRepository.findByUserExternalId("user-uuid-1")).thenReturn(Arrays.asList(testFeedback));
         when(feedbackMapper.toDto(testFeedback)).thenReturn(testFeedbackDTO);
 
         List<FeedbackDTO> result = feedbackService.getAll();
 
         assertNotNull(result);
         assertEquals(1, result.size());
-        verify(feedbackRepository, times(1)).findByUserId(1L);
+        verify(feedbackRepository, times(1)).findByUserExternalId("user-uuid-1");
     }
 
     @Test
@@ -115,7 +115,7 @@ class FeedbackServiceTest {
     @Test
     void getById_Unauthorized() {
         when(securityService.isAdmin()).thenReturn(false);
-        when(securityService.hasAccessToUser(1L)).thenReturn(false);
+        when(securityService.getCurrentUserExternalId()).thenReturn("user-uuid-2");
         when(feedbackRepository.findById(1L)).thenReturn(Optional.of(testFeedback));
 
         assertThrows(UnauthorizedException.class, () -> feedbackService.getById(1L));
@@ -142,29 +142,8 @@ class FeedbackServiceTest {
     }
 
     @Test
-    void getByUserId_Success() {
-        when(securityService.isAdmin()).thenReturn(true);
-        when(feedbackRepository.findByUserId(1L)).thenReturn(Arrays.asList(testFeedback));
-        when(feedbackMapper.toDto(testFeedback)).thenReturn(testFeedbackDTO);
-
-        List<FeedbackDTO> result = feedbackService.getByUserId(1L);
-
-        assertNotNull(result);
-        assertEquals(1, result.size());
-        verify(feedbackRepository, times(1)).findByUserId(1L);
-    }
-
-    @Test
-    void getByUserId_Unauthorized() {
-        when(securityService.isAdmin()).thenReturn(false);
-        when(securityService.hasAccessToUser(2L)).thenReturn(false);
-
-        assertThrows(UnauthorizedException.class, () -> feedbackService.getByUserId(2L));
-    }
-
-    @Test
     void create_Success() {
-        when(securityService.getCurrentUserId()).thenReturn(1L);
+        when(securityService.getCurrentUserExternalId()).thenReturn("user-uuid-1");
         when(feedbackMapper.toEntity(testFeedbackDTO)).thenReturn(testFeedback);
         when(feedbackRepository.save(any(Feedback.class))).thenReturn(testFeedback);
         when(feedbackMapper.toDto(testFeedback)).thenReturn(testFeedbackDTO);
@@ -177,29 +156,29 @@ class FeedbackServiceTest {
     }
 
     @Test
-    void create_WithoutUserId_SetsCurrentUser() {
-        FeedbackDTO dtoWithoutUserId = FeedbackDTO.builder()
+    void create_WithoutUserExternalId_SetsCurrentUser() {
+        FeedbackDTO dtoWithoutUserExternalId = FeedbackDTO.builder()
                 .rate(5)
                 .comment("Test")
                 .dateTime(testDateTime)
                 .build();
         
-        when(securityService.getCurrentUserId()).thenReturn(1L);
+        when(securityService.getCurrentUserExternalId()).thenReturn("user-uuid-1");
         when(feedbackMapper.toEntity(any(FeedbackDTO.class))).thenReturn(testFeedback);
         when(feedbackRepository.save(any(Feedback.class))).thenReturn(testFeedback);
         when(feedbackMapper.toDto(testFeedback)).thenReturn(testFeedbackDTO);
 
-        FeedbackDTO result = feedbackService.create(dtoWithoutUserId);
+        FeedbackDTO result = feedbackService.create(dtoWithoutUserExternalId);
 
         assertNotNull(result);
-        assertEquals(1L, dtoWithoutUserId.getUserId());
+        assertEquals("user-uuid-1", dtoWithoutUserExternalId.getUserExternalId());
     }
 
     @Test
     void create_Unauthorized() {
         when(securityService.isAdmin()).thenReturn(false);
-        when(securityService.getCurrentUserId()).thenReturn(1L);
-        testFeedbackDTO.setUserId(2L);
+        when(securityService.getCurrentUserExternalId()).thenReturn("user-uuid-1");
+        testFeedbackDTO.setUserExternalId("user-uuid-2");
 
         assertThrows(UnauthorizedException.class, () -> feedbackService.create(testFeedbackDTO));
     }
@@ -228,7 +207,7 @@ class FeedbackServiceTest {
     @Test
     void update_Unauthorized() {
         when(securityService.isAdmin()).thenReturn(false);
-        when(securityService.hasAccessToUser(1L)).thenReturn(false);
+        when(securityService.getCurrentUserExternalId()).thenReturn("user-uuid-2");
         when(feedbackRepository.findById(1L)).thenReturn(Optional.of(testFeedback));
 
         assertThrows(UnauthorizedException.class, () -> feedbackService.update(1L, testFeedbackDTO));
@@ -255,7 +234,7 @@ class FeedbackServiceTest {
     @Test
     void delete_Unauthorized() {
         when(securityService.isAdmin()).thenReturn(false);
-        when(securityService.hasAccessToUser(1L)).thenReturn(false);
+        when(securityService.getCurrentUserExternalId()).thenReturn("user-uuid-2");
         when(feedbackRepository.findById(1L)).thenReturn(Optional.of(testFeedback));
 
         assertThrows(UnauthorizedException.class, () -> feedbackService.delete(1L));

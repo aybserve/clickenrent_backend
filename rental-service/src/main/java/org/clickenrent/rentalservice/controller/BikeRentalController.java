@@ -40,6 +40,38 @@ public class BikeRentalController {
         return ResponseEntity.ok(bikeRentalService.getBikeRentalById(id));
     }
 
+    @GetMapping("/{id}/exists")
+    @PreAuthorize("isAuthenticated()")
+    @Operation(summary = "Check if bike rental exists by ID")
+    public ResponseEntity<Boolean> checkBikeRentalExists(@PathVariable Long id) {
+        boolean exists = bikeRentalService.getBikeRentalById(id) != null;
+        return ResponseEntity.ok(exists);
+    }
+
+    @GetMapping("/external/{externalId}")
+    @PreAuthorize("isAuthenticated()")
+    @Operation(summary = "Get bike rental by external ID")
+    public ResponseEntity<BikeRentalDTO> getByExternalId(@PathVariable String externalId) {
+        return ResponseEntity.ok(bikeRentalService.findByExternalId(externalId));
+    }
+
+    @PutMapping("/external/{externalId}")
+    @PreAuthorize("isAuthenticated()")
+    @Operation(summary = "Update bike rental by external ID")
+    public ResponseEntity<BikeRentalDTO> updateByExternalId(
+            @PathVariable String externalId,
+            @Valid @RequestBody BikeRentalDTO dto) {
+        return ResponseEntity.ok(bikeRentalService.updateByExternalId(externalId, dto));
+    }
+
+    @DeleteMapping("/external/{externalId}")
+    @PreAuthorize("hasAnyRole('SUPERADMIN', 'ADMIN')")
+    @Operation(summary = "Delete bike rental by external ID")
+    public ResponseEntity<Void> deleteByExternalId(@PathVariable String externalId) {
+        bikeRentalService.deleteByExternalId(externalId);
+        return ResponseEntity.noContent().build();
+    }
+
     @PostMapping
     @PreAuthorize("isAuthenticated()")
     @Operation(summary = "Create bike rental", description = "Creates bike rental and calculates revenue share if applicable")

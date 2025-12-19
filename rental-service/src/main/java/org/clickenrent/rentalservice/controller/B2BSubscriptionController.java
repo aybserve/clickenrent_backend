@@ -49,6 +49,28 @@ public class B2BSubscriptionController {
         return ResponseEntity.ok(b2bSubscriptionService.getSubscriptionById(id));
     }
 
+    @GetMapping("/{id}/exists")
+    @PreAuthorize("isAuthenticated()")
+    @Operation(summary = "Check if B2B subscription exists by ID")
+    public ResponseEntity<Boolean> checkSubscriptionExists(@PathVariable Long id) {
+        boolean exists = b2bSubscriptionService.getSubscriptionById(id) != null;
+        return ResponseEntity.ok(exists);
+    }
+
+    @GetMapping("/external/{externalId}")
+    @PreAuthorize("hasAnyRole('SUPERADMIN', 'ADMIN', 'B2B')")
+    @Operation(summary = "Get subscription by external ID")
+    public ResponseEntity<B2BSubscriptionDTO> getSubscriptionByExternalId(@PathVariable String externalId) {
+        return ResponseEntity.ok(b2bSubscriptionService.findByExternalId(externalId));
+    }
+
+    @GetMapping("/external/{externalId}/exists")
+    @PreAuthorize("isAuthenticated()")
+    @Operation(summary = "Check if B2B subscription exists by external ID")
+    public ResponseEntity<Boolean> checkSubscriptionExistsByExternalId(@PathVariable String externalId) {
+        return ResponseEntity.ok(b2bSubscriptionService.existsByExternalId(externalId));
+    }
+
     @PostMapping
     @PreAuthorize("hasAnyRole('SUPERADMIN', 'ADMIN', 'B2B')")
     @Operation(summary = "Create B2B subscription")

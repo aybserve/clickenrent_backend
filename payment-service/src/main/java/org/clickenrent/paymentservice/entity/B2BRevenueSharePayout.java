@@ -32,11 +32,15 @@ public class B2BRevenueSharePayout {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(unique = true, nullable = false, updatable = false)
-    private UUID externalId;
+    @Column(name = "external_id", unique = true, length = 100)
+    private String externalId;
 
     @Column(nullable = false)
     private Long companyId; // References company in auth-service
+
+    // Cross-service reference field using externalId
+    @Column(name = "company_external_id", length = 100)
+    private String companyExternalId;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "payment_status_id", nullable = false)
@@ -75,8 +79,8 @@ public class B2BRevenueSharePayout {
 
     @PrePersist
     public void prePersist() {
-        if (externalId == null) {
-            externalId = UUID.randomUUID();
+        if (externalId == null || externalId.isEmpty()) {
+            externalId = UUID.randomUUID().toString();
         }
     }
 

@@ -13,7 +13,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.UUID;
 
 /**
  * REST controller for Currency management
@@ -34,6 +33,7 @@ public class CurrencyController {
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Get currency by ID")
     @ApiResponse(responseCode = "200", description = "Successfully retrieved currency")
     @ApiResponse(responseCode = "404", description = "Currency not found")
@@ -42,10 +42,11 @@ public class CurrencyController {
     }
 
     @GetMapping("/external/{externalId}")
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Get currency by external ID")
     @ApiResponse(responseCode = "200", description = "Successfully retrieved currency")
     @ApiResponse(responseCode = "404", description = "Currency not found")
-    public ResponseEntity<CurrencyDTO> getCurrencyByExternalId(@PathVariable UUID externalId) {
+    public ResponseEntity<CurrencyDTO> getCurrencyByExternalId(@PathVariable String externalId) {
         return ResponseEntity.ok(currencyService.findByExternalId(externalId));
     }
 

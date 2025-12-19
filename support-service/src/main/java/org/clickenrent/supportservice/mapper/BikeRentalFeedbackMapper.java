@@ -17,8 +17,9 @@ public class BikeRentalFeedbackMapper {
 
         return BikeRentalFeedbackDTO.builder()
                 .id(entity.getId())
-                .userId(entity.getUserId())
-                .bikeRentalId(entity.getBikeRentalId())
+                .externalId(entity.getExternalId())
+                .userExternalId(entity.getUserExternalId())
+                .bikeRentalExternalId(entity.getBikeRentalExternalId())
                 .rate(entity.getRate())
                 .comment(entity.getComment())
                 .dateTime(entity.getDateTime())
@@ -36,8 +37,9 @@ public class BikeRentalFeedbackMapper {
 
         return BikeRentalFeedback.builder()
                 .id(dto.getId())
-                .userId(dto.getUserId())
-                .bikeRentalId(dto.getBikeRentalId())
+                .externalId(dto.getExternalId())
+                .userExternalId(dto.getUserExternalId())
+                .bikeRentalExternalId(dto.getBikeRentalExternalId())
                 .rate(dto.getRate())
                 .comment(dto.getComment())
                 .dateTime(dto.getDateTime())
@@ -49,11 +51,11 @@ public class BikeRentalFeedbackMapper {
             return;
         }
 
-        if (dto.getUserId() != null) {
-            entity.setUserId(dto.getUserId());
+        if (dto.getUserExternalId() != null) {
+            entity.setUserExternalId(dto.getUserExternalId());
         }
-        if (dto.getBikeRentalId() != null) {
-            entity.setBikeRentalId(dto.getBikeRentalId());
+        if (dto.getBikeRentalExternalId() != null) {
+            entity.setBikeRentalExternalId(dto.getBikeRentalExternalId());
         }
         if (dto.getRate() != null) {
             entity.setRate(dto.getRate());

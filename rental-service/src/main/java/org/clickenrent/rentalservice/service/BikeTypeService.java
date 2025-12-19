@@ -34,6 +34,13 @@ public class BikeTypeService {
         return bikeTypeMapper.toDto(bikeType);
     }
 
+    @Transactional(readOnly = true)
+    public BikeTypeDTO getBikeTypeByExternalId(String externalId) {
+        BikeType bikeType = bikeTypeRepository.findByExternalId(externalId)
+                .orElseThrow(() -> new ResourceNotFoundException("BikeType", "externalId", externalId));
+        return bikeTypeMapper.toDto(bikeType);
+    }
+
     @Transactional
     public BikeTypeDTO createBikeType(BikeTypeDTO dto) {
         if (!securityService.isAdmin()) {

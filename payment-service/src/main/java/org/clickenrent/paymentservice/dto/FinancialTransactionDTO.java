@@ -9,7 +9,6 @@ import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.UUID;
 
 /**
  * DTO for FinancialTransaction entity
@@ -22,13 +21,17 @@ public class FinancialTransactionDTO {
     
     private Long id;
     
-    private UUID externalId;
+    private String externalId;
     
     @NotNull(message = "Payer ID is required")
     private Long payerId;
     
     @NotNull(message = "Recipient ID is required")
     private Long recipientId;
+    
+    // Cross-service externalId references
+    private String payerExternalId;
+    private String recipientExternalId;
     
     @NotNull(message = "Amount is required")
     @Positive(message = "Amount must be positive")

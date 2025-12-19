@@ -30,6 +30,8 @@ public class FinancialTransactionMapper {
                 .externalId(entity.getExternalId())
                 .payerId(entity.getPayerId())
                 .recipientId(entity.getRecipientId())
+                .payerExternalId(entity.getPayerExternalId())
+                .recipientExternalId(entity.getRecipientExternalId())
                 .amount(entity.getAmount())
                 .currency(currencyMapper.toDTO(entity.getCurrency()))
                 .dateTime(entity.getDateTime())

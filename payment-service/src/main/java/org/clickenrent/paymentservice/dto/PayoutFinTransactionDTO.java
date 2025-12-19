@@ -6,7 +6,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.UUID;
 
 /**
  * DTO for PayoutFinTransaction entity
@@ -19,7 +18,7 @@ public class PayoutFinTransactionDTO {
     
     private Long id;
     
-    private UUID externalId;
+    private String externalId;
     
     @NotNull(message = "B2B revenue share payout is required")
     private B2BRevenueSharePayoutDTO b2bRevenueSharePayout;

@@ -24,6 +24,7 @@ import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.*;
 import static org.mockito.Mockito.lenient;
@@ -46,11 +47,11 @@ class B2BRevenueSharePayoutServiceTest {
     private B2BRevenueSharePayout testPayout;
     private B2BRevenueSharePayoutDTO testPayoutDTO;
     private PaymentStatus testPaymentStatus;
-    private UUID testExternalId;
+    private String testExternalId;
 
     @BeforeEach
     void setUp() {
-        testExternalId = UUID.randomUUID();
+        testExternalId = UUID.randomUUID().toString();
 
         testPaymentStatus = PaymentStatus.builder()
                 .id(1L)

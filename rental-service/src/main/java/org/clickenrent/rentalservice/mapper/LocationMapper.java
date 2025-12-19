@@ -28,6 +28,7 @@ public class LocationMapper {
                 .address(location.getAddress())
                 .description(location.getDescription())
                 .companyId(location.getCompanyId())
+                .companyExternalId(location.getCompanyExternalId())
                 .isPublic(location.getIsPublic())
                 .directions(location.getDirections())
                 .coordinatesId(location.getCoordinates() != null ? location.getCoordinates().getId() : null)

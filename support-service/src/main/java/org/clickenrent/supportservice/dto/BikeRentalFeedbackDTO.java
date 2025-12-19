@@ -17,11 +17,14 @@ import java.time.LocalDateTime;
 public class BikeRentalFeedbackDTO {
 
     private Long id;
-    private Long userId;
-    private Long bikeRentalId;
+    private String externalId;
     private Integer rate;
     private String comment;
     private LocalDateTime dateTime;
+
+    // Cross-service externalId references
+    private String userExternalId;
+    private String bikeRentalExternalId;
 
     // Audit fields
     private LocalDateTime dateCreated;

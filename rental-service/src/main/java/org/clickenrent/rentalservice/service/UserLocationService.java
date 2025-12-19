@@ -1,6 +1,9 @@
 package org.clickenrent.rentalservice.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.clickenrent.contracts.auth.UserDTO;
+import org.clickenrent.rentalservice.client.AuthServiceClient;
 import org.clickenrent.rentalservice.dto.UserLocationDTO;
 import org.clickenrent.rentalservice.entity.Location;
 import org.clickenrent.rentalservice.entity.UserLocation;
@@ -18,6 +21,7 @@ import java.util.List;
  * Service for managing UserLocation entities.
  * Assigns users to locations with specific roles.
  */
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class UserLocationService {
@@ -26,6 +30,7 @@ public class UserLocationService {
     private final LocationRepository locationRepository;
     private final UserLocationMapper userLocationMapper;
     private final SecurityService securityService;
+    private final AuthServiceClient authServiceClient;
 
     @Transactional(readOnly = true)
     public List<UserLocationDTO> getUserLocationsByUser(Long userId) {
@@ -62,6 +67,20 @@ public class UserLocationService {
         }
 
         UserLocation userLocation = userLocationMapper.toEntity(dto);
+        
+        // DUAL-WRITE: Populate userExternalId
+        if (dto.getUserId() != null) {
+            try {
+                UserDTO user = authServiceClient.getUserById(dto.getUserId());
+                userLocation.setUserId(dto.getUserId());
+                userLocation.setUserExternalId(user.getExternalId());
+                log.debug("Populated userExternalId: {} for user location", user.getExternalId());
+            } catch (Exception e) {
+                log.error("Failed to fetch user external ID for userId: {}", dto.getUserId(), e);
+                throw new RuntimeException("Failed to fetch user details", e);
+            }
+        }
+        
         userLocation = userLocationRepository.save(userLocation);
         return userLocationMapper.toDto(userLocation);
     }

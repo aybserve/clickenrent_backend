@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
 import java.util.List;
-import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/financial-transactions")
@@ -30,15 +29,34 @@ public class FinancialTransactionController {
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Get financial transaction by ID")
     public ResponseEntity<FinancialTransactionDTO> getById(@PathVariable Long id) {
         return ResponseEntity.ok(financialTransactionService.findById(id));
     }
 
     @GetMapping("/external/{externalId}")
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Get financial transaction by external ID")
-    public ResponseEntity<FinancialTransactionDTO> getByExternalId(@PathVariable UUID externalId) {
+    public ResponseEntity<FinancialTransactionDTO> getByExternalId(@PathVariable String externalId) {
         return ResponseEntity.ok(financialTransactionService.findByExternalId(externalId));
+    }
+
+    @PutMapping("/external/{externalId}")
+    @PreAuthorize("hasAnyRole('SUPERADMIN', 'ADMIN')")
+    @Operation(summary = "Update financial transaction by external ID", description = "Admin only - updates payment status")
+    public ResponseEntity<FinancialTransactionDTO> updateByExternalId(
+            @PathVariable String externalId,
+            @Valid @RequestBody FinancialTransactionDTO dto) {
+        return ResponseEntity.ok(financialTransactionService.updateByExternalId(externalId, dto));
+    }
+
+    @DeleteMapping("/external/{externalId}")
+    @PreAuthorize("hasRole('SUPERADMIN')")
+    @Operation(summary = "Delete financial transaction by external ID", description = "SUPERADMIN only - for data correction")
+    public ResponseEntity<Void> deleteByExternalId(@PathVariable String externalId) {
+        financialTransactionService.deleteByExternalId(externalId);
+        return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/payer/{payerId}")

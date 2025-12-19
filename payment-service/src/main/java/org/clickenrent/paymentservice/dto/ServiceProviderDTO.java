@@ -6,7 +6,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.UUID;
 
 /**
  * DTO for ServiceProvider entity
@@ -19,7 +18,7 @@ public class ServiceProviderDTO {
     
     private Long id;
     
-    private UUID externalId;
+    private String externalId;
     
     @NotBlank(message = "Service provider code is required")
     private String code;

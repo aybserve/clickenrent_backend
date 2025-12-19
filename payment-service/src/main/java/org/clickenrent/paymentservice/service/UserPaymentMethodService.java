@@ -14,7 +14,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.UUID;
 
 /**
  * Service for UserPaymentMethod management
@@ -49,7 +48,7 @@ public class UserPaymentMethodService {
     }
 
     @Transactional(readOnly = true)
-    public UserPaymentMethodDTO findByExternalId(UUID externalId) {
+    public UserPaymentMethodDTO findByExternalId(String externalId) {
         UserPaymentMethod method = userPaymentMethodRepository.findByExternalId(externalId)
                 .orElseThrow(() -> new ResourceNotFoundException("UserPaymentMethod", "externalId", externalId));
         

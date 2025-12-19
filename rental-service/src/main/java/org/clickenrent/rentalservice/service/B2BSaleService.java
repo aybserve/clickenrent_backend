@@ -93,4 +93,22 @@ public class B2BSaleService {
                 .orElseThrow(() -> new ResourceNotFoundException("B2BSale", "id", id));
         b2bSaleRepository.delete(sale);
     }
+
+    @Transactional(readOnly = true)
+    public B2BSaleDTO findByExternalId(String externalId) {
+        B2BSale sale = b2bSaleRepository.findByExternalId(externalId)
+                .orElseThrow(() -> new ResourceNotFoundException("B2BSale", "externalId", externalId));
+
+        // Check access
+        if (!securityService.isAdmin()) {
+            throw new UnauthorizedException("You don't have permission to view this sale");
+        }
+
+        return b2bSaleMapper.toDto(sale);
+    }
+
+    @Transactional(readOnly = true)
+    public boolean existsByExternalId(String externalId) {
+        return b2bSaleRepository.existsByExternalId(externalId);
+    }
 }

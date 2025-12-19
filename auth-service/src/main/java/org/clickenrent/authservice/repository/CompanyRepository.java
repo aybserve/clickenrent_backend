@@ -20,6 +20,11 @@ public interface CompanyRepository extends JpaRepository<Company, Long> {
      * Used for B2B users to fetch only their accessible companies efficiently.
      */
     Page<Company> findByIdIn(List<Long> ids, Pageable pageable);
+
+    /**
+     * Find company by externalId for cross-service lookups
+     */
+    java.util.Optional<Company> findByExternalId(String externalId);
 }
 
 

@@ -16,6 +16,11 @@ public interface RentalRepository extends JpaRepository<Rental, Long> {
     List<Rental> findByUserId(Long userId);
     List<Rental> findByCompanyId(Long companyId);
     Optional<Rental> findByErpRentalOrderId(String erpRentalOrderId);
+
+    // Cross-service query methods using externalId
+    List<Rental> findByUserExternalId(String userExternalId);
+    List<Rental> findByCompanyExternalId(String companyExternalId);
+    boolean existsByExternalId(String externalId);
 }
 
 

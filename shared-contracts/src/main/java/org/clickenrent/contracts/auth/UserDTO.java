@@ -1,4 +1,4 @@
-package org.clickenrent.rentalservice.dto;
+package org.clickenrent.contracts.auth;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -8,8 +8,13 @@ import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
 
 /**
- * Data Transfer Object for User entity from auth-service.
- * Used for Feign client responses.
+ * Shared contract DTO for User entity.
+ * Used for cross-service communication.
+ * 
+ * Source: auth-service
+ * Consumers: rental-service, payment-service, support-service
+ * 
+ * @version 1.0.0
  */
 @Data
 @Builder
@@ -41,5 +46,3 @@ public class UserDTO {
     private String createdBy;
     private String lastModifiedBy;
 }
-
-

@@ -7,7 +7,6 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
 /**
  * Repository for B2BRevenueSharePayout entity
@@ -19,7 +18,7 @@ public interface B2BRevenueSharePayoutRepository extends JpaRepository<B2BRevenu
     
     List<B2BRevenueSharePayout> findByPaymentStatus(PaymentStatus status);
     
-    Optional<B2BRevenueSharePayout> findByExternalId(UUID externalId);
+    Optional<B2BRevenueSharePayout> findByExternalId(String externalId);
 }
 
 

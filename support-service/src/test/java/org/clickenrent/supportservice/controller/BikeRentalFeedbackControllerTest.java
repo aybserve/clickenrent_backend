@@ -42,8 +42,8 @@ class BikeRentalFeedbackControllerTest {
     void setUp() {
         feedbackDTO = BikeRentalFeedbackDTO.builder()
                 .id(1L)
-                .userId(1L)
-                .bikeRentalId(101L)
+                .userExternalId("user-uuid-1")
+                .bikeRentalExternalId("bike-rental-uuid-101")
                 .rate(5)
                 .comment("Great bike!")
                 .dateTime(LocalDateTime.now())

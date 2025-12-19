@@ -28,6 +28,7 @@ public class B2BRevenueSharePayoutMapper {
                 .id(entity.getId())
                 .externalId(entity.getExternalId())
                 .companyId(entity.getCompanyId())
+                .companyExternalId(entity.getCompanyExternalId())
                 .paymentStatus(paymentStatusMapper.toDTO(entity.getPaymentStatus()))
                 .dueDate(entity.getDueDate())
                 .totalAmount(entity.getTotalAmount())

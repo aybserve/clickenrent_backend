@@ -24,7 +24,9 @@ public class UserLocationMapper {
 
         return UserLocationDTO.builder()
                 .id(userLocation.getId())
+                .externalId(userLocation.getExternalId())
                 .userId(userLocation.getUserId())
+                .userExternalId(userLocation.getUserExternalId())
                 .locationId(userLocation.getLocation() != null ? userLocation.getLocation().getId() : null)
                 .locationRoleId(userLocation.getLocationRole() != null ? userLocation.getLocationRole().getId() : null)
                 .build();
@@ -37,6 +39,7 @@ public class UserLocationMapper {
 
         UserLocation.UserLocationBuilder builder = UserLocation.builder()
                 .id(dto.getId())
+                .externalId(dto.getExternalId())
                 .userId(dto.getUserId());
 
         if (dto.getLocationId() != null) {

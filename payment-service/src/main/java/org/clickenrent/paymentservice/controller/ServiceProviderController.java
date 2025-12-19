@@ -8,10 +8,10 @@ import org.clickenrent.paymentservice.dto.ServiceProviderDTO;
 import org.clickenrent.paymentservice.service.ServiceProviderService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/service-providers")
@@ -28,14 +28,16 @@ public class ServiceProviderController {
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Get service provider by ID")
     public ResponseEntity<ServiceProviderDTO> getById(@PathVariable Long id) {
         return ResponseEntity.ok(serviceProviderService.findById(id));
     }
 
     @GetMapping("/external/{externalId}")
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Get service provider by external ID")
-    public ResponseEntity<ServiceProviderDTO> getByExternalId(@PathVariable UUID externalId) {
+    public ResponseEntity<ServiceProviderDTO> getByExternalId(@PathVariable String externalId) {
         return ResponseEntity.ok(serviceProviderService.findByExternalId(externalId));
     }
 

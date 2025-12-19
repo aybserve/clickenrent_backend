@@ -18,6 +18,9 @@ public class BikeBrandDTO {
     private String externalId;
     private String name;
     private Long companyId;
+
+    // Cross-service externalId reference
+    private String companyExternalId;
 }
 
 

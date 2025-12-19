@@ -77,6 +77,43 @@ public class BikeController {
     }
 
     /**
+     * Get bike by external ID.
+     * GET /api/bikes/external/{externalId}
+     */
+    @GetMapping("/external/{externalId}")
+    @PreAuthorize("isAuthenticated()")
+    @Operation(summary = "Get bike by external ID", description = "Retrieve bike details by external ID for cross-service communication")
+    public ResponseEntity<BikeDTO> getByExternalId(@PathVariable String externalId) {
+        BikeDTO bike = bikeService.findByExternalId(externalId);
+        return ResponseEntity.ok(bike);
+    }
+
+    /**
+     * Update bike by external ID.
+     * PUT /api/bikes/external/{externalId}
+     */
+    @PutMapping("/external/{externalId}")
+    @PreAuthorize("isAuthenticated()")
+    @Operation(summary = "Update bike by external ID", description = "Used for cross-service updates (e.g., support-service reporting issues)")
+    public ResponseEntity<BikeDTO> updateByExternalId(
+            @PathVariable String externalId,
+            @Valid @RequestBody BikeDTO dto) {
+        return ResponseEntity.ok(bikeService.updateByExternalId(externalId, dto));
+    }
+
+    /**
+     * Delete bike by external ID.
+     * DELETE /api/bikes/external/{externalId}
+     */
+    @DeleteMapping("/external/{externalId}")
+    @PreAuthorize("hasAnyRole('SUPERADMIN', 'ADMIN')")
+    @Operation(summary = "Delete bike by external ID")
+    public ResponseEntity<Void> deleteByExternalId(@PathVariable String externalId) {
+        bikeService.deleteByExternalId(externalId);
+        return ResponseEntity.noContent().build();
+    }
+
+    /**
      * Get bike by code.
      * GET /api/bikes/code/{code}
      */

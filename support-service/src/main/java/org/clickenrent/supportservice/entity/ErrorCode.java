@@ -16,7 +16,7 @@ import org.hibernate.annotations.Where;
     name = "error_code",
     indexes = {
         @Index(name = "idx_error_code_external_id", columnList = "external_id"),
-        @Index(name = "idx_error_code_bike_engine_id", columnList = "bike_engine_id")
+        @Index(name = "idx_error_code_bike_engine_ext_id", columnList = "bike_engine_external_id")
     }
 )
 @SQLDelete(sql = "UPDATE error_code SET is_deleted = true WHERE id = ?")
@@ -41,8 +41,8 @@ public class ErrorCode extends BaseAuditEntity {
     @Column(name = "name", nullable = false, length = 255)
     private String name;
 
-    @Column(name = "bike_engine_id")
-    private Long bikeEngineId;
+    @Column(name = "bike_engine_external_id", length = 100)
+    private String bikeEngineExternalId;
 
     @Size(max = 1000, message = "Description must not exceed 1000 characters")
     @Column(name = "description", length = 1000)

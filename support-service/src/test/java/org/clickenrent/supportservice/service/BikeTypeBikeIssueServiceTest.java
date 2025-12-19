@@ -50,13 +50,13 @@ class BikeTypeBikeIssueServiceTest {
 
         testJunction = BikeTypeBikeIssue.builder()
                 .id(1L)
-                .bikeTypeId(1L)
+                .bikeTypeExternalId("bike-type-uuid-1")
                 .bikeIssue(testBikeIssue)
                 .build();
 
         testJunctionDTO = BikeTypeBikeIssueDTO.builder()
                 .id(1L)
-                .bikeTypeId(1L)
+                .bikeTypeExternalId("bike-type-uuid-1")
                 .build();
     }
 
@@ -80,7 +80,7 @@ class BikeTypeBikeIssueServiceTest {
         BikeTypeBikeIssueDTO result = bikeTypeBikeIssueService.getById(1L);
 
         assertNotNull(result);
-        assertEquals(1L, result.getBikeTypeId());
+        assertEquals("bike-type-uuid-1", result.getBikeTypeExternalId());
         verify(bikeTypeBikeIssueRepository, times(1)).findById(1L);
     }
 
@@ -92,16 +92,16 @@ class BikeTypeBikeIssueServiceTest {
     }
 
     @Test
-    void getByBikeTypeId_Success() {
-        when(bikeTypeBikeIssueRepository.findByBikeTypeId(1L)).thenReturn(Arrays.asList(testJunction));
+    void getByBikeTypeExternalId_Success() {
+        when(bikeTypeBikeIssueRepository.findByBikeTypeExternalId("bike-type-uuid-1")).thenReturn(Arrays.asList(testJunction));
         when(bikeTypeBikeIssueMapper.toDto(testJunction)).thenReturn(testJunctionDTO);
 
-        List<BikeTypeBikeIssueDTO> result = bikeTypeBikeIssueService.getByBikeTypeId(1L);
+        List<BikeTypeBikeIssueDTO> result = bikeTypeBikeIssueService.getByBikeTypeExternalId("bike-type-uuid-1");
 
         assertNotNull(result);
         assertEquals(1, result.size());
-        assertEquals(1L, result.get(0).getBikeTypeId());
-        verify(bikeTypeBikeIssueRepository, times(1)).findByBikeTypeId(1L);
+        assertEquals("bike-type-uuid-1", result.get(0).getBikeTypeExternalId());
+        verify(bikeTypeBikeIssueRepository, times(1)).findByBikeTypeExternalId("bike-type-uuid-1");
     }
 
     @Test

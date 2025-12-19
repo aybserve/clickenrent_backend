@@ -8,6 +8,8 @@ import lombok.experimental.SuperBuilder;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
 
+import java.util.UUID;
+
 /**
  * Entity representing customer support requests.
  */
@@ -16,8 +18,8 @@ import org.hibernate.annotations.Where;
     name = "support_request",
     indexes = {
         @Index(name = "idx_support_request_external_id", columnList = "external_id"),
-        @Index(name = "idx_support_request_user_id", columnList = "user_id"),
-        @Index(name = "idx_support_request_bike_id", columnList = "bike_id")
+        @Index(name = "idx_support_request_user_external_id", columnList = "user_external_id"),
+        @Index(name = "idx_support_request_bike_external_id", columnList = "bike_external_id")
     }
 )
 @SQLDelete(sql = "UPDATE support_request SET is_deleted = true WHERE id = ?")
@@ -37,12 +39,11 @@ public class SupportRequest extends BaseAuditEntity {
     @Column(name = "external_id", unique = true, length = 100)
     private String externalId;
 
-    @NotNull(message = "User ID is required")
-    @Column(name = "user_id", nullable = false)
-    private Long userId;
+    @Column(name = "user_external_id", length = 100)
+    private String userExternalId;
 
-    @Column(name = "bike_id")
-    private Long bikeId;
+    @Column(name = "bike_external_id", length = 100)
+    private String bikeExternalId;
 
     @Builder.Default
     @Column(name = "is_near_location", nullable = false)
@@ -60,6 +61,13 @@ public class SupportRequest extends BaseAuditEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "support_request_status_id", nullable = false)
     private SupportRequestStatus supportRequestStatus;
+
+    @PrePersist
+    public void prePersist() {
+        if (externalId == null || externalId.isEmpty()) {
+            externalId = UUID.randomUUID().toString();
+        }
+    }
 }
 
 

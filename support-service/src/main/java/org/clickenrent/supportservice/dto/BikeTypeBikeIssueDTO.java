@@ -15,7 +15,7 @@ import lombok.NoArgsConstructor;
 public class BikeTypeBikeIssueDTO {
 
     private Long id;
-    private Long bikeTypeId;
+    private String bikeTypeExternalId;
     private Long bikeIssueId;
     private String bikeIssueName;
 }

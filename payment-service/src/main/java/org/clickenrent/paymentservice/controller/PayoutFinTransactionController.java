@@ -8,10 +8,10 @@ import org.clickenrent.paymentservice.dto.PayoutFinTransactionDTO;
 import org.clickenrent.paymentservice.service.PayoutFinTransactionService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/payout-fin-transactions")
@@ -28,14 +28,16 @@ public class PayoutFinTransactionController {
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Get payout transaction by ID")
     public ResponseEntity<PayoutFinTransactionDTO> getById(@PathVariable Long id) {
         return ResponseEntity.ok(payoutFinTransactionService.findById(id));
     }
 
     @GetMapping("/external/{externalId}")
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Get payout transaction by external ID")
-    public ResponseEntity<PayoutFinTransactionDTO> getByExternalId(@PathVariable UUID externalId) {
+    public ResponseEntity<PayoutFinTransactionDTO> getByExternalId(@PathVariable String externalId) {
         return ResponseEntity.ok(payoutFinTransactionService.findByExternalId(externalId));
     }
 

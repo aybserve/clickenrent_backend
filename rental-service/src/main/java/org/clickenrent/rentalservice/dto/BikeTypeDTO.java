@@ -15,6 +15,7 @@ import lombok.NoArgsConstructor;
 public class BikeTypeDTO {
 
     private Long id;
+    private String externalId;
     private String name;
 }
 

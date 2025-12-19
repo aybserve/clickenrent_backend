@@ -6,7 +6,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.UUID;
 
 /**
  * DTO for UserPaymentMethod entity
@@ -19,7 +18,7 @@ public class UserPaymentMethodDTO {
     
     private Long id;
     
-    private UUID externalId;
+    private String externalId;
     
     @NotNull(message = "User payment profile is required")
     private UserPaymentProfileDTO userPaymentProfile;

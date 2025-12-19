@@ -23,6 +23,10 @@ public class RentalDTO {
     private Long rentalStatusId;
     private String erpRentalOrderId;
 
+    // Cross-service externalId references
+    private String userExternalId;
+    private String companyExternalId;
+
     // Audit fields
     private LocalDateTime dateCreated;
     private LocalDateTime lastDateModified;

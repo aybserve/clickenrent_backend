@@ -11,7 +11,6 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 /**
  * DTO for B2BRevenueSharePayout entity
@@ -24,10 +23,13 @@ public class B2BRevenueSharePayoutDTO {
     
     private Long id;
     
-    private UUID externalId;
+    private String externalId;
     
     @NotNull(message = "Company ID is required")
     private Long companyId;
+    
+    // Cross-service externalId reference
+    private String companyExternalId;
     
     @NotNull(message = "Payment status is required")
     private PaymentStatusDTO paymentStatus;

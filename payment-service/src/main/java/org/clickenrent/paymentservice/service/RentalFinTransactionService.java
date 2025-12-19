@@ -1,6 +1,9 @@
 package org.clickenrent.paymentservice.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.clickenrent.contracts.rental.BikeRentalDTO;
+import org.clickenrent.contracts.rental.RentalDTO;
 import org.clickenrent.paymentservice.client.RentalServiceClient;
 import org.clickenrent.paymentservice.dto.RentalFinTransactionDTO;
 import org.clickenrent.paymentservice.entity.RentalFinTransaction;
@@ -12,11 +15,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.UUID;
 
 /**
  * Service for Rental FinancialTransaction management
  */
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class RentalFinTransactionService {
@@ -47,7 +50,7 @@ public class RentalFinTransactionService {
     }
 
     @Transactional(readOnly = true)
-    public RentalFinTransactionDTO findByExternalId(UUID externalId) {
+    public RentalFinTransactionDTO findByExternalId(String externalId) {
         if (!securityService.isAdmin()) {
             throw new UnauthorizedException("Only admins can view rental transactions");
         }
@@ -60,10 +63,36 @@ public class RentalFinTransactionService {
 
     @Transactional
     public RentalFinTransactionDTO create(RentalFinTransactionDTO dto) {
-        // Validate rental exists
-        rentalServiceClient.checkRentalExists(dto.getRentalId());
-        
         RentalFinTransaction transaction = rentalFinTransactionMapper.toEntity(dto);
+        
+        // DUAL-WRITE: Populate rentalExternalId
+        if (dto.getRentalId() != null) {
+            try {
+                RentalDTO rental = rentalServiceClient.getRentalById(dto.getRentalId());
+                transaction.setRentalId(dto.getRentalId());
+                transaction.setRentalExternalId(rental.getExternalId());
+                log.debug("Populated rentalExternalId: {} for rental transaction", rental.getExternalId());
+            } catch (Exception e) {
+                log.error("Failed to fetch rental external ID for rentalId: {}", dto.getRentalId(), e);
+                throw new RuntimeException("Failed to fetch rental details", e);
+            }
+        }
+        
+        // DUAL-WRITE: Populate bikeRentalExternalId (optional)
+        if (dto.getBikeRentalId() != null) {
+            try {
+                BikeRentalDTO bikeRental =
+                    rentalServiceClient.getBikeRentalById(dto.getBikeRentalId());
+                transaction.setBikeRentalId(dto.getBikeRentalId());
+                transaction.setBikeRentalExternalId(bikeRental.getExternalId());
+                log.debug("Populated bikeRentalExternalId: {} for rental transaction", bikeRental.getExternalId());
+            } catch (Exception e) {
+                log.error("Failed to fetch bike rental external ID for bikeRentalId: {}", dto.getBikeRentalId(), e);
+                // Don't fail - bikeRental is optional
+                log.warn("Continuing without bikeRentalExternalId");
+            }
+        }
+        
         RentalFinTransaction savedTransaction = rentalFinTransactionRepository.save(transaction);
         return rentalFinTransactionMapper.toDTO(savedTransaction);
     }

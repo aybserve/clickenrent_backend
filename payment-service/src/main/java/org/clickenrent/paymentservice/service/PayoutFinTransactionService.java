@@ -11,7 +11,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.UUID;
 
 /**
  * Service for Payout FinancialTransaction management
@@ -45,7 +44,7 @@ public class PayoutFinTransactionService {
     }
 
     @Transactional(readOnly = true)
-    public PayoutFinTransactionDTO findByExternalId(UUID externalId) {
+    public PayoutFinTransactionDTO findByExternalId(String externalId) {
         if (!securityService.isAdmin() && !securityService.isB2B()) {
             throw new UnauthorizedException("You don't have permission to view payout transactions");
         }

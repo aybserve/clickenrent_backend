@@ -14,6 +14,7 @@ import java.util.Optional;
 @Repository
 public interface BikeReservationRepository extends JpaRepository<BikeReservation, Long> {
     Optional<BikeReservation> findByExternalId(String externalId);
+    boolean existsByExternalId(String externalId);
     List<BikeReservation> findByUserId(Long userId);
     List<BikeReservation> findByBike(Bike bike);
 }

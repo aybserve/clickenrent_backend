@@ -11,6 +11,7 @@ import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 /**
  * Entity representing feedback specific to bike rentals.
@@ -19,8 +20,9 @@ import java.time.LocalDateTime;
 @Table(
     name = "bike_rental_feedback",
     indexes = {
-        @Index(name = "idx_bike_rental_feedback_user_id", columnList = "user_id"),
-        @Index(name = "idx_bike_rental_feedback_bike_rental_id", columnList = "bike_rental_id")
+        @Index(name = "idx_bike_rental_feedback_external_id", columnList = "external_id"),
+        @Index(name = "idx_bike_rental_feedback_user_external_id", columnList = "user_external_id"),
+        @Index(name = "idx_bike_rental_feedback_bike_rental_ext_id", columnList = "bike_rental_external_id")
     }
 )
 @SQLDelete(sql = "UPDATE bike_rental_feedback SET is_deleted = true WHERE id = ?")
@@ -37,13 +39,14 @@ public class BikeRentalFeedback extends BaseAuditEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotNull(message = "User ID is required")
-    @Column(name = "user_id", nullable = false)
-    private Long userId;
+    @Column(name = "external_id", unique = true, length = 100)
+    private String externalId;
 
-    @NotNull(message = "Bike rental ID is required")
-    @Column(name = "bike_rental_id", nullable = false)
-    private Long bikeRentalId;
+    @Column(name = "user_external_id", length = 100)
+    private String userExternalId;
+
+    @Column(name = "bike_rental_external_id", length = 100)
+    private String bikeRentalExternalId;
 
     @NotNull(message = "Rate is required")
     @Min(value = 1, message = "Rate must be at least 1")
@@ -58,6 +61,13 @@ public class BikeRentalFeedback extends BaseAuditEntity {
     @NotNull(message = "Date time is required")
     @Column(name = "date_time", nullable = false)
     private LocalDateTime dateTime;
+
+    @PrePersist
+    public void prePersist() {
+        if (externalId == null || externalId.isEmpty()) {
+            externalId = UUID.randomUUID().toString();
+        }
+    }
 }
 
 

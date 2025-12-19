@@ -7,8 +7,6 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
-
 /**
  * Repository for FinancialTransaction entity
  */
@@ -21,7 +19,7 @@ public interface FinancialTransactionRepository extends JpaRepository<FinancialT
     
     Optional<FinancialTransaction> findByStripePaymentIntentId(String stripePaymentIntentId);
     
-    Optional<FinancialTransaction> findByExternalId(UUID externalId);
+    Optional<FinancialTransaction> findByExternalId(String externalId);
     
     List<FinancialTransaction> findByPaymentStatus(PaymentStatus status);
 }

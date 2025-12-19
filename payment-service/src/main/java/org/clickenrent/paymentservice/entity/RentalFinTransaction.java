@@ -28,11 +28,21 @@ public class RentalFinTransaction {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(unique = true, nullable = false, updatable = false)
-    private UUID externalId;
+    @Column(name = "external_id", unique = true, length = 100)
+    private String externalId;
 
     @Column(nullable = false)
     private Long rentalId; // References rental in rental-service
+
+    @Column(name = "bike_rental_id")
+    private Long bikeRentalId; // References bike rental in rental-service (optional)
+
+    // Cross-service reference fields using externalId
+    @Column(name = "rental_external_id", length = 100)
+    private String rentalExternalId;
+
+    @Column(name = "bike_rental_external_id", length = 100)
+    private String bikeRentalExternalId;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "financial_transaction_id", nullable = false)
@@ -55,8 +65,8 @@ public class RentalFinTransaction {
 
     @PrePersist
     public void prePersist() {
-        if (externalId == null) {
-            externalId = UUID.randomUUID();
+        if (externalId == null || externalId.isEmpty()) {
+            externalId = UUID.randomUUID().toString();
         }
     }
 

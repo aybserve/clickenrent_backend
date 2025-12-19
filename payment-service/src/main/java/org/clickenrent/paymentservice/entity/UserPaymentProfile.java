@@ -28,11 +28,15 @@ public class UserPaymentProfile {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(unique = true, nullable = false, updatable = false)
-    private UUID externalId;
+    @Column(name = "external_id", unique = true, length = 100)
+    private String externalId;
 
     @Column(nullable = false)
     private Long userId; // References user in auth-service
+
+    // Cross-service reference field using externalId
+    @Column(name = "user_external_id", length = 100)
+    private String userExternalId;
 
     @Column(unique = true, length = 255)
     private String stripeCustomerId;
@@ -57,8 +61,8 @@ public class UserPaymentProfile {
 
     @PrePersist
     public void prePersist() {
-        if (externalId == null) {
-            externalId = UUID.randomUUID();
+        if (externalId == null || externalId.isEmpty()) {
+            externalId = UUID.randomUUID().toString();
         }
     }
 

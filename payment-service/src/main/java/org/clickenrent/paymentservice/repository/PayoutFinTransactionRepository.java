@@ -5,7 +5,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
-import java.util.UUID;
 
 /**
  * Repository for PayoutFinTransaction entity
@@ -15,7 +14,7 @@ public interface PayoutFinTransactionRepository extends JpaRepository<PayoutFinT
     
     Optional<PayoutFinTransaction> findByB2bRevenueSharePayoutId(Long payoutId);
     
-    Optional<PayoutFinTransaction> findByExternalId(UUID externalId);
+    Optional<PayoutFinTransaction> findByExternalId(String externalId);
 }
 
 

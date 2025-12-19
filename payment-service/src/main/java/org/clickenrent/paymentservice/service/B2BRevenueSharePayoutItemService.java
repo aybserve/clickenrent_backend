@@ -12,7 +12,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.UUID;
 
 /**
  * Service for B2B Revenue Share Payout Item management
@@ -47,7 +46,7 @@ public class B2BRevenueSharePayoutItemService {
     }
 
     @Transactional(readOnly = true)
-    public B2BRevenueSharePayoutItemDTO findByExternalId(UUID externalId) {
+    public B2BRevenueSharePayoutItemDTO findByExternalId(String externalId) {
         if (!securityService.isAdmin() && !securityService.isB2B()) {
             throw new UnauthorizedException("You don't have permission to view payout items");
         }

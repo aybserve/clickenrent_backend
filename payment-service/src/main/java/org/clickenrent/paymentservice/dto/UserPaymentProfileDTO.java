@@ -6,7 +6,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.UUID;
 
 /**
  * DTO for UserPaymentProfile entity
@@ -19,10 +18,13 @@ public class UserPaymentProfileDTO {
     
     private Long id;
     
-    private UUID externalId;
+    private String externalId;
     
     @NotNull(message = "User ID is required")
     private Long userId;
+    
+    // Cross-service externalId reference
+    private String userExternalId;
     
     private String stripeCustomerId;
     

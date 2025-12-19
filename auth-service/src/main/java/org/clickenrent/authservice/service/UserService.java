@@ -94,9 +94,19 @@ public class UserService {
         if (!securityService.hasAccessToUser(id)) {
             throw new UnauthorizedException("You don't have permission to view this user");
         }
-        
+
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("User", "id", id));
+        return userMapper.toDto(user);
+    }
+
+    /**
+     * Find user by externalId for cross-service communication
+     */
+    @Transactional(readOnly = true)
+    public UserDTO findByExternalId(String externalId) {
+        User user = userRepository.findByExternalId(externalId)
+                .orElseThrow(() -> new ResourceNotFoundException("User", "externalId", externalId));
         return userMapper.toDto(user);
     }
     

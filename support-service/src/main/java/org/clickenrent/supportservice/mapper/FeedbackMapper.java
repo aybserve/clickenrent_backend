@@ -18,7 +18,7 @@ public class FeedbackMapper {
         return FeedbackDTO.builder()
                 .id(entity.getId())
                 .externalId(entity.getExternalId())
-                .userId(entity.getUserId())
+                .userExternalId(entity.getUserExternalId())
                 .rate(entity.getRate())
                 .comment(entity.getComment())
                 .dateTime(entity.getDateTime())
@@ -37,7 +37,7 @@ public class FeedbackMapper {
         return Feedback.builder()
                 .id(dto.getId())
                 .externalId(dto.getExternalId())
-                .userId(dto.getUserId())
+                .userExternalId(dto.getUserExternalId())
                 .rate(dto.getRate())
                 .comment(dto.getComment())
                 .dateTime(dto.getDateTime())
@@ -49,8 +49,8 @@ public class FeedbackMapper {
             return;
         }
 
-        if (dto.getUserId() != null) {
-            entity.setUserId(dto.getUserId());
+        if (dto.getUserExternalId() != null) {
+            entity.setUserExternalId(dto.getUserExternalId());
         }
         if (dto.getRate() != null) {
             entity.setRate(dto.getRate());

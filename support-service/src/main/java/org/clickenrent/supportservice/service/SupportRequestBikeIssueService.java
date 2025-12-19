@@ -43,8 +43,8 @@ public class SupportRequestBikeIssueService {
                 .orElseThrow(() -> new ResourceNotFoundException("SupportRequestBikeIssue", "id", id));
         
         if (!securityService.isAdmin()) {
-            Long userId = entity.getSupportRequest().getUserId();
-            if (!securityService.hasAccessToUser(userId)) {
+            String userExternalId = entity.getSupportRequest().getUserExternalId();
+            if (!securityService.hasAccessToUserByExternalId(userExternalId)) {
                 throw new UnauthorizedException("You don't have permission to access this issue");
             }
         }
@@ -57,7 +57,7 @@ public class SupportRequestBikeIssueService {
         if (!securityService.isAdmin()) {
             var supportRequest = supportRequestRepository.findById(supportRequestId)
                     .orElseThrow(() -> new ResourceNotFoundException("SupportRequest", "id", supportRequestId));
-            if (!securityService.hasAccessToUser(supportRequest.getUserId())) {
+            if (!securityService.hasAccessToUserByExternalId(supportRequest.getUserExternalId())) {
                 throw new UnauthorizedException("You don't have permission to access these issues");
             }
         }
@@ -83,7 +83,7 @@ public class SupportRequestBikeIssueService {
         if (!securityService.isAdmin()) {
             var supportRequest = supportRequestRepository.findById(dto.getSupportRequestId())
                     .orElseThrow(() -> new ResourceNotFoundException("SupportRequest", "id", dto.getSupportRequestId()));
-            if (!securityService.hasAccessToUser(supportRequest.getUserId())) {
+            if (!securityService.hasAccessToUserByExternalId(supportRequest.getUserExternalId())) {
                 throw new UnauthorizedException("You can only add issues to your own support requests");
             }
         }
@@ -99,8 +99,8 @@ public class SupportRequestBikeIssueService {
                 .orElseThrow(() -> new ResourceNotFoundException("SupportRequestBikeIssue", "id", id));
 
         if (!securityService.isAdmin()) {
-            Long userId = entity.getSupportRequest().getUserId();
-            if (!securityService.hasAccessToUser(userId)) {
+            String userExternalId = entity.getSupportRequest().getUserExternalId();
+            if (!securityService.hasAccessToUserByExternalId(userExternalId)) {
                 throw new UnauthorizedException("You don't have permission to delete this issue");
             }
         }

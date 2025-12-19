@@ -6,7 +6,6 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
 /**
  * Repository for PaymentMethod entity
@@ -18,7 +17,7 @@ public interface PaymentMethodRepository extends JpaRepository<PaymentMethod, Lo
     
     List<PaymentMethod> findByIsActive(Boolean isActive);
     
-    Optional<PaymentMethod> findByExternalId(UUID externalId);
+    Optional<PaymentMethod> findByExternalId(String externalId);
 }
 
 

@@ -12,7 +12,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.UUID;
 
 /**
  * Service for B2B Sale FinancialTransaction management
@@ -47,7 +46,7 @@ public class B2BSaleFinTransactionService {
     }
 
     @Transactional(readOnly = true)
-    public B2BSaleFinTransactionDTO findByExternalId(UUID externalId) {
+    public B2BSaleFinTransactionDTO findByExternalId(String externalId) {
         if (!securityService.isAdmin() && !securityService.isB2B()) {
             throw new UnauthorizedException("You don't have permission to view B2B sale transactions");
         }

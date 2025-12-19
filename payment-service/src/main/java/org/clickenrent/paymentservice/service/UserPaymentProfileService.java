@@ -2,8 +2,8 @@ package org.clickenrent.paymentservice.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.clickenrent.contracts.auth.UserDTO;
 import org.clickenrent.paymentservice.client.AuthServiceClient;
-import org.clickenrent.paymentservice.dto.UserDTO;
 import org.clickenrent.paymentservice.dto.UserPaymentProfileDTO;
 import org.clickenrent.paymentservice.entity.UserPaymentProfile;
 import org.clickenrent.paymentservice.exception.ResourceNotFoundException;
@@ -14,7 +14,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.UUID;
 
 /**
  * Service for UserPaymentProfile management with Stripe customer integration
@@ -49,7 +48,7 @@ public class UserPaymentProfileService {
     }
 
     @Transactional(readOnly = true)
-    public UserPaymentProfileDTO findByExternalId(UUID externalId) {
+    public UserPaymentProfileDTO findByExternalId(String externalId) {
         UserPaymentProfile profile = userPaymentProfileRepository.findByExternalId(externalId)
                 .orElseThrow(() -> new ResourceNotFoundException("UserPaymentProfile", "externalId", externalId));
         
@@ -106,10 +105,21 @@ public class UserPaymentProfileService {
 
     @Transactional
     public UserPaymentProfileDTO create(UserPaymentProfileDTO dto) {
-        // Validate user exists
-        authServiceClient.getUserById(dto.getUserId());
-        
         UserPaymentProfile profile = userPaymentProfileMapper.toEntity(dto);
+        
+        // DUAL-WRITE: Populate userExternalId
+        if (dto.getUserId() != null) {
+            try {
+                UserDTO user = authServiceClient.getUserById(dto.getUserId());
+                profile.setUserId(dto.getUserId());
+                profile.setUserExternalId(user.getExternalId());
+                log.debug("Populated userExternalId: {} for payment profile", user.getExternalId());
+            } catch (Exception e) {
+                log.error("Failed to fetch user external ID for userId: {}", dto.getUserId(), e);
+                throw new RuntimeException("Failed to fetch user details", e);
+            }
+        }
+        
         UserPaymentProfile savedProfile = userPaymentProfileRepository.save(profile);
         return userPaymentProfileMapper.toDTO(savedProfile);
     }

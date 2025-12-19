@@ -8,10 +8,10 @@ import org.clickenrent.paymentservice.dto.B2BSaleFinTransactionDTO;
 import org.clickenrent.paymentservice.service.B2BSaleFinTransactionService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/b2b-sale-fin-transactions")
@@ -28,14 +28,16 @@ public class B2BSaleFinTransactionController {
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Get B2B sale transaction by ID")
     public ResponseEntity<B2BSaleFinTransactionDTO> getById(@PathVariable Long id) {
         return ResponseEntity.ok(b2bSaleFinTransactionService.findById(id));
     }
 
     @GetMapping("/external/{externalId}")
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Get B2B sale transaction by external ID")
-    public ResponseEntity<B2BSaleFinTransactionDTO> getByExternalId(@PathVariable UUID externalId) {
+    public ResponseEntity<B2BSaleFinTransactionDTO> getByExternalId(@PathVariable String externalId) {
         return ResponseEntity.ok(b2bSaleFinTransactionService.findByExternalId(externalId));
     }
 

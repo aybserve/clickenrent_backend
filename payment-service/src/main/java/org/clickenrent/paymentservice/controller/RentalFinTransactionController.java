@@ -8,10 +8,10 @@ import org.clickenrent.paymentservice.dto.RentalFinTransactionDTO;
 import org.clickenrent.paymentservice.service.RentalFinTransactionService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/rental-fin-transactions")
@@ -28,14 +28,16 @@ public class RentalFinTransactionController {
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Get rental transaction by ID")
     public ResponseEntity<RentalFinTransactionDTO> getById(@PathVariable Long id) {
         return ResponseEntity.ok(rentalFinTransactionService.findById(id));
     }
 
     @GetMapping("/external/{externalId}")
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(summary = "Get rental transaction by external ID")
-    public ResponseEntity<RentalFinTransactionDTO> getByExternalId(@PathVariable UUID externalId) {
+    public ResponseEntity<RentalFinTransactionDTO> getByExternalId(@PathVariable String externalId) {
         return ResponseEntity.ok(rentalFinTransactionService.findByExternalId(externalId));
     }
 

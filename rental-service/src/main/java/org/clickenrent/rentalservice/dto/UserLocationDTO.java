@@ -15,9 +15,13 @@ import lombok.NoArgsConstructor;
 public class UserLocationDTO {
 
     private Long id;
+    private String externalId;
     private Long userId;
     private Long locationId;
     private Long locationRoleId;
+
+    // Cross-service externalId reference
+    private String userExternalId;
 }
 
 

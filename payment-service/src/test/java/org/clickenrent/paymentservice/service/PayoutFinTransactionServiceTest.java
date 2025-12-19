@@ -24,6 +24,7 @@ import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.*;
 import static org.mockito.Mockito.lenient;
@@ -45,11 +46,11 @@ class PayoutFinTransactionServiceTest {
 
     private PayoutFinTransaction testPayoutFinTransaction;
     private PayoutFinTransactionDTO testPayoutFinTransactionDTO;
-    private UUID testExternalId;
+    private String testExternalId;
 
     @BeforeEach
     void setUp() {
-        testExternalId = UUID.randomUUID();
+        testExternalId = UUID.randomUUID().toString();
 
         B2BRevenueSharePayout payout = B2BRevenueSharePayout.builder()
                 .id(1L)
@@ -150,7 +151,7 @@ class PayoutFinTransactionServiceTest {
 
     @Test
     void findByExternalId_NotFound() {
-        UUID randomId = UUID.randomUUID();
+        String randomId = UUID.randomUUID().toString();
         when(payoutFinTransactionRepository.findByExternalId(randomId)).thenReturn(Optional.empty());
 
         assertThrows(ResourceNotFoundException.class, () -> payoutFinTransactionService.findByExternalId(randomId));

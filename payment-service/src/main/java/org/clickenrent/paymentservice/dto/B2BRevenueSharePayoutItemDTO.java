@@ -8,7 +8,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
-import java.util.UUID;
 
 /**
  * DTO for B2BRevenueSharePayoutItem entity
@@ -21,7 +20,7 @@ public class B2BRevenueSharePayoutItemDTO {
     
     private Long id;
     
-    private UUID externalId;
+    private String externalId;
     
     private Long b2bRevenueSharePayoutId;
     

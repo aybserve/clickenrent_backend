@@ -15,7 +15,7 @@ public interface FeedbackRepository extends JpaRepository<Feedback, Long> {
     
     Optional<Feedback> findByExternalId(String externalId);
     
-    List<Feedback> findByUserId(Long userId);
+    List<Feedback> findByUserExternalId(String userExternalId);
     
     List<Feedback> findByRate(Integer rate);
 }

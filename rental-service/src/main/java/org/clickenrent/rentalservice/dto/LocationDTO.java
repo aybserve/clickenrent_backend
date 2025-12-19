@@ -27,6 +27,9 @@ public class LocationDTO {
     private String directions;
     private Long coordinatesId;
 
+    // Cross-service externalId reference
+    private String companyExternalId;
+
     // Audit fields
     private LocalDateTime dateCreated;
     private LocalDateTime lastDateModified;

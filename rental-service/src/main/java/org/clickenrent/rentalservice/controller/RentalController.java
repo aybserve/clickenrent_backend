@@ -78,6 +78,55 @@ public class RentalController {
     }
 
     /**
+     * Get rental by external ID.
+     * GET /api/rentals/external/{externalId}
+     */
+    @GetMapping("/external/{externalId}")
+    @PreAuthorize("isAuthenticated()")
+    @Operation(summary = "Get rental by external ID", description = "Retrieve rental details by external ID for cross-service communication")
+    public ResponseEntity<RentalDTO> getByExternalId(@PathVariable String externalId) {
+        RentalDTO rental = rentalService.findByExternalId(externalId);
+        return ResponseEntity.ok(rental);
+    }
+
+    /**
+     * Check if rental exists by external ID.
+     * GET /api/rentals/external/{externalId}/exists
+     */
+    @GetMapping("/external/{externalId}/exists")
+    @PreAuthorize("isAuthenticated()")
+    @Operation(summary = "Check if rental exists by external ID", description = "Check if rental exists by external ID for cross-service validation")
+    public ResponseEntity<Boolean> checkExistsByExternalId(@PathVariable String externalId) {
+        Boolean exists = rentalService.existsByExternalId(externalId);
+        return ResponseEntity.ok(exists);
+    }
+
+    /**
+     * Update rental by external ID.
+     * PUT /api/rentals/external/{externalId}
+     */
+    @PutMapping("/external/{externalId}")
+    @PreAuthorize("isAuthenticated()")
+    @Operation(summary = "Update rental by external ID")
+    public ResponseEntity<RentalDTO> updateByExternalId(
+            @PathVariable String externalId,
+            @Valid @RequestBody RentalDTO dto) {
+        return ResponseEntity.ok(rentalService.updateByExternalId(externalId, dto));
+    }
+
+    /**
+     * Delete rental by external ID.
+     * DELETE /api/rentals/external/{externalId}
+     */
+    @DeleteMapping("/external/{externalId}")
+    @PreAuthorize("hasAnyRole('SUPERADMIN', 'ADMIN')")
+    @Operation(summary = "Delete rental by external ID")
+    public ResponseEntity<Void> deleteByExternalId(@PathVariable String externalId) {
+        rentalService.deleteByExternalId(externalId);
+        return ResponseEntity.noContent().build();
+    }
+
+    /**
      * Create a new rental.
      * POST /api/rentals
      */

@@ -6,6 +6,8 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 
+import java.util.UUID;
+
 /**
  * Entity representing bike brands.
  */
@@ -14,7 +16,8 @@ import lombok.*;
     name = "bike_brand",
     indexes = {
         @Index(name = "idx_bike_brand_external_id", columnList = "external_id"),
-        @Index(name = "idx_bike_brand_company_id", columnList = "company_id")
+        @Index(name = "idx_bike_brand_company_id", columnList = "company_id"),
+        @Index(name = "idx_bike_brand_company_external_id", columnList = "company_external_id")
     }
 )
 @Getter
@@ -41,6 +44,17 @@ public class BikeBrand {
     @NotNull(message = "Company ID is required")
     @Column(name = "company_id", nullable = false)
     private Long companyId;
+
+    // Cross-service reference field using externalId
+    @Column(name = "company_external_id", length = 100)
+    private String companyExternalId;
+
+    @PrePersist
+    public void prePersist() {
+        if (externalId == null || externalId.isEmpty()) {
+            externalId = UUID.randomUUID().toString();
+        }
+    }
 }
 
 

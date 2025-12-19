@@ -13,6 +13,7 @@ import java.util.Optional;
 @Repository
 public interface LocationRepository extends JpaRepository<Location, Long> {
     Optional<Location> findByExternalId(String externalId);
+    boolean existsByExternalId(String externalId);
     List<Location> findByCompanyId(Long companyId);
     Optional<Location> findByErpPartnerId(String erpPartnerId);
 }

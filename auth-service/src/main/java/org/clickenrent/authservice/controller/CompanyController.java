@@ -83,6 +83,18 @@ public class CompanyController {
     }
     
     /**
+     * Get company by external ID.
+     * GET /api/companies/external/{externalId}
+     */
+    @GetMapping("/external/{externalId}")
+    @PreAuthorize("isAuthenticated()")
+    @Operation(summary = "Get company by external ID", description = "Retrieve company details by external ID for cross-service communication")
+    public ResponseEntity<CompanyDTO> getCompanyByExternalId(@PathVariable String externalId) {
+        CompanyDTO company = companyService.findByExternalId(externalId);
+        return ResponseEntity.ok(company);
+    }
+    
+    /**
      * Create a new company.
      * POST /api/companies
      */

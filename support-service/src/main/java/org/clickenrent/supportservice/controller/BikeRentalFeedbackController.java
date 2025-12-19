@@ -40,18 +40,18 @@ public class BikeRentalFeedbackController {
         return ResponseEntity.ok(bikeRentalFeedbackService.getById(id));
     }
 
-    @GetMapping("/bike-rental/{bikeRentalId}")
+    @GetMapping("/bike-rental/{bikeRentalExternalId}")
     @PreAuthorize("isAuthenticated()")
-    @Operation(summary = "Get bike rental feedback by bike rental ID")
-    public ResponseEntity<BikeRentalFeedbackDTO> getByBikeRentalId(@PathVariable Long bikeRentalId) {
-        return ResponseEntity.ok(bikeRentalFeedbackService.getByBikeRentalId(bikeRentalId));
+    @Operation(summary = "Get bike rental feedback by bike rental external ID")
+    public ResponseEntity<BikeRentalFeedbackDTO> getByBikeRentalExternalId(@PathVariable String bikeRentalExternalId) {
+        return ResponseEntity.ok(bikeRentalFeedbackService.getByBikeRentalExternalId(bikeRentalExternalId));
     }
 
-    @GetMapping("/user/{userId}")
+    @GetMapping("/user/{userExternalId}")
     @PreAuthorize("isAuthenticated()")
-    @Operation(summary = "Get bike rental feedbacks by user ID")
-    public ResponseEntity<List<BikeRentalFeedbackDTO>> getByUserId(@PathVariable Long userId) {
-        return ResponseEntity.ok(bikeRentalFeedbackService.getByUserId(userId));
+    @Operation(summary = "Get bike rental feedbacks by user external ID")
+    public ResponseEntity<List<BikeRentalFeedbackDTO>> getByUserExternalId(@PathVariable String userExternalId) {
+        return ResponseEntity.ok(bikeRentalFeedbackService.getByUserExternalId(userExternalId));
     }
 
     @PostMapping

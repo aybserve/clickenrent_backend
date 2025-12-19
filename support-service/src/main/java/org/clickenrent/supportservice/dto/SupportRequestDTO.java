@@ -18,14 +18,16 @@ public class SupportRequestDTO {
 
     private Long id;
     private String externalId;
-    private Long userId;
-    private Long bikeId;
     private Boolean isNearLocation;
     private String photoUrl;
     private Long errorCodeId;
     private String errorCodeName;
     private Long supportRequestStatusId;
     private String supportRequestStatusName;
+
+    // Cross-service externalId references
+    private String userExternalId;
+    private String bikeExternalId;
 
     // Audit fields
     private LocalDateTime dateCreated;

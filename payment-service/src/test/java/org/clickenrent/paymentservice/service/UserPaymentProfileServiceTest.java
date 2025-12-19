@@ -1,7 +1,7 @@
 package org.clickenrent.paymentservice.service;
 
+import org.clickenrent.contracts.auth.UserDTO;
 import org.clickenrent.paymentservice.client.AuthServiceClient;
-import org.clickenrent.paymentservice.dto.UserDTO;
 import org.clickenrent.paymentservice.dto.UserPaymentProfileDTO;
 import org.clickenrent.paymentservice.entity.UserPaymentProfile;
 import org.clickenrent.paymentservice.exception.ResourceNotFoundException;
@@ -22,6 +22,7 @@ import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
@@ -50,11 +51,11 @@ class UserPaymentProfileServiceTest {
 
     private UserPaymentProfile testProfile;
     private UserPaymentProfileDTO testProfileDTO;
-    private UUID testExternalId;
+    private String testExternalId;
 
     @BeforeEach
     void setUp() {
-        testExternalId = UUID.randomUUID();
+        testExternalId = UUID.randomUUID().toString();
 
         testProfile = UserPaymentProfile.builder()
                 .id(1L)

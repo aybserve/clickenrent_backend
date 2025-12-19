@@ -43,7 +43,7 @@ class ErrorCodeControllerTest {
                 .id(1L)
                 .externalId("550e8400-e29b-41d4-a716-446655440201")
                 .name("E001")
-                .bikeEngineId(1L)
+                .bikeEngineExternalId("bike-engine-uuid-1")
                 .description("Battery Low Voltage")
                 .isFixableByClient(false)
                 .build();

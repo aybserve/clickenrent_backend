@@ -6,7 +6,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.UUID;
 
 /**
  * DTO for B2BSaleFinTransaction entity
@@ -19,7 +18,7 @@ public class B2BSaleFinTransactionDTO {
     
     private Long id;
     
-    private UUID externalId;
+    private String externalId;
     
     @NotNull(message = "B2B sale ID is required")
     private Long b2bSaleId;

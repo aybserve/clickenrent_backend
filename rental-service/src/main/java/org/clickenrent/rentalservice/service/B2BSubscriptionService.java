@@ -91,4 +91,21 @@ public class B2BSubscriptionService {
                 .orElseThrow(() -> new ResourceNotFoundException("B2BSubscription", "id", id));
         b2bSubscriptionRepository.delete(subscription);
     }
+
+    @Transactional(readOnly = true)
+    public B2BSubscriptionDTO findByExternalId(String externalId) {
+        B2BSubscription subscription = b2bSubscriptionRepository.findByExternalId(externalId)
+                .orElseThrow(() -> new ResourceNotFoundException("B2BSubscription", "externalId", externalId));
+
+        if (!securityService.isAdmin()) {
+            throw new UnauthorizedException("You don't have permission to view this subscription");
+        }
+
+        return b2bSubscriptionMapper.toDto(subscription);
+    }
+
+    @Transactional(readOnly = true)
+    public boolean existsByExternalId(String externalId) {
+        return b2bSubscriptionRepository.existsByExternalId(externalId);
+    }
 }

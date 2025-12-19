@@ -47,11 +47,11 @@ public class FeedbackController {
         return ResponseEntity.ok(feedbackService.getByExternalId(externalId));
     }
 
-    @GetMapping("/user/{userId}")
+    @GetMapping("/user/{userExternalId}")
     @PreAuthorize("isAuthenticated()")
-    @Operation(summary = "Get feedbacks by user ID")
-    public ResponseEntity<List<FeedbackDTO>> getByUserId(@PathVariable Long userId) {
-        return ResponseEntity.ok(feedbackService.getByUserId(userId));
+    @Operation(summary = "Get feedbacks by user external ID")
+    public ResponseEntity<List<FeedbackDTO>> getByUserExternalId(@PathVariable String userExternalId) {
+        return ResponseEntity.ok(feedbackService.getByUserExternalId(userExternalId));
     }
 
     @PostMapping

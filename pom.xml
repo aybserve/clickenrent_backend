@@ -36,10 +36,18 @@
         <type>pom</type>
         <scope>import</scope>
       </dependency>
+      
+      <!-- Shared contracts module -->
+      <dependency>
+        <groupId>org.clickenrent</groupId>
+        <artifactId>shared-contracts</artifactId>
+        <version>1.0.0</version>
+      </dependency>
     </dependencies>
   </dependencyManagement>
 
   <modules>
+    <module>shared-contracts</module>
     <module>eureka-server</module>
     <module>auth-service</module>
     <module>rental-service</module>

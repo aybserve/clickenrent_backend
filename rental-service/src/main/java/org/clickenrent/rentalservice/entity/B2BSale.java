@@ -8,6 +8,7 @@ import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 /**
  * Entity representing B2B sales between companies.
@@ -50,4 +51,11 @@ public class B2BSale extends BaseAuditEntity {
     @NotNull(message = "Date time is required")
     @Column(name = "date_time", nullable = false)
     private LocalDateTime dateTime;
+
+    @PrePersist
+    public void prePersist() {
+        if (externalId == null || externalId.isEmpty()) {
+            externalId = UUID.randomUUID().toString();
+        }
+    }
 }

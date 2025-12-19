@@ -59,9 +59,19 @@ public class CompanyService {
         if (!securityService.hasAccessToCompany(id)) {
             throw new UnauthorizedException("You don't have permission to view this company");
         }
-        
+
         Company company = companyRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Company", "id", id));
+        return companyMapper.toDto(company);
+    }
+
+    /**
+     * Find company by externalId for cross-service communication
+     */
+    @Transactional(readOnly = true)
+    public CompanyDTO findByExternalId(String externalId) {
+        Company company = companyRepository.findByExternalId(externalId)
+                .orElseThrow(() -> new ResourceNotFoundException("Company", "externalId", externalId));
         return companyMapper.toDto(company);
     }
     

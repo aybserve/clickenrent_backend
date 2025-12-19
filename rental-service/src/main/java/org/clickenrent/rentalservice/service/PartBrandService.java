@@ -1,6 +1,9 @@
 package org.clickenrent.rentalservice.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.clickenrent.contracts.auth.CompanyDTO;
+import org.clickenrent.rentalservice.client.AuthServiceClient;
 import org.clickenrent.rentalservice.dto.PartBrandDTO;
 import org.clickenrent.rentalservice.entity.PartBrand;
 import org.clickenrent.rentalservice.exception.ResourceNotFoundException;
@@ -14,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class PartBrandService {
@@ -21,6 +25,7 @@ public class PartBrandService {
     private final PartBrandRepository partBrandRepository;
     private final PartBrandMapper partBrandMapper;
     private final SecurityService securityService;
+    private final AuthServiceClient authServiceClient;
 
     @Transactional(readOnly = true)
     public Page<PartBrandDTO> getAllBrands(Pageable pageable) {
@@ -53,6 +58,20 @@ public class PartBrandService {
         }
 
         PartBrand brand = partBrandMapper.toEntity(dto);
+        
+        // DUAL-WRITE: Populate companyExternalId
+        if (dto.getCompanyId() != null) {
+            try {
+                CompanyDTO company = authServiceClient.getCompanyById(dto.getCompanyId());
+                brand.setCompanyId(dto.getCompanyId());
+                brand.setCompanyExternalId(company.getExternalId());
+                log.debug("Populated companyExternalId: {} for part brand", company.getExternalId());
+            } catch (Exception e) {
+                log.error("Failed to fetch company external ID for companyId: {}", dto.getCompanyId(), e);
+                throw new RuntimeException("Failed to fetch company details", e);
+            }
+        }
+        
         brand = partBrandRepository.save(brand);
         return partBrandMapper.toDto(brand);
     }
