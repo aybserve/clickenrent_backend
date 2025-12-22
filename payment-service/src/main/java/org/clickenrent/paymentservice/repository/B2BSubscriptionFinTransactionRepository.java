@@ -12,7 +12,7 @@ import java.util.Optional;
 @Repository
 public interface B2BSubscriptionFinTransactionRepository extends JpaRepository<B2BSubscriptionFinTransaction, Long> {
     
-    Optional<B2BSubscriptionFinTransaction> findByB2bSubscriptionId(Long b2bSubscriptionId);
+    Optional<B2BSubscriptionFinTransaction> findByB2bSubscriptionExternalId(String b2bSubscriptionExternalId);
     
     Optional<B2BSubscriptionFinTransaction> findByExternalId(String externalId);
 }

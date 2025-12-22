@@ -23,14 +23,11 @@ public class FinancialTransactionDTO {
     
     private String externalId;
     
-    @NotNull(message = "Payer ID is required")
-    private Long payerId;
-    
-    @NotNull(message = "Recipient ID is required")
-    private Long recipientId;
-    
     // Cross-service externalId references
+    @NotNull(message = "Payer external ID is required")
     private String payerExternalId;
+    
+    @NotNull(message = "Recipient external ID is required")
     private String recipientExternalId;
     
     @NotNull(message = "Amount is required")

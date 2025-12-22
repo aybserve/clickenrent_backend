@@ -2,13 +2,10 @@ package org.clickenrent.paymentservice.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.springframework.data.annotation.CreatedBy;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedBy;
-import org.springframework.data.annotation.LastModifiedDate;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+import lombok.experimental.SuperBuilder;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.Where;
 
-import java.time.LocalDateTime;
 import java.util.UUID;
 
 /**
@@ -16,13 +13,14 @@ import java.util.UUID;
  */
 @Entity
 @Table(name = "b2b_sale_fin_transactions")
-@EntityListeners(AuditingEntityListener.class)
+@SQLDelete(sql = "UPDATE b2b_sale_fin_transactions SET is_deleted = true WHERE id = ?")
+@Where(clause = "is_deleted = false")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
-public class B2BSaleFinTransaction {
+@SuperBuilder
+public class B2BSaleFinTransaction extends BaseAuditEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -31,27 +29,12 @@ public class B2BSaleFinTransaction {
     @Column(name = "external_id", unique = true, length = 100)
     private String externalId;
 
-    @Column(nullable = false)
-    private Long b2bSaleId; // References B2B sale in rental-service
+    @Column(name = "b2b_sale_external_id", length = 100)
+    private String b2bSaleExternalId; // References B2B sale in rental-service
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "financial_transaction_id", nullable = false)
     private FinancialTransaction financialTransaction;
-
-    @CreatedDate
-    @Column(nullable = false, updatable = false)
-    private LocalDateTime createdAt;
-
-    @LastModifiedDate
-    @Column(nullable = false)
-    private LocalDateTime updatedAt;
-
-    @CreatedBy
-    @Column(updatable = false)
-    private String createdBy;
-
-    @LastModifiedBy
-    private String lastModifiedBy;
 
     @PrePersist
     public void prePersist() {

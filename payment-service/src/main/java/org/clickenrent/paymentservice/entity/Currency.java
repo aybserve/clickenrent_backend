@@ -2,13 +2,10 @@ package org.clickenrent.paymentservice.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.springframework.data.annotation.CreatedBy;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedBy;
-import org.springframework.data.annotation.LastModifiedDate;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+import lombok.experimental.SuperBuilder;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.Where;
 
-import java.time.LocalDateTime;
 import java.util.UUID;
 
 /**
@@ -16,13 +13,14 @@ import java.util.UUID;
  */
 @Entity
 @Table(name = "currencies")
-@EntityListeners(AuditingEntityListener.class)
+@SQLDelete(sql = "UPDATE currencies SET is_deleted = true WHERE id = ?")
+@Where(clause = "is_deleted = false")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
-public class Currency {
+@SuperBuilder
+public class Currency extends BaseAuditEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -36,21 +34,9 @@ public class Currency {
 
     @Column(nullable = false)
     private String name; // US Dollar, Euro, British Pound, etc.
-
-    @CreatedDate
-    @Column(nullable = false, updatable = false)
-    private LocalDateTime createdAt;
-
-    @LastModifiedDate
-    @Column(nullable = false)
-    private LocalDateTime updatedAt;
-
-    @CreatedBy
-    @Column(updatable = false)
-    private String createdBy;
-
-    @LastModifiedBy
-    private String lastModifiedBy;
+    
+    @Column(length = 10)
+    private String symbol; // $, €, £, etc.
 
     @PrePersist
     public void prePersist() {

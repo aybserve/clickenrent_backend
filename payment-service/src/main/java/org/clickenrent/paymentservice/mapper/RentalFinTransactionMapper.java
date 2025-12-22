@@ -25,8 +25,6 @@ public class RentalFinTransactionMapper {
         return RentalFinTransactionDTO.builder()
                 .id(entity.getId())
                 .externalId(entity.getExternalId())
-                .rentalId(entity.getRentalId())
-                .bikeRentalId(entity.getBikeRentalId())
                 .rentalExternalId(entity.getRentalExternalId())
                 .bikeRentalExternalId(entity.getBikeRentalExternalId())
                 .financialTransaction(financialTransactionMapper.toDTO(entity.getFinancialTransaction()))
@@ -41,8 +39,8 @@ public class RentalFinTransactionMapper {
         return RentalFinTransaction.builder()
                 .id(dto.getId())
                 .externalId(dto.getExternalId())
-                .rentalId(dto.getRentalId())
-                .bikeRentalId(dto.getBikeRentalId())
+                .rentalExternalId(dto.getRentalExternalId())
+                .bikeRentalExternalId(dto.getBikeRentalExternalId())
                 .financialTransaction(financialTransactionMapper.toEntity(dto.getFinancialTransaction()))
                 .build();
     }

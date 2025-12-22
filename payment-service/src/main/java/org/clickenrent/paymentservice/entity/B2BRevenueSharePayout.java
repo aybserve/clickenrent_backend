@@ -2,15 +2,12 @@ package org.clickenrent.paymentservice.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.springframework.data.annotation.CreatedBy;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedBy;
-import org.springframework.data.annotation.LastModifiedDate;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+import lombok.experimental.SuperBuilder;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.Where;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -20,13 +17,14 @@ import java.util.UUID;
  */
 @Entity
 @Table(name = "b2b_revenue_share_payouts")
-@EntityListeners(AuditingEntityListener.class)
+@SQLDelete(sql = "UPDATE b2b_revenue_share_payouts SET is_deleted = true WHERE id = ?")
+@Where(clause = "is_deleted = false")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
-public class B2BRevenueSharePayout {
+@SuperBuilder
+public class B2BRevenueSharePayout extends BaseAuditEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -34,9 +32,6 @@ public class B2BRevenueSharePayout {
 
     @Column(name = "external_id", unique = true, length = 100)
     private String externalId;
-
-    @Column(nullable = false)
-    private Long companyId; // References company in auth-service
 
     // Cross-service reference field using externalId
     @Column(name = "company_external_id", length = 100)
@@ -61,21 +56,6 @@ public class B2BRevenueSharePayout {
     @OneToMany(mappedBy = "b2bRevenueSharePayout", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     private List<B2BRevenueSharePayoutItem> payoutItems = new ArrayList<>();
-
-    @CreatedDate
-    @Column(nullable = false, updatable = false)
-    private LocalDateTime createdAt;
-
-    @LastModifiedDate
-    @Column(nullable = false)
-    private LocalDateTime updatedAt;
-
-    @CreatedBy
-    @Column(updatable = false)
-    private String createdBy;
-
-    @LastModifiedBy
-    private String lastModifiedBy;
 
     @PrePersist
     public void prePersist() {

@@ -43,10 +43,10 @@ public class B2BRevenueSharePayoutController {
         return ResponseEntity.ok(b2bRevenueSharePayoutService.findByExternalId(externalId));
     }
 
-    @GetMapping("/company/{companyId}")
-    @Operation(summary = "Get payouts by company ID")
-    public ResponseEntity<List<B2BRevenueSharePayoutDTO>> getByCompanyId(@PathVariable Long companyId) {
-        return ResponseEntity.ok(b2bRevenueSharePayoutService.findByCompanyId(companyId));
+    @GetMapping("/company/{companyExternalId}")
+    @Operation(summary = "Get payouts by company external ID")
+    public ResponseEntity<List<B2BRevenueSharePayoutDTO>> getByCompanyExternalId(@PathVariable String companyExternalId) {
+        return ResponseEntity.ok(b2bRevenueSharePayoutService.findByCompanyExternalId(companyExternalId));
     }
 
     @PostMapping

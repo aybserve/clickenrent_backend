@@ -59,10 +59,16 @@ public class FinancialTransactionController {
         return ResponseEntity.noContent().build();
     }
 
-    @GetMapping("/payer/{payerId}")
-    @Operation(summary = "Get transactions by payer ID")
-    public ResponseEntity<List<FinancialTransactionDTO>> getByPayerId(@PathVariable Long payerId) {
-        return ResponseEntity.ok(financialTransactionService.findByPayerId(payerId));
+    @GetMapping("/payer/{payerExternalId}")
+    @Operation(summary = "Get transactions by payer external ID")
+    public ResponseEntity<List<FinancialTransactionDTO>> getByPayerExternalId(@PathVariable String payerExternalId) {
+        return ResponseEntity.ok(financialTransactionService.findByPayerExternalId(payerExternalId));
+    }
+    
+    @GetMapping("/recipient/{recipientExternalId}")
+    @Operation(summary = "Get transactions by recipient external ID")
+    public ResponseEntity<List<FinancialTransactionDTO>> getByRecipientExternalId(@PathVariable String recipientExternalId) {
+        return ResponseEntity.ok(financialTransactionService.findByRecipientExternalId(recipientExternalId));
     }
 
     @PostMapping

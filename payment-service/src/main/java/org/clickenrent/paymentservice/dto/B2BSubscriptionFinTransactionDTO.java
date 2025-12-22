@@ -20,8 +20,8 @@ public class B2BSubscriptionFinTransactionDTO {
     
     private String externalId;
     
-    @NotNull(message = "B2B subscription ID is required")
-    private Long b2bSubscriptionId;
+    @NotNull(message = "B2B subscription external ID is required")
+    private String b2bSubscriptionExternalId;
     
     @NotNull(message = "Financial transaction is required")
     private FinancialTransactionDTO financialTransaction;

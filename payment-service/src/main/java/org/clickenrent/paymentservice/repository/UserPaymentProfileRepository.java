@@ -12,7 +12,7 @@ import java.util.Optional;
 @Repository
 public interface UserPaymentProfileRepository extends JpaRepository<UserPaymentProfile, Long> {
     
-    Optional<UserPaymentProfile> findByUserId(Long userId);
+    Optional<UserPaymentProfile> findByUserExternalId(String userExternalId);
     
     Optional<UserPaymentProfile> findByStripeCustomerId(String stripeCustomerId);
     

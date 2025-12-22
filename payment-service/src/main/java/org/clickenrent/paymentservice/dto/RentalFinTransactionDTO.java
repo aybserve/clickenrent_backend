@@ -20,14 +20,11 @@ public class RentalFinTransactionDTO {
     
     private String externalId;
     
-    @NotNull(message = "Rental ID is required")
-    private Long rentalId;
-    
-    private Long bikeRentalId; // Optional: References specific bike rental within the rental
-    
     // Cross-service externalId references
+    @NotNull(message = "Rental external ID is required")
     private String rentalExternalId;
-    private String bikeRentalExternalId;
+    
+    private String bikeRentalExternalId; // Optional: References specific bike rental within the rental
     
     @NotNull(message = "Financial transaction is required")
     private FinancialTransactionDTO financialTransaction;

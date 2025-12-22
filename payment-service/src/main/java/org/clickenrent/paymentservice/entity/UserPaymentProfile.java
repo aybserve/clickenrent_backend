@@ -2,13 +2,10 @@ package org.clickenrent.paymentservice.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.springframework.data.annotation.CreatedBy;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedBy;
-import org.springframework.data.annotation.LastModifiedDate;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+import lombok.experimental.SuperBuilder;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.Where;
 
-import java.time.LocalDateTime;
 import java.util.UUID;
 
 /**
@@ -16,13 +13,14 @@ import java.util.UUID;
  */
 @Entity
 @Table(name = "user_payment_profiles")
-@EntityListeners(AuditingEntityListener.class)
+@SQLDelete(sql = "UPDATE user_payment_profiles SET is_deleted = true WHERE id = ?")
+@Where(clause = "is_deleted = false")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
-public class UserPaymentProfile {
+@SuperBuilder
+public class UserPaymentProfile extends BaseAuditEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -30,9 +28,6 @@ public class UserPaymentProfile {
 
     @Column(name = "external_id", unique = true, length = 100)
     private String externalId;
-
-    @Column(nullable = false)
-    private Long userId; // References user in auth-service
 
     // Cross-service reference field using externalId
     @Column(name = "user_external_id", length = 100)
@@ -43,21 +38,6 @@ public class UserPaymentProfile {
 
     @Column(nullable = false)
     private Boolean isActive = true;
-
-    @CreatedDate
-    @Column(nullable = false, updatable = false)
-    private LocalDateTime createdAt;
-
-    @LastModifiedDate
-    @Column(nullable = false)
-    private LocalDateTime updatedAt;
-
-    @CreatedBy
-    @Column(updatable = false)
-    private String createdBy;
-
-    @LastModifiedBy
-    private String lastModifiedBy;
 
     @PrePersist
     public void prePersist() {
@@ -71,7 +51,7 @@ public class UserPaymentProfile {
         if (this == o) return true;
         if (!(o instanceof UserPaymentProfile)) return false;
         UserPaymentProfile that = (UserPaymentProfile) o;
-        return userId != null && userId.equals(that.userId);
+        return externalId != null && externalId.equals(that.externalId);
     }
 
     @Override

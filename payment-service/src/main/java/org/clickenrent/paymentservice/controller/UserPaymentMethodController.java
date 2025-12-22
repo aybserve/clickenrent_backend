@@ -42,10 +42,10 @@ public class UserPaymentMethodController {
         return ResponseEntity.ok(userPaymentMethodService.findByExternalId(externalId));
     }
 
-    @GetMapping("/user/{userId}")
-    @Operation(summary = "Get payment methods by user ID")
-    public ResponseEntity<List<UserPaymentMethodDTO>> getByUserId(@PathVariable Long userId) {
-        return ResponseEntity.ok(userPaymentMethodService.findByUserId(userId));
+    @GetMapping("/user/{userExternalId}")
+    @Operation(summary = "Get payment methods by user external ID")
+    public ResponseEntity<List<UserPaymentMethodDTO>> getByUserExternalId(@PathVariable String userExternalId) {
+        return ResponseEntity.ok(userPaymentMethodService.findByUserExternalId(userExternalId));
     }
 
     @PostMapping

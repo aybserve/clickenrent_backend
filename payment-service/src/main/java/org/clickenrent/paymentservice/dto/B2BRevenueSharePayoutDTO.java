@@ -25,10 +25,8 @@ public class B2BRevenueSharePayoutDTO {
     
     private String externalId;
     
-    @NotNull(message = "Company ID is required")
-    private Long companyId;
-    
     // Cross-service externalId reference
+    @NotNull(message = "Company external ID is required")
     private String companyExternalId;
     
     @NotNull(message = "Payment status is required")

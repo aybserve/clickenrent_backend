@@ -21,7 +21,6 @@ public class UserPaymentProfileMapper {
         return UserPaymentProfileDTO.builder()
                 .id(entity.getId())
                 .externalId(entity.getExternalId())
-                .userId(entity.getUserId())
                 .userExternalId(entity.getUserExternalId())
                 .stripeCustomerId(entity.getStripeCustomerId())
                 .isActive(entity.getIsActive())
@@ -36,7 +35,7 @@ public class UserPaymentProfileMapper {
         return UserPaymentProfile.builder()
                 .id(dto.getId())
                 .externalId(dto.getExternalId())
-                .userId(dto.getUserId())
+                .userExternalId(dto.getUserExternalId())
                 .stripeCustomerId(dto.getStripeCustomerId())
                 .isActive(dto.getIsActive())
                 .build();

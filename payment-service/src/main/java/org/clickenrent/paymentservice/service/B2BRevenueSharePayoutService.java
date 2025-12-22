@@ -2,8 +2,6 @@ package org.clickenrent.paymentservice.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.clickenrent.contracts.auth.CompanyDTO;
-import org.clickenrent.paymentservice.client.AuthServiceClient;
 import org.clickenrent.paymentservice.dto.B2BRevenueSharePayoutDTO;
 import org.clickenrent.paymentservice.entity.B2BRevenueSharePayout;
 import org.clickenrent.paymentservice.exception.ResourceNotFoundException;
@@ -13,10 +11,8 @@ import org.clickenrent.paymentservice.repository.B2BRevenueSharePayoutRepository
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * Service for B2B Revenue Share Payout management
@@ -29,20 +25,15 @@ public class B2BRevenueSharePayoutService {
     private final B2BRevenueSharePayoutRepository b2bRevenueSharePayoutRepository;
     private final B2BRevenueSharePayoutMapper b2bRevenueSharePayoutMapper;
     private final SecurityService securityService;
-    private final AuthServiceClient authServiceClient;
 
     @Transactional(readOnly = true)
     public List<B2BRevenueSharePayoutDTO> findAll() {
-        List<B2BRevenueSharePayout> payouts = b2bRevenueSharePayoutRepository.findAll();
-        
-        // Filter by permissions
+        // Only admins can view all payouts
         if (!securityService.isAdmin()) {
-            List<Long> companyIds = securityService.getCurrentUserCompanyIds();
-            payouts = payouts.stream()
-                    .filter(p -> companyIds.contains(p.getCompanyId()))
-                    .collect(Collectors.toList());
+            throw new UnauthorizedException("Only admins can view all payouts");
         }
         
+        List<B2BRevenueSharePayout> payouts = b2bRevenueSharePayoutRepository.findAll();
         return b2bRevenueSharePayoutMapper.toDTOList(payouts);
     }
 
@@ -67,36 +58,30 @@ public class B2BRevenueSharePayoutService {
     }
 
     @Transactional(readOnly = true)
-    public List<B2BRevenueSharePayoutDTO> findByCompanyId(Long companyId) {
-        // Check permission
-        if (!securityService.isAdmin() && !securityService.hasAccessToCompany(companyId)) {
+    public List<B2BRevenueSharePayoutDTO> findByCompanyExternalId(String companyExternalId) {
+        // Check permission - only admins for now
+        if (!securityService.isAdmin()) {
             throw new UnauthorizedException("You don't have permission to access payouts for this company");
         }
         
-        List<B2BRevenueSharePayout> payouts = b2bRevenueSharePayoutRepository.findByCompanyId(companyId);
+        List<B2BRevenueSharePayout> payouts = b2bRevenueSharePayoutRepository.findByCompanyExternalId(companyExternalId);
         return b2bRevenueSharePayoutMapper.toDTOList(payouts);
     }
 
     @Transactional
     public B2BRevenueSharePayoutDTO create(B2BRevenueSharePayoutDTO dto) {
-        // Check permission
-        if (!securityService.isAdmin() && !securityService.hasAccessToCompany(dto.getCompanyId())) {
-            throw new UnauthorizedException("You don't have permission to create payouts for this company");
+        // Check permission - only admins for now
+        if (!securityService.isAdmin()) {
+            throw new UnauthorizedException("You don't have permission to create payouts");
         }
         
         B2BRevenueSharePayout payout = b2bRevenueSharePayoutMapper.toEntity(dto);
         
-        // DUAL-WRITE: Populate companyExternalId
-        if (dto.getCompanyId() != null) {
-            try {
-                CompanyDTO company = authServiceClient.getCompanyById(dto.getCompanyId());
-                payout.setCompanyId(dto.getCompanyId());
-                payout.setCompanyExternalId(company.getExternalId());
-                log.debug("Populated companyExternalId: {} for B2B revenue share payout", company.getExternalId());
-            } catch (Exception e) {
-                log.error("Failed to fetch company external ID for companyId: {}", dto.getCompanyId(), e);
-                throw new RuntimeException("Failed to fetch company details", e);
-            }
+        // External ID is provided directly in the DTO
+        log.debug("Creating B2B revenue share payout with companyExternalId: {}", dto.getCompanyExternalId());
+        
+        if (dto.getCompanyExternalId() == null) {
+            throw new IllegalArgumentException("Company external ID is required");
         }
         
         B2BRevenueSharePayout savedPayout = b2bRevenueSharePayoutRepository.save(payout);
@@ -175,7 +160,8 @@ public class B2BRevenueSharePayoutService {
     }
 
     private void checkPayoutAccess(B2BRevenueSharePayout payout) {
-        if (!securityService.isAdmin() && !securityService.hasAccessToCompany(payout.getCompanyId())) {
+        // Only admins can access payouts for now (since we're using externalIds)
+        if (!securityService.isAdmin()) {
             throw new UnauthorizedException("You don't have permission to access this payout");
         }
     }

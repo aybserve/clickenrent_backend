@@ -2,9 +2,6 @@ package org.clickenrent.paymentservice.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.clickenrent.contracts.rental.BikeRentalDTO;
-import org.clickenrent.contracts.rental.RentalDTO;
-import org.clickenrent.paymentservice.client.RentalServiceClient;
 import org.clickenrent.paymentservice.dto.RentalFinTransactionDTO;
 import org.clickenrent.paymentservice.entity.RentalFinTransaction;
 import org.clickenrent.paymentservice.exception.ResourceNotFoundException;
@@ -27,7 +24,6 @@ public class RentalFinTransactionService {
     private final RentalFinTransactionRepository rentalFinTransactionRepository;
     private final RentalFinTransactionMapper rentalFinTransactionMapper;
     private final SecurityService securityService;
-    private final RentalServiceClient rentalServiceClient;
 
     @Transactional(readOnly = true)
     public List<RentalFinTransactionDTO> findAll() {
@@ -65,33 +61,9 @@ public class RentalFinTransactionService {
     public RentalFinTransactionDTO create(RentalFinTransactionDTO dto) {
         RentalFinTransaction transaction = rentalFinTransactionMapper.toEntity(dto);
         
-        // DUAL-WRITE: Populate rentalExternalId
-        if (dto.getRentalId() != null) {
-            try {
-                RentalDTO rental = rentalServiceClient.getRentalById(dto.getRentalId());
-                transaction.setRentalId(dto.getRentalId());
-                transaction.setRentalExternalId(rental.getExternalId());
-                log.debug("Populated rentalExternalId: {} for rental transaction", rental.getExternalId());
-            } catch (Exception e) {
-                log.error("Failed to fetch rental external ID for rentalId: {}", dto.getRentalId(), e);
-                throw new RuntimeException("Failed to fetch rental details", e);
-            }
-        }
-        
-        // DUAL-WRITE: Populate bikeRentalExternalId (optional)
-        if (dto.getBikeRentalId() != null) {
-            try {
-                BikeRentalDTO bikeRental =
-                    rentalServiceClient.getBikeRentalById(dto.getBikeRentalId());
-                transaction.setBikeRentalId(dto.getBikeRentalId());
-                transaction.setBikeRentalExternalId(bikeRental.getExternalId());
-                log.debug("Populated bikeRentalExternalId: {} for rental transaction", bikeRental.getExternalId());
-            } catch (Exception e) {
-                log.error("Failed to fetch bike rental external ID for bikeRentalId: {}", dto.getBikeRentalId(), e);
-                // Don't fail - bikeRental is optional
-                log.warn("Continuing without bikeRentalExternalId");
-            }
-        }
+        // External IDs are provided directly in the DTO
+        log.debug("Creating rental transaction with rentalExternalId: {}, bikeRentalExternalId: {}", 
+                dto.getRentalExternalId(), dto.getBikeRentalExternalId());
         
         RentalFinTransaction savedTransaction = rentalFinTransactionRepository.save(transaction);
         return rentalFinTransactionMapper.toDTO(savedTransaction);
@@ -106,7 +78,8 @@ public class RentalFinTransactionService {
         RentalFinTransaction existingTransaction = rentalFinTransactionRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("RentalFinTransaction", "id", id));
         
-        existingTransaction.setRentalId(dto.getRentalId());
+        existingTransaction.setRentalExternalId(dto.getRentalExternalId());
+        existingTransaction.setBikeRentalExternalId(dto.getBikeRentalExternalId());
         
         RentalFinTransaction updatedTransaction = rentalFinTransactionRepository.save(existingTransaction);
         return rentalFinTransactionMapper.toDTO(updatedTransaction);

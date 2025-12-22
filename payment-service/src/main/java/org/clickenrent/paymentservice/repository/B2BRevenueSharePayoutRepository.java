@@ -14,7 +14,7 @@ import java.util.Optional;
 @Repository
 public interface B2BRevenueSharePayoutRepository extends JpaRepository<B2BRevenueSharePayout, Long> {
     
-    List<B2BRevenueSharePayout> findByCompanyId(Long companyId);
+    List<B2BRevenueSharePayout> findByCompanyExternalId(String companyExternalId);
     
     List<B2BRevenueSharePayout> findByPaymentStatus(PaymentStatus status);
     

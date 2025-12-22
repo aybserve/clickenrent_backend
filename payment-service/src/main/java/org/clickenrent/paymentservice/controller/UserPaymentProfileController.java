@@ -42,10 +42,10 @@ public class UserPaymentProfileController {
         return ResponseEntity.ok(userPaymentProfileService.findByExternalId(externalId));
     }
 
-    @GetMapping("/user/{userId}")
-    @Operation(summary = "Get payment profile by user ID")
-    public ResponseEntity<UserPaymentProfileDTO> getByUserId(@PathVariable Long userId) {
-        return ResponseEntity.ok(userPaymentProfileService.findByUserId(userId));
+    @GetMapping("/user/{userExternalId}")
+    @Operation(summary = "Get payment profile by user external ID")
+    public ResponseEntity<UserPaymentProfileDTO> getByUserExternalId(@PathVariable String userExternalId) {
+        return ResponseEntity.ok(userPaymentProfileService.findByUserExternalId(userExternalId));
     }
 
     @PostMapping
@@ -54,10 +54,12 @@ public class UserPaymentProfileController {
         return ResponseEntity.status(HttpStatus.CREATED).body(userPaymentProfileService.create(dto));
     }
 
-    @PostMapping("/create-or-get/{userId}")
+    @PostMapping("/create-or-get")
     @Operation(summary = "Create or get payment profile for user")
-    public ResponseEntity<UserPaymentProfileDTO> createOrGetProfile(@PathVariable Long userId) {
-        return ResponseEntity.ok(userPaymentProfileService.createOrGetProfile(userId));
+    public ResponseEntity<UserPaymentProfileDTO> createOrGetProfile(
+            @RequestParam String userExternalId,
+            @RequestParam String userEmail) {
+        return ResponseEntity.ok(userPaymentProfileService.createOrGetProfile(userExternalId, userEmail));
     }
 
     @PutMapping("/{id}")

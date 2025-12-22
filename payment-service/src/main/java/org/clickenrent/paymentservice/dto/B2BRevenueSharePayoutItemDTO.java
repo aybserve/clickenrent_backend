@@ -24,8 +24,8 @@ public class B2BRevenueSharePayoutItemDTO {
     
     private Long b2bRevenueSharePayoutId;
     
-    @NotNull(message = "Bike rental ID is required")
-    private Long bikeRentalId;
+    @NotNull(message = "Bike rental external ID is required")
+    private String bikeRentalExternalId;
     
     @NotNull(message = "Amount is required")
     @Positive(message = "Amount must be positive")

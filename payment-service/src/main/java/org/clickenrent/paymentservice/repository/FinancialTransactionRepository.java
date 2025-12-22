@@ -13,9 +13,9 @@ import java.util.Optional;
 @Repository
 public interface FinancialTransactionRepository extends JpaRepository<FinancialTransaction, Long> {
     
-    List<FinancialTransaction> findByPayerId(Long payerId);
+    List<FinancialTransaction> findByPayerExternalId(String payerExternalId);
     
-    List<FinancialTransaction> findByRecipientId(Long recipientId);
+    List<FinancialTransaction> findByRecipientExternalId(String recipientExternalId);
     
     Optional<FinancialTransaction> findByStripePaymentIntentId(String stripePaymentIntentId);
     

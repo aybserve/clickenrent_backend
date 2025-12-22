@@ -58,13 +58,14 @@ public class UserPaymentMethodService {
     }
 
     @Transactional(readOnly = true)
-    public List<UserPaymentMethodDTO> findByUserId(Long userId) {
-        if (!securityService.isAdmin() && !securityService.hasAccessToUser(userId)) {
+    public List<UserPaymentMethodDTO> findByUserExternalId(String userExternalId) {
+        // Only admins can access payment methods for now
+        if (!securityService.isAdmin()) {
             throw new UnauthorizedException("You don't have permission to access these payment methods");
         }
         
-        UserPaymentProfile profile = userPaymentProfileRepository.findByUserId(userId)
-                .orElseThrow(() -> new ResourceNotFoundException("UserPaymentProfile", "userId", userId));
+        UserPaymentProfile profile = userPaymentProfileRepository.findByUserExternalId(userExternalId)
+                .orElseThrow(() -> new ResourceNotFoundException("UserPaymentProfile", "userExternalId", userExternalId));
         
         List<UserPaymentMethod> methods = userPaymentMethodRepository.findByUserPaymentProfileId(profile.getId());
         return userPaymentMethodMapper.toDTOList(methods);
@@ -75,7 +76,8 @@ public class UserPaymentMethodService {
         UserPaymentProfile profile = userPaymentProfileRepository.findById(profileId)
                 .orElseThrow(() -> new ResourceNotFoundException("UserPaymentProfile", "id", profileId));
         
-        if (!securityService.isAdmin() && !securityService.hasAccessToUser(profile.getUserId())) {
+        // Only admins can attach payment methods for now
+        if (!securityService.isAdmin()) {
             throw new UnauthorizedException("You don't have permission to attach payment methods to this profile");
         }
         
@@ -156,8 +158,8 @@ public class UserPaymentMethodService {
     }
 
     private void checkMethodAccess(UserPaymentMethod method) {
-        Long userId = method.getUserPaymentProfile().getUserId();
-        if (!securityService.isAdmin() && !securityService.hasAccessToUser(userId)) {
+        // Only admins can access payment methods for now
+        if (!securityService.isAdmin()) {
             throw new UnauthorizedException("You don't have permission to access this payment method");
         }
     }

@@ -2,8 +2,6 @@ package org.clickenrent.paymentservice.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.clickenrent.contracts.auth.UserDTO;
-import org.clickenrent.paymentservice.client.AuthServiceClient;
 import org.clickenrent.paymentservice.dto.FinancialTransactionDTO;
 import org.clickenrent.paymentservice.entity.FinancialTransaction;
 import org.clickenrent.paymentservice.exception.ResourceNotFoundException;
@@ -16,7 +14,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * Service for FinancialTransaction management with Stripe integration
@@ -31,20 +28,15 @@ public class FinancialTransactionService {
     private final PaymentStatusRepository paymentStatusRepository;
     private final SecurityService securityService;
     private final StripeService stripeService;
-    private final AuthServiceClient authServiceClient;
 
     @Transactional(readOnly = true)
     public List<FinancialTransactionDTO> findAll() {
-        List<FinancialTransaction> transactions = financialTransactionRepository.findAll();
-        
-        // Filter by permissions
+        // Only admins can view all transactions
         if (!securityService.isAdmin()) {
-            Long currentUserId = securityService.getCurrentUserId();
-            transactions = transactions.stream()
-                    .filter(t -> t.getPayerId().equals(currentUserId) || t.getRecipientId().equals(currentUserId))
-                    .collect(Collectors.toList());
+            throw new UnauthorizedException("Only admins can view all transactions");
         }
         
+        List<FinancialTransaction> transactions = financialTransactionRepository.findAll();
         return financialTransactionMapper.toDTOList(transactions);
     }
 
@@ -70,13 +62,24 @@ public class FinancialTransactionService {
     }
 
     @Transactional(readOnly = true)
-    public List<FinancialTransactionDTO> findByPayerId(Long payerId) {
-        // Check permission
-        if (!securityService.isAdmin() && !securityService.hasAccessToUser(payerId)) {
+    public List<FinancialTransactionDTO> findByPayerExternalId(String payerExternalId) {
+        // Check permission - only admins for now
+        if (!securityService.isAdmin()) {
             throw new UnauthorizedException("You don't have permission to access these transactions");
         }
         
-        List<FinancialTransaction> transactions = financialTransactionRepository.findByPayerId(payerId);
+        List<FinancialTransaction> transactions = financialTransactionRepository.findByPayerExternalId(payerExternalId);
+        return financialTransactionMapper.toDTOList(transactions);
+    }
+    
+    @Transactional(readOnly = true)
+    public List<FinancialTransactionDTO> findByRecipientExternalId(String recipientExternalId) {
+        // Check permission - only admins for now
+        if (!securityService.isAdmin()) {
+            throw new UnauthorizedException("You don't have permission to access these transactions");
+        }
+        
+        List<FinancialTransaction> transactions = financialTransactionRepository.findByRecipientExternalId(recipientExternalId);
         return financialTransactionMapper.toDTOList(transactions);
     }
 
@@ -84,29 +87,12 @@ public class FinancialTransactionService {
     public FinancialTransactionDTO create(FinancialTransactionDTO dto) {
         FinancialTransaction transaction = financialTransactionMapper.toEntity(dto);
         
-        // DUAL-WRITE: Populate payer and recipient externalIds
-        if (dto.getPayerId() != null) {
-            try {
-                UserDTO payer = authServiceClient.getUserById(dto.getPayerId());
-                transaction.setPayerId(dto.getPayerId());
-                transaction.setPayerExternalId(payer.getExternalId());
-                log.debug("Populated payerExternalId: {} for transaction", payer.getExternalId());
-            } catch (Exception e) {
-                log.error("Failed to fetch payer external ID for payerId: {}", dto.getPayerId(), e);
-                throw new RuntimeException("Failed to fetch payer details", e);
-            }
-        }
+        // External IDs are provided directly in the DTO
+        log.debug("Creating financial transaction with payerExternalId: {}, recipientExternalId: {}", 
+                dto.getPayerExternalId(), dto.getRecipientExternalId());
         
-        if (dto.getRecipientId() != null) {
-            try {
-                UserDTO recipient = authServiceClient.getUserById(dto.getRecipientId());
-                transaction.setRecipientId(dto.getRecipientId());
-                transaction.setRecipientExternalId(recipient.getExternalId());
-                log.debug("Populated recipientExternalId: {} for transaction", recipient.getExternalId());
-            } catch (Exception e) {
-                log.error("Failed to fetch recipient external ID for recipientId: {}", dto.getRecipientId(), e);
-                throw new RuntimeException("Failed to fetch recipient details", e);
-            }
+        if (dto.getPayerExternalId() == null || dto.getRecipientExternalId() == null) {
+            throw new IllegalArgumentException("Payer and recipient external IDs are required");
         }
         
         FinancialTransaction savedTransaction = financialTransactionRepository.save(transaction);
@@ -186,8 +172,8 @@ public class FinancialTransactionService {
             
             // Create refund transaction
             FinancialTransaction refundTransaction = FinancialTransaction.builder()
-                    .payerId(originalTransaction.getRecipientId()) // Reversed
-                    .recipientId(originalTransaction.getPayerId()) // Reversed
+                    .payerExternalId(originalTransaction.getRecipientExternalId()) // Reversed
+                    .recipientExternalId(originalTransaction.getPayerExternalId()) // Reversed
                     .amount(amount != null ? amount : originalTransaction.getAmount())
                     .currency(originalTransaction.getCurrency())
                     .paymentMethod(originalTransaction.getPaymentMethod())
@@ -275,9 +261,8 @@ public class FinancialTransactionService {
     }
 
     private void checkTransactionAccess(FinancialTransaction transaction) {
-        if (!securityService.isAdmin() && 
-            !securityService.hasAccessToUser(transaction.getPayerId()) &&
-            !securityService.hasAccessToUser(transaction.getRecipientId())) {
+        // Only admins can access transactions for now (since we're using externalIds)
+        if (!securityService.isAdmin()) {
             throw new UnauthorizedException("You don't have permission to access this transaction");
         }
     }

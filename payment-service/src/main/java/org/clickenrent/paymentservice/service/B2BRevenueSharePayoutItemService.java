@@ -1,7 +1,7 @@
 package org.clickenrent.paymentservice.service;
 
 import lombok.RequiredArgsConstructor;
-import org.clickenrent.paymentservice.client.RentalServiceClient;
+import lombok.extern.slf4j.Slf4j;
 import org.clickenrent.paymentservice.dto.B2BRevenueSharePayoutItemDTO;
 import org.clickenrent.paymentservice.entity.B2BRevenueSharePayoutItem;
 import org.clickenrent.paymentservice.exception.ResourceNotFoundException;
@@ -16,6 +16,7 @@ import java.util.List;
 /**
  * Service for B2B Revenue Share Payout Item management
  */
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class B2BRevenueSharePayoutItemService {
@@ -23,7 +24,6 @@ public class B2BRevenueSharePayoutItemService {
     private final B2BRevenueSharePayoutItemRepository payoutItemRepository;
     private final B2BRevenueSharePayoutItemMapper payoutItemMapper;
     private final SecurityService securityService;
-    private final RentalServiceClient rentalServiceClient;
 
     @Transactional(readOnly = true)
     public List<B2BRevenueSharePayoutItemDTO> findAll() {
@@ -69,8 +69,8 @@ public class B2BRevenueSharePayoutItemService {
 
     @Transactional
     public B2BRevenueSharePayoutItemDTO create(B2BRevenueSharePayoutItemDTO dto) {
-        // Validate bike rental exists
-        rentalServiceClient.checkBikeRentalExists(dto.getBikeRentalId());
+        // External ID is provided directly in the DTO
+        log.debug("Creating payout item with bikeRentalExternalId: {}", dto.getBikeRentalExternalId());
         
         B2BRevenueSharePayoutItem item = payoutItemMapper.toEntity(dto);
         B2BRevenueSharePayoutItem savedItem = payoutItemRepository.save(item);
@@ -86,7 +86,7 @@ public class B2BRevenueSharePayoutItemService {
         B2BRevenueSharePayoutItem existingItem = payoutItemRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("B2BRevenueSharePayoutItem", "id", id));
         
-        existingItem.setBikeRentalId(dto.getBikeRentalId());
+        existingItem.setBikeRentalExternalId(dto.getBikeRentalExternalId());
         existingItem.setAmount(dto.getAmount());
         
         B2BRevenueSharePayoutItem updatedItem = payoutItemRepository.save(existingItem);

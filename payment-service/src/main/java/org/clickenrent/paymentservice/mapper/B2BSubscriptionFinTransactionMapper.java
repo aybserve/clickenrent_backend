@@ -25,7 +25,7 @@ public class B2BSubscriptionFinTransactionMapper {
         return B2BSubscriptionFinTransactionDTO.builder()
                 .id(entity.getId())
                 .externalId(entity.getExternalId())
-                .b2bSubscriptionId(entity.getB2bSubscriptionId())
+                .b2bSubscriptionExternalId(entity.getB2bSubscriptionExternalId())
                 .financialTransaction(financialTransactionMapper.toDTO(entity.getFinancialTransaction()))
                 .build();
     }
@@ -38,7 +38,7 @@ public class B2BSubscriptionFinTransactionMapper {
         return B2BSubscriptionFinTransaction.builder()
                 .id(dto.getId())
                 .externalId(dto.getExternalId())
-                .b2bSubscriptionId(dto.getB2bSubscriptionId())
+                .b2bSubscriptionExternalId(dto.getB2bSubscriptionExternalId())
                 .financialTransaction(financialTransactionMapper.toEntity(dto.getFinancialTransaction()))
                 .build();
     }

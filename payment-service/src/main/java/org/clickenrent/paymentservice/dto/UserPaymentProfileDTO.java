@@ -20,10 +20,8 @@ public class UserPaymentProfileDTO {
     
     private String externalId;
     
-    @NotNull(message = "User ID is required")
-    private Long userId;
-    
     // Cross-service externalId reference
+    @NotNull(message = "User external ID is required")
     private String userExternalId;
     
     private String stripeCustomerId;
