@@ -22,3 +22,5 @@ public interface B2BRevenueSharePayoutRepository extends JpaRepository<B2BRevenu
 }
 
 
+
+

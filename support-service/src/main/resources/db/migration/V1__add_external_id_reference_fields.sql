@@ -19,3 +19,5 @@ ALTER TABLE bike_rental_feedback ADD COLUMN IF NOT EXISTS external_id VARCHAR(10
 CREATE INDEX idx_bike_rental_feedback_user_external_id ON bike_rental_feedback(user_external_id);
 CREATE INDEX idx_bike_rental_feedback_bike_rental_ext_id ON bike_rental_feedback(bike_rental_external_id);
 CREATE INDEX IF NOT EXISTS idx_bike_rental_feedback_external_id ON bike_rental_feedback(external_id);
+
+

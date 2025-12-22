@@ -18,3 +18,5 @@ public interface RentalFinTransactionRepository extends JpaRepository<RentalFinT
 }
 
 
+
+

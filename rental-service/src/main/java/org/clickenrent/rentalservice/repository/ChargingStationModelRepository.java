@@ -15,3 +15,5 @@ public interface ChargingStationModelRepository extends JpaRepository<ChargingSt
 }
 
 
+
+

@@ -40,3 +40,5 @@ WHERE external_id IS NULL OR external_id = '';
 UPDATE b2b_subscription 
 SET external_id = CONCAT('B2BSUB-', UUID()) 
 WHERE external_id IS NULL OR external_id = '';
+
+

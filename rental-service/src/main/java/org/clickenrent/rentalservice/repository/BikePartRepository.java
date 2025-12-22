@@ -16,3 +16,5 @@ public interface BikePartRepository extends JpaRepository<BikePart, Long> {
 }
 
 
+
+

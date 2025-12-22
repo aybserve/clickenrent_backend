@@ -21,3 +21,5 @@ public interface BikeTypeBikeIssueRepository extends JpaRepository<BikeTypeBikeI
 }
 
 
+
+

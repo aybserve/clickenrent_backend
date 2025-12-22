@@ -38,3 +38,5 @@ public class BikeRentalDTO {
     private String locationExternalId;
     private String rentalExternalId;
 }
+
+

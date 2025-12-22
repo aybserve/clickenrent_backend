@@ -15,3 +15,5 @@ public interface B2BSubscriptionOrderRepository extends JpaRepository<B2BSubscri
 }
 
 
+
+

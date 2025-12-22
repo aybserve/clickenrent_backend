@@ -25,3 +25,5 @@ public interface FinancialTransactionRepository extends JpaRepository<FinancialT
 }
 
 
+
+

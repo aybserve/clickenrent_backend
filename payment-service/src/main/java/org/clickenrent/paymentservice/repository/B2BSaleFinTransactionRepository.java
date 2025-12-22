@@ -18,3 +18,5 @@ public interface B2BSaleFinTransactionRepository extends JpaRepository<B2BSaleFi
 }
 
 
+
+

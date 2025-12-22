@@ -15,3 +15,5 @@ WHERE external_id IS NULL OR external_id = '';
 UPDATE bike_rental_feedback 
 SET external_id = CONCAT('BRF-', UUID()) 
 WHERE external_id IS NULL OR external_id = '';
+
+

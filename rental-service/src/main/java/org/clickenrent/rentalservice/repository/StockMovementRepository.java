@@ -17,3 +17,5 @@ public interface StockMovementRepository extends JpaRepository<StockMovement, Lo
 }
 
 
+
+

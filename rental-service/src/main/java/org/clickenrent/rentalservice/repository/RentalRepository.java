@@ -24,3 +24,5 @@ public interface RentalRepository extends JpaRepository<Rental, Long> {
 }
 
 
+
+

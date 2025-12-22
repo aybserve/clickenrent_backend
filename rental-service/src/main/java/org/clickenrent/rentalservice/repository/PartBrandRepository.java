@@ -15,3 +15,5 @@ public interface PartBrandRepository extends JpaRepository<PartBrand, Long> {
 }
 
 
+
+

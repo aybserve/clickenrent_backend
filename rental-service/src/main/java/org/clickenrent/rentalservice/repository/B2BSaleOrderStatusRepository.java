@@ -15,3 +15,5 @@ public interface B2BSaleOrderStatusRepository extends JpaRepository<B2BSaleOrder
 }
 
 
+
+

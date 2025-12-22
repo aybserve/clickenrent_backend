@@ -18,3 +18,5 @@ public interface B2BSubscriptionFinTransactionRepository extends JpaRepository<B
 }
 
 
+
+

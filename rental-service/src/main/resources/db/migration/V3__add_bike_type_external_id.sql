@@ -13,3 +13,5 @@ UPDATE bike_type SET external_id = gen_random_uuid()::text WHERE external_id IS 
 
 -- Make it non-nullable after backfill
 ALTER TABLE bike_type ALTER COLUMN external_id SET NOT NULL;
+
+

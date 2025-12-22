@@ -30,3 +30,5 @@ CREATE INDEX idx_part_brand_company_external_id ON part_brand(company_external_i
 -- ChargingStationBrand table: Add companyExternalId
 ALTER TABLE charging_station_brand ADD COLUMN company_external_id VARCHAR(100);
 CREATE INDEX idx_charging_station_brand_company_external_id ON charging_station_brand(company_external_id);
+
+

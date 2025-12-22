@@ -15,3 +15,5 @@ public interface PartCategoryRepository extends JpaRepository<PartCategory, Long
 }
 
 
+
+

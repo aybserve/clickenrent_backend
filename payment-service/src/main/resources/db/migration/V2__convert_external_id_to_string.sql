@@ -52,3 +52,5 @@ ALTER TABLE currencies
 -- User Payment Methods
 ALTER TABLE user_payment_methods 
     ALTER COLUMN external_id TYPE VARCHAR(100) USING external_id::TEXT;
+
+

@@ -21,3 +21,5 @@ public interface B2BRevenueSharePayoutItemRepository extends JpaRepository<B2BRe
 }
 
 
+
+

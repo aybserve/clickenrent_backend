@@ -202,3 +202,5 @@ MERGE INTO invitation (id, email, token, invited_by_user_id, company_id, status,
 -- Note: H2 auto-increments sequences, no manual reset needed like PostgreSQL's setval
 
 
+
+

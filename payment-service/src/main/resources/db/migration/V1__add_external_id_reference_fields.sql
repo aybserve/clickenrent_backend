@@ -20,3 +20,5 @@ CREATE INDEX idx_rental_fin_trans_bike_rental_ext_id ON rental_fin_transactions(
 -- B2BRevenueSharePayout table: Add companyExternalId
 ALTER TABLE b2b_revenue_share_payouts ADD COLUMN company_external_id VARCHAR(100);
 CREATE INDEX idx_b2b_revenue_share_payouts_company_ext_id ON b2b_revenue_share_payouts(company_external_id);
+
+

@@ -57,3 +57,5 @@ COMMENT ON COLUMN email_verification.is_deleted IS 'Soft delete flag for audit t
 -- =====================================================================================================================
 
 
+
+

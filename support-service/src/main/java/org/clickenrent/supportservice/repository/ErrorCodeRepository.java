@@ -21,3 +21,5 @@ public interface ErrorCodeRepository extends JpaRepository<ErrorCode, Long> {
 }
 
 
+
+

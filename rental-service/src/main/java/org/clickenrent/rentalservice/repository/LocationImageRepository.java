@@ -18,3 +18,5 @@ public interface LocationImageRepository extends JpaRepository<LocationImage, Lo
 }
 
 
+
+

@@ -9,3 +9,5 @@ CREATE INDEX idx_bike_type_bike_issue_bike_type_ext_id ON bike_type_bike_issue(b
 
 -- Note: Backfill will need to be done separately once BikeType external IDs are established
 -- in rental-service and communicated to support-service
+
+

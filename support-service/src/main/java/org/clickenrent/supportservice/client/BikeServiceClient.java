@@ -24,3 +24,5 @@ public interface BikeServiceClient {
     @GetMapping("/bikes/external/{externalId}")
     BikeDTO getBikeByExternalId(@PathVariable("externalId") String externalId);
 }
+
+

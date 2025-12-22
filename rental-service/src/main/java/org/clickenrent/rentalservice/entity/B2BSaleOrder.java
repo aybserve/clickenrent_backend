@@ -67,3 +67,5 @@ public class B2BSaleOrder extends BaseAuditEntity {
 }
 
 
+
+
