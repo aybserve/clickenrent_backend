@@ -18,7 +18,8 @@ import java.time.LocalDateTime;
 public class AddressDTO {
 
     private Long id;
-    private Long cityId;
+    private String city;
+    private Long countryId;
     private String street;
     private String postcode;
 

@@ -33,6 +33,12 @@ public interface RentalServiceClient {
     BikeRentalDTO getBikeRentalById(@PathVariable("id") Long bikeRentalId);
 
     /**
+     * Get bike rental by external ID (for cross-service communication)
+     */
+    @GetMapping("/bike-rentals/external/{externalId}")
+    BikeRentalDTO getBikeRentalByExternalId(@PathVariable("externalId") String externalId);
+
+    /**
      * Check if bike rental exists by ID
      */
     @GetMapping("/bike-rentals/{id}/exists")

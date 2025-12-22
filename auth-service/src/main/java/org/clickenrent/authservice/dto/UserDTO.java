@@ -25,9 +25,6 @@ public class UserDTO {
     private String firstName;
     private String lastName;
     private String phone;
-    private String city;
-    private String address;
-    private String zipcode;
     private String imageUrl;
     private Long languageId;
     private Boolean isActive;

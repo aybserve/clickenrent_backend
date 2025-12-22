@@ -67,18 +67,6 @@ public class User extends BaseAuditEntity {
     @Column(name = "phone", length = 20)
     private String phone;
 
-    @Size(max = 100, message = "City must not exceed 100 characters")
-    @Column(name = "city", length = 100)
-    private String city;
-
-    @Size(max = 255, message = "Address must not exceed 255 characters")
-    @Column(name = "address", length = 255)
-    private String address;
-
-    @Size(max = 20, message = "Zipcode must not exceed 20 characters")
-    @Column(name = "zipcode", length = 20)
-    private String zipcode;
-
     @Size(max = 500, message = "Image URL must not exceed 500 characters")
     @Column(name = "image_url", length = 500)
     private String imageUrl;

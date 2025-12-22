@@ -52,18 +52,6 @@ public class AddressController {
     }
     
     /**
-     * Get addresses by city ID.
-     * GET /api/addresses/by-city/{cityId}
-     */
-    @GetMapping("/by-city/{cityId}")
-    @PreAuthorize("hasAnyRole('SUPERADMIN', 'ADMIN')")
-    @Operation(summary = "Get addresses by city", description = "Retrieve all addresses in a specific city")
-    public ResponseEntity<List<AddressDTO>> getAddressesByCityId(@PathVariable Long cityId) {
-        List<AddressDTO> addresses = addressService.getAddressesByCityId(cityId);
-        return ResponseEntity.ok(addresses);
-    }
-    
-    /**
      * Create a new address.
      * POST /api/addresses
      */

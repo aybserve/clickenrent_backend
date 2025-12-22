@@ -3,13 +3,13 @@ package org.clickenrent.authservice.service;
 import lombok.RequiredArgsConstructor;
 import org.clickenrent.authservice.dto.AddressDTO;
 import org.clickenrent.authservice.entity.Address;
-import org.clickenrent.authservice.entity.City;
+import org.clickenrent.authservice.entity.Country;
 import org.clickenrent.authservice.entity.User;
 import org.clickenrent.authservice.entity.UserAddress;
 import org.clickenrent.authservice.exception.ResourceNotFoundException;
 import org.clickenrent.authservice.mapper.AddressMapper;
 import org.clickenrent.authservice.repository.AddressRepository;
-import org.clickenrent.authservice.repository.CityRepository;
+import org.clickenrent.authservice.repository.CountryRepository;
 import org.clickenrent.authservice.repository.UserAddressRepository;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
@@ -33,7 +33,7 @@ public class AddressService {
     
     private final AddressRepository addressRepository;
     private final AddressMapper addressMapper;
-    private final CityRepository cityRepository;
+    private final CountryRepository countryRepository;
     private final SecurityService securityService;
     private final UserAddressRepository userAddressRepository;
     
@@ -57,22 +57,15 @@ public class AddressService {
         return addressMapper.toDto(address);
     }
     
-    @Transactional(readOnly = true)
-    public List<AddressDTO> getAddressesByCityId(Long cityId) {
-        return addressRepository.findByCityId(cityId).stream()
-                .map(addressMapper::toDto)
-                .collect(Collectors.toList());
-    }
-    
     @Transactional
     public AddressDTO createAddress(AddressDTO addressDTO) {
         Address address = addressMapper.toEntity(addressDTO);
         
-        // Set the city relationship
-        if (addressDTO.getCityId() != null) {
-            City city = cityRepository.findById(addressDTO.getCityId())
-                    .orElseThrow(() -> new ResourceNotFoundException("City", "id", addressDTO.getCityId()));
-            address.setCity(city);
+        // Set the country relationship
+        if (addressDTO.getCountryId() != null) {
+            Country country = countryRepository.findById(addressDTO.getCountryId())
+                    .orElseThrow(() -> new ResourceNotFoundException("Country", "id", addressDTO.getCountryId()));
+            address.setCountry(country);
         }
         
         address = addressRepository.save(address);
@@ -104,11 +97,11 @@ public class AddressService {
         
         addressMapper.updateEntityFromDto(addressDTO, address);
         
-        // Update city relationship if provided
-        if (addressDTO.getCityId() != null) {
-            City city = cityRepository.findById(addressDTO.getCityId())
-                    .orElseThrow(() -> new ResourceNotFoundException("City", "id", addressDTO.getCityId()));
-            address.setCity(city);
+        // Update country relationship if provided
+        if (addressDTO.getCountryId() != null) {
+            Country country = countryRepository.findById(addressDTO.getCountryId())
+                    .orElseThrow(() -> new ResourceNotFoundException("Country", "id", addressDTO.getCountryId()));
+            address.setCountry(country);
         }
         
         address = addressRepository.save(address);

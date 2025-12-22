@@ -24,9 +24,6 @@ public class UserMapper {
                 .firstName(user.getFirstName())
                 .lastName(user.getLastName())
                 .phone(user.getPhone())
-                .city(user.getCity())
-                .address(user.getAddress())
-                .zipcode(user.getZipcode())
                 .imageUrl(user.getImageUrl())
                 .languageId(user.getLanguage() != null ? user.getLanguage().getId() : null)
                 .isActive(user.getIsActive())
@@ -54,9 +51,6 @@ public class UserMapper {
                 .firstName(dto.getFirstName())
                 .lastName(dto.getLastName())
                 .phone(dto.getPhone())
-                .city(dto.getCity())
-                .address(dto.getAddress())
-                .zipcode(dto.getZipcode())
                 .imageUrl(dto.getImageUrl())
                 .isActive(dto.getIsActive())
                 .isDeleted(dto.getIsDeleted())
@@ -85,15 +79,6 @@ public class UserMapper {
         }
         if (dto.getPhone() != null) {
             user.setPhone(dto.getPhone());
-        }
-        if (dto.getCity() != null) {
-            user.setCity(dto.getCity());
-        }
-        if (dto.getAddress() != null) {
-            user.setAddress(dto.getAddress());
-        }
-        if (dto.getZipcode() != null) {
-            user.setZipcode(dto.getZipcode());
         }
         if (dto.getImageUrl() != null) {
             user.setImageUrl(dto.getImageUrl());

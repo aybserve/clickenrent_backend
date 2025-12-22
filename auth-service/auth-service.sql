@@ -21,7 +21,6 @@ DROP TABLE IF EXISTS user_global_role CASCADE;
 DROP TABLE IF EXISTS address CASCADE;
 DROP TABLE IF EXISTS company CASCADE;
 DROP TABLE IF EXISTS users CASCADE;
-DROP TABLE IF EXISTS city CASCADE;
 DROP TABLE IF EXISTS country CASCADE;
 DROP TABLE IF EXISTS company_role CASCADE;
 DROP TABLE IF EXISTS company_type CASCADE;
@@ -88,20 +87,6 @@ CREATE TABLE country (
     CONSTRAINT chk_country_name_not_empty CHECK (name <> '')
 );
 
--- ---------------------------------------------------------------------------------------------------------------------
--- Table: city
--- Description: City reference data linked to countries
--- ---------------------------------------------------------------------------------------------------------------------
-CREATE TABLE city (
-    id                  BIGSERIAL PRIMARY KEY,
-    name                VARCHAR(100) NOT NULL,
-    country_id          BIGINT NOT NULL,
-    
-    CONSTRAINT fk_city_country FOREIGN KEY (country_id) 
-        REFERENCES country(id) ON DELETE RESTRICT,
-    CONSTRAINT chk_city_name_not_empty CHECK (name <> '')
-);
-
 -- =====================================================================================================================
 -- SECTION 2: CORE BUSINESS TABLES
 -- =====================================================================================================================
@@ -122,9 +107,6 @@ CREATE TABLE users (
     first_name                  VARCHAR(100),
     last_name                   VARCHAR(100),
     phone                       VARCHAR(20),
-    city                        VARCHAR(100),
-    address                     VARCHAR(255),
-    zipcode                     VARCHAR(20),
     image_url                   VARCHAR(500),
     language_id                 BIGINT,
     is_active                   BOOLEAN NOT NULL DEFAULT true,
@@ -176,13 +158,14 @@ CREATE TABLE company (
 
 -- ---------------------------------------------------------------------------------------------------------------------
 -- Table: address
--- Description: Physical addresses with street, postcode, and city information
+-- Description: Physical addresses with street, postcode, city, and country information
 -- Audit Fields: date_created, last_date_modified, created_by, last_modified_by, is_deleted
 -- Soft Delete: Supports soft deletion via is_deleted flag
 -- ---------------------------------------------------------------------------------------------------------------------
 CREATE TABLE address (
     id                          BIGSERIAL PRIMARY KEY,
-    city_id                     BIGINT NOT NULL,
+    city                        VARCHAR(100) NOT NULL,
+    country_id                  BIGINT NOT NULL,
     street                      VARCHAR(255),
     postcode                    VARCHAR(20),
     
@@ -193,8 +176,9 @@ CREATE TABLE address (
     last_modified_by            VARCHAR(255),
     is_deleted                  BOOLEAN NOT NULL DEFAULT false,
     
-    CONSTRAINT fk_address_city FOREIGN KEY (city_id) 
-        REFERENCES city(id) ON DELETE RESTRICT
+    CONSTRAINT fk_address_country FOREIGN KEY (country_id) 
+        REFERENCES country(id) ON DELETE RESTRICT,
+    CONSTRAINT chk_address_city_not_empty CHECK (city <> '')
 );
 
 -- ---------------------------------------------------------------------------------------------------------------------
@@ -329,12 +313,8 @@ CREATE INDEX idx_company_external_id ON company(external_id);
 -- Country table indexes
 CREATE INDEX idx_country_name ON country(name);
 
--- City table indexes
-CREATE INDEX idx_city_name ON city(name);
-CREATE INDEX idx_city_country ON city(country_id);
-
 -- Address table indexes
-CREATE INDEX idx_address_city ON address(city_id);
+CREATE INDEX idx_address_country ON address(country_id);
 
 -- Invitation table indexes
 CREATE INDEX idx_invitation_token ON invitation(token);
@@ -396,49 +376,32 @@ INSERT INTO country (id, name) VALUES
 (6, 'USA')
 ON CONFLICT (id) DO NOTHING;
 
--- Cities
-INSERT INTO city (id, name, country_id) VALUES
-(1, 'Berlin', 1),
-(2, 'Munich', 1),
-(3, 'Hamburg', 1),
-(4, 'Vienna', 2),
-(5, 'Salzburg', 2),
-(6, 'Zurich', 3),
-(7, 'Geneva', 3),
-(8, 'Paris', 4),
-(9, 'Lyon', 4),
-(10, 'Rome', 5),
-(11, 'Milan', 5),
-(12, 'New York', 6),
-(13, 'Los Angeles', 6)
-ON CONFLICT (id) DO NOTHING;
-
 -- ---------------------------------------------------------------------------------------------------------------------
 -- 5.2 USERS DATA
 -- Password for all users: Test123!
 -- ---------------------------------------------------------------------------------------------------------------------
 
-INSERT INTO users (id, external_id, user_name, email, password, first_name, last_name, phone, city, address, zipcode, language_id, is_active, is_email_verified, is_accepted_terms, is_accepted_privacy_policy, date_created, last_date_modified, created_by, last_modified_by, is_deleted) VALUES
+INSERT INTO users (id, external_id, user_name, email, password, first_name, last_name, phone, language_id, is_active, is_email_verified, is_accepted_terms, is_accepted_privacy_policy, date_created, last_date_modified, created_by, last_modified_by, is_deleted) VALUES
 -- SUPERADMIN
-(1, 'usr-ext-00001', 'superadmin', 'superadmin@clickenrent.com', '$2a$10$59i5SxRWkbcxt2rfTyjJ2.dZrlXFchPqyw1p56D/Ltp6jvYGVh2YK', 'Super', 'Admin', '+49-30-12345001', 'Berlin', 'Admin Street 1', '10115', 1, true, true, true, true, NOW(), NOW(), 'system', 'system', false),
+(1, 'usr-ext-00001', 'superadmin', 'superadmin@clickenrent.com', '$2a$10$59i5SxRWkbcxt2rfTyjJ2.dZrlXFchPqyw1p56D/Ltp6jvYGVh2YK', 'Super', 'Admin', '+49-30-12345001', 1, true, true, true, true, NOW(), NOW(), 'system', 'system', false),
 
 -- ADMIN Users
-(2, 'usr-ext-00002', 'admin_john', 'john.admin@clickenrent.com', '$2a$10$59i5SxRWkbcxt2rfTyjJ2.dZrlXFchPqyw1p56D/Ltp6jvYGVh2YK', 'John', 'Administrator', '+49-89-12345002', 'Munich', 'Admin Plaza 5', '80331', 1, true, true, true, true, NOW(), NOW(), 'system', 'system', false),
-(3, 'usr-ext-00003', 'admin_sarah', 'sarah.admin@clickenrent.com', '$2a$10$59i5SxRWkbcxt2rfTyjJ2.dZrlXFchPqyw1p56D/Ltp6jvYGVh2YK', 'Sarah', 'Manager', '+41-44-12345003', 'Zurich', 'Management Ave 12', '8001', 2, true, true, true, true, NOW(), NOW(), 'system', 'system', false),
+(2, 'usr-ext-00002', 'admin_john', 'john.admin@clickenrent.com', '$2a$10$59i5SxRWkbcxt2rfTyjJ2.dZrlXFchPqyw1p56D/Ltp6jvYGVh2YK', 'John', 'Administrator', '+49-89-12345002', 1, true, true, true, true, NOW(), NOW(), 'system', 'system', false),
+(3, 'usr-ext-00003', 'admin_sarah', 'sarah.admin@clickenrent.com', '$2a$10$59i5SxRWkbcxt2rfTyjJ2.dZrlXFchPqyw1p56D/Ltp6jvYGVh2YK', 'Sarah', 'Manager', '+41-44-12345003', 2, true, true, true, true, NOW(), NOW(), 'system', 'system', false),
 
 -- B2B Users (Hotel/Company Owners/Managers)
-(4, 'usr-ext-00004', 'hotelowner_max', 'max.mueller@grandhotel.de', '$2a$10$59i5SxRWkbcxt2rfTyjJ2.dZrlXFchPqyw1p56D/Ltp6jvYGVh2YK', 'Max', 'Mueller', '+49-30-55512001', 'Berlin', 'Friedrichstrasse 100', '10117', 2, true, true, true, true, NOW(), NOW(), 'system', 'system', false),
-(5, 'usr-ext-00005', 'hotelowner_anna', 'anna.schmidt@alpineresort.at', '$2a$10$59i5SxRWkbcxt2rfTyjJ2.dZrlXFchPqyw1p56D/Ltp6jvYGVh2YK', 'Anna', 'Schmidt', '+43-662-88800001', 'Salzburg', 'Getreidegasse 25', '5020', 2, true, true, true, true, NOW(), NOW(), 'system', 'system', false),
-(6, 'usr-ext-00006', 'campingowner_pierre', 'pierre.dubois@camping-provence.fr', '$2a$10$59i5SxRWkbcxt2rfTyjJ2.dZrlXFchPqyw1p56D/Ltp6jvYGVh2YK', 'Pierre', 'Dubois', '+33-4-90-123456', 'Lyon', 'Route de Camping 15', '69001', 3, true, true, true, true, NOW(), NOW(), 'system', 'system', false),
+(4, 'usr-ext-00004', 'hotelowner_max', 'max.mueller@grandhotel.de', '$2a$10$59i5SxRWkbcxt2rfTyjJ2.dZrlXFchPqyw1p56D/Ltp6jvYGVh2YK', 'Max', 'Mueller', '+49-30-55512001', 2, true, true, true, true, NOW(), NOW(), 'system', 'system', false),
+(5, 'usr-ext-00005', 'hotelowner_anna', 'anna.schmidt@alpineresort.at', '$2a$10$59i5SxRWkbcxt2rfTyjJ2.dZrlXFchPqyw1p56D/Ltp6jvYGVh2YK', 'Anna', 'Schmidt', '+43-662-88800001', 2, true, true, true, true, NOW(), NOW(), 'system', 'system', false),
+(6, 'usr-ext-00006', 'campingowner_pierre', 'pierre.dubois@camping-provence.fr', '$2a$10$59i5SxRWkbcxt2rfTyjJ2.dZrlXFchPqyw1p56D/Ltp6jvYGVh2YK', 'Pierre', 'Dubois', '+33-4-90-123456', 3, true, true, true, true, NOW(), NOW(), 'system', 'system', false),
 
 -- CUSTOMER Users
-(7, 'usr-ext-00007', 'customer_tom', 'tom.wilson@email.com', '$2a$10$59i5SxRWkbcxt2rfTyjJ2.dZrlXFchPqyw1p56D/Ltp6jvYGVh2YK', 'Tom', 'Wilson', '+1-212-555-0101', 'New York', '123 Broadway', '10001', 1, true, true, true, true, NOW(), NOW(), 'system', 'system', false),
-(8, 'usr-ext-00008', 'customer_emma', 'emma.johnson@email.com', '$2a$10$59i5SxRWkbcxt2rfTyjJ2.dZrlXFchPqyw1p56D/Ltp6jvYGVh2YK', 'Emma', 'Johnson', '+49-40-555-0102', 'Hamburg', 'Reeperbahn 50', '20359', 2, true, true, true, true, NOW(), NOW(), 'system', 'system', false),
-(9, 'usr-ext-00009', 'customer_luca', 'luca.rossi@email.it', '$2a$10$59i5SxRWkbcxt2rfTyjJ2.dZrlXFchPqyw1p56D/Ltp6jvYGVh2YK', 'Luca', 'Rossi', '+39-06-555-0103', 'Rome', 'Via del Corso 120', '00186', 5, true, true, true, true, NOW(), NOW(), 'system', 'system', false),
-(10, 'usr-ext-00010', 'customer_marie', 'marie.blanc@email.fr', '$2a$10$59i5SxRWkbcxt2rfTyjJ2.dZrlXFchPqyw1p56D/Ltp6jvYGVh2YK', 'Marie', 'Blanc', '+33-1-555-0104', 'Paris', 'Champs-Élysées 88', '75008', 3, true, true, true, true, NOW(), NOW(), 'system', 'system', false),
-(11, 'usr-ext-00011', 'customer_hans', 'hans.weber@email.de', '$2a$10$59i5SxRWkbcxt2rfTyjJ2.dZrlXFchPqyw1p56D/Ltp6jvYGVh2YK', 'Hans', 'Weber', '+49-89-555-0105', 'Munich', 'Marienplatz 8', '80331', 2, true, true, true, true, NOW(), NOW(), 'system', 'system', false),
-(12, 'usr-ext-00012', 'customer_sophia', 'sophia.martin@email.com', '$2a$10$59i5SxRWkbcxt2rfTyjJ2.dZrlXFchPqyw1p56D/Ltp6jvYGVh2YK', 'Sophia', 'Martin', '+41-22-555-0106', 'Geneva', 'Rue du Rhône 42', '1204', 1, true, true, true, true, NOW(), NOW(), 'system', 'system', false),
-(13, 'usr-ext-00013', 'customer_oliver', 'oliver.brown@email.com', '$2a$10$59i5SxRWkbcxt2rfTyjJ2.dZrlXFchPqyw1p56D/Ltp6jvYGVh2YK', 'Oliver', 'Brown', '+1-310-555-0107', 'Los Angeles', 'Sunset Blvd 500', '90028', 1, true, false, true, true, NOW(), NOW(), 'system', 'system', false)
+(7, 'usr-ext-00007', 'customer_tom', 'tom.wilson@email.com', '$2a$10$59i5SxRWkbcxt2rfTyjJ2.dZrlXFchPqyw1p56D/Ltp6jvYGVh2YK', 'Tom', 'Wilson', '+1-212-555-0101', 1, true, true, true, true, NOW(), NOW(), 'system', 'system', false),
+(8, 'usr-ext-00008', 'customer_emma', 'emma.johnson@email.com', '$2a$10$59i5SxRWkbcxt2rfTyjJ2.dZrlXFchPqyw1p56D/Ltp6jvYGVh2YK', 'Emma', 'Johnson', '+49-40-555-0102', 2, true, true, true, true, NOW(), NOW(), 'system', 'system', false),
+(9, 'usr-ext-00009', 'customer_luca', 'luca.rossi@email.it', '$2a$10$59i5SxRWkbcxt2rfTyjJ2.dZrlXFchPqyw1p56D/Ltp6jvYGVh2YK', 'Luca', 'Rossi', '+39-06-555-0103', 5, true, true, true, true, NOW(), NOW(), 'system', 'system', false),
+(10, 'usr-ext-00010', 'customer_marie', 'marie.blanc@email.fr', '$2a$10$59i5SxRWkbcxt2rfTyjJ2.dZrlXFchPqyw1p56D/Ltp6jvYGVh2YK', 'Marie', 'Blanc', '+33-1-555-0104', 3, true, true, true, true, NOW(), NOW(), 'system', 'system', false),
+(11, 'usr-ext-00011', 'customer_hans', 'hans.weber@email.de', '$2a$10$59i5SxRWkbcxt2rfTyjJ2.dZrlXFchPqyw1p56D/Ltp6jvYGVh2YK', 'Hans', 'Weber', '+49-89-555-0105', 2, true, true, true, true, NOW(), NOW(), 'system', 'system', false),
+(12, 'usr-ext-00012', 'customer_sophia', 'sophia.martin@email.com', '$2a$10$59i5SxRWkbcxt2rfTyjJ2.dZrlXFchPqyw1p56D/Ltp6jvYGVh2YK', 'Sophia', 'Martin', '+41-22-555-0106', 1, true, true, true, true, NOW(), NOW(), 'system', 'system', false),
+(13, 'usr-ext-00013', 'customer_oliver', 'oliver.brown@email.com', '$2a$10$59i5SxRWkbcxt2rfTyjJ2.dZrlXFchPqyw1p56D/Ltp6jvYGVh2YK', 'Oliver', 'Brown', '+1-310-555-0107', 1, true, false, true, true, NOW(), NOW(), 'system', 'system', false)
 ON CONFLICT (id) DO NOTHING;
 
 -- ---------------------------------------------------------------------------------------------------------------------
@@ -503,20 +466,20 @@ ON CONFLICT (id) DO NOTHING;
 -- 5.6 ADDRESSES
 -- ---------------------------------------------------------------------------------------------------------------------
 
-INSERT INTO address (id, city_id, street, postcode, date_created, last_date_modified, created_by, last_modified_by, is_deleted) VALUES
-(1, 1, 'Friedrichstrasse 100', '10117', NOW(), NOW(), 'system', 'system', false),
-(2, 2, 'Marienplatz 8', '80331', NOW(), NOW(), 'system', 'system', false),
-(3, 3, 'Reeperbahn 50', '20359', NOW(), NOW(), 'system', 'system', false),
-(4, 4, 'Kärntner Strasse 15', '1010', NOW(), NOW(), 'system', 'system', false),
-(5, 5, 'Getreidegasse 25', '5020', NOW(), NOW(), 'system', 'system', false),
-(6, 6, 'Bahnhofstrasse 45', '8001', NOW(), NOW(), 'system', 'system', false),
-(7, 7, 'Rue du Rhône 42', '1204', NOW(), NOW(), 'system', 'system', false),
-(8, 8, 'Champs-Élysées 88', '75008', NOW(), NOW(), 'system', 'system', false),
-(9, 9, 'Route de Camping 15', '69001', NOW(), NOW(), 'system', 'system', false),
-(10, 10, 'Via del Corso 120', '00186', NOW(), NOW(), 'system', 'system', false),
-(11, 11, 'Via Montenapoleone 10', '20121', NOW(), NOW(), 'system', 'system', false),
-(12, 12, '123 Broadway', '10001', NOW(), NOW(), 'system', 'system', false),
-(13, 13, 'Sunset Blvd 500', '90028', NOW(), NOW(), 'system', 'system', false)
+INSERT INTO address (id, city, country_id, street, postcode, date_created, last_date_modified, created_by, last_modified_by, is_deleted) VALUES
+(1, 'Berlin', 1, 'Friedrichstrasse 100', '10117', NOW(), NOW(), 'system', 'system', false),
+(2, 'Munich', 1, 'Marienplatz 8', '80331', NOW(), NOW(), 'system', 'system', false),
+(3, 'Hamburg', 1, 'Reeperbahn 50', '20359', NOW(), NOW(), 'system', 'system', false),
+(4, 'Vienna', 2, 'Kärntner Strasse 15', '1010', NOW(), NOW(), 'system', 'system', false),
+(5, 'Salzburg', 2, 'Getreidegasse 25', '5020', NOW(), NOW(), 'system', 'system', false),
+(6, 'Zurich', 3, 'Bahnhofstrasse 45', '8001', NOW(), NOW(), 'system', 'system', false),
+(7, 'Geneva', 3, 'Rue du Rhône 42', '1204', NOW(), NOW(), 'system', 'system', false),
+(8, 'Paris', 4, 'Champs-Élysées 88', '75008', NOW(), NOW(), 'system', 'system', false),
+(9, 'Lyon', 4, 'Route de Camping 15', '69001', NOW(), NOW(), 'system', 'system', false),
+(10, 'Rome', 5, 'Via del Corso 120', '00186', NOW(), NOW(), 'system', 'system', false),
+(11, 'Milan', 5, 'Via Montenapoleone 10', '20121', NOW(), NOW(), 'system', 'system', false),
+(12, 'New York', 6, '123 Broadway', '10001', NOW(), NOW(), 'system', 'system', false),
+(13, 'Los Angeles', 6, 'Sunset Blvd 500', '90028', NOW(), NOW(), 'system', 'system', false)
 ON CONFLICT (id) DO NOTHING;
 
 -- ---------------------------------------------------------------------------------------------------------------------
@@ -567,7 +530,6 @@ SELECT setval('global_role_id_seq', (SELECT COALESCE(MAX(id), 1) FROM global_rol
 SELECT setval('company_type_id_seq', (SELECT COALESCE(MAX(id), 1) FROM company_type));
 SELECT setval('company_role_id_seq', (SELECT COALESCE(MAX(id), 1) FROM company_role));
 SELECT setval('country_id_seq', (SELECT COALESCE(MAX(id), 1) FROM country));
-SELECT setval('city_id_seq', (SELECT COALESCE(MAX(id), 1) FROM city));
 SELECT setval('users_id_seq', (SELECT COALESCE(MAX(id), 1) FROM users));
 SELECT setval('user_global_role_id_seq', (SELECT COALESCE(MAX(id), 1) FROM user_global_role));
 SELECT setval('company_id_seq', (SELECT COALESCE(MAX(id), 1) FROM company));

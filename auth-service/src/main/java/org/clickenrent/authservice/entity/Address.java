@@ -1,6 +1,7 @@
 package org.clickenrent.authservice.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.*;
@@ -10,13 +11,13 @@ import org.hibernate.annotations.Where;
 
 /**
  * Entity representing a physical address.
- * Contains street, postcode, and city information.
+ * Contains street, postcode, city, and country information.
  */
 @Entity
 @Table(
     name = "address",
     indexes = {
-        @Index(name = "idx_address_city", columnList = "city_id")
+        @Index(name = "idx_address_country", columnList = "country_id")
     }
 )
 @SQLDelete(sql = "UPDATE address SET is_deleted = true WHERE id = ?")
@@ -33,10 +34,15 @@ public class Address extends BaseAuditEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotNull(message = "City is required")
+    @NotBlank(message = "City is required")
+    @Size(max = 100, message = "City must not exceed 100 characters")
+    @Column(name = "city", nullable = false, length = 100)
+    private String city;
+
+    @NotNull(message = "Country is required")
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "city_id", nullable = false)
-    private City city;
+    @JoinColumn(name = "country_id", nullable = false)
+    private Country country;
 
     @Size(max = 255, message = "Street must not exceed 255 characters")
     @Column(name = "street", length = 255)

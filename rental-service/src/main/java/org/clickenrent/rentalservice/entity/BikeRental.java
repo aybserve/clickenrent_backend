@@ -19,7 +19,10 @@ import java.util.UUID;
 @Table(
         name = "bike_rental",
         indexes = {
-                @Index(name = "idx_bike_rental_external_id", columnList = "external_id")
+                @Index(name = "idx_bike_rental_external_id", columnList = "external_id"),
+                @Index(name = "idx_bike_rental_bike_external_id", columnList = "bike_external_id"),
+                @Index(name = "idx_bike_rental_location_external_id", columnList = "location_external_id"),
+                @Index(name = "idx_bike_rental_rental_external_id", columnList = "rental_external_id")
         }
 )
 @SQLDelete(sql = "UPDATE bike_rental SET is_deleted = true WHERE id = ?")
@@ -45,15 +48,27 @@ public class BikeRental extends BaseAuditEntity {
     @JoinColumn(name = "bike_id", nullable = false)
     private Bike bike;
 
+    // Cross-service reference field using externalId
+    @Column(name = "bike_external_id", length = 100)
+    private String bikeExternalId;
+
     @NotNull(message = "Location is required")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "location_id", nullable = false)
     private Location location;
 
+    // Cross-service reference field using externalId
+    @Column(name = "location_external_id", length = 100)
+    private String locationExternalId;
+
     @NotNull(message = "Rental is required")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "rental_id", nullable = false)
     private Rental rental;
+
+    // Cross-service reference field using externalId
+    @Column(name = "rental_external_id", length = 100)
+    private String rentalExternalId;
 
     @NotNull(message = "Start date time is required")
     @Column(name = "start_date_time", nullable = false)

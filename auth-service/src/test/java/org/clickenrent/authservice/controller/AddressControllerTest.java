@@ -57,7 +57,8 @@ class AddressControllerTest {
                 .id(1L)
                 .street("Main Street 123")
                 .postcode("12345")
-                .cityId(1L)
+                .city("Berlin")
+                .countryId(1L)
                 .build();
     }
 
@@ -110,32 +111,10 @@ class AddressControllerTest {
     }
 
     @Test
-    @WithMockUser(roles = "SUPERADMIN")
-    void getAddressesByCityId_ReturnsOk() throws Exception {
-        List<AddressDTO> addresses = Arrays.asList(addressDTO);
-        when(addressService.getAddressesByCityId(1L)).thenReturn(addresses);
-
-        mockMvc.perform(get("/api/addresses/by-city/1").with(csrf()))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].id").value(1L));
-
-        verify(addressService, times(1)).getAddressesByCityId(1L);
-    }
-
-    @Test
-    @WithMockUser(roles = "CUSTOMER")
-    void getAddressesByCityId_WithCustomerRole_ReturnsForbidden() throws Exception {
-        mockMvc.perform(get("/api/addresses/by-city/1").with(csrf()))
-                .andExpect(status().isForbidden());
-
-        verify(addressService, never()).getAddressesByCityId(anyLong());
-    }
-
-    @Test
     @WithMockUser(roles = "CUSTOMER")
     void createAddress_WithCustomerRole_ReturnsCreated() throws Exception {
-        AddressDTO newAddress = AddressDTO.builder().street("Oak Ave 456").postcode("67890").cityId(1L).build();
-        AddressDTO createdAddress = AddressDTO.builder().id(2L).street("Oak Ave 456").postcode("67890").cityId(1L).build();
+        AddressDTO newAddress = AddressDTO.builder().street("Oak Ave 456").postcode("67890").city("Munich").countryId(1L).build();
+        AddressDTO createdAddress = AddressDTO.builder().id(2L).street("Oak Ave 456").postcode("67890").city("Munich").countryId(1L).build();
 
         when(addressService.createAddress(any(AddressDTO.class))).thenReturn(createdAddress);
 
@@ -153,7 +132,7 @@ class AddressControllerTest {
     @Test
     @WithMockUser(roles = "B2B")
     void createAddress_WithB2BRole_ReturnsCreated() throws Exception {
-        AddressDTO newAddress = AddressDTO.builder().street("Oak Ave 456").postcode("67890").cityId(1L).build();
+        AddressDTO newAddress = AddressDTO.builder().street("Oak Ave 456").postcode("67890").city("Munich").countryId(1L).build();
 
         when(addressService.createAddress(any(AddressDTO.class))).thenReturn(newAddress);
 
@@ -169,7 +148,7 @@ class AddressControllerTest {
     @Test
     @WithMockUser(roles = "ADMIN")
     void updateAddress_ReturnsOk() throws Exception {
-        AddressDTO updated = AddressDTO.builder().id(1L).street("Main Street 123 Updated").postcode("12345").cityId(1L).build();
+        AddressDTO updated = AddressDTO.builder().id(1L).street("Main Street 123 Updated").postcode("12345").city("Berlin").countryId(1L).build();
 
         when(addressService.updateAddress(eq(1L), any(AddressDTO.class))).thenReturn(updated);
 

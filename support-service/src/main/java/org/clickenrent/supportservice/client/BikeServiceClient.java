@@ -1,6 +1,7 @@
 package org.clickenrent.supportservice.client;
 
 import org.clickenrent.contracts.rental.BikeDTO;
+import org.clickenrent.contracts.rental.BikeTypeDTO;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -23,6 +24,13 @@ public interface BikeServiceClient {
      */
     @GetMapping("/bikes/external/{externalId}")
     BikeDTO getBikeByExternalId(@PathVariable("externalId") String externalId);
+
+    /**
+     * Get bike type by external ID from rental-service (for cross-service communication)
+     */
+    @GetMapping("/bike-types/external/{externalId}")
+    BikeTypeDTO getBikeTypeByExternalId(@PathVariable("externalId") String externalId);
 }
+
 
 
