@@ -40,7 +40,7 @@ public class BikeMapper {
                 .hubId(bike.getHub() != null ? bike.getHub().getId() : null)
                 .coordinatesId(bike.getCoordinates() != null ? bike.getCoordinates().getId() : null)
                 .bikeTypeId(bike.getBikeType() != null ? bike.getBikeType().getId() : null)
-                .currencyId(bike.getCurrencyId())
+                .currencyExternalId(bike.getCurrencyExternalId())
                 .inServiceDate(bike.getInServiceDate())
                 .bikeModelId(bike.getBikeModel() != null ? bike.getBikeModel().getId() : null)
                 .isB2BRentable(bike.getIsB2BRentable())
@@ -65,7 +65,7 @@ public class BikeMapper {
                 .frameNumber(dto.getFrameNumber())
                 .vat(dto.getVat())
                 .isVatInclude(dto.getIsVatInclude())
-                .currencyId(dto.getCurrencyId())
+                .currencyExternalId(dto.getCurrencyExternalId())
                 .inServiceDate(dto.getInServiceDate())
                 .isB2BRentable(dto.getIsB2BRentable())
                 .revenueSharePercent(dto.getRevenueSharePercent());

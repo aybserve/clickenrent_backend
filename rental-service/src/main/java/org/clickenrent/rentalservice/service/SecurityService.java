@@ -135,6 +135,70 @@ public class SecurityService {
         Long currentUserId = getCurrentUserId();
         return currentUserId != null && currentUserId.equals(userId);
     }
+
+    /**
+     * Get current user external ID from JWT token
+     */
+    public String getCurrentUserExternalId() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return null;
+        }
+        
+        if (authentication.getPrincipal() instanceof Jwt jwt) {
+            return jwt.getClaim("userExternalId");
+        }
+        
+        return null;
+    }
+
+    /**
+     * Get current user's company external IDs from JWT token
+     */
+    public List<String> getCurrentUserCompanyExternalIds() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return List.of();
+        }
+        
+        if (authentication.getPrincipal() instanceof Jwt jwt) {
+            List<?> companyExternalIds = jwt.getClaim("companyExternalIds");
+            if (companyExternalIds != null) {
+                return companyExternalIds.stream()
+                        .filter(id -> id instanceof String)
+                        .map(id -> (String) id)
+                        .collect(Collectors.toList());
+            }
+        }
+        
+        return List.of();
+    }
+
+    /**
+     * Check if user has access to a specific company by external ID
+     */
+    public boolean hasAccessToCompanyByExternalId(String companyExternalId) {
+        if (isAdmin()) {
+            return true;
+        }
+        
+        List<String> userCompanyExternalIds = getCurrentUserCompanyExternalIds();
+        return userCompanyExternalIds.contains(companyExternalId);
+    }
+
+    /**
+     * Check if user has access to resource owned by user external ID
+     */
+    public boolean hasAccessToUserByExternalId(String userExternalId) {
+        if (isAdmin()) {
+            return true;
+        }
+        
+        String currentUserExternalId = getCurrentUserExternalId();
+        return currentUserExternalId != null && currentUserExternalId.equals(userExternalId);
+    }
 }
 
 

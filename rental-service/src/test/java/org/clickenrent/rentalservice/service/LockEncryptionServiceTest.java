@@ -51,8 +51,8 @@ class LockEncryptionServiceTest {
 
         Rental rental = Rental.builder()
                 .id(1L)
-                .userId(100L)
-                .companyId(1L)
+                .userExternalId("usr-ext-00100")
+                .companyExternalId("company-ext-001")
                 .build();
 
         bikeRental = BikeRental.builder()

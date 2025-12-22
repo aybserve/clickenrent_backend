@@ -49,7 +49,7 @@ public class BikeRentalService {
                 .orElseThrow(() -> new ResourceNotFoundException("BikeRental", "id", id));
 
         // Check access
-        if (!securityService.isAdmin() && !securityService.hasAccessToUser(bikeRental.getRental().getUserId())) {
+        if (!securityService.isAdmin() && !securityService.hasAccessToUserByExternalId(bikeRental.getRental().getUserExternalId())) {
             throw new UnauthorizedException("You don't have permission to view this bike rental");
         }
 
@@ -63,7 +63,7 @@ public class BikeRentalService {
         
         // Security check - verify access through rental
         if (bikeRental.getRental() != null) {
-            if (!securityService.isAdmin() && !securityService.hasAccessToUser(bikeRental.getRental().getUserId())) {
+            if (!securityService.isAdmin() && !securityService.hasAccessToUserByExternalId(bikeRental.getRental().getUserExternalId())) {
                 throw new UnauthorizedException("You don't have permission to view this bike rental");
             }
         }
@@ -78,7 +78,7 @@ public class BikeRentalService {
         
         // Security check
         if (bikeRental.getRental() != null) {
-            if (!securityService.isAdmin() && !securityService.hasAccessToUser(bikeRental.getRental().getUserId())) {
+            if (!securityService.isAdmin() && !securityService.hasAccessToUserByExternalId(bikeRental.getRental().getUserExternalId())) {
                 throw new UnauthorizedException("You don't have permission to update this bike rental");
             }
         }
@@ -116,7 +116,7 @@ public class BikeRentalService {
                 .orElseThrow(() -> new ResourceNotFoundException("Rental", "id", dto.getRentalId()));
 
         // Check permissions
-        if (!securityService.isAdmin() && !securityService.hasAccessToUser(rental.getUserId())) {
+        if (!securityService.isAdmin() && !securityService.hasAccessToUserByExternalId(rental.getUserExternalId())) {
             throw new UnauthorizedException("You don't have permission to create bike rentals");
         }
 
@@ -166,7 +166,7 @@ public class BikeRentalService {
                 .orElseThrow(() -> new ResourceNotFoundException("BikeRental", "id", bikeRentalId));
 
         // Verify user authorization
-        if (!securityService.isAdmin() && !securityService.hasAccessToUser(bikeRental.getRental().getUserId())) {
+        if (!securityService.isAdmin() && !securityService.hasAccessToUserByExternalId(bikeRental.getRental().getUserExternalId())) {
             throw new UnauthorizedException("You don't have permission to unlock this bike");
         }
 
@@ -211,7 +211,7 @@ public class BikeRentalService {
                 .orElseThrow(() -> new ResourceNotFoundException("BikeRental", "id", bikeRentalId));
 
         // Verify user authorization
-        if (!securityService.isAdmin() && !securityService.hasAccessToUser(bikeRental.getRental().getUserId())) {
+        if (!securityService.isAdmin() && !securityService.hasAccessToUserByExternalId(bikeRental.getRental().getUserExternalId())) {
             throw new UnauthorizedException("You don't have permission to lock this bike");
         }
 

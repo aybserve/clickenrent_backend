@@ -97,7 +97,7 @@ class RideServiceTest {
         when(securityService.isAdmin()).thenReturn(true);
         BikeRental bikeRental = new BikeRental();
         Rental rental = new Rental();
-        rental.setUserId(1L);
+        rental.setUserExternalId("usr-ext-00001");
         bikeRental.setRental(rental);
         testRide.setBikeRental(bikeRental);
         
@@ -123,7 +123,7 @@ class RideServiceTest {
         when(securityService.isAdmin()).thenReturn(true);
         BikeRental bikeRental = new BikeRental();
         Rental rental = new Rental();
-        rental.setUserId(1L);
+        rental.setUserExternalId("usr-ext-00001");
         bikeRental.setRental(rental);
         
         when(bikeRentalRepository.findById(1L)).thenReturn(Optional.of(bikeRental));
@@ -142,7 +142,7 @@ class RideServiceTest {
         when(securityService.isAdmin()).thenReturn(true);
         BikeRental bikeRental = new BikeRental();
         Rental rental = new Rental();
-        rental.setUserId(1L);
+        rental.setUserExternalId("usr-ext-00001");
         bikeRental.setRental(rental);
         
         RideStatus activeStatus = new RideStatus();
@@ -165,7 +165,7 @@ class RideServiceTest {
         when(securityService.isAdmin()).thenReturn(true);
         BikeRental bikeRental = new BikeRental();
         Rental rental = new Rental();
-        rental.setUserId(1L);
+        rental.setUserExternalId("usr-ext-00001");
         bikeRental.setRental(rental);
         testRide.setBikeRental(bikeRental);
         

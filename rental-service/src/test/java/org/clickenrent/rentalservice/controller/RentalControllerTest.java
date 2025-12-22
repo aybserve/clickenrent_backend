@@ -46,8 +46,8 @@ class RentalControllerTest {
         rentalDTO = RentalDTO.builder()
                 .id(1L)
                 .externalId("RENT001")
-                .userId(1L)
-                .companyId(1L)
+                .userExternalId("usr-ext-00001")
+                .companyExternalId("company-ext-001")
                 .rentalStatusId(2L)
                 .build();
     }
@@ -136,15 +136,15 @@ class RentalControllerTest {
     void createRental_WithCustomerRole_ReturnsCreated() throws Exception {
         // Given
         RentalDTO newRental = RentalDTO.builder()
-                .userId(1L)
-                .companyId(1L)
+                .userExternalId("usr-ext-00001")
+                .companyExternalId("company-ext-001")
                 .rentalStatusId(1L)
                 .build();
 
         RentalDTO createdRental = RentalDTO.builder()
                 .id(2L)
-                .userId(1L)
-                .companyId(1L)
+                .userExternalId("usr-ext-00001")
+                .companyExternalId("company-ext-001")
                 .rentalStatusId(1L)
                 .build();
 
@@ -184,8 +184,8 @@ class RentalControllerTest {
         RentalDTO updatedRental = RentalDTO.builder()
                 .id(1L)
                 .externalId("RENT001")
-                .userId(1L)
-                .companyId(1L)
+                .userExternalId("usr-ext-00001")
+                .companyExternalId("company-ext-001")
                 .rentalStatusId(3L)
                 .build();
 

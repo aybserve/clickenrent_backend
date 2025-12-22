@@ -19,7 +19,6 @@ public class PartBrandMapper {
                 .id(partBrand.getId())
                 .externalId(partBrand.getExternalId())
                 .name(partBrand.getName())
-                .companyId(partBrand.getCompanyId())
                 .companyExternalId(partBrand.getCompanyExternalId())
                 .build();
     }
@@ -33,7 +32,7 @@ public class PartBrandMapper {
                 .id(dto.getId())
                 .externalId(dto.getExternalId())
                 .name(dto.getName())
-                .companyId(dto.getCompanyId())
+                .companyExternalId(dto.getCompanyExternalId())
                 .build();
     }
 

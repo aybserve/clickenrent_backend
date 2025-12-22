@@ -64,7 +64,7 @@ class BikeReservationServiceTest {
         testReservation = BikeReservation.builder()
         .id(1L)
         .externalId("BRES001")
-        .userId(1L)
+        .userExternalId("usr-ext-00001")
         .bike(testBike)
         .startDateTime(LocalDateTime.now().plusDays(1))
         .endDateTime(LocalDateTime.now().plusDays(2))
@@ -73,7 +73,7 @@ class BikeReservationServiceTest {
         testReservationDTO = BikeReservationDTO.builder()
         .id(1L)
         .externalId("BRES001")
-        .userId(1L)
+        .userExternalId("usr-ext-00001")
         .bikeId(1L)
         .startDateTime(LocalDateTime.now().plusDays(1))
         .endDateTime(LocalDateTime.now().plusDays(2))
@@ -110,28 +110,28 @@ class BikeReservationServiceTest {
     void getReservationsByUser_WithAdminRole_Success() {
         // Arrange
         when(securityService.isAdmin()).thenReturn(true);
-        when(bikeReservationRepository.findByUserId(1L)).thenReturn(Arrays.asList(testReservation));
+        when(bikeReservationRepository.findByUserExternalId("usr-ext-00001")).thenReturn(Arrays.asList(testReservation));
         when(bikeReservationMapper.toDto(testReservation)).thenReturn(testReservationDTO);
 
         // Act
-        var result = bikeReservationService.getReservationsByUser(1L);
+        var result = bikeReservationService.getReservationsByUserExternalId("usr-ext-00001");
 
         // Assert
         assertNotNull(result);
         assertEquals(1, result.size());
-        verify(bikeReservationRepository, times(1)).findByUserId(1L);
+        verify(bikeReservationRepository, times(1)).findByUserExternalId("usr-ext-00001");
     }
 
     @Test
     void getReservationsByUser_WithAccessToUser_Success() {
         // Arrange
         when(securityService.isAdmin()).thenReturn(false);
-        when(securityService.hasAccessToUser(1L)).thenReturn(true);
-        when(bikeReservationRepository.findByUserId(1L)).thenReturn(Arrays.asList(testReservation));
+        when(securityService.hasAccessToUserByExternalId("usr-ext-00001")).thenReturn(true);
+        when(bikeReservationRepository.findByUserExternalId("usr-ext-00001")).thenReturn(Arrays.asList(testReservation));
         when(bikeReservationMapper.toDto(testReservation)).thenReturn(testReservationDTO);
 
         // Act
-        var result = bikeReservationService.getReservationsByUser(1L);
+        var result = bikeReservationService.getReservationsByUserExternalId("usr-ext-00001");
 
         // Assert
         assertNotNull(result);
@@ -142,8 +142,9 @@ class BikeReservationServiceTest {
     void getReservationsByUser_WithoutAccess_ThrowsUnauthorizedException() {
         // Arrange
         when(securityService.isAdmin()).thenReturn(false);
+        when(securityService.hasAccessToUserByExternalId("usr-ext-00001")).thenReturn(false);
         // Act & Assert
-        assertThrows(UnauthorizedException.class, () -> bikeReservationService.getReservationsByUser(1L));
+        assertThrows(UnauthorizedException.class, () -> bikeReservationService.getReservationsByUserExternalId("usr-ext-00001"));
     }
 
     @Test

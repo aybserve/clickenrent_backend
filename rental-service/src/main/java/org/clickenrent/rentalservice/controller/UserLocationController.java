@@ -23,11 +23,11 @@ public class UserLocationController {
 
     private final UserLocationService userLocationService;
 
-    @GetMapping("/by-user/{userId}")
+    @GetMapping("/by-user/{userExternalId}")
     @PreAuthorize("isAuthenticated()")
     @Operation(summary = "Get locations for a user")
-    public ResponseEntity<List<UserLocationDTO>> getUserLocationsByUser(@PathVariable Long userId) {
-        return ResponseEntity.ok(userLocationService.getUserLocationsByUser(userId));
+    public ResponseEntity<List<UserLocationDTO>> getUserLocationsByUserExternalId(@PathVariable String userExternalId) {
+        return ResponseEntity.ok(userLocationService.getUserLocationsByUserExternalId(userExternalId));
     }
 
     @GetMapping("/by-location/{locationId}")

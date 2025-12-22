@@ -12,7 +12,7 @@ import java.util.List;
  */
 @Repository
 public interface UserLocationRepository extends JpaRepository<UserLocation, Long> {
-    List<UserLocation> findByUserId(Long userId);
+    List<UserLocation> findByUserExternalId(String userExternalId);
     List<UserLocation> findByLocation(Location location);
 }
 

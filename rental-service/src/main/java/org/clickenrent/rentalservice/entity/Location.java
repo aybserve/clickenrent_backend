@@ -20,7 +20,6 @@ import java.util.UUID;
     name = "location",
     indexes = {
         @Index(name = "idx_location_external_id", columnList = "external_id"),
-        @Index(name = "idx_location_company_id", columnList = "company_id"),
         @Index(name = "idx_location_company_external_id", columnList = "company_external_id"),
         @Index(name = "idx_location_erp_partner_id", columnList = "erp_partner_id")
     }
@@ -60,12 +59,9 @@ public class Location extends BaseAuditEntity {
     @Column(name = "description", length = 1000)
     private String description;
 
-    @NotNull(message = "Company ID is required")
-    @Column(name = "company_id", nullable = false)
-    private Long companyId;
-
     // Cross-service reference field using externalId
-    @Column(name = "company_external_id", length = 100)
+    @NotNull(message = "Company external ID is required")
+    @Column(name = "company_external_id", nullable = false, length = 100)
     private String companyExternalId;
 
     @Builder.Default

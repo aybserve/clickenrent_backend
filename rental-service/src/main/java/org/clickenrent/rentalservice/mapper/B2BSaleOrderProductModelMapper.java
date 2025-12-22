@@ -14,6 +14,7 @@ import org.springframework.stereotype.Component;
 public class B2BSaleOrderProductModelMapper {
 
     private final B2BSaleOrderRepository b2bSaleOrderRepository;
+    private final org.clickenrent.rentalservice.repository.ProductRepository productRepository;
 
     public B2BSaleOrderProductModelDTO toDto(B2BSaleOrderProductModel productModel) {
         if (productModel == null) {
@@ -24,8 +25,7 @@ public class B2BSaleOrderProductModelMapper {
                 .id(productModel.getId())
                 .externalId(productModel.getExternalId())
                 .b2bSaleOrderId(productModel.getB2bSaleOrder() != null ? productModel.getB2bSaleOrder().getId() : null)
-                .productModelType(productModel.getProductModelType())
-                .productModelId(productModel.getProductModelId())
+                .productId(productModel.getProduct() != null ? productModel.getProduct().getId() : null)
                 .quantity(productModel.getQuantity())
                 .price(productModel.getPrice())
                 .totalPrice(productModel.getTotalPrice())
@@ -40,14 +40,15 @@ public class B2BSaleOrderProductModelMapper {
         var builder = B2BSaleOrderProductModel.builder()
                 .id(dto.getId())
                 .externalId(dto.getExternalId())
-                .productModelType(dto.getProductModelType())
-                .productModelId(dto.getProductModelId())
                 .quantity(dto.getQuantity())
                 .price(dto.getPrice())
                 .totalPrice(dto.getTotalPrice());
 
         if (dto.getB2bSaleOrderId() != null) {
             builder.b2bSaleOrder(b2bSaleOrderRepository.findById(dto.getB2bSaleOrderId()).orElse(null));
+        }
+        if (dto.getProductId() != null) {
+            builder.product(productRepository.findById(dto.getProductId()).orElse(null));
         }
 
         return builder.build();

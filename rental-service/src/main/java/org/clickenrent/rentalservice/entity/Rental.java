@@ -18,8 +18,6 @@ import java.util.UUID;
     name = "rental",
     indexes = {
         @Index(name = "idx_rental_external_id", columnList = "external_id"),
-        @Index(name = "idx_rental_user_id", columnList = "user_id"),
-        @Index(name = "idx_rental_company_id", columnList = "company_id"),
         @Index(name = "idx_rental_user_external_id", columnList = "user_external_id"),
         @Index(name = "idx_rental_company_external_id", columnList = "company_external_id"),
         @Index(name = "idx_rental_erp_order_id", columnList = "erp_rental_order_id")
@@ -43,19 +41,13 @@ public class Rental extends BaseAuditEntity {
     @Column(name = "external_id", unique = true, length = 100)
     private String externalId;
 
-    @NotNull(message = "User ID is required")
-    @Column(name = "user_id", nullable = false)
-    private Long userId;
-
-    @NotNull(message = "Company ID is required")
-    @Column(name = "company_id", nullable = false)
-    private Long companyId;
-
     // Cross-service reference fields using externalId
-    @Column(name = "user_external_id", length = 100)
+    @NotNull(message = "User external ID is required")
+    @Column(name = "user_external_id", nullable = false, length = 100)
     private String userExternalId;
 
-    @Column(name = "company_external_id", length = 100)
+    @NotNull(message = "Company external ID is required")
+    @Column(name = "company_external_id", nullable = false, length = 100)
     private String companyExternalId;
 
     @NotNull(message = "Rental status is required")

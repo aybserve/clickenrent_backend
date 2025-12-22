@@ -18,8 +18,8 @@ public class B2BSaleOrderDTO {
 
     private Long id;
     private String externalId;
-    private Long sellerCompanyId;
-    private Long buyerCompanyId;
+    private String sellerCompanyExternalId;
+    private String buyerCompanyExternalId;
     private Long b2bSaleOrderStatusId;
     private Long locationId;
     private Long b2bSaleId;

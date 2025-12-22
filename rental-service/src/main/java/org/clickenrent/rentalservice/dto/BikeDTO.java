@@ -31,7 +31,7 @@ public class BikeDTO {
     private Long hubId;
     private Long coordinatesId;
     private Long bikeTypeId;
-    private Long currencyId;
+    private String currencyExternalId;
     private LocalDate inServiceDate;
     private Long bikeModelId;
     private Boolean isB2BRentable;

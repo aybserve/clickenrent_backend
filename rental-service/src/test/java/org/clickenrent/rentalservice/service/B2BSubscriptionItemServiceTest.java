@@ -51,7 +51,7 @@ class B2BSubscriptionItemServiceTest {
     void setUp() {
         testLocation = Location.builder()
         .id(1L)
-        .companyId(1L)
+        .companyExternalId("company-ext-001")
         .build();
 
         testSubscription = B2BSubscription.builder()

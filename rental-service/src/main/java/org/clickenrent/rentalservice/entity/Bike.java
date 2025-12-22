@@ -70,8 +70,9 @@ public class Bike extends Product {
     @JoinColumn(name = "bike_type_id", nullable = true)
     private BikeType bikeType;
 
-    @Column(name = "currency_id")
-    private Long currencyId;
+    // Cross-service reference field using externalId
+    @Column(name = "currency_external_id", length = 100)
+    private String currencyExternalId;
 
     @Column(name = "in_service_date")
     private LocalDate inServiceDate;

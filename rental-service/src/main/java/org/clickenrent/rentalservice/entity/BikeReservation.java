@@ -18,7 +18,6 @@ import java.util.UUID;
     name = "bike_reservation",
     indexes = {
         @Index(name = "idx_bike_reservation_external_id", columnList = "external_id"),
-        @Index(name = "idx_bike_reservation_user_id", columnList = "user_id"),
         @Index(name = "idx_bike_reservation_user_external_id", columnList = "user_external_id")
     }
 )
@@ -47,12 +46,9 @@ public class BikeReservation extends BaseAuditEntity {
     @Column(name = "end_date_time", nullable = false)
     private LocalDateTime endDateTime;
 
-    @NotNull(message = "User ID is required")
-    @Column(name = "user_id", nullable = false)
-    private Long userId;
-
     // Cross-service reference field using externalId
-    @Column(name = "user_external_id", length = 100)
+    @NotNull(message = "User external ID is required")
+    @Column(name = "user_external_id", nullable = false, length = 100)
     private String userExternalId;
 
     @NotNull(message = "Bike is required")

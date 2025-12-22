@@ -20,7 +20,7 @@ public class BikeReservationDTO {
     private String externalId;
     private LocalDateTime startDateTime;
     private LocalDateTime endDateTime;
-    private Long userId;
+    private String userExternalId;
     private Long bikeId;
 }
 

@@ -44,7 +44,7 @@ public class HubService {
                 .orElseThrow(() -> new ResourceNotFoundException("Location", "id", locationId));
 
         // Check access to location's company
-        if (!securityService.isAdmin() && !securityService.hasAccessToCompany(location.getCompanyId())) {
+        if (!securityService.isAdmin() && !securityService.hasAccessToCompanyByExternalId(location.getCompanyExternalId())) {
             throw new UnauthorizedException("You don't have permission to view hubs for this location");
         }
 
@@ -59,7 +59,7 @@ public class HubService {
                 .orElseThrow(() -> new ResourceNotFoundException("Hub", "id", id));
 
         // Check access to hub's location company
-        if (!securityService.isAdmin() && !securityService.hasAccessToCompany(hub.getLocation().getCompanyId())) {
+        if (!securityService.isAdmin() && !securityService.hasAccessToCompanyByExternalId(hub.getLocation().getCompanyExternalId())) {
             throw new UnauthorizedException("You don't have permission to view this hub");
         }
 
@@ -72,7 +72,7 @@ public class HubService {
         Location location = locationRepository.findById(hubDTO.getLocationId())
                 .orElseThrow(() -> new ResourceNotFoundException("Location", "id", hubDTO.getLocationId()));
 
-        if (!securityService.isAdmin() && !securityService.hasAccessToCompany(location.getCompanyId())) {
+        if (!securityService.isAdmin() && !securityService.hasAccessToCompanyByExternalId(location.getCompanyExternalId())) {
             throw new UnauthorizedException("You don't have permission to create hub for this location");
         }
 
@@ -86,7 +86,7 @@ public class HubService {
         Hub hub = hubRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Hub", "id", id));
 
-        if (!securityService.isAdmin() && !securityService.hasAccessToCompany(hub.getLocation().getCompanyId())) {
+        if (!securityService.isAdmin() && !securityService.hasAccessToCompanyByExternalId(hub.getLocation().getCompanyExternalId())) {
             throw new UnauthorizedException("You don't have permission to update this hub");
         }
 
@@ -100,7 +100,7 @@ public class HubService {
         Hub hub = hubRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Hub", "id", id));
 
-        if (!securityService.isAdmin() && !securityService.hasAccessToCompany(hub.getLocation().getCompanyId())) {
+        if (!securityService.isAdmin() && !securityService.hasAccessToCompanyByExternalId(hub.getLocation().getCompanyExternalId())) {
             throw new UnauthorizedException("You don't have permission to delete this hub");
         }
 

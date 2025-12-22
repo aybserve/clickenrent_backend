@@ -18,7 +18,9 @@ import java.util.UUID;
     name = "b2b_sale",
     indexes = {
         @Index(name = "idx_b2b_sale_external_id", columnList = "external_id"),
-        @Index(name = "idx_b2b_sale_location_id", columnList = "location_id")
+        @Index(name = "idx_b2b_sale_location_id", columnList = "location_id"),
+        @Index(name = "idx_b2b_sale_seller_company_external_id", columnList = "seller_company_external_id"),
+        @Index(name = "idx_b2b_sale_buyer_company_external_id", columnList = "buyer_company_external_id")
     }
 )
 @SQLDelete(sql = "UPDATE b2b_sale SET is_deleted = true WHERE id = ?")
@@ -51,6 +53,15 @@ public class B2BSale extends BaseAuditEntity {
     @NotNull(message = "Date time is required")
     @Column(name = "date_time", nullable = false)
     private LocalDateTime dateTime;
+
+    // Cross-service reference fields using externalId
+    @NotNull(message = "Seller company external ID is required")
+    @Column(name = "seller_company_external_id", nullable = false, length = 100)
+    private String sellerCompanyExternalId;
+
+    @NotNull(message = "Buyer company external ID is required")
+    @Column(name = "buyer_company_external_id", nullable = false, length = 100)
+    private String buyerCompanyExternalId;
 
     @PrePersist
     public void prePersist() {

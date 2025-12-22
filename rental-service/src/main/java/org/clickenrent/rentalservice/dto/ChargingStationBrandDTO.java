@@ -17,7 +17,6 @@ public class ChargingStationBrandDTO {
     private Long id;
     private String externalId;
     private String name;
-    private Long companyId;
 
     // Cross-service externalId reference
     private String companyExternalId;

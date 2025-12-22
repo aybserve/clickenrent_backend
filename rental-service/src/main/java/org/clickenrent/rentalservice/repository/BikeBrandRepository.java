@@ -13,7 +13,7 @@ import java.util.Optional;
 @Repository
 public interface BikeBrandRepository extends JpaRepository<BikeBrand, Long> {
     Optional<BikeBrand> findByExternalId(String externalId);
-    List<BikeBrand> findByCompanyId(Long companyId);
+    List<BikeBrand> findByCompanyExternalId(String companyExternalId);
 }
 
 

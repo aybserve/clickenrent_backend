@@ -31,7 +31,7 @@ public class HubImageService {
         Hub hub = hubRepository.findById(hubId)
                 .orElseThrow(() -> new ResourceNotFoundException("Hub", "id", hubId));
 
-        if (!securityService.isAdmin() && !securityService.hasAccessToCompany(hub.getLocation().getCompanyId())) {
+        if (!securityService.isAdmin() && !securityService.hasAccessToCompanyByExternalId(hub.getLocation().getCompanyExternalId())) {
             throw new UnauthorizedException("You don't have permission to view images for this hub");
         }
 
@@ -45,7 +45,7 @@ public class HubImageService {
         HubImage hubImage = hubImageRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("HubImage", "id", id));
 
-        if (!securityService.isAdmin() && !securityService.hasAccessToCompany(hubImage.getHub().getLocation().getCompanyId())) {
+        if (!securityService.isAdmin() && !securityService.hasAccessToCompanyByExternalId(hubImage.getHub().getLocation().getCompanyExternalId())) {
             throw new UnauthorizedException("You don't have permission to view this image");
         }
 
@@ -57,7 +57,7 @@ public class HubImageService {
         Hub hub = hubRepository.findById(dto.getHubId())
                 .orElseThrow(() -> new ResourceNotFoundException("Hub", "id", dto.getHubId()));
 
-        if (!securityService.isAdmin() && !securityService.hasAccessToCompany(hub.getLocation().getCompanyId())) {
+        if (!securityService.isAdmin() && !securityService.hasAccessToCompanyByExternalId(hub.getLocation().getCompanyExternalId())) {
             throw new UnauthorizedException("You don't have permission to create images for this hub");
         }
 
@@ -71,7 +71,7 @@ public class HubImageService {
         HubImage hubImage = hubImageRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("HubImage", "id", id));
 
-        if (!securityService.isAdmin() && !securityService.hasAccessToCompany(hubImage.getHub().getLocation().getCompanyId())) {
+        if (!securityService.isAdmin() && !securityService.hasAccessToCompanyByExternalId(hubImage.getHub().getLocation().getCompanyExternalId())) {
             throw new UnauthorizedException("You don't have permission to update this image");
         }
 
@@ -85,7 +85,7 @@ public class HubImageService {
         HubImage hubImage = hubImageRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("HubImage", "id", id));
 
-        if (!securityService.isAdmin() && !securityService.hasAccessToCompany(hubImage.getHub().getLocation().getCompanyId())) {
+        if (!securityService.isAdmin() && !securityService.hasAccessToCompanyByExternalId(hubImage.getHub().getLocation().getCompanyExternalId())) {
             throw new UnauthorizedException("You don't have permission to delete this image");
         }
 

@@ -35,11 +35,11 @@ public class PartBrandController {
         return ResponseEntity.ok(partBrandService.getAllBrands(pageable));
     }
 
-    @GetMapping("/by-company/{companyId}")
+    @GetMapping("/by-company/{companyExternalId}")
     @PreAuthorize("isAuthenticated()")
-    @Operation(summary = "Get brands by company")
-    public ResponseEntity<List<PartBrandDTO>> getBrandsByCompany(@PathVariable Long companyId) {
-        return ResponseEntity.ok(partBrandService.getBrandsByCompany(companyId));
+    @Operation(summary = "Get brands by company external ID")
+    public ResponseEntity<List<PartBrandDTO>> getBrandsByCompanyExternalId(@PathVariable String companyExternalId) {
+        return ResponseEntity.ok(partBrandService.getBrandsByCompanyExternalId(companyExternalId));
     }
 
     @GetMapping("/{id}")

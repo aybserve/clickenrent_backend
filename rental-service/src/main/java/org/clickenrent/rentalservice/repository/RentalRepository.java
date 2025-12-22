@@ -13,8 +13,6 @@ import java.util.Optional;
 @Repository
 public interface RentalRepository extends JpaRepository<Rental, Long> {
     Optional<Rental> findByExternalId(String externalId);
-    List<Rental> findByUserId(Long userId);
-    List<Rental> findByCompanyId(Long companyId);
     Optional<Rental> findByErpRentalOrderId(String erpRentalOrderId);
 
     // Cross-service query methods using externalId

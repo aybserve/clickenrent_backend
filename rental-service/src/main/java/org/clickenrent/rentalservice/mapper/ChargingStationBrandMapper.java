@@ -19,7 +19,6 @@ public class ChargingStationBrandMapper {
                 .id(brand.getId())
                 .externalId(brand.getExternalId())
                 .name(brand.getName())
-                .companyId(brand.getCompanyId())
                 .companyExternalId(brand.getCompanyExternalId())
                 .build();
     }
@@ -33,7 +32,7 @@ public class ChargingStationBrandMapper {
                 .id(dto.getId())
                 .externalId(dto.getExternalId())
                 .name(dto.getName())
-                .companyId(dto.getCompanyId())
+                .companyExternalId(dto.getCompanyExternalId())
                 .build();
     }
 

@@ -18,8 +18,8 @@ import java.time.LocalDateTime;
     name = "b2b_sale_order",
     indexes = {
         @Index(name = "idx_b2b_sale_order_external_id", columnList = "external_id"),
-        @Index(name = "idx_b2b_sale_order_seller_company_id", columnList = "seller_company_id"),
-        @Index(name = "idx_b2b_sale_order_buyer_company_id", columnList = "buyer_company_id")
+        @Index(name = "idx_b2b_sale_order_seller_company_external_id", columnList = "seller_company_external_id"),
+        @Index(name = "idx_b2b_sale_order_buyer_company_external_id", columnList = "buyer_company_external_id")
     }
 )
 @SQLDelete(sql = "UPDATE b2b_sale_order SET is_deleted = true WHERE id = ?")
@@ -39,13 +39,14 @@ public class B2BSaleOrder extends BaseAuditEntity {
     @Column(name = "external_id", unique = true, length = 100)
     private String externalId;
 
-    @NotNull(message = "Seller company ID is required")
-    @Column(name = "seller_company_id", nullable = false)
-    private Long sellerCompanyId;
+    // Cross-service reference fields using externalId
+    @NotNull(message = "Seller company external ID is required")
+    @Column(name = "seller_company_external_id", nullable = false, length = 100)
+    private String sellerCompanyExternalId;
 
-    @NotNull(message = "Buyer company ID is required")
-    @Column(name = "buyer_company_id", nullable = false)
-    private Long buyerCompanyId;
+    @NotNull(message = "Buyer company external ID is required")
+    @Column(name = "buyer_company_external_id", nullable = false, length = 100)
+    private String buyerCompanyExternalId;
 
     @NotNull(message = "B2B sale order status is required")
     @ManyToOne(fetch = FetchType.LAZY)

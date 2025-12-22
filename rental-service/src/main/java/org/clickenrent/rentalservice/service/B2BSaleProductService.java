@@ -29,7 +29,7 @@ public class B2BSaleProductService {
                 .orElseThrow(() -> new ResourceNotFoundException("B2BSale", "id", b2bSaleId));
 
         if (!securityService.isAdmin() && 
-            !securityService.hasAccessToCompany(sale.getLocation().getCompanyId())) {
+            !securityService.hasAccessToCompanyByExternalId(sale.getLocation().getCompanyExternalId())) {
             throw new UnauthorizedException("You don't have permission to view products for this sale");
         }
 
@@ -50,7 +50,7 @@ public class B2BSaleProductService {
         B2BSale sale = b2bSaleRepository.findById(dto.getB2bSaleId())
                 .orElseThrow(() -> new ResourceNotFoundException("B2BSale", "id", dto.getB2bSaleId()));
 
-        if (!securityService.isAdmin() && !securityService.hasAccessToCompany(sale.getLocation().getCompanyId())) {
+        if (!securityService.isAdmin() && !securityService.hasAccessToCompanyByExternalId(sale.getLocation().getCompanyExternalId())) {
             throw new UnauthorizedException("You don't have permission to add products to this sale");
         }
 
@@ -64,7 +64,7 @@ public class B2BSaleProductService {
         B2BSaleProduct product = b2bSaleProductRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("B2BSaleProduct", "id", id));
 
-        if (!securityService.isAdmin() && !securityService.hasAccessToCompany(product.getB2bSale().getLocation().getCompanyId())) {
+        if (!securityService.isAdmin() && !securityService.hasAccessToCompanyByExternalId(product.getB2bSale().getLocation().getCompanyExternalId())) {
             throw new UnauthorizedException("You don't have permission to update this product");
         }
 

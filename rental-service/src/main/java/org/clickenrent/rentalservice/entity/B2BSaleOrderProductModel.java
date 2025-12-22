@@ -10,15 +10,16 @@ import org.hibernate.annotations.Where;
 import java.math.BigDecimal;
 
 /**
- * Entity representing B2B sale order product models.
- * Links orders to product model types (BikeModel, BikeType, Part, ServiceProduct).
+ * Entity representing B2B sale order products.
+ * Links orders to products that implement ProductModelType interface.
  */
 @Entity
 @Table(
     name = "b2b_sale_order_product_model",
     indexes = {
         @Index(name = "idx_b2b_sale_order_pm_external_id", columnList = "external_id"),
-        @Index(name = "idx_b2b_sale_order_pm_order_id", columnList = "b2b_sale_order_id")
+        @Index(name = "idx_b2b_sale_order_pm_order_id", columnList = "b2b_sale_order_id"),
+        @Index(name = "idx_b2b_sale_order_pm_product_id", columnList = "product_id")
     }
 )
 @SQLDelete(sql = "UPDATE b2b_sale_order_product_model SET is_deleted = true WHERE id = ?")
@@ -43,13 +44,10 @@ public class B2BSaleOrderProductModel extends BaseAuditEntity {
     @JoinColumn(name = "b2b_sale_order_id", nullable = false)
     private B2BSaleOrder b2bSaleOrder;
 
-    @NotNull(message = "Product model type is required")
-    @Column(name = "product_model_type", nullable = false, length = 50)
-    private String productModelType;
-
-    @NotNull(message = "Product model ID is required")
-    @Column(name = "product_model_id", nullable = false)
-    private Long productModelId;
+    @NotNull(message = "Product is required")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "product_id", nullable = false)
+    private Product product;
 
     @NotNull(message = "Quantity is required")
     @Column(name = "quantity", nullable = false)

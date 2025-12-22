@@ -44,7 +44,7 @@ class PartBrandControllerTest {
         brandDTO = PartBrandDTO.builder()
                 .id(1L)
                 .name("Samsung")
-                .companyId(1L)
+                .companyExternalId("company-ext-001")
                 .build();
     }
 
@@ -62,7 +62,7 @@ class PartBrandControllerTest {
     @WithMockUser(roles = "ADMIN")
     void getBrandsByCompany_ReturnsOk() throws Exception {
         List<PartBrandDTO> brands = Collections.singletonList(brandDTO);
-        when(partBrandService.getBrandsByCompany(1L)).thenReturn(brands);
+        when(partBrandService.getBrandsByCompanyExternalId("company-ext-001")).thenReturn(brands);
 
         mockMvc.perform(get("/api/part-brands/by-company/1").with(csrf()))
                 .andExpect(status().isOk())

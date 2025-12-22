@@ -11,7 +11,7 @@ import java.util.List;
  */
 @Repository
 public interface ChargingStationBrandRepository extends JpaRepository<ChargingStationBrand, Long> {
-    List<ChargingStationBrand> findByCompanyId(Long companyId);
+    List<ChargingStationBrand> findByCompanyExternalId(String companyExternalId);
 }
 
 

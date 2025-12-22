@@ -53,15 +53,15 @@ class RentalServiceTest {
         testRental = Rental.builder()
         .id(1L)
         .externalId("RENT001")
-        .userId(1L)
-        .companyId(1L)
+        .userExternalId("usr-ext-00001")
+        .companyExternalId("company-ext-001")
         .build();
 
         testRentalDTO = RentalDTO.builder()
         .id(1L)
         .externalId("RENT001")
-        .userId(1L)
-        .companyId(1L)
+        .userExternalId("usr-ext-00001")
+        .companyExternalId("company-ext-001")
         .rentalStatusId(2L)
         .build();
     }
@@ -110,8 +110,8 @@ class RentalServiceTest {
         when(securityService.isAdmin()).thenReturn(false);
         when(securityService.isB2B()).thenReturn(false);
         when(securityService.isCustomer()).thenReturn(true);
-        when(securityService.getCurrentUserId()).thenReturn(1L);
-        when(rentalRepository.findByUserId(1L)).thenReturn(Collections.singletonList(testRental));
+        when(securityService.getCurrentUserExternalId()).thenReturn("usr-ext-00001");
+        when(rentalRepository.findByUserExternalId("usr-ext-00001")).thenReturn(Collections.singletonList(testRental));
         when(rentalMapper.toDto(testRental)).thenReturn(testRentalDTO);
 
         // Act

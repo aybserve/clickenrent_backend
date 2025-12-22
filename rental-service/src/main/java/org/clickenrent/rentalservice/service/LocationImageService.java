@@ -31,7 +31,7 @@ public class LocationImageService {
         Location location = locationRepository.findById(locationId)
                 .orElseThrow(() -> new ResourceNotFoundException("Location", "id", locationId));
 
-        if (!securityService.isAdmin() && !securityService.hasAccessToCompany(location.getCompanyId())) {
+        if (!securityService.isAdmin() && !securityService.hasAccessToCompanyByExternalId(location.getCompanyExternalId())) {
             throw new UnauthorizedException("You don't have permission to view images for this location");
         }
 
@@ -45,7 +45,7 @@ public class LocationImageService {
         LocationImage locationImage = locationImageRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("LocationImage", "id", id));
 
-        if (!securityService.isAdmin() && !securityService.hasAccessToCompany(locationImage.getLocation().getCompanyId())) {
+        if (!securityService.isAdmin() && !securityService.hasAccessToCompanyByExternalId(locationImage.getLocation().getCompanyExternalId())) {
             throw new UnauthorizedException("You don't have permission to view this image");
         }
 
@@ -57,7 +57,7 @@ public class LocationImageService {
         Location location = locationRepository.findById(dto.getLocationId())
                 .orElseThrow(() -> new ResourceNotFoundException("Location", "id", dto.getLocationId()));
 
-        if (!securityService.isAdmin() && !securityService.hasAccessToCompany(location.getCompanyId())) {
+        if (!securityService.isAdmin() && !securityService.hasAccessToCompanyByExternalId(location.getCompanyExternalId())) {
             throw new UnauthorizedException("You don't have permission to create images for this location");
         }
 
@@ -71,7 +71,7 @@ public class LocationImageService {
         LocationImage locationImage = locationImageRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("LocationImage", "id", id));
 
-        if (!securityService.isAdmin() && !securityService.hasAccessToCompany(locationImage.getLocation().getCompanyId())) {
+        if (!securityService.isAdmin() && !securityService.hasAccessToCompanyByExternalId(locationImage.getLocation().getCompanyExternalId())) {
             throw new UnauthorizedException("You don't have permission to update this image");
         }
 
@@ -85,7 +85,7 @@ public class LocationImageService {
         LocationImage locationImage = locationImageRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("LocationImage", "id", id));
 
-        if (!securityService.isAdmin() && !securityService.hasAccessToCompany(locationImage.getLocation().getCompanyId())) {
+        if (!securityService.isAdmin() && !securityService.hasAccessToCompanyByExternalId(locationImage.getLocation().getCompanyExternalId())) {
             throw new UnauthorizedException("You don't have permission to delete this image");
         }
 

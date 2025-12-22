@@ -16,7 +16,6 @@ import java.util.UUID;
     name = "bike_brand",
     indexes = {
         @Index(name = "idx_bike_brand_external_id", columnList = "external_id"),
-        @Index(name = "idx_bike_brand_company_id", columnList = "company_id"),
         @Index(name = "idx_bike_brand_company_external_id", columnList = "company_external_id")
     }
 )
@@ -41,12 +40,9 @@ public class BikeBrand {
     @Column(name = "name", nullable = false, length = 100)
     private String name;
 
-    @NotNull(message = "Company ID is required")
-    @Column(name = "company_id", nullable = false)
-    private Long companyId;
-
     // Cross-service reference field using externalId
-    @Column(name = "company_external_id", length = 100)
+    @NotNull(message = "Company external ID is required")
+    @Column(name = "company_external_id", nullable = false, length = 100)
     private String companyExternalId;
 
     @PrePersist

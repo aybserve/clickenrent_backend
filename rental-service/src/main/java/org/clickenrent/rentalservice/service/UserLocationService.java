@@ -2,8 +2,6 @@ package org.clickenrent.rentalservice.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.clickenrent.contracts.auth.UserDTO;
-import org.clickenrent.rentalservice.client.AuthServiceClient;
 import org.clickenrent.rentalservice.dto.UserLocationDTO;
 import org.clickenrent.rentalservice.entity.Location;
 import org.clickenrent.rentalservice.entity.UserLocation;
@@ -30,15 +28,14 @@ public class UserLocationService {
     private final LocationRepository locationRepository;
     private final UserLocationMapper userLocationMapper;
     private final SecurityService securityService;
-    private final AuthServiceClient authServiceClient;
 
     @Transactional(readOnly = true)
-    public List<UserLocationDTO> getUserLocationsByUser(Long userId) {
-        if (!securityService.isAdmin() && !securityService.hasAccessToUser(userId)) {
+    public List<UserLocationDTO> getUserLocationsByUserExternalId(String userExternalId) {
+        if (!securityService.isAdmin() && !securityService.hasAccessToUserByExternalId(userExternalId)) {
             throw new UnauthorizedException("You don't have permission to view user locations");
         }
 
-        return userLocationRepository.findByUserId(userId).stream()
+        return userLocationRepository.findByUserExternalId(userExternalId).stream()
                 .map(userLocationMapper::toDto)
                 .toList();
     }
@@ -48,7 +45,7 @@ public class UserLocationService {
         Location location = locationRepository.findById(locationId)
                 .orElseThrow(() -> new ResourceNotFoundException("Location", "id", locationId));
 
-        if (!securityService.isAdmin() && !securityService.hasAccessToCompany(location.getCompanyId())) {
+        if (!securityService.isAdmin() && !securityService.hasAccessToCompanyByExternalId(location.getCompanyExternalId())) {
             throw new UnauthorizedException("You don't have permission to view location users");
         }
 
@@ -62,25 +59,11 @@ public class UserLocationService {
         Location location = locationRepository.findById(dto.getLocationId())
                 .orElseThrow(() -> new ResourceNotFoundException("Location", "id", dto.getLocationId()));
 
-        if (!securityService.isAdmin() && !securityService.hasAccessToCompany(location.getCompanyId())) {
+        if (!securityService.isAdmin() && !securityService.hasAccessToCompanyByExternalId(location.getCompanyExternalId())) {
             throw new UnauthorizedException("You don't have permission to assign users to this location");
         }
 
         UserLocation userLocation = userLocationMapper.toEntity(dto);
-        
-        // DUAL-WRITE: Populate userExternalId
-        if (dto.getUserId() != null) {
-            try {
-                UserDTO user = authServiceClient.getUserById(dto.getUserId());
-                userLocation.setUserId(dto.getUserId());
-                userLocation.setUserExternalId(user.getExternalId());
-                log.debug("Populated userExternalId: {} for user location", user.getExternalId());
-            } catch (Exception e) {
-                log.error("Failed to fetch user external ID for userId: {}", dto.getUserId(), e);
-                throw new RuntimeException("Failed to fetch user details", e);
-            }
-        }
-        
         userLocation = userLocationRepository.save(userLocation);
         return userLocationMapper.toDto(userLocation);
     }
@@ -90,7 +73,7 @@ public class UserLocationService {
         UserLocation userLocation = userLocationRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("UserLocation", "id", id));
 
-        if (!securityService.isAdmin() && !securityService.hasAccessToCompany(userLocation.getLocation().getCompanyId())) {
+        if (!securityService.isAdmin() && !securityService.hasAccessToCompanyByExternalId(userLocation.getLocation().getCompanyExternalId())) {
             throw new UnauthorizedException("You don't have permission to remove users from this location");
         }
 

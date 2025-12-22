@@ -35,11 +35,11 @@ public class BikeBrandController {
         return ResponseEntity.ok(bikeBrandService.getAllBikeBrands(pageable));
     }
 
-    @GetMapping("/by-company/{companyId}")
+    @GetMapping("/by-company/{companyExternalId}")
     @PreAuthorize("isAuthenticated()")
-    @Operation(summary = "Get bike brands by company")
-    public ResponseEntity<List<BikeBrandDTO>> getBikeBrandsByCompany(@PathVariable Long companyId) {
-        return ResponseEntity.ok(bikeBrandService.getBikeBrandsByCompany(companyId));
+    @Operation(summary = "Get bike brands by company external ID")
+    public ResponseEntity<List<BikeBrandDTO>> getBikeBrandsByCompanyExternalId(@PathVariable String companyExternalId) {
+        return ResponseEntity.ok(bikeBrandService.getBikeBrandsByCompanyExternalId(companyExternalId));
     }
 
     @GetMapping("/{id}")

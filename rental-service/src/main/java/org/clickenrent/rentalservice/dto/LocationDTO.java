@@ -22,7 +22,6 @@ public class LocationDTO {
     private String name;
     private String address;
     private String description;
-    private Long companyId;
     private Boolean isPublic;
     private String directions;
     private Long coordinatesId;

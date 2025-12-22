@@ -14,7 +14,6 @@ import java.util.UUID;
     name = "user_location",
     indexes = {
         @Index(name = "idx_user_location_external_id", columnList = "external_id"),
-        @Index(name = "idx_user_location_user_id", columnList = "user_id"),
         @Index(name = "idx_user_location_user_external_id", columnList = "user_external_id")
     }
 )
@@ -34,12 +33,9 @@ public class UserLocation {
     @Column(name = "external_id", unique = true, length = 100)
     private String externalId;
 
-    @NotNull(message = "User ID is required")
-    @Column(name = "user_id", nullable = false)
-    private Long userId;
-
     // Cross-service reference field using externalId
-    @Column(name = "user_external_id", length = 100)
+    @NotNull(message = "User external ID is required")
+    @Column(name = "user_external_id", nullable = false, length = 100)
     private String userExternalId;
 
     @NotNull(message = "Location is required")

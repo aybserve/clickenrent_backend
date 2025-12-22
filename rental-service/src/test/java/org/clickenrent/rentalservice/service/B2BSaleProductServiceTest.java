@@ -50,7 +50,7 @@ class B2BSaleProductServiceTest {
     void setUp() {
         testLocation = Location.builder()
         .id(1L)
-        .companyId(1L)
+        .companyExternalId("company-ext-001")
         .build();
 
         testSale = B2BSale.builder()

@@ -27,7 +27,6 @@ public class LocationMapper {
                 .name(location.getName())
                 .address(location.getAddress())
                 .description(location.getDescription())
-                .companyId(location.getCompanyId())
                 .companyExternalId(location.getCompanyExternalId())
                 .isPublic(location.getIsPublic())
                 .directions(location.getDirections())
@@ -51,7 +50,7 @@ public class LocationMapper {
                 .name(dto.getName())
                 .address(dto.getAddress())
                 .description(dto.getDescription())
-                .companyId(dto.getCompanyId())
+                .companyExternalId(dto.getCompanyExternalId())
                 .isPublic(dto.getIsPublic())
                 .directions(dto.getDirections());
 

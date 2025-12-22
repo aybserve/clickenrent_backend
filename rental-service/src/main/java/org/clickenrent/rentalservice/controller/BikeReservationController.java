@@ -35,11 +35,11 @@ public class BikeReservationController {
         return ResponseEntity.ok(bikeReservationService.getAllReservations(pageable));
     }
 
-    @GetMapping("/by-user/{userId}")
+    @GetMapping("/by-user/{userExternalId}")
     @PreAuthorize("isAuthenticated()")
-    @Operation(summary = "Get reservations by user")
-    public ResponseEntity<List<BikeReservationDTO>> getReservationsByUser(@PathVariable Long userId) {
-        return ResponseEntity.ok(bikeReservationService.getReservationsByUser(userId));
+    @Operation(summary = "Get reservations by user external ID")
+    public ResponseEntity<List<BikeReservationDTO>> getReservationsByUserExternalId(@PathVariable String userExternalId) {
+        return ResponseEntity.ok(bikeReservationService.getReservationsByUserExternalId(userExternalId));
     }
 
     @GetMapping("/{id}")

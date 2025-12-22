@@ -28,7 +28,7 @@ public class B2BSubscriptionItemService {
         B2BSubscription subscription = b2bSubscriptionRepository.findById(subscriptionId)
                 .orElseThrow(() -> new ResourceNotFoundException("B2BSubscription", "id", subscriptionId));
 
-        if (!securityService.isAdmin() && !securityService.hasAccessToCompany(subscription.getLocation().getCompanyId())) {
+        if (!securityService.isAdmin() && !securityService.hasAccessToCompanyByExternalId(subscription.getLocation().getCompanyExternalId())) {
             throw new UnauthorizedException("You don't have permission to view items for this subscription");
         }
 
@@ -49,7 +49,7 @@ public class B2BSubscriptionItemService {
         B2BSubscription subscription = b2bSubscriptionRepository.findById(dto.getB2bSubscriptionId())
                 .orElseThrow(() -> new ResourceNotFoundException("B2BSubscription", "id", dto.getB2bSubscriptionId()));
 
-        if (!securityService.isAdmin() && !securityService.hasAccessToCompany(subscription.getLocation().getCompanyId())) {
+        if (!securityService.isAdmin() && !securityService.hasAccessToCompanyByExternalId(subscription.getLocation().getCompanyExternalId())) {
             throw new UnauthorizedException("You don't have permission to add items to this subscription");
         }
 
@@ -63,7 +63,7 @@ public class B2BSubscriptionItemService {
         B2BSubscriptionItem item = b2bSubscriptionItemRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("B2BSubscriptionItem", "id", id));
 
-        if (!securityService.isAdmin() && !securityService.hasAccessToCompany(item.getB2bSubscription().getLocation().getCompanyId())) {
+        if (!securityService.isAdmin() && !securityService.hasAccessToCompanyByExternalId(item.getB2bSubscription().getLocation().getCompanyExternalId())) {
             throw new UnauthorizedException("You don't have permission to update this item");
         }
 

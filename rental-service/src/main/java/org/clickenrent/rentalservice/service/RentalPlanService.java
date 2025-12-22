@@ -53,7 +53,7 @@ public class RentalPlanService {
         Location location = locationRepository.findById(dto.getLocationId())
                 .orElseThrow(() -> new ResourceNotFoundException("Location", "id", dto.getLocationId()));
 
-        if (!securityService.isAdmin() && !securityService.hasAccessToCompany(location.getCompanyId())) {
+        if (!securityService.isAdmin() && !securityService.hasAccessToCompanyByExternalId(location.getCompanyExternalId())) {
             throw new UnauthorizedException("You don't have permission to create rental plans for this location");
         }
 
@@ -67,7 +67,7 @@ public class RentalPlanService {
         RentalPlan rentalPlan = rentalPlanRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("RentalPlan", "id", id));
 
-        if (!securityService.isAdmin() && !securityService.hasAccessToCompany(rentalPlan.getLocation().getCompanyId())) {
+        if (!securityService.isAdmin() && !securityService.hasAccessToCompanyByExternalId(rentalPlan.getLocation().getCompanyExternalId())) {
             throw new UnauthorizedException("You don't have permission to update this rental plan");
         }
 

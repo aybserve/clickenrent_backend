@@ -35,11 +35,11 @@ public class ChargingStationBrandController {
         return ResponseEntity.ok(chargingStationBrandService.getAllBrands(pageable));
     }
 
-    @GetMapping("/by-company/{companyId}")
+    @GetMapping("/by-company/{companyExternalId}")
     @PreAuthorize("isAuthenticated()")
-    @Operation(summary = "Get brands by company")
-    public ResponseEntity<List<ChargingStationBrandDTO>> getBrandsByCompany(@PathVariable Long companyId) {
-        return ResponseEntity.ok(chargingStationBrandService.getBrandsByCompany(companyId));
+    @Operation(summary = "Get brands by company external ID")
+    public ResponseEntity<List<ChargingStationBrandDTO>> getBrandsByCompanyExternalId(@PathVariable String companyExternalId) {
+        return ResponseEntity.ok(chargingStationBrandService.getBrandsByCompanyExternalId(companyExternalId));
     }
 
     @GetMapping("/{id}")

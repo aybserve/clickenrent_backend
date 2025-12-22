@@ -28,6 +28,8 @@ public class B2BSaleMapper {
                 .locationId(b2bSale.getLocation() != null ? b2bSale.getLocation().getId() : null)
                 .b2bSaleStatusId(b2bSale.getB2bSaleStatus() != null ? b2bSale.getB2bSaleStatus().getId() : null)
                 .dateTime(b2bSale.getDateTime())
+                .sellerCompanyExternalId(b2bSale.getSellerCompanyExternalId())
+                .buyerCompanyExternalId(b2bSale.getBuyerCompanyExternalId())
                 .build();
     }
 
@@ -39,7 +41,9 @@ public class B2BSaleMapper {
         var builder = B2BSale.builder()
                 .id(dto.getId())
                 .externalId(dto.getExternalId())
-                .dateTime(dto.getDateTime());
+                .dateTime(dto.getDateTime())
+                .sellerCompanyExternalId(dto.getSellerCompanyExternalId())
+                .buyerCompanyExternalId(dto.getBuyerCompanyExternalId());
 
         if (dto.getLocationId() != null) {
             builder.location(locationRepository.findById(dto.getLocationId()).orElse(null));

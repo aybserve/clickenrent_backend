@@ -33,23 +33,23 @@ public class B2BSaleOrderService {
     }
 
     @Transactional(readOnly = true)
-    public List<B2BSaleOrderDTO> getOrdersBySellerCompany(Long sellerCompanyId) {
-        if (!securityService.isAdmin() && !securityService.hasAccessToCompany(sellerCompanyId)) {
+    public List<B2BSaleOrderDTO> getOrdersBySellerCompanyExternalId(String sellerCompanyExternalId) {
+        if (!securityService.isAdmin() && !securityService.hasAccessToCompanyByExternalId(sellerCompanyExternalId)) {
             throw new UnauthorizedException("You don't have permission to view orders for this company");
         }
 
-        return b2bSaleOrderRepository.findBySellerCompanyId(sellerCompanyId).stream()
+        return b2bSaleOrderRepository.findBySellerCompanyExternalId(sellerCompanyExternalId).stream()
                 .map(b2bSaleOrderMapper::toDto)
                 .toList();
     }
 
     @Transactional(readOnly = true)
-    public List<B2BSaleOrderDTO> getOrdersByBuyerCompany(Long buyerCompanyId) {
-        if (!securityService.isAdmin() && !securityService.hasAccessToCompany(buyerCompanyId)) {
+    public List<B2BSaleOrderDTO> getOrdersByBuyerCompanyExternalId(String buyerCompanyExternalId) {
+        if (!securityService.isAdmin() && !securityService.hasAccessToCompanyByExternalId(buyerCompanyExternalId)) {
             throw new UnauthorizedException("You don't have permission to view orders for this company");
         }
 
-        return b2bSaleOrderRepository.findByBuyerCompanyId(buyerCompanyId).stream()
+        return b2bSaleOrderRepository.findByBuyerCompanyExternalId(buyerCompanyExternalId).stream()
                 .map(b2bSaleOrderMapper::toDto)
                 .toList();
     }
@@ -61,8 +61,8 @@ public class B2BSaleOrderService {
 
         // Check access
         if (!securityService.isAdmin() && 
-            !securityService.hasAccessToCompany(order.getSellerCompanyId()) &&
-            !securityService.hasAccessToCompany(order.getBuyerCompanyId())) {
+            !securityService.hasAccessToCompanyByExternalId(order.getSellerCompanyExternalId()) &&
+            !securityService.hasAccessToCompanyByExternalId(order.getBuyerCompanyExternalId())) {
             throw new UnauthorizedException("You don't have permission to view this order");
         }
 
@@ -72,7 +72,7 @@ public class B2BSaleOrderService {
     @Transactional
     public B2BSaleOrderDTO createOrder(B2BSaleOrderDTO dto) {
         // Validate user has access to seller company
-        if (!securityService.isAdmin() && !securityService.hasAccessToCompany(dto.getSellerCompanyId())) {
+        if (!securityService.isAdmin() && !securityService.hasAccessToCompanyByExternalId(dto.getSellerCompanyExternalId())) {
             throw new UnauthorizedException("You don't have permission to create orders for this company");
         }
 
@@ -86,7 +86,7 @@ public class B2BSaleOrderService {
         B2BSaleOrder order = b2bSaleOrderRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("B2BSaleOrder", "id", id));
 
-        if (!securityService.isAdmin() && !securityService.hasAccessToCompany(order.getSellerCompanyId())) {
+        if (!securityService.isAdmin() && !securityService.hasAccessToCompanyByExternalId(order.getSellerCompanyExternalId())) {
             throw new UnauthorizedException("You don't have permission to update this order");
         }
 

@@ -5,8 +5,8 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.clickenrent.rentalservice.dto.BikePartDTO;
-import org.clickenrent.rentalservice.service.BikePartService;
+import org.clickenrent.rentalservice.dto.BikeModelPartDTO;
+import org.clickenrent.rentalservice.service.BikeModelPartService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -17,45 +17,42 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/bike-parts")
+@RequestMapping("/api/bike-model-parts")
 @RequiredArgsConstructor
-@Tag(name = "BikePart", description = "Bike part relationship management")
+@Tag(name = "BikeModelPart", description = "Bike model part relationship management")
 @SecurityRequirement(name = "bearerAuth")
-public class BikePartController {
+public class BikeModelPartController {
 
-    private final BikePartService bikePartService;
+    private final BikeModelPartService bikeModelPartService;
 
     @GetMapping
     @PreAuthorize("hasAnyRole('SUPERADMIN', 'ADMIN')")
-    @Operation(summary = "Get all bike parts")
-    public ResponseEntity<Page<BikePartDTO>> getAllBikeParts(
+    @Operation(summary = "Get all bike model parts")
+    public ResponseEntity<Page<BikeModelPartDTO>> getAllBikeModelParts(
             @PageableDefault(size = 20, sort = "id", direction = Sort.Direction.DESC) Pageable pageable) {
-        return ResponseEntity.ok(bikePartService.getAllBikeParts(pageable));
+        return ResponseEntity.ok(bikeModelPartService.getAllBikeModelParts(pageable));
     }
 
     @GetMapping("/{id}")
     @PreAuthorize("hasAnyRole('SUPERADMIN', 'ADMIN')")
-    @Operation(summary = "Get bike part by ID")
-    public ResponseEntity<BikePartDTO> getBikePartById(@PathVariable Long id) {
-        return ResponseEntity.ok(bikePartService.getBikePartById(id));
+    @Operation(summary = "Get bike model part by ID")
+    public ResponseEntity<BikeModelPartDTO> getBikeModelPartById(@PathVariable Long id) {
+        return ResponseEntity.ok(bikeModelPartService.getBikeModelPartById(id));
     }
 
     @PostMapping
     @PreAuthorize("hasAnyRole('SUPERADMIN', 'ADMIN')")
-    @Operation(summary = "Create bike part")
-    public ResponseEntity<BikePartDTO> createBikePart(@Valid @RequestBody BikePartDTO dto) {
-        return new ResponseEntity<>(bikePartService.createBikePart(dto), HttpStatus.CREATED);
+    @Operation(summary = "Create bike model part")
+    public ResponseEntity<BikeModelPartDTO> createBikeModelPart(@Valid @RequestBody BikeModelPartDTO dto) {
+        return new ResponseEntity<>(bikeModelPartService.createBikeModelPart(dto), HttpStatus.CREATED);
     }
 
     @DeleteMapping("/{id}")
     @PreAuthorize("hasAnyRole('SUPERADMIN', 'ADMIN')")
-    @Operation(summary = "Delete bike part")
-    public ResponseEntity<Void> deleteBikePart(@PathVariable Long id) {
-        bikePartService.deleteBikePart(id);
+    @Operation(summary = "Delete bike model part")
+    public ResponseEntity<Void> deleteBikeModelPart(@PathVariable Long id) {
+        bikeModelPartService.deleteBikeModelPart(id);
         return ResponseEntity.noContent().build();
     }
 }
-
-
-
 

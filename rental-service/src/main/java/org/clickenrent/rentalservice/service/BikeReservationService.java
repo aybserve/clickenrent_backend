@@ -2,8 +2,6 @@ package org.clickenrent.rentalservice.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.clickenrent.contracts.auth.UserDTO;
-import org.clickenrent.rentalservice.client.AuthServiceClient;
 import org.clickenrent.rentalservice.dto.BikeReservationDTO;
 import org.clickenrent.rentalservice.entity.Bike;
 import org.clickenrent.rentalservice.entity.BikeReservation;
@@ -28,7 +26,6 @@ public class BikeReservationService {
     private final BikeRepository bikeRepository;
     private final BikeReservationMapper bikeReservationMapper;
     private final SecurityService securityService;
-    private final AuthServiceClient authServiceClient;
 
     @Transactional(readOnly = true)
     public Page<BikeReservationDTO> getAllReservations(Pageable pageable) {
@@ -41,12 +38,12 @@ public class BikeReservationService {
     }
 
     @Transactional(readOnly = true)
-    public List<BikeReservationDTO> getReservationsByUser(Long userId) {
-        if (!securityService.isAdmin() && !securityService.hasAccessToUser(userId)) {
+    public List<BikeReservationDTO> getReservationsByUserExternalId(String userExternalId) {
+        if (!securityService.isAdmin() && !securityService.hasAccessToUserByExternalId(userExternalId)) {
             throw new UnauthorizedException("You don't have permission to view these reservations");
         }
 
-        return bikeReservationRepository.findByUserId(userId).stream()
+        return bikeReservationRepository.findByUserExternalId(userExternalId).stream()
                 .map(bikeReservationMapper::toDto)
                 .toList();
     }
@@ -56,7 +53,7 @@ public class BikeReservationService {
         BikeReservation reservation = bikeReservationRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("BikeReservation", "id", id));
 
-        if (!securityService.isAdmin() && !securityService.hasAccessToUser(reservation.getUserId())) {
+        if (!securityService.isAdmin() && !securityService.hasAccessToUserByExternalId(reservation.getUserExternalId())) {
             throw new UnauthorizedException("You don't have permission to view this reservation");
         }
 
@@ -68,7 +65,7 @@ public class BikeReservationService {
         BikeReservation reservation = bikeReservationRepository.findByExternalId(externalId)
                 .orElseThrow(() -> new ResourceNotFoundException("BikeReservation", "externalId", externalId));
 
-        if (!securityService.isAdmin() && !securityService.hasAccessToUser(reservation.getUserId())) {
+        if (!securityService.isAdmin() && !securityService.hasAccessToUserByExternalId(reservation.getUserExternalId())) {
             throw new UnauthorizedException("You don't have permission to view this reservation");
         }
 
@@ -80,7 +77,7 @@ public class BikeReservationService {
         BikeReservation reservation = bikeReservationRepository.findByExternalId(externalId)
                 .orElseThrow(() -> new ResourceNotFoundException("BikeReservation", "externalId", externalId));
 
-        if (!securityService.isAdmin() && !securityService.hasAccessToUser(reservation.getUserId())) {
+        if (!securityService.isAdmin() && !securityService.hasAccessToUserByExternalId(reservation.getUserExternalId())) {
             throw new UnauthorizedException("You don't have permission to update this reservation");
         }
 
@@ -102,7 +99,7 @@ public class BikeReservationService {
         BikeReservation reservation = bikeReservationRepository.findByExternalId(externalId)
                 .orElseThrow(() -> new ResourceNotFoundException("BikeReservation", "externalId", externalId));
 
-        if (!securityService.isAdmin() && !securityService.hasAccessToUser(reservation.getUserId())) {
+        if (!securityService.isAdmin() && !securityService.hasAccessToUserByExternalId(reservation.getUserExternalId())) {
             throw new UnauthorizedException("You can only delete your own reservations");
         }
 
@@ -113,7 +110,7 @@ public class BikeReservationService {
     @Transactional
     public BikeReservationDTO createReservation(BikeReservationDTO dto) {
         // Users can only create reservations for themselves (unless admin)
-        if (!securityService.isAdmin() && !securityService.hasAccessToUser(dto.getUserId())) {
+        if (!securityService.isAdmin() && !securityService.hasAccessToUserByExternalId(dto.getUserExternalId())) {
             throw new UnauthorizedException("You can only create reservations for yourself");
         }
 
@@ -124,20 +121,6 @@ public class BikeReservationService {
         // TODO: Check for overlapping reservations
 
         BikeReservation reservation = bikeReservationMapper.toEntity(dto);
-        
-        // DUAL-WRITE: Populate userExternalId
-        if (dto.getUserId() != null) {
-            try {
-                UserDTO user = authServiceClient.getUserById(dto.getUserId());
-                reservation.setUserId(dto.getUserId());
-                reservation.setUserExternalId(user.getExternalId());
-                log.debug("Populated userExternalId: {} for bike reservation", user.getExternalId());
-            } catch (Exception e) {
-                log.error("Failed to fetch user external ID for userId: {}", dto.getUserId(), e);
-                throw new RuntimeException("Failed to fetch user details", e);
-            }
-        }
-        
         reservation = bikeReservationRepository.save(reservation);
         return bikeReservationMapper.toDto(reservation);
     }
@@ -147,7 +130,7 @@ public class BikeReservationService {
         BikeReservation reservation = bikeReservationRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("BikeReservation", "id", id));
 
-        if (!securityService.isAdmin() && !securityService.hasAccessToUser(reservation.getUserId())) {
+        if (!securityService.isAdmin() && !securityService.hasAccessToUserByExternalId(reservation.getUserExternalId())) {
             throw new UnauthorizedException("You can only delete your own reservations");
         }
 

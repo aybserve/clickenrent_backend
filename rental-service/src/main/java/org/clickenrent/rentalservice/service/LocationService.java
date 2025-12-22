@@ -2,8 +2,6 @@ package org.clickenrent.rentalservice.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.clickenrent.contracts.auth.CompanyDTO;
-import org.clickenrent.rentalservice.client.AuthServiceClient;
 import org.clickenrent.rentalservice.dto.LocationDTO;
 import org.clickenrent.rentalservice.entity.Hub;
 import org.clickenrent.rentalservice.entity.Location;
@@ -29,7 +27,6 @@ public class LocationService {
     private final HubRepository hubRepository;
     private final LocationMapper locationMapper;
     private final SecurityService securityService;
-    private final AuthServiceClient authServiceClient;
 
     @Transactional(readOnly = true)
     public Page<LocationDTO> getAllLocations(Pageable pageable) {
@@ -50,7 +47,7 @@ public class LocationService {
                 .orElseThrow(() -> new ResourceNotFoundException("Location", "id", id));
 
         // Check if user has access to this location's company
-        if (!securityService.isAdmin() && !securityService.hasAccessToCompany(location.getCompanyId())) {
+        if (!securityService.isAdmin() && !securityService.hasAccessToCompanyByExternalId(location.getCompanyExternalId())) {
             throw new UnauthorizedException("You don't have permission to view this location");
         }
 
@@ -67,25 +64,11 @@ public class LocationService {
     @Transactional
     public LocationDTO createLocation(LocationDTO locationDTO) {
         // Check if user has access to the company
-        if (!securityService.isAdmin() && !securityService.hasAccessToCompany(locationDTO.getCompanyId())) {
+        if (!securityService.isAdmin() && !securityService.hasAccessToCompanyByExternalId(locationDTO.getCompanyExternalId())) {
             throw new UnauthorizedException("You don't have permission to create location for this company");
         }
 
         Location location = locationMapper.toEntity(locationDTO);
-        
-        // DUAL-WRITE: Populate companyExternalId
-        if (locationDTO.getCompanyId() != null) {
-            try {
-                CompanyDTO company = authServiceClient.getCompanyById(locationDTO.getCompanyId());
-                location.setCompanyId(locationDTO.getCompanyId());
-                location.setCompanyExternalId(company.getExternalId());
-                log.debug("Populated companyExternalId: {} for location", company.getExternalId());
-            } catch (Exception e) {
-                log.error("Failed to fetch company external ID for companyId: {}", locationDTO.getCompanyId(), e);
-                throw new RuntimeException("Failed to fetch company details", e);
-            }
-        }
-        
         location = locationRepository.save(location);
 
         // Auto-create "Main" hub for this location
@@ -104,7 +87,7 @@ public class LocationService {
                 .orElseThrow(() -> new ResourceNotFoundException("Location", "id", id));
 
         // Check if user has access to this location's company
-        if (!securityService.isAdmin() && !securityService.hasAccessToCompany(location.getCompanyId())) {
+        if (!securityService.isAdmin() && !securityService.hasAccessToCompanyByExternalId(location.getCompanyExternalId())) {
             throw new UnauthorizedException("You don't have permission to update this location");
         }
 
@@ -119,7 +102,7 @@ public class LocationService {
                 .orElseThrow(() -> new ResourceNotFoundException("Location", "id", id));
 
         // Check if user has access to this location's company
-        if (!securityService.isAdmin() && !securityService.hasAccessToCompany(location.getCompanyId())) {
+        if (!securityService.isAdmin() && !securityService.hasAccessToCompanyByExternalId(location.getCompanyExternalId())) {
             throw new UnauthorizedException("You don't have permission to delete this location");
         }
 

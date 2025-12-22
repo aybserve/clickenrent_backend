@@ -19,8 +19,7 @@ public class B2BSubscriptionOrderItemDTO {
     private Long id;
     private String externalId;
     private Long b2bSubscriptionOrderId;
-    private String productModelType;
-    private Long productModelId;
+    private Long productId;
     private Integer quantity;
     private BigDecimal price;
     private BigDecimal totalPrice;

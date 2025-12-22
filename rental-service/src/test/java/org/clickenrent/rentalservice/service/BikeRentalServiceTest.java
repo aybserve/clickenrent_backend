@@ -68,8 +68,8 @@ class BikeRentalServiceTest {
 
         testRental = Rental.builder()
         .id(1L)
-        .userId(1L)
-        .companyId(1L)
+        .userExternalId("usr-ext-00001")
+        .companyExternalId("company-ext-001")
         .build();
 
         testBikeRental = BikeRental.builder()

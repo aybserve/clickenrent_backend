@@ -27,8 +27,8 @@ public class B2BSaleOrderMapper {
         return B2BSaleOrderDTO.builder()
                 .id(b2bSaleOrder.getId())
                 .externalId(b2bSaleOrder.getExternalId())
-                .sellerCompanyId(b2bSaleOrder.getSellerCompanyId())
-                .buyerCompanyId(b2bSaleOrder.getBuyerCompanyId())
+                .sellerCompanyExternalId(b2bSaleOrder.getSellerCompanyExternalId())
+                .buyerCompanyExternalId(b2bSaleOrder.getBuyerCompanyExternalId())
                 .b2bSaleOrderStatusId(b2bSaleOrder.getB2bSaleOrderStatus() != null ? b2bSaleOrder.getB2bSaleOrderStatus().getId() : null)
                 .locationId(b2bSaleOrder.getLocation() != null ? b2bSaleOrder.getLocation().getId() : null)
                 .b2bSaleId(b2bSaleOrder.getB2bSale() != null ? b2bSaleOrder.getB2bSale().getId() : null)
@@ -44,8 +44,8 @@ public class B2BSaleOrderMapper {
         var builder = B2BSaleOrder.builder()
                 .id(dto.getId())
                 .externalId(dto.getExternalId())
-                .sellerCompanyId(dto.getSellerCompanyId())
-                .buyerCompanyId(dto.getBuyerCompanyId())
+                .sellerCompanyExternalId(dto.getSellerCompanyExternalId())
+                .buyerCompanyExternalId(dto.getBuyerCompanyExternalId())
                 .dateTime(dto.getDateTime());
 
         if (dto.getB2bSaleOrderStatusId() != null) {

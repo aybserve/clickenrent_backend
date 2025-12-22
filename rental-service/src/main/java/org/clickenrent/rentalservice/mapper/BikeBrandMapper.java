@@ -19,7 +19,6 @@ public class BikeBrandMapper {
                 .id(bikeBrand.getId())
                 .externalId(bikeBrand.getExternalId())
                 .name(bikeBrand.getName())
-                .companyId(bikeBrand.getCompanyId())
                 .companyExternalId(bikeBrand.getCompanyExternalId())
                 .build();
     }
@@ -33,7 +32,7 @@ public class BikeBrandMapper {
                 .id(dto.getId())
                 .externalId(dto.getExternalId())
                 .name(dto.getName())
-                .companyId(dto.getCompanyId())
+                .companyExternalId(dto.getCompanyExternalId())
                 .build();
     }
 

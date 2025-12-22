@@ -51,7 +51,7 @@ class HubServiceTest {
 
     @BeforeEach
     void setUp() {
-        testLocation = Location.builder().id(1L).companyId(1L).build();
+        testLocation = Location.builder().id(1L).companyExternalId("company-ext-001").build();
         
         testHub = Hub.builder()
         .id(1L)

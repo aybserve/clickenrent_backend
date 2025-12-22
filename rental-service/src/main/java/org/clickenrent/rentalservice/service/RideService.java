@@ -45,7 +45,7 @@ public class RideService {
                 .orElseThrow(() -> new ResourceNotFoundException("BikeRental", "id", bikeRentalId));
 
         // Check access
-        if (!securityService.isAdmin() && !securityService.hasAccessToUser(bikeRental.getRental().getUserId())) {
+        if (!securityService.isAdmin() && !securityService.hasAccessToUserByExternalId(bikeRental.getRental().getUserExternalId())) {
             throw new UnauthorizedException("You don't have permission to view rides for this bike rental");
         }
 
@@ -60,7 +60,7 @@ public class RideService {
                 .orElseThrow(() -> new ResourceNotFoundException("Ride", "id", id));
 
         // Check access
-        if (!securityService.isAdmin() && !securityService.hasAccessToUser(ride.getBikeRental().getRental().getUserId())) {
+        if (!securityService.isAdmin() && !securityService.hasAccessToUserByExternalId(ride.getBikeRental().getRental().getUserExternalId())) {
             throw new UnauthorizedException("You don't have permission to view this ride");
         }
 
@@ -73,7 +73,7 @@ public class RideService {
                 .orElseThrow(() -> new ResourceNotFoundException("BikeRental", "id", dto.getBikeRentalId()));
 
         // Check access
-        if (!securityService.isAdmin() && !securityService.hasAccessToUser(bikeRental.getRental().getUserId())) {
+        if (!securityService.isAdmin() && !securityService.hasAccessToUserByExternalId(bikeRental.getRental().getUserExternalId())) {
             throw new UnauthorizedException("You don't have permission to start this ride");
         }
 
@@ -97,7 +97,7 @@ public class RideService {
                 .orElseThrow(() -> new ResourceNotFoundException("Ride", "id", id));
 
         // Check access
-        if (!securityService.isAdmin() && !securityService.hasAccessToUser(ride.getBikeRental().getRental().getUserId())) {
+        if (!securityService.isAdmin() && !securityService.hasAccessToUserByExternalId(ride.getBikeRental().getRental().getUserExternalId())) {
             throw new UnauthorizedException("You don't have permission to end this ride");
         }
 
