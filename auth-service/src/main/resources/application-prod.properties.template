@@ -12,11 +12,16 @@ spring.datasource.password=${DB_PASSWORD}
 spring.datasource.driver-class-name=org.postgresql.Driver
 
 #JPA / HIBERNATE CONFIG
-# Use 'validate' or 'none' in production, never 'update' or 'create-drop'
+# Use 'validate' in production - schema must be created manually via auth-service.sql
+# NEVER use 'update' or 'create-drop' in production
 spring.jpa.hibernate.ddl-auto=validate
 spring.jpa.show-sql=false
 spring.jpa.properties.hibernate.format_sql=false
 spring.jpa.database-platform=org.hibernate.dialect.PostgreSQLDialect
+
+#DATA INITIALIZATION CONFIG
+# PRODUCTION: Never auto-initialize data - database is set up manually
+spring.sql.init.mode=never
 
 #JWT CONFIGURATION
 # CRITICAL: Set JWT_SECRET environment variable with a strong 256-bit key

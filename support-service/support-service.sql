@@ -77,7 +77,7 @@ CREATE TABLE error_code (
     id                      BIGSERIAL PRIMARY KEY,
     external_id             VARCHAR(100) UNIQUE,
     name                    VARCHAR(255) NOT NULL,
-    bike_engine_id          BIGINT,
+    bike_engine_external_id VARCHAR(100),
     description             VARCHAR(1000),
     common_cause            VARCHAR(1000),
     diagnostic_steps        VARCHAR(2000),
@@ -133,7 +133,7 @@ CREATE TABLE bike_issue (
 CREATE TABLE feedback (
     id                      BIGSERIAL PRIMARY KEY,
     external_id             VARCHAR(100) UNIQUE,
-    user_id                 BIGINT NOT NULL,
+    user_external_id        VARCHAR(100),
     rate                    INTEGER NOT NULL,
     comment                 VARCHAR(2000),
     date_time               TIMESTAMP NOT NULL,
@@ -145,7 +145,6 @@ CREATE TABLE feedback (
     last_modified_by        VARCHAR(255),
     is_deleted              BOOLEAN NOT NULL DEFAULT false,
     
-    CONSTRAINT chk_feedback_user_id CHECK (user_id > 0),
     CONSTRAINT chk_feedback_rate CHECK (rate >= 1 AND rate <= 5)
 );
 
@@ -155,8 +154,9 @@ CREATE TABLE feedback (
 -- ---------------------------------------------------------------------------------------------------------------------
 CREATE TABLE bike_rental_feedback (
     id                      BIGSERIAL PRIMARY KEY,
-    user_id                 BIGINT NOT NULL,
-    bike_rental_id          BIGINT NOT NULL,
+    external_id             VARCHAR(100) UNIQUE,
+    user_external_id        VARCHAR(100),
+    bike_rental_external_id VARCHAR(100),
     rate                    INTEGER NOT NULL,
     comment                 VARCHAR(2000),
     date_time               TIMESTAMP NOT NULL,
@@ -168,8 +168,6 @@ CREATE TABLE bike_rental_feedback (
     last_modified_by        VARCHAR(255),
     is_deleted              BOOLEAN NOT NULL DEFAULT false,
     
-    CONSTRAINT chk_bike_rental_feedback_user_id CHECK (user_id > 0),
-    CONSTRAINT chk_bike_rental_feedback_bike_rental_id CHECK (bike_rental_id > 0),
     CONSTRAINT chk_bike_rental_feedback_rate CHECK (rate >= 1 AND rate <= 5)
 );
 
@@ -184,8 +182,8 @@ CREATE TABLE bike_rental_feedback (
 CREATE TABLE support_request (
     id                          BIGSERIAL PRIMARY KEY,
     external_id                 VARCHAR(100) UNIQUE,
-    user_id                     BIGINT NOT NULL,
-    bike_id                     BIGINT,
+    user_external_id            VARCHAR(100),
+    bike_external_id            VARCHAR(100),
     is_near_location            BOOLEAN NOT NULL DEFAULT false,
     photo_url                   VARCHAR(500),
     error_code_id               BIGINT,
@@ -201,8 +199,7 @@ CREATE TABLE support_request (
     CONSTRAINT fk_support_request_error_code FOREIGN KEY (error_code_id) 
         REFERENCES error_code(id) ON DELETE SET NULL,
     CONSTRAINT fk_support_request_status FOREIGN KEY (support_request_status_id) 
-        REFERENCES support_request_status(id) ON DELETE RESTRICT,
-    CONSTRAINT chk_support_request_user_id CHECK (user_id > 0)
+        REFERENCES support_request_status(id) ON DELETE RESTRICT
 );
 
 -- ---------------------------------------------------------------------------------------------------------------------
@@ -256,13 +253,12 @@ CREATE TABLE support_request_bike_issue (
 -- ---------------------------------------------------------------------------------------------------------------------
 CREATE TABLE bike_type_bike_issue (
     id                      BIGSERIAL PRIMARY KEY,
-    bike_type_id            BIGINT NOT NULL,
+    bike_type_external_id   VARCHAR(100),
     bike_issue_id           BIGINT NOT NULL,
     
     CONSTRAINT fk_bike_type_bike_issue_issue FOREIGN KEY (bike_issue_id) 
         REFERENCES bike_issue(id) ON DELETE CASCADE,
-    CONSTRAINT chk_bike_type_bike_issue_bike_type_id CHECK (bike_type_id > 0),
-    CONSTRAINT uk_bike_type_bike_issue UNIQUE (bike_type_id, bike_issue_id)
+    CONSTRAINT uk_bike_type_bike_issue UNIQUE (bike_type_external_id, bike_issue_id)
 );
 
 -- =====================================================================================================================
@@ -272,7 +268,7 @@ CREATE TABLE bike_type_bike_issue (
 
 -- Error Code indexes
 CREATE INDEX idx_error_code_external_id ON error_code(external_id);
-CREATE INDEX idx_error_code_bike_engine_id ON error_code(bike_engine_id);
+CREATE INDEX idx_error_code_bike_engine_ext_id ON error_code(bike_engine_external_id);
 
 -- Bike Issue indexes
 CREATE INDEX idx_bike_issue_external_id ON bike_issue(external_id);
@@ -281,16 +277,17 @@ CREATE INDEX idx_bike_issue_responsible_person ON bike_issue(responsible_person_
 
 -- Feedback indexes
 CREATE INDEX idx_feedback_external_id ON feedback(external_id);
-CREATE INDEX idx_feedback_user_id ON feedback(user_id);
+CREATE INDEX idx_feedback_user_external_id ON feedback(user_external_id);
 
 -- Bike Rental Feedback indexes
-CREATE INDEX idx_bike_rental_feedback_user_id ON bike_rental_feedback(user_id);
-CREATE INDEX idx_bike_rental_feedback_bike_rental_id ON bike_rental_feedback(bike_rental_id);
+CREATE INDEX idx_bike_rental_feedback_external_id ON bike_rental_feedback(external_id);
+CREATE INDEX idx_bike_rental_feedback_user_external_id ON bike_rental_feedback(user_external_id);
+CREATE INDEX idx_bike_rental_feedback_bike_rental_ext_id ON bike_rental_feedback(bike_rental_external_id);
 
 -- Support Request indexes
 CREATE INDEX idx_support_request_external_id ON support_request(external_id);
-CREATE INDEX idx_support_request_user_id ON support_request(user_id);
-CREATE INDEX idx_support_request_bike_id ON support_request(bike_id);
+CREATE INDEX idx_support_request_user_external_id ON support_request(user_external_id);
+CREATE INDEX idx_support_request_bike_external_id ON support_request(bike_external_id);
 CREATE INDEX idx_support_request_error_code ON support_request(error_code_id);
 CREATE INDEX idx_support_request_status ON support_request(support_request_status_id);
 
@@ -301,7 +298,7 @@ CREATE INDEX idx_support_request_guide_item_status ON support_request_guide_item
 -- Junction table indexes
 CREATE INDEX idx_support_request_bike_issue_request ON support_request_bike_issue(support_request_id);
 CREATE INDEX idx_support_request_bike_issue_issue ON support_request_bike_issue(bike_issue_id);
-CREATE INDEX idx_bike_type_bike_issue_bike_type ON bike_type_bike_issue(bike_type_id);
+CREATE INDEX idx_bike_type_bike_issue_bike_type_ext_id ON bike_type_bike_issue(bike_type_external_id);
 CREATE INDEX idx_bike_type_bike_issue_bike_issue ON bike_type_bike_issue(bike_issue_id);
 
 -- =====================================================================================================================
@@ -359,55 +356,55 @@ ON CONFLICT (id) DO NOTHING;
 -- ---------------------------------------------------------------------------------------------------------------------
 -- 7.4 ERROR CODE
 -- ---------------------------------------------------------------------------------------------------------------------
-INSERT INTO error_code (id, external_id, name, bike_engine_id, description, common_cause, diagnostic_steps, recommended_fix, notes, is_fixable_by_client, date_created, last_date_modified, created_by, last_modified_by, is_deleted) VALUES
-(1, '550e8400-e29b-41d4-a716-446655440201', 'E001', 1, 'Battery Low Voltage', 'Battery discharged or faulty cell', 'Check battery voltage with multimeter', 'Charge or replace battery', 'Common error in cold weather', false, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
-(2, '550e8400-e29b-41d4-a716-446655440202', 'E002', 1, 'Motor Controller Error', 'Faulty controller or wiring', 'Inspect controller connections', 'Replace motor controller', 'May require professional service', false, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
-(3, '550e8400-e29b-41d4-a716-446655440203', 'E003', 2, 'Throttle Sensor Fault', 'Throttle sensor disconnected or damaged', 'Check throttle sensor connection', 'Reconnect or replace sensor', 'Client can check connection', true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
-(4, '550e8400-e29b-41d4-a716-446655440204', 'E004', 2, 'Brake Sensor Active', 'Brake lever engaged or sensor stuck', 'Check brake lever and sensor', 'Adjust or clean brake sensor', 'Usually easy fix', true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
-(5, '550e8400-e29b-41d4-a716-446655440205', 'E005', 3, 'Overheat Protection', 'Motor or controller overheating', 'Let bike cool down for 30 minutes', 'Avoid steep hills or heavy loads', 'Temporary error', true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false)
+INSERT INTO error_code (id, external_id, name, bike_engine_external_id, description, common_cause, diagnostic_steps, recommended_fix, notes, is_fixable_by_client, date_created, last_date_modified, created_by, last_modified_by, is_deleted) VALUES
+(1, '550e8400-e29b-41d4-a716-446655440201', 'E001', 'bike-engine-ext-001', 'Battery Low Voltage', 'Battery discharged or faulty cell', 'Check battery voltage with multimeter', 'Charge or replace battery', 'Common error in cold weather', false, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(2, '550e8400-e29b-41d4-a716-446655440202', 'E002', 'bike-engine-ext-001', 'Motor Controller Error', 'Faulty controller or wiring', 'Inspect controller connections', 'Replace motor controller', 'May require professional service', false, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(3, '550e8400-e29b-41d4-a716-446655440203', 'E003', 'bike-engine-ext-002', 'Throttle Sensor Fault', 'Throttle sensor disconnected or damaged', 'Check throttle sensor connection', 'Reconnect or replace sensor', 'Client can check connection', true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(4, '550e8400-e29b-41d4-a716-446655440204', 'E004', 'bike-engine-ext-002', 'Brake Sensor Active', 'Brake lever engaged or sensor stuck', 'Check brake lever and sensor', 'Adjust or clean brake sensor', 'Usually easy fix', true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(5, '550e8400-e29b-41d4-a716-446655440205', 'E005', 'bike-engine-ext-003', 'Overheat Protection', 'Motor or controller overheating', 'Let bike cool down for 30 minutes', 'Avoid steep hills or heavy loads', 'Temporary error', true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false)
 ON CONFLICT (id) DO NOTHING;
 
 -- ---------------------------------------------------------------------------------------------------------------------
 -- 7.5 FEEDBACK
 -- ---------------------------------------------------------------------------------------------------------------------
-INSERT INTO feedback (id, external_id, user_id, rate, comment, date_time, date_created, last_date_modified, created_by, last_modified_by, is_deleted) VALUES
-(1, '550e8400-e29b-41d4-a716-446655440301', 1, 5, 'Excellent service, very responsive support team!', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
-(2, '550e8400-e29b-41d4-a716-446655440302', 2, 4, 'Good overall experience, minor delay in response.', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
-(3, '550e8400-e29b-41d4-a716-446655440303', 3, 3, 'Average service, could be improved.', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
-(4, '550e8400-e29b-41d4-a716-446655440304', 1, 2, 'Not satisfied, took too long to resolve issue.', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false)
+INSERT INTO feedback (id, external_id, user_external_id, rate, comment, date_time, date_created, last_date_modified, created_by, last_modified_by, is_deleted) VALUES
+(1, '550e8400-e29b-41d4-a716-446655440301', 'usr-ext-00007', 5, 'Excellent service, very responsive support team!', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(2, '550e8400-e29b-41d4-a716-446655440302', 'usr-ext-00008', 4, 'Good overall experience, minor delay in response.', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(3, '550e8400-e29b-41d4-a716-446655440303', 'usr-ext-00009', 3, 'Average service, could be improved.', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(4, '550e8400-e29b-41d4-a716-446655440304', 'usr-ext-00007', 2, 'Not satisfied, took too long to resolve issue.', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false)
 ON CONFLICT (id) DO NOTHING;
 
 -- ---------------------------------------------------------------------------------------------------------------------
 -- 7.6 BIKE RENTAL FEEDBACK
 -- ---------------------------------------------------------------------------------------------------------------------
-INSERT INTO bike_rental_feedback (id, user_id, bike_rental_id, rate, comment, date_time, date_created, last_date_modified, created_by, last_modified_by, is_deleted) VALUES
-(1, 1, 101, 5, 'Great bike, smooth ride!', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
-(2, 2, 102, 4, 'Good bike, but battery could last longer.', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
-(3, 3, 103, 3, 'Average experience, brakes were squeaky.', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
-(4, 1, 104, 2, 'Poor condition, motor had issues.', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false)
+INSERT INTO bike_rental_feedback (id, external_id, user_external_id, bike_rental_external_id, rate, comment, date_time, date_created, last_date_modified, created_by, last_modified_by, is_deleted) VALUES
+(1, '550e8400-e29b-41d4-a716-446655440501', 'usr-ext-00007', 'bike-rental-ext-00101', 5, 'Great bike, smooth ride!', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(2, '550e8400-e29b-41d4-a716-446655440502', 'usr-ext-00008', 'bike-rental-ext-00102', 4, 'Good bike, but battery could last longer.', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(3, '550e8400-e29b-41d4-a716-446655440503', 'usr-ext-00009', 'bike-rental-ext-00103', 3, 'Average experience, brakes were squeaky.', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(4, '550e8400-e29b-41d4-a716-446655440504', 'usr-ext-00007', 'bike-rental-ext-00104', 2, 'Poor condition, motor had issues.', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false)
 ON CONFLICT (id) DO NOTHING;
 
 -- ---------------------------------------------------------------------------------------------------------------------
 -- 7.7 SUPPORT REQUEST
 -- ---------------------------------------------------------------------------------------------------------------------
-INSERT INTO support_request (id, external_id, user_id, bike_id, is_near_location, photo_url, error_code_id, support_request_status_id, date_created, last_date_modified, created_by, last_modified_by, is_deleted) VALUES
-(1, '550e8400-e29b-41d4-a716-446655440401', 1, 201, true, 'https://example.com/photos/issue1.jpg', 1, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
-(2, '550e8400-e29b-41d4-a716-446655440402', 2, 202, false, NULL, 2, 2, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
-(3, '550e8400-e29b-41d4-a716-446655440403', 3, 203, true, 'https://example.com/photos/issue3.jpg', NULL, 3, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
-(4, '550e8400-e29b-41d4-a716-446655440404', 1, NULL, false, NULL, 3, 4, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
-(5, '550e8400-e29b-41d4-a716-446655440405', 2, 204, true, 'https://example.com/photos/issue5.jpg', 4, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false)
+INSERT INTO support_request (id, external_id, user_external_id, bike_external_id, is_near_location, photo_url, error_code_id, support_request_status_id, date_created, last_date_modified, created_by, last_modified_by, is_deleted) VALUES
+(1, '550e8400-e29b-41d4-a716-446655440401', 'usr-ext-00007', 'bike-ext-00201', true, 'https://example.com/photos/issue1.jpg', 1, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(2, '550e8400-e29b-41d4-a716-446655440402', 'usr-ext-00008', 'bike-ext-00202', false, NULL, 2, 2, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(3, '550e8400-e29b-41d4-a716-446655440403', 'usr-ext-00009', 'bike-ext-00203', true, 'https://example.com/photos/issue3.jpg', NULL, 3, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(4, '550e8400-e29b-41d4-a716-446655440404', 'usr-ext-00007', NULL, false, NULL, 3, 4, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(5, '550e8400-e29b-41d4-a716-446655440405', 'usr-ext-00008', 'bike-ext-00204', true, 'https://example.com/photos/issue5.jpg', 4, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false)
 ON CONFLICT (id) DO NOTHING;
 
 -- ---------------------------------------------------------------------------------------------------------------------
 -- 7.8 BIKE TYPE BIKE ISSUE (Junction Table)
 -- ---------------------------------------------------------------------------------------------------------------------
-INSERT INTO bike_type_bike_issue (id, bike_type_id, bike_issue_id) VALUES
-(1, 1, 1),
-(2, 1, 2),
-(3, 2, 1),
-(4, 2, 3),
-(5, 3, 2),
-(6, 3, 3)
+INSERT INTO bike_type_bike_issue (id, bike_type_external_id, bike_issue_id) VALUES
+(1, 'bike-type-ext-001', 1),
+(2, 'bike-type-ext-001', 2),
+(3, 'bike-type-ext-002', 1),
+(4, 'bike-type-ext-002', 3),
+(5, 'bike-type-ext-003', 2),
+(6, 'bike-type-ext-003', 3)
 ON CONFLICT (id) DO NOTHING;
 
 -- ---------------------------------------------------------------------------------------------------------------------
