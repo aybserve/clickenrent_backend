@@ -61,7 +61,7 @@ class B2BRevenueSharePayoutItemServiceTest {
                 .id(1L)
                 .externalId(testExternalId)
                 .b2bRevenueSharePayout(testPayout)
-                .bikeRentalId(1L)
+                .bikeRentalExternalId("bike-rental-ext-123")
                 .amount(new BigDecimal("50.00"))
                 .build();
 
@@ -69,7 +69,7 @@ class B2BRevenueSharePayoutItemServiceTest {
                 .id(1L)
                 .externalId(testExternalId)
                 .b2bRevenueSharePayoutId(1L)
-                .bikeRentalId(1L)
+                .bikeRentalExternalId("bike-rental-ext-123")
                 .amount(new BigDecimal("50.00"))
                 .build();
 

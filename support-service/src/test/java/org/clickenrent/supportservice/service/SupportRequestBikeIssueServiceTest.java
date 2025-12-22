@@ -51,7 +51,7 @@ class SupportRequestBikeIssueServiceTest {
     void setUp() {
         testRequest = SupportRequest.builder()
                 .id(1L)
-                .userId(1L)
+                .userExternalId("user-ext-123")
                 .build();
 
         testBikeIssue = BikeIssue.builder()

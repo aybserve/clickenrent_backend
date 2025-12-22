@@ -60,14 +60,14 @@ class B2BSaleFinTransactionServiceTest {
         testB2BSaleFinTransaction = B2BSaleFinTransaction.builder()
                 .id(1L)
                 .externalId(testExternalId)
-                .b2bSaleId(1L)
+                .b2bSaleExternalId("b2b-sale-ext-123")
                 .financialTransaction(financialTransaction)
                 .build();
 
         testB2BSaleFinTransactionDTO = B2BSaleFinTransactionDTO.builder()
                 .id(1L)
                 .externalId(testExternalId)
-                .b2bSaleId(1L)
+                .b2bSaleExternalId("b2b-sale-ext-123")
                 .financialTransaction(FinancialTransactionDTO.builder().id(1L).build())
                 .build();
 
@@ -115,7 +115,7 @@ class B2BSaleFinTransactionServiceTest {
         B2BSaleFinTransactionDTO result = b2bSaleFinTransactionService.findById(1L);
 
         assertNotNull(result);
-        assertEquals(1L, result.getB2bSaleId());
+        assertEquals("b2b-sale-ext-123", result.getB2bSaleExternalId());
         verify(b2bSaleFinTransactionRepository, times(1)).findById(1L);
     }
 

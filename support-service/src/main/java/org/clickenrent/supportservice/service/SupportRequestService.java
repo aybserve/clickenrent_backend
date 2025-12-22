@@ -2,7 +2,6 @@ package org.clickenrent.supportservice.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.clickenrent.contracts.rental.BikeDTO;
 import org.clickenrent.supportservice.client.BikeServiceClient;
 import org.clickenrent.supportservice.dto.SupportRequestDTO;
 import org.clickenrent.supportservice.entity.SupportRequest;

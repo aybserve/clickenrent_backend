@@ -61,14 +61,16 @@ class RentalFinTransactionServiceTest {
         testRentalFinTransaction = RentalFinTransaction.builder()
                 .id(1L)
                 .externalId(testExternalId)
-                .rentalId(1L)
+                .rentalExternalId("rental-ext-123")
+                .bikeRentalExternalId("bike-rental-ext-456")
                 .financialTransaction(testFinancialTransaction)
                 .build();
 
         testRentalFinTransactionDTO = RentalFinTransactionDTO.builder()
                 .id(1L)
                 .externalId(testExternalId)
-                .rentalId(1L)
+                .rentalExternalId("rental-ext-123")
+                .bikeRentalExternalId("bike-rental-ext-456")
                 .financialTransaction(FinancialTransactionDTO.builder().id(1L).build())
                 .build();
 
@@ -102,7 +104,7 @@ class RentalFinTransactionServiceTest {
         RentalFinTransactionDTO result = rentalFinTransactionService.findById(1L);
 
         assertNotNull(result);
-        assertEquals(1L, result.getRentalId());
+        assertEquals("rental-ext-123", result.getRentalExternalId());
         verify(rentalFinTransactionRepository, times(1)).findById(1L);
     }
 

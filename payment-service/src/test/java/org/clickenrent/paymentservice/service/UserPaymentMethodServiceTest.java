@@ -60,7 +60,7 @@ class UserPaymentMethodServiceTest {
 
         testProfile = UserPaymentProfile.builder()
                 .id(1L)
-                .userId(1L)
+                .userExternalId("user-ext-123")
                 .stripeCustomerId("cus_test123")
                 .build();
 
@@ -126,12 +126,12 @@ class UserPaymentMethodServiceTest {
     }
 
     @Test
-    void findByUserId_Success() {
-        when(userPaymentProfileRepository.findByUserId(1L)).thenReturn(Optional.of(testProfile));
+    void findByUserExternalId_Success() {
+        when(userPaymentProfileRepository.findByUserExternalId("user-ext-123")).thenReturn(Optional.of(testProfile));
         when(userPaymentMethodRepository.findByUserPaymentProfileId(1L)).thenReturn(Arrays.asList(testMethod));
         when(userPaymentMethodMapper.toDTOList(anyList())).thenReturn(Arrays.asList(testMethodDTO));
 
-        List<UserPaymentMethodDTO> result = userPaymentMethodService.findByUserId(1L);
+        List<UserPaymentMethodDTO> result = userPaymentMethodService.findByUserExternalId("user-ext-123");
 
         assertNotNull(result);
         assertEquals(1, result.size());

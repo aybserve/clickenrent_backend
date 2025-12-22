@@ -36,7 +36,7 @@ class B2BRevenueSharePayoutItemControllerTest {
         payoutItemDTO = B2BRevenueSharePayoutItemDTO.builder()
                 .id(1L)
                 .b2bRevenueSharePayoutId(1L)
-                .bikeRentalId(1L)
+                .bikeRentalExternalId("bike-rental-ext-123")
                 .amount(new BigDecimal("50.00"))
                 .build();
     }

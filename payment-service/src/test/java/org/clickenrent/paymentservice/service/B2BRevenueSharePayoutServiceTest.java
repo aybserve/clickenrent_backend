@@ -62,7 +62,7 @@ class B2BRevenueSharePayoutServiceTest {
         testPayout = B2BRevenueSharePayout.builder()
                 .id(1L)
                 .externalId(testExternalId)
-                .companyId(1L)
+                .companyExternalId("company-ext-123")
                 .paymentStatus(testPaymentStatus)
                 .dueDate(LocalDate.now().plusDays(30))
                 .totalAmount(new BigDecimal("1000.00"))
@@ -73,7 +73,7 @@ class B2BRevenueSharePayoutServiceTest {
         testPayoutDTO = B2BRevenueSharePayoutDTO.builder()
                 .id(1L)
                 .externalId(testExternalId)
-                .companyId(1L)
+                .companyExternalId("company-ext-123")
                 .paymentStatus(PaymentStatusDTO.builder().id(1L).code("PENDING").name("Pending").build())
                 .dueDate(LocalDate.now().plusDays(30))
                 .totalAmount(new BigDecimal("1000.00"))
@@ -142,23 +142,22 @@ class B2BRevenueSharePayoutServiceTest {
     }
 
     @Test
-    void findByCompanyId_Success() {
-        when(b2bRevenueSharePayoutRepository.findByCompanyId(1L)).thenReturn(Arrays.asList(testPayout));
+    void findByCompanyExternalId_Success() {
+        when(b2bRevenueSharePayoutRepository.findByCompanyExternalId("company-ext-123")).thenReturn(Arrays.asList(testPayout));
         when(b2bRevenueSharePayoutMapper.toDTOList(anyList())).thenReturn(Arrays.asList(testPayoutDTO));
 
-        List<B2BRevenueSharePayoutDTO> result = b2bRevenueSharePayoutService.findByCompanyId(1L);
+        List<B2BRevenueSharePayoutDTO> result = b2bRevenueSharePayoutService.findByCompanyExternalId("company-ext-123");
 
         assertNotNull(result);
         assertEquals(1, result.size());
-        verify(b2bRevenueSharePayoutRepository, times(1)).findByCompanyId(1L);
+        verify(b2bRevenueSharePayoutRepository, times(1)).findByCompanyExternalId("company-ext-123");
     }
 
     @Test
-    void findByCompanyId_Unauthorized() {
+    void findByCompanyExternalId_Unauthorized() {
         when(securityService.isAdmin()).thenReturn(false);
-        when(securityService.hasAccessToCompany(1L)).thenReturn(false);
 
-        assertThrows(UnauthorizedException.class, () -> b2bRevenueSharePayoutService.findByCompanyId(1L));
+        assertThrows(UnauthorizedException.class, () -> b2bRevenueSharePayoutService.findByCompanyExternalId("company-ext-123"));
     }
 
     @Test

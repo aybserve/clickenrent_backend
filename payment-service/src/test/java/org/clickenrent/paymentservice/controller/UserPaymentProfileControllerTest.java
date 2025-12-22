@@ -40,7 +40,7 @@ class UserPaymentProfileControllerTest {
     void setUp() {
         profileDTO = UserPaymentProfileDTO.builder()
                 .id(1L)
-                .userId(1L)
+                .userExternalId("user-ext-123")
                 .stripeCustomerId("cus_test123")
                 .isActive(true)
                 .build();

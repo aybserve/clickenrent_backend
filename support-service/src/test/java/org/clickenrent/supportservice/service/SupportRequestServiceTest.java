@@ -150,7 +150,7 @@ class SupportRequestServiceTest {
         when(supportRequestRepository.findByUserExternalId("user-uuid-1")).thenReturn(Arrays.asList(testRequest));
         when(supportRequestMapper.toDto(testRequest)).thenReturn(testRequestDTO);
 
-        List<SupportRequestDTO> result = supportRequestService.getByUserId(1L);
+        List<SupportRequestDTO> result = supportRequestService.getByUserExternalId("user-uuid-1");
 
         assertNotNull(result);
         assertEquals(1, result.size());
@@ -158,11 +158,10 @@ class SupportRequestServiceTest {
     }
 
     @Test
-    void getByUserId_Unauthorized() {
+    void getByUserExternalId_Unauthorized() {
         when(securityService.isAdmin()).thenReturn(false);
-        when(securityService.hasAccessToUser(2L)).thenReturn(false);
 
-        assertThrows(UnauthorizedException.class, () -> supportRequestService.getByUserId(2L));
+        assertThrows(UnauthorizedException.class, () -> supportRequestService.getByUserExternalId("user-uuid-2"));
     }
 
     @Test

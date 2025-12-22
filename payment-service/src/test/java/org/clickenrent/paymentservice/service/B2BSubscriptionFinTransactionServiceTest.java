@@ -60,14 +60,14 @@ class B2BSubscriptionFinTransactionServiceTest {
         testB2BSubscriptionFinTransaction = B2BSubscriptionFinTransaction.builder()
                 .id(1L)
                 .externalId(testExternalId)
-                .b2bSubscriptionId(1L)
+                .b2bSubscriptionExternalId("b2b-subscription-ext-123")
                 .financialTransaction(financialTransaction)
                 .build();
 
         testB2BSubscriptionFinTransactionDTO = B2BSubscriptionFinTransactionDTO.builder()
                 .id(1L)
                 .externalId(testExternalId)
-                .b2bSubscriptionId(1L)
+                .b2bSubscriptionExternalId("b2b-subscription-ext-123")
                 .financialTransaction(FinancialTransactionDTO.builder().id(1L).build())
                 .build();
 
@@ -115,7 +115,7 @@ class B2BSubscriptionFinTransactionServiceTest {
         B2BSubscriptionFinTransactionDTO result = b2bSubscriptionFinTransactionService.findById(1L);
 
         assertNotNull(result);
-        assertEquals(1L, result.getB2bSubscriptionId());
+        assertEquals("b2b-subscription-ext-123", result.getB2bSubscriptionExternalId());
         verify(b2bSubscriptionFinTransactionRepository, times(1)).findById(1L);
     }
 

@@ -35,7 +35,7 @@ class B2BSaleFinTransactionControllerTest {
     void setUp() {
         b2bSaleFinTransactionDTO = B2BSaleFinTransactionDTO.builder()
                 .id(1L)
-                .b2bSaleId(1L)
+                .b2bSaleExternalId("b2b-sale-ext-123")
                 .financialTransaction(FinancialTransactionDTO.builder().id(1L).build())
                 .build();
     }

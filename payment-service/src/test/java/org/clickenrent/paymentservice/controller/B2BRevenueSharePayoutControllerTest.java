@@ -38,7 +38,7 @@ class B2BRevenueSharePayoutControllerTest {
     void setUp() {
         payoutDTO = B2BRevenueSharePayoutDTO.builder()
                 .id(1L)
-                .companyId(1L)
+                .companyExternalId("company-ext-123")
                 .paymentStatus(PaymentStatusDTO.builder().code("PENDING").build())
                 .dueDate(LocalDate.now())
                 .totalAmount(new BigDecimal("1000.00"))
