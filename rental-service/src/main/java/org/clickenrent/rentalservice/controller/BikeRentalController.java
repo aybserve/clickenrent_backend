@@ -15,6 +15,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -112,6 +113,20 @@ public class BikeRentalController {
             @PathVariable Long id,
             @Valid @RequestBody LockRequestDTO request) {
         LockResponseDTO response = bikeRentalService.lockBike(id, request);
+        return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/{id}/photo")
+    @PreAuthorize("isAuthenticated()")
+    @Operation(
+            summary = "Upload photo for bike rental",
+            description = "Upload a photo for a completed bike rental. Only one photo per rental allowed. " +
+                         "Photo must be JPEG or PNG format and not exceed 5 MB."
+    )
+    public ResponseEntity<PhotoUploadResponseDTO> uploadPhoto(
+            @PathVariable Long id,
+            @RequestParam("file") MultipartFile file) {
+        PhotoUploadResponseDTO response = bikeRentalService.uploadPhoto(id, file);
         return ResponseEntity.ok(response);
     }
 

@@ -58,8 +58,12 @@ public class Ride extends BaseAuditEntity {
     private Location endLocation;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "coordinates_id")
-    private Coordinates coordinates;
+    @JoinColumn(name = "start_coordinates_id")
+    private Coordinates startCoordinates;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "end_coordinates_id")
+    private Coordinates endCoordinates;
 
     @NotNull(message = "Ride status is required")
     @ManyToOne(fetch = FetchType.LAZY)

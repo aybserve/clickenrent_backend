@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.clickenrent.rentalservice.dto.*;
 import org.clickenrent.rentalservice.entity.*;
+import org.clickenrent.rentalservice.exception.PhotoAlreadyExistsException;
 import org.clickenrent.rentalservice.exception.ResourceNotFoundException;
 import org.clickenrent.rentalservice.exception.UnauthorizedException;
 import org.clickenrent.rentalservice.mapper.BikeRentalMapper;
@@ -15,6 +16,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -33,6 +35,8 @@ public class BikeRentalService {
     private final LockEncryptionService lockEncryptionService;
     private final LockStatusService lockStatusService;
     private final CoordinatesService coordinatesService;
+    private final AzureBlobStorageService azureBlobStorageService;
+    private final PhotoValidationService photoValidationService;
 
     @Transactional(readOnly = true)
     public Page<BikeRentalDTO> getAllBikeRentals(Pageable pageable) {
@@ -298,5 +302,79 @@ public class BikeRentalService {
         return bikeRentalRepository.findByRental(rental).stream()
                 .map(bikeRentalMapper::toDto)
                 .toList();
+    }
+
+    /**
+     * Upload photo for a bike rental.
+     *
+     * @param bikeRentalId the bike rental ID
+     * @param file the photo file to upload
+     * @return response with photo URL
+     * @throws ResourceNotFoundException if bike rental not found
+     * @throws UnauthorizedException if user doesn't have permission
+     * @throws PhotoAlreadyExistsException if photo already exists
+     * @throws IllegalStateException if bike rental is not ended
+     */
+    @Transactional
+    public PhotoUploadResponseDTO uploadPhoto(Long bikeRentalId, MultipartFile file) {
+        // 1. Check bikeRental exists
+        BikeRental bikeRental = bikeRentalRepository.findById(bikeRentalId)
+                .orElseThrow(() -> new ResourceNotFoundException("BikeRental", "id", bikeRentalId));
+
+        // 2. Check bikeRental is ended (via bikeRentalStatus)
+        if (bikeRental.getBikeRentalStatus() == null || 
+            !isRentalEnded(bikeRental.getBikeRentalStatus().getName())) {
+            throw new IllegalStateException(
+                    String.format("Cannot upload photo for bike rental that is not completed. Current status: %s",
+                            bikeRental.getBikeRentalStatus() != null ? bikeRental.getBikeRentalStatus().getName() : "unknown")
+            );
+        }
+
+        // 3. Check user has rights (via SecurityService)
+        if (!securityService.isAdmin() && 
+            !securityService.hasAccessToUserByExternalId(bikeRental.getRental().getUserExternalId())) {
+            throw new UnauthorizedException("You don't have permission to upload photo for this bike rental");
+        }
+
+        // 4. Check only 1 photo exists (photoUrl should be null)
+        if (bikeRental.getPhotoUrl() != null && !bikeRental.getPhotoUrl().isEmpty()) {
+            throw new PhotoAlreadyExistsException(
+                    "Photo already exists for this bike rental. Only one photo per rental is allowed."
+            );
+        }
+
+        // 5. Validate photo (size, content-type)
+        photoValidationService.validatePhoto(file);
+
+        // 6. Upload to Azure Storage
+        String photoUrl = azureBlobStorageService.uploadPhoto(file, bikeRentalId.toString());
+
+        // 7. Save photoUrl to database
+        bikeRental.setPhotoUrl(photoUrl);
+        bikeRentalRepository.save(bikeRental);
+
+        log.info("Successfully uploaded photo for bike rental ID: {}. Photo URL: {}", bikeRentalId, photoUrl);
+
+        return PhotoUploadResponseDTO.builder()
+                .photoUrl(photoUrl)
+                .message("Photo uploaded successfully")
+                .build();
+    }
+
+    /**
+     * Check if rental status indicates the rental is ended.
+     *
+     * @param statusName the status name
+     * @return true if rental is ended
+     */
+    private boolean isRentalEnded(String statusName) {
+        if (statusName == null) {
+            return false;
+        }
+        // Check for common "ended" status names (case-insensitive)
+        String lowerStatus = statusName.toLowerCase();
+        return lowerStatus.equals("Completed") ||
+               lowerStatus.equals("Finished") ||
+               lowerStatus.equals("Ended");
     }
 }

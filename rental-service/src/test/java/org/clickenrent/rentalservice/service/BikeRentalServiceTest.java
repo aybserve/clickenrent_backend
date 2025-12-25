@@ -9,6 +9,7 @@ import org.clickenrent.rentalservice.exception.UnauthorizedException;
 import org.clickenrent.rentalservice.mapper.BikeRentalMapper;
 import org.clickenrent.rentalservice.repository.BikeRentalRepository;
 import org.clickenrent.rentalservice.repository.BikeRepository;
+import org.clickenrent.rentalservice.repository.LockRepository;
 import org.clickenrent.rentalservice.repository.RentalRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -45,11 +46,28 @@ class BikeRentalServiceTest {
     private RentalRepository rentalRepository;
 
     @Mock
+    private LockRepository lockRepository;
+
+    @Mock
     private BikeRentalMapper bikeRentalMapper;
 
     @Mock
     private SecurityService securityService;
 
+    @Mock
+    private LockEncryptionService lockEncryptionService;
+
+    @Mock
+    private LockStatusService lockStatusService;
+
+    @Mock
+    private CoordinatesService coordinatesService;
+
+    @Mock
+    private AzureBlobStorageService azureBlobStorageService;
+
+    @Mock
+    private PhotoValidationService photoValidationService;
 
     @InjectMocks
     private BikeRentalService bikeRentalService;
