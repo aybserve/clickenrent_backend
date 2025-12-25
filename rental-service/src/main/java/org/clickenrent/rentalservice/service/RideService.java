@@ -55,6 +55,21 @@ public class RideService {
     }
 
     @Transactional(readOnly = true)
+    public List<RideDTO> getRidesByBikeRentalExternalId(String bikeRentalExternalId) {
+        BikeRental bikeRental = bikeRentalRepository.findByExternalId(bikeRentalExternalId)
+                .orElseThrow(() -> new ResourceNotFoundException("BikeRental", "externalId", bikeRentalExternalId));
+
+        // Check access
+        if (!securityService.isAdmin() && !securityService.hasAccessToUserByExternalId(bikeRental.getRental().getUserExternalId())) {
+            throw new UnauthorizedException("You don't have permission to view rides for this bike rental");
+        }
+
+        return rideRepository.findByBikeRental(bikeRental).stream()
+                .map(rideMapper::toDto)
+                .toList();
+    }
+
+    @Transactional(readOnly = true)
     public RideDTO getRideById(Long id) {
         Ride ride = rideRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Ride", "id", id));

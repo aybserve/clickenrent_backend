@@ -168,6 +168,21 @@ public class RentalService {
 
         rentalRepository.delete(rental);
     }
+
+    /**
+     * Get all rentals for a specific user by external ID
+     */
+    @Transactional(readOnly = true)
+    public List<RentalDTO> getRentalsByUserExternalId(String userExternalId) {
+        // Check if user has access to this user's data
+        if (!securityService.isAdmin() && !securityService.hasAccessToUserByExternalId(userExternalId)) {
+            throw new UnauthorizedException("You don't have permission to view this user's rentals");
+        }
+
+        return rentalRepository.findByUserExternalId(userExternalId).stream()
+                .map(rentalMapper::toDto)
+                .toList();
+    }
 }
 
 

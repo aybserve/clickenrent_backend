@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -261,5 +262,41 @@ public class BikeRentalService {
     @Transactional(readOnly = true)
     public boolean existsByExternalId(String externalId) {
         return bikeRentalRepository.existsByExternalId(externalId);
+    }
+
+    /**
+     * Get all bike rentals for a specific rental
+     */
+    @Transactional(readOnly = true)
+    public List<BikeRentalDTO> getBikeRentalsByRentalId(Long rentalId) {
+        Rental rental = rentalRepository.findById(rentalId)
+                .orElseThrow(() -> new ResourceNotFoundException("Rental", "id", rentalId));
+
+        // Check access
+        if (!securityService.isAdmin() && !securityService.hasAccessToUserByExternalId(rental.getUserExternalId())) {
+            throw new UnauthorizedException("You don't have permission to view these bike rentals");
+        }
+
+        return bikeRentalRepository.findByRental(rental).stream()
+                .map(bikeRentalMapper::toDto)
+                .toList();
+    }
+
+    /**
+     * Get all bike rentals for a specific rental by external ID
+     */
+    @Transactional(readOnly = true)
+    public List<BikeRentalDTO> getBikeRentalsByRentalExternalId(String rentalExternalId) {
+        Rental rental = rentalRepository.findByExternalId(rentalExternalId)
+                .orElseThrow(() -> new ResourceNotFoundException("Rental", "externalId", rentalExternalId));
+
+        // Check access
+        if (!securityService.isAdmin() && !securityService.hasAccessToUserByExternalId(rental.getUserExternalId())) {
+            throw new UnauthorizedException("You don't have permission to view these bike rentals");
+        }
+
+        return bikeRentalRepository.findByRental(rental).stream()
+                .map(bikeRentalMapper::toDto)
+                .toList();
     }
 }

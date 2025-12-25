@@ -12,7 +12,9 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.clickenrent.authservice.dto.CreateUserRequest;
 import org.clickenrent.authservice.dto.UserDTO;
+import org.clickenrent.authservice.dto.UserStatsDTO;
 import org.clickenrent.authservice.service.UserService;
+import org.clickenrent.authservice.service.UserStatisticsService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -38,6 +40,7 @@ import org.springframework.web.bind.annotation.*;
 public class UserController {
     
     private final UserService userService;
+    private final UserStatisticsService userStatisticsService;
     
     /**
      * Get all users with pagination.
@@ -199,6 +202,30 @@ public class UserController {
     public ResponseEntity<UserDTO> deactivateUser(@PathVariable Long id) {
         UserDTO user = userService.deactivateUser(id);
         return ResponseEntity.ok(user);
+    }
+    
+    /**
+     * Get user bike rental statistics.
+     * GET /api/users/{id}/stats
+     */
+    @GetMapping("/{id}/stats")
+    @PreAuthorize("hasAnyRole('SUPERADMIN', 'ADMIN') or @resourceSecurity.canAccessUser(#id)")
+    @Operation(
+            summary = "Get user bike rental statistics",
+            description = "Returns comprehensive statistics about user's bike rentals, rides, spending, and ratings. " +
+                          "Admins can view any user's stats, regular users can only view their own."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Statistics retrieved successfully",
+                    content = @Content(schema = @Schema(implementation = UserStatsDTO.class))),
+            @ApiResponse(responseCode = "401", description = "Not authenticated"),
+            @ApiResponse(responseCode = "403", description = "Access denied"),
+            @ApiResponse(responseCode = "404", description = "User not found")
+    })
+    public ResponseEntity<UserStatsDTO> getUserStats(
+            @Parameter(description = "User ID", required = true) @PathVariable Long id) {
+        UserStatsDTO stats = userStatisticsService.getUserStats(id);
+        return ResponseEntity.ok(stats);
     }
 }
 

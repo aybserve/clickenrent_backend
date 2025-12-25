@@ -16,6 +16,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/bike-rentals")
 @RequiredArgsConstructor
@@ -111,5 +113,19 @@ public class BikeRentalController {
             @Valid @RequestBody LockRequestDTO request) {
         LockResponseDTO response = bikeRentalService.lockBike(id, request);
         return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/rental/{rentalId}")
+    @PreAuthorize("isAuthenticated()")
+    @Operation(summary = "Get bike rentals by rental ID", description = "Retrieve all bike rentals for a specific rental")
+    public ResponseEntity<List<BikeRentalDTO>> getBikeRentalsByRentalId(@PathVariable Long rentalId) {
+        return ResponseEntity.ok(bikeRentalService.getBikeRentalsByRentalId(rentalId));
+    }
+
+    @GetMapping("/rental/external/{rentalExternalId}")
+    @PreAuthorize("isAuthenticated()")
+    @Operation(summary = "Get bike rentals by rental external ID", description = "Retrieve all bike rentals for a specific rental by external ID")
+    public ResponseEntity<List<BikeRentalDTO>> getBikeRentalsByRentalExternalId(@PathVariable String rentalExternalId) {
+        return ResponseEntity.ok(bikeRentalService.getBikeRentalsByRentalExternalId(rentalExternalId));
     }
 }

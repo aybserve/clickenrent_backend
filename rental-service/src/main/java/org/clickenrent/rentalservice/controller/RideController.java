@@ -37,9 +37,16 @@ public class RideController {
 
     @GetMapping("/by-bike-rental/{bikeRentalId}")
     @PreAuthorize("isAuthenticated()")
-    @Operation(summary = "Get rides by bike rental")
+    @Operation(summary = "Get rides by bike rental ID")
     public ResponseEntity<List<RideDTO>> getRidesByBikeRental(@PathVariable Long bikeRentalId) {
         return ResponseEntity.ok(rideService.getRidesByBikeRental(bikeRentalId));
+    }
+
+    @GetMapping("/by-bike-rental/external/{bikeRentalExternalId}")
+    @PreAuthorize("isAuthenticated()")
+    @Operation(summary = "Get rides by bike rental external ID")
+    public ResponseEntity<List<RideDTO>> getRidesByBikeRentalExternalId(@PathVariable String bikeRentalExternalId) {
+        return ResponseEntity.ok(rideService.getRidesByBikeRentalExternalId(bikeRentalExternalId));
     }
 
     @GetMapping("/{id}")

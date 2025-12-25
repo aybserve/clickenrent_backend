@@ -21,6 +21,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 /**
  * REST controller for Rental management operations.
  */
@@ -193,6 +195,18 @@ public class RentalController {
             @Parameter(description = "Rental ID", required = true) @PathVariable Long id) {
         rentalService.deleteRental(id);
         return ResponseEntity.noContent().build();
+    }
+
+    /**
+     * Get rentals by user external ID.
+     * GET /api/rentals/user/{userExternalId}
+     */
+    @GetMapping("/user/{userExternalId}")
+    @PreAuthorize("isAuthenticated()")
+    @Operation(summary = "Get rentals by user external ID", description = "Retrieve all rentals for a specific user by external ID")
+    public ResponseEntity<List<RentalDTO>> getRentalsByUserExternalId(@PathVariable String userExternalId) {
+        List<RentalDTO> rentals = rentalService.getRentalsByUserExternalId(userExternalId);
+        return ResponseEntity.ok(rentals);
     }
 }
 
