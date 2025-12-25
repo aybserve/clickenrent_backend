@@ -54,6 +54,7 @@
     <module>support-service</module>
     <module>payment-service</module>
     <module>gateway</module>
+    <module>notification-service</module>
   </modules>
 
   <build>

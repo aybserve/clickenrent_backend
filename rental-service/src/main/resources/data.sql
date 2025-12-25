@@ -518,10 +518,11 @@ ON CONFLICT (id) DO NOTHING;
 
 -- ---------------------------------------------------------------------------------------------------------------------
 -- 9.4 RIDES (HAS audit fields)
+-- NOTE: Updated to use start_coordinates_id and end_coordinates_id instead of coordinates_id
 -- ---------------------------------------------------------------------------------------------------------------------
-INSERT INTO ride (id, external_id, bike_rental_id, start_date_time, end_date_time, start_location_id, end_location_id, coordinates_id, ride_status_id, date_created, last_date_modified, created_by, last_modified_by, is_deleted) VALUES
-(1, 'ride-ext-00101', 1, CURRENT_TIMESTAMP - INTERVAL '2 days', CURRENT_TIMESTAMP - INTERVAL '2 days' + INTERVAL '45 minutes', 1, 2, 1, 2, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
-(2, 'ride-ext-00102', 2, CURRENT_TIMESTAMP - INTERVAL '5 days', CURRENT_TIMESTAMP - INTERVAL '5 days' + INTERVAL '30 minutes', 2, 1, 2, 2, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false)
+INSERT INTO ride (id, external_id, bike_rental_id, start_date_time, end_date_time, start_location_id, end_location_id, start_coordinates_id, end_coordinates_id, ride_status_id, date_created, last_date_modified, created_by, last_modified_by, is_deleted) VALUES
+(1, 'ride-ext-00101', 1, CURRENT_TIMESTAMP - INTERVAL '2 days', CURRENT_TIMESTAMP - INTERVAL '2 days' + INTERVAL '45 minutes', 1, 2, 1, 2, 2, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(2, 'ride-ext-00102', 2, CURRENT_TIMESTAMP - INTERVAL '5 days', CURRENT_TIMESTAMP - INTERVAL '5 days' + INTERVAL '30 minutes', 2, 1, 2, 1, 2, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false)
 ON CONFLICT (id) DO NOTHING;
 
 -- =====================================================================================================================

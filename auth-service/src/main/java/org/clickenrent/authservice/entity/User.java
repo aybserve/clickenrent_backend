@@ -19,7 +19,8 @@ import org.hibernate.annotations.Where;
     indexes = {
         @Index(name = "idx_user_external_id", columnList = "external_id"),
         @Index(name = "idx_user_email", columnList = "email"),
-        @Index(name = "idx_user_username", columnList = "user_name")
+        @Index(name = "idx_user_username", columnList = "user_name"),
+        @Index(name = "idx_user_provider", columnList = "provider_id, provider_user_id")
     }
 )
 @SQLDelete(sql = "UPDATE users SET is_deleted = true WHERE id = ?")
@@ -44,9 +45,8 @@ public class User extends BaseAuditEntity {
     @Column(name = "user_name", nullable = false, unique = true, length = 100)
     private String userName;
 
-    @NotBlank(message = "Password is required")
     @Size(max = 255, message = "Password must not exceed 255 characters")
-    @Column(name = "password", nullable = false, length = 255)
+    @Column(name = "password", length = 255)
     private String password;
 
     @NotBlank(message = "Email is required")
@@ -90,6 +90,14 @@ public class User extends BaseAuditEntity {
     @Builder.Default
     @Column(name = "is_accepted_privacy_policy")
     private Boolean isAcceptedPrivacyPolicy = false;
+
+    @Size(max = 50, message = "Provider ID must not exceed 50 characters")
+    @Column(name = "provider_id", length = 50)
+    private String providerId;
+
+    @Size(max = 255, message = "Provider user ID must not exceed 255 characters")
+    @Column(name = "provider_user_id", length = 255)
+    private String providerUserId;
 }
 
 

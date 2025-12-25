@@ -1,6 +1,9 @@
 package org.clickenrent.rentalservice.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.clickenrent.contracts.notification.SendNotificationRequest;
+import org.clickenrent.rentalservice.client.NotificationClient;
 import org.clickenrent.rentalservice.dto.RideDTO;
 import org.clickenrent.rentalservice.entity.BikeRental;
 import org.clickenrent.rentalservice.entity.Ride;
@@ -16,11 +19,14 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class RideService {
 
     private final RideRepository rideRepository;
@@ -28,6 +34,7 @@ public class RideService {
     private final RideStatusRepository rideStatusRepository;
     private final RideMapper rideMapper;
     private final SecurityService securityService;
+    private final NotificationClient notificationClient;
 
     @Transactional(readOnly = true)
     public Page<RideDTO> getAllRides(Pageable pageable) {
@@ -103,6 +110,20 @@ public class RideService {
         ride.setRideStatus(activeStatus);
 
         ride = rideRepository.save(ride);
+
+        // Send notification
+        sendNotificationAsync(
+                bikeRental,
+                "RIDE_STARTED",
+                "Ride Started 🚴‍♂️",
+                "Your ride has begun! Enjoy your journey!",
+                Map.of(
+                        "rideId", ride.getId(),
+                        "bikeRentalId", bikeRental.getId(),
+                        "startTime", ride.getStartDateTime().toString()
+                )
+        );
+
         return rideMapper.toDto(ride);
     }
 
@@ -128,6 +149,26 @@ public class RideService {
         }
 
         ride = rideRepository.save(ride);
+
+        // Calculate ride duration
+        Duration duration = Duration.between(ride.getStartDateTime(), ride.getEndDateTime());
+        long minutes = duration.toMinutes();
+
+        // Send notification
+        sendNotificationAsync(
+                ride.getBikeRental(),
+                "RIDE_ENDED",
+                "Ride Completed ✅",
+                String.format("Your ride is complete! Duration: %d minutes. Thank you!", minutes),
+                Map.of(
+                        "rideId", ride.getId(),
+                        "bikeRentalId", ride.getBikeRental().getId(),
+                        "duration", minutes,
+                        "startTime", ride.getStartDateTime().toString(),
+                        "endTime", ride.getEndDateTime().toString()
+                )
+        );
+
         return rideMapper.toDto(ride);
     }
 
@@ -141,6 +182,43 @@ public class RideService {
         }
 
         rideRepository.delete(ride);
+    }
+
+    /**
+     * Send notification asynchronously without blocking the main operation.
+     * Uses userExternalId directly from Rental entity - no conversion needed!
+     *
+     * @param bikeRental       The bike rental
+     * @param notificationType Notification type
+     * @param title            Notification title
+     * @param body             Notification body
+     * @param data             Additional data
+     */
+    private void sendNotificationAsync(
+            BikeRental bikeRental,
+            String notificationType,
+            String title,
+            String body,
+            Map<String, Object> data
+    ) {
+        try {
+            String userExternalId = bikeRental.getRental().getUserExternalId();
+
+            SendNotificationRequest request = SendNotificationRequest.builder()
+                    .userExternalId(userExternalId)
+                    .notificationType(notificationType)
+                    .title(title)
+                    .body(body)
+                    .data(data)
+                    .priority("high")
+                    .build();
+
+            notificationClient.sendNotification(request);
+            log.debug("Sent notification for user: {}, type: {}", userExternalId, notificationType);
+        } catch (Exception e) {
+            // Don't fail the main operation if notification fails
+            log.error("Failed to send notification for bike rental: {}", bikeRental.getId(), e);
+        }
     }
 }
 

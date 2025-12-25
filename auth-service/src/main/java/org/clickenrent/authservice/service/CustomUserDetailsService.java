@@ -49,9 +49,13 @@ public class CustomUserDetailsService implements UserDetailsService {
         
         List<SimpleGrantedAuthority> authorities = loadUserAuthorities(user);
         
+        // Handle social login users who don't have passwords
+        // Use empty string as password for social login users (password is null)
+        String password = user.getPassword() != null ? user.getPassword() : "";
+        
         return new org.springframework.security.core.userdetails.User(
                 user.getUserName(),
-                user.getPassword(),
+                password,
                 user.getIsActive(),
                 true, // accountNonExpired
                 true, // credentialsNonExpired

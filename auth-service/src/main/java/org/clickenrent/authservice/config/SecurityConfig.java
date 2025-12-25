@@ -40,6 +40,8 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         // Public endpoints
                         .requestMatchers("/api/auth/**").permitAll()
+                        // Google OAuth endpoints (public)
+                        .requestMatchers("/api/auth/google/**").permitAll()
                         // Public invitation endpoints (validate token and complete registration)
                         .requestMatchers("/api/invitations/validate/**", "/api/invitations/complete").permitAll()
                         // Actuator endpoints (health checks)

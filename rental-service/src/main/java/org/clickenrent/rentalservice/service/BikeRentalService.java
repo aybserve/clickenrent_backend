@@ -2,6 +2,8 @@ package org.clickenrent.rentalservice.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.clickenrent.contracts.notification.SendNotificationRequest;
+import org.clickenrent.rentalservice.client.NotificationClient;
 import org.clickenrent.rentalservice.dto.*;
 import org.clickenrent.rentalservice.entity.*;
 import org.clickenrent.rentalservice.exception.PhotoAlreadyExistsException;
@@ -20,6 +22,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -37,6 +40,7 @@ public class BikeRentalService {
     private final CoordinatesService coordinatesService;
     private final AzureBlobStorageService azureBlobStorageService;
     private final PhotoValidationService photoValidationService;
+    private final NotificationClient notificationClient;
 
     @Transactional(readOnly = true)
     public Page<BikeRentalDTO> getAllBikeRentals(Pageable pageable) {
@@ -200,6 +204,19 @@ public class BikeRentalService {
         lock.setLastSeenAt(LocalDateTime.now());
         lockRepository.save(lock);
 
+        // Send notification
+        sendNotificationAsync(
+                bikeRental,
+                "BIKE_UNLOCKED",
+                "Bike Unlocked 🚴",
+                "Your bike has been unlocked. Have a great ride!",
+                Map.of(
+                        "bikeRentalId", bikeRentalId,
+                        "bikeId", bikeRental.getBike().getId(),
+                        "bikeExternalId", bikeRental.getBike().getExternalId() != null ? bikeRental.getBike().getExternalId() : ""
+                )
+        );
+
         // Return response
         return UnlockResponseDTO.builder()
                 .unlockToken(unlockToken)
@@ -256,6 +273,19 @@ public class BikeRentalService {
         String rentalStatus = bikeRental.getBikeRentalStatus() != null 
                 ? bikeRental.getBikeRentalStatus().getName() 
                 : "active";
+
+        // Send notification
+        sendNotificationAsync(
+                bikeRental,
+                "BIKE_LOCKED",
+                "Bike Locked 🔒",
+                "Your bike has been securely locked.",
+                Map.of(
+                        "bikeRentalId", bikeRentalId,
+                        "bikeId", bikeRental.getBike().getId(),
+                        "rentalStatus", rentalStatus
+                )
+        );
 
         return LockResponseDTO.builder()
                 .success(true)
@@ -376,5 +406,42 @@ public class BikeRentalService {
         return lowerStatus.equals("Completed") ||
                lowerStatus.equals("Finished") ||
                lowerStatus.equals("Ended");
+    }
+
+    /**
+     * Send notification asynchronously without blocking the main operation.
+     * Uses userExternalId directly from Rental entity - no conversion needed!
+     *
+     * @param bikeRental       The bike rental
+     * @param notificationType Notification type
+     * @param title            Notification title
+     * @param body             Notification body
+     * @param data             Additional data
+     */
+    private void sendNotificationAsync(
+            BikeRental bikeRental,
+            String notificationType,
+            String title,
+            String body,
+            Map<String, Object> data
+    ) {
+        try {
+            String userExternalId = bikeRental.getRental().getUserExternalId();
+
+            SendNotificationRequest request = SendNotificationRequest.builder()
+                    .userExternalId(userExternalId)
+                    .notificationType(notificationType)
+                    .title(title)
+                    .body(body)
+                    .data(data)
+                    .priority("high")
+                    .build();
+
+            notificationClient.sendNotification(request);
+            log.debug("Sent notification for user: {}, type: {}", userExternalId, notificationType);
+        } catch (Exception e) {
+            // Don't fail the main operation if notification fails
+            log.error("Failed to send notification for bike rental: {}", bikeRental.getId(), e);
+        }
     }
 }
