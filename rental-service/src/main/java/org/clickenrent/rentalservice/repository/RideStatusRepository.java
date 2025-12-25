@@ -17,3 +17,5 @@ public interface RideStatusRepository extends JpaRepository<RideStatus, Long> {
 
 
 
+
+

@@ -15,3 +15,5 @@ public interface BikeModelPartRepository extends JpaRepository<BikeModelPart, Lo
     List<BikeModelPart> findByPartId(Long partId);
 }
 
+
+

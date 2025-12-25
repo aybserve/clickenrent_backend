@@ -17,3 +17,5 @@ public interface RentalUnitRepository extends JpaRepository<RentalUnit, Long> {
 
 
 
+
+

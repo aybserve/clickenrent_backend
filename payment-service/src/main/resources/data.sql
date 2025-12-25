@@ -172,3 +172,5 @@ SELECT setval('b2b_revenue_share_payout_items_id_seq', (SELECT COALESCE(MAX(id),
 -- - B2B Subscription External IDs: Referenced from rental-service (b2b-subscription-ext-XXXXX)
 -- =====================================================================================================================
 
+
+

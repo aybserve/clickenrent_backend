@@ -15,3 +15,5 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     boolean existsByExternalId(String externalId);
 }
 
+
+

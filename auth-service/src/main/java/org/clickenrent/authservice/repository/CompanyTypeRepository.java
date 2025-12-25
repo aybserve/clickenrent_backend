@@ -17,3 +17,5 @@ public interface CompanyTypeRepository extends JpaRepository<CompanyType, Long> 
 
 
 
+
+

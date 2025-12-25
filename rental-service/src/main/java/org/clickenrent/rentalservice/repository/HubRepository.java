@@ -20,3 +20,5 @@ public interface HubRepository extends JpaRepository<Hub, Long> {
 
 
 
+
+

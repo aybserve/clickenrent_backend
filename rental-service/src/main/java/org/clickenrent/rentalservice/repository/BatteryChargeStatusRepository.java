@@ -17,3 +17,5 @@ public interface BatteryChargeStatusRepository extends JpaRepository<BatteryChar
 
 
 
+
+
