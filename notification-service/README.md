@@ -387,7 +387,7 @@ notificationClient.sendNotification(SendNotificationRequest.builder()
 
 ### Benefits
 
-The service now uses the official Expo Server SDK (v1.1.0) which provides:
+The service now uses the official Expo Server SDK for Java (v3.1.6) from [hlspablo/expo-server-sdk-java](https://github.com/hlspablo/expo-server-sdk-java) which provides:
 
 - ✅ Automatic message chunking (max 100 per request)
 - ✅ Built-in retry logic
@@ -399,15 +399,16 @@ The service now uses the official Expo Server SDK (v1.1.0) which provides:
 ### Batch Sending
 
 ```java
-List<ExpoPushMessage> messages = buildMessages(notifications);
-List<ExpoPushTicket> tickets = expoPushService.sendBatch(messages);
+import com.niamedtech.expo.exposerversdk.request.PushNotification;
+import com.niamedtech.expo.exposerversdk.response.TicketResponse;
 
-// Check receipts later
-List<String> receiptIds = tickets.stream()
-    .map(ExpoPushTicket::getId)
-    .collect(Collectors.toList());
-    
-List<ExpoPushReceipt> receipts = expoPushService.getReceipts(receiptIds);
+List<PushNotification> messages = buildMessages(notifications);
+List<TicketResponse.Ticket> tickets = expoPushService.sendBatch(messages);
+
+// Tickets contain the receipt IDs for tracking delivery
+for (TicketResponse.Ticket ticket : tickets) {
+    log.info("Notification sent with ID: {}, Status: {}", ticket.getId(), ticket.getStatus());
+}
 ```
 
 ## Error Handling

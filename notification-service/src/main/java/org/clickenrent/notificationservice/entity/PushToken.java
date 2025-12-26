@@ -46,9 +46,9 @@ public class PushToken extends BaseAuditEntity {
     @Column(name = "expo_push_token", unique = true, nullable = false, length = 255)
     private String expoPushToken;
 
-    @Size(max = 20, message = "Device type must not exceed 20 characters")
-    @Column(name = "device_type", length = 20)
-    private String deviceType;
+    @Size(max = 20, message = "Platform must not exceed 20 characters")
+    @Column(name = "platform", length = 20)
+    private String platform;
 
     @Size(max = 100, message = "Device name must not exceed 100 characters")
     @Column(name = "device_name", length = 100)

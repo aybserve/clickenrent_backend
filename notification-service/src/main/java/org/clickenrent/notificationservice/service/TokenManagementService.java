@@ -53,6 +53,7 @@ public class TokenManagementService {
             // Update existing token for this device
             token = existingByDeviceId.get();
             token.setExpoPushToken(request.getExpoPushToken());
+            token.setPlatform(request.getPlatform());
             token.setDeviceName(request.getDeviceName());
             token.setDeviceModel(request.getDeviceModel());
             token.setOsVersion(request.getOsVersion());
@@ -69,6 +70,7 @@ public class TokenManagementService {
                 // Update the existing token with new device info
                 token = existingByToken.get();
                 token.setUserExternalId(userExternalId);
+                token.setPlatform(request.getPlatform());
                 token.setDeviceId(request.getDeviceId());
                 token.setDeviceName(request.getDeviceName());
                 token.setDeviceModel(request.getDeviceModel());
@@ -83,6 +85,7 @@ public class TokenManagementService {
                 token = PushToken.builder()
                         .userExternalId(userExternalId)
                         .expoPushToken(request.getExpoPushToken())
+                        .platform(request.getPlatform())
                         .deviceId(request.getDeviceId())
                         .deviceName(request.getDeviceName())
                         .deviceModel(request.getDeviceModel())

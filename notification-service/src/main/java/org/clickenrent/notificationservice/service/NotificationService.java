@@ -1,7 +1,7 @@
 package org.clickenrent.notificationservice.service;
 
-import io.github.jav.exposerversdk.ExpoPushTicket;
-import io.github.jav.exposerversdk.Status;
+import com.niamedtech.expo.exposerversdk.response.Status;
+import com.niamedtech.expo.exposerversdk.response.TicketResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.clickenrent.contracts.notification.SendNotificationRequest;
@@ -72,7 +72,7 @@ public class NotificationService {
 
         for (PushToken token : activeTokens) {
             try {
-                ExpoPushTicket ticket = expoPushService.sendNotification(
+                TicketResponse.Ticket ticket = expoPushService.sendNotification(
                         token.getExpoPushToken(),
                         request.getTitle(),
                         request.getBody(),
@@ -90,8 +90,8 @@ public class NotificationService {
                             token.getExpoPushToken(), ticket.getMessage());
                     errorMessage = ticket.getMessage();
 
-                    // Handle specific errors
-                    if (ticket.getDetails() != null && "DeviceNotRegistered".equals(ticket.getDetails().getError())) {
+                    // Handle specific errors - check if details contain DeviceNotRegistered
+                    if (ticket.getMessage() != null && ticket.getMessage().contains("DeviceNotRegistered")) {
                         log.info("Deactivating invalid token: {}", token.getExpoPushToken());
                         tokenManagementService.deactivateToken(token.getExpoPushToken());
                     }

@@ -73,9 +73,9 @@
 
         <!-- Expo Server SDK for push notifications -->
         <dependency>
-            <groupId>io.github.jav.exposerversdk</groupId>
-            <artifactId>expo-server-sdk</artifactId>
-            <version>1.1.0</version>
+            <groupId>io.github.hlspablo</groupId>
+            <artifactId>expo-server-sdk-java</artifactId>
+            <version>3.1.6</version>
         </dependency>
 
         <!-- Shared contracts for cross-service communication -->
