@@ -52,6 +52,15 @@ public class NotificationPreferenceService {
         if (request.getRentalUpdatesEnabled() != null) {
             preference.setRentalUpdatesEnabled(request.getRentalUpdatesEnabled());
         }
+        if (request.getRentalStartEnabled() != null) {
+            preference.setRentalStartEnabled(request.getRentalStartEnabled());
+        }
+        if (request.getRentalEndRemindersEnabled() != null) {
+            preference.setRentalEndRemindersEnabled(request.getRentalEndRemindersEnabled());
+        }
+        if (request.getRentalCompletionEnabled() != null) {
+            preference.setRentalCompletionEnabled(request.getRentalCompletionEnabled());
+        }
         if (request.getPaymentUpdatesEnabled() != null) {
             preference.setPaymentUpdatesEnabled(request.getPaymentUpdatesEnabled());
         }
@@ -79,12 +88,51 @@ public class NotificationPreferenceService {
         NotificationPreference preference = NotificationPreference.builder()
                 .userExternalId(userExternalId)
                 .rentalUpdatesEnabled(true)
+                .rentalStartEnabled(true)
+                .rentalEndRemindersEnabled(true)
+                .rentalCompletionEnabled(true)
                 .paymentUpdatesEnabled(true)
                 .supportMessagesEnabled(true)
                 .marketingEnabled(false)
                 .isDeleted(false)
                 .build();
         return preferenceRepository.save(preference);
+    }
+
+    /**
+     * Check if rental start notifications should be sent.
+     *
+     * @param userExternalId User external ID
+     * @return true if enabled
+     */
+    public boolean shouldSendRentalStart(String userExternalId) {
+        return preferenceRepository.findByUserExternalId(userExternalId)
+                .map(p -> p.getRentalUpdatesEnabled() && p.getRentalStartEnabled())
+                .orElse(true);
+    }
+
+    /**
+     * Check if rental end reminder notifications should be sent.
+     *
+     * @param userExternalId User external ID
+     * @return true if enabled
+     */
+    public boolean shouldSendRentalEndReminder(String userExternalId) {
+        return preferenceRepository.findByUserExternalId(userExternalId)
+                .map(p -> p.getRentalUpdatesEnabled() && p.getRentalEndRemindersEnabled())
+                .orElse(true);
+    }
+
+    /**
+     * Check if rental completion notifications should be sent.
+     *
+     * @param userExternalId User external ID
+     * @return true if enabled
+     */
+    public boolean shouldSendRentalCompletion(String userExternalId) {
+        return preferenceRepository.findByUserExternalId(userExternalId)
+                .map(p -> p.getRentalUpdatesEnabled() && p.getRentalCompletionEnabled())
+                .orElse(true);
     }
 
     /**
@@ -95,6 +143,9 @@ public class NotificationPreferenceService {
                 .id(preference.getId())
                 .userExternalId(preference.getUserExternalId())
                 .rentalUpdatesEnabled(preference.getRentalUpdatesEnabled())
+                .rentalStartEnabled(preference.getRentalStartEnabled())
+                .rentalEndRemindersEnabled(preference.getRentalEndRemindersEnabled())
+                .rentalCompletionEnabled(preference.getRentalCompletionEnabled())
                 .paymentUpdatesEnabled(preference.getPaymentUpdatesEnabled())
                 .supportMessagesEnabled(preference.getSupportMessagesEnabled())
                 .marketingEnabled(preference.getMarketingEnabled())

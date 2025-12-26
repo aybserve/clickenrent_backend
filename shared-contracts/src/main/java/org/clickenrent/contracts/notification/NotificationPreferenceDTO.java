@@ -18,10 +18,20 @@ public class NotificationPreferenceDTO {
 
     private Long id;
     private String userExternalId;
+    
+    // Master rental toggle
     private Boolean rentalUpdatesEnabled;
+    
+    // Granular rental preferences
+    private Boolean rentalStartEnabled;
+    private Boolean rentalEndRemindersEnabled;
+    private Boolean rentalCompletionEnabled;
+    
+    // Other preferences
     private Boolean paymentUpdatesEnabled;
     private Boolean supportMessagesEnabled;
     private Boolean marketingEnabled;
+    
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 }

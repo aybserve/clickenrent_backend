@@ -21,11 +21,34 @@ public class RegisterTokenRequest {
     /**
      * Device platform: "ios" or "android"
      */
-    private String deviceType;
+    @NotBlank(message = "Platform is required")
+    private String platform;
+
+    /**
+     * Unique device identifier (UUID)
+     */
+    @NotBlank(message = "Device ID is required")
+    private String deviceId;
+
+    /**
+     * Mobile app version (e.g., "1.0.0")
+     */
+    @NotBlank(message = "App version is required")
+    private String appVersion;
 
     /**
      * Human-readable device name (e.g., "iPhone 14 Pro", "Samsung Galaxy S23")
      */
     private String deviceName;
+
+    /**
+     * Device model (e.g., "iPhone 15 Pro", "Pixel 8")
+     */
+    private String deviceModel;
+
+    /**
+     * OS version (e.g., "iOS 17.2", "Android 14")
+     */
+    private String osVersion;
 }
 

@@ -39,5 +39,20 @@ public interface NotificationLogRepository extends JpaRepository<NotificationLog
      * Count notifications by user and status
      */
     long countByUserExternalIdAndStatus(String userExternalId, String status);
+
+    /**
+     * Count unread notifications for a user
+     */
+    long countByUserExternalIdAndIsReadFalse(String userExternalId);
+
+    /**
+     * Find all unread notifications for a user
+     */
+    List<NotificationLog> findByUserExternalIdAndIsReadFalse(String userExternalId);
+
+    /**
+     * Find notification logs with receipt IDs for status checking
+     */
+    List<NotificationLog> findByStatusAndExpoReceiptIdNotNull(String status);
 }
 

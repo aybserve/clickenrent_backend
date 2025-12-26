@@ -3,6 +3,7 @@ package org.clickenrent.notificationservice.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.clickenrent.contracts.notification.RegisterTokenRequest;
+import org.clickenrent.contracts.notification.RegisterTokenResponse;
 import org.clickenrent.notificationservice.entity.PushToken;
 import org.clickenrent.notificationservice.repository.PushTokenRepository;
 import org.springframework.stereotype.Service;
@@ -25,13 +26,15 @@ public class TokenManagementService {
 
     /**
      * Register or update a push token for a user.
+     * Handles device ID tracking to prevent duplicate tokens for the same device.
      *
      * @param userExternalId  User external ID
      * @param request Token registration request
+     * @return RegisterTokenResponse with registration details
      */
     @Transactional
-    public void registerToken(String userExternalId, RegisterTokenRequest request) {
-        log.info("Registering push token for user: {}", userExternalId);
+    public RegisterTokenResponse registerToken(String userExternalId, RegisterTokenRequest request) {
+        log.info("Registering push token for user: {}, deviceId: {}", userExternalId, request.getDeviceId());
 
         // Validate token format
         if (!expoPushService.isValidExpoToken(request.getExpoPushToken())) {
@@ -39,34 +42,69 @@ public class TokenManagementService {
             throw new IllegalArgumentException("Invalid Expo Push Token format");
         }
 
-        // Check if token already exists
-        Optional<PushToken> existingToken = pushTokenRepository.findByExpoPushToken(request.getExpoPushToken());
+        LocalDateTime now = LocalDateTime.now();
+        PushToken token;
 
-        if (existingToken.isPresent()) {
-            // Update existing token
-            PushToken token = existingToken.get();
-            token.setUserExternalId(userExternalId);
-            token.setDeviceType(request.getDeviceType());
+        // Check if device already has a token registered
+        Optional<PushToken> existingByDeviceId = pushTokenRepository.findByUserExternalIdAndDeviceId(
+                userExternalId, request.getDeviceId());
+
+        if (existingByDeviceId.isPresent()) {
+            // Update existing token for this device
+            token = existingByDeviceId.get();
+            token.setExpoPushToken(request.getExpoPushToken());
             token.setDeviceName(request.getDeviceName());
+            token.setDeviceModel(request.getDeviceModel());
+            token.setOsVersion(request.getOsVersion());
+            token.setAppVersion(request.getAppVersion());
             token.setIsActive(true);
-            token.setLastUsedAt(LocalDateTime.now());
+            token.setLastUsedAt(now);
             pushTokenRepository.save(token);
-            log.info("Updated existing push token for user: {}", userExternalId);
+            log.info("Updated existing token for deviceId: {} (user: {})", request.getDeviceId(), userExternalId);
         } else {
-            // Create new token
-            PushToken token = PushToken.builder()
-                    .userExternalId(userExternalId)
-                    .expoPushToken(request.getExpoPushToken())
-                    .deviceType(request.getDeviceType())
-                    .deviceName(request.getDeviceName())
-                    .isActive(true)
-                    .createdAt(LocalDateTime.now())
-                    .lastUsedAt(LocalDateTime.now())
-                    .isDeleted(false)
-                    .build();
-            pushTokenRepository.save(token);
-            log.info("Created new push token for user: {}", userExternalId);
+            // Check if this expo token exists for a different device
+            Optional<PushToken> existingByToken = pushTokenRepository.findByExpoPushToken(request.getExpoPushToken());
+            
+            if (existingByToken.isPresent()) {
+                // Update the existing token with new device info
+                token = existingByToken.get();
+                token.setUserExternalId(userExternalId);
+                token.setDeviceId(request.getDeviceId());
+                token.setDeviceName(request.getDeviceName());
+                token.setDeviceModel(request.getDeviceModel());
+                token.setOsVersion(request.getOsVersion());
+                token.setAppVersion(request.getAppVersion());
+                token.setIsActive(true);
+                token.setLastUsedAt(now);
+                pushTokenRepository.save(token);
+                log.info("Updated existing token with new device info for user: {}", userExternalId);
+            } else {
+                // Create new token
+                token = PushToken.builder()
+                        .userExternalId(userExternalId)
+                        .expoPushToken(request.getExpoPushToken())
+                        .deviceId(request.getDeviceId())
+                        .deviceName(request.getDeviceName())
+                        .deviceModel(request.getDeviceModel())
+                        .osVersion(request.getOsVersion())
+                        .appVersion(request.getAppVersion())
+                        .isActive(true)
+                        .createdAt(now)
+                        .lastUsedAt(now)
+                        .isDeleted(false)
+                        .build();
+                pushTokenRepository.save(token);
+                log.info("Created new push token for user: {}, deviceId: {}", userExternalId, request.getDeviceId());
+            }
         }
+
+        // Build response
+        return RegisterTokenResponse.builder()
+                .success(true)
+                .notificationId(String.valueOf(token.getId()))
+                .deviceId(token.getDeviceId())
+                .registeredAt(token.getCreatedAt())
+                .build();
     }
 
     /**

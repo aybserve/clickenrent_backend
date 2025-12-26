@@ -54,6 +54,22 @@ public class PushToken extends BaseAuditEntity {
     @Column(name = "device_name", length = 100)
     private String deviceName;
 
+    @Size(max = 255, message = "Device ID must not exceed 255 characters")
+    @Column(name = "device_id", length = 255)
+    private String deviceId;
+
+    @Size(max = 50, message = "App version must not exceed 50 characters")
+    @Column(name = "app_version", length = 50)
+    private String appVersion;
+
+    @Size(max = 100, message = "Device model must not exceed 100 characters")
+    @Column(name = "device_model", length = 100)
+    private String deviceModel;
+
+    @Size(max = 50, message = "OS version must not exceed 50 characters")
+    @Column(name = "os_version", length = 50)
+    private String osVersion;
+
     @Builder.Default
     @Column(name = "is_active", nullable = false)
     private Boolean isActive = true;

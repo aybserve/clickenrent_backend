@@ -1,28 +1,27 @@
 package org.clickenrent.notificationservice.service;
 
+import io.github.jav.exposerversdk.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.clickenrent.notificationservice.dto.expo.ExpoPushMessage;
-import org.clickenrent.notificationservice.dto.expo.ExpoPushResponse;
 import org.springframework.stereotype.Service;
-import org.springframework.web.reactive.function.client.WebClient;
-import reactor.core.publisher.Mono;
 
-import java.time.Duration;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
+import java.util.stream.Collectors;
 
 /**
- * Service for communicating with Expo Push Notification API.
+ * Service for communicating with Expo Push Notification API using official Expo Server SDK.
  */
 @Service
 @RequiredArgsConstructor
 @Slf4j
 public class ExpoPushService {
 
-    private final WebClient expoWebClient;
+    private final PushClient pushClient;
 
-    private static final int TIMEOUT_SECONDS = 10;
     private static final int MAX_BATCH_SIZE = 100;
 
     /**
@@ -33,9 +32,9 @@ public class ExpoPushService {
      * @param body     Notification body
      * @param data     Additional data payload
      * @param priority Priority: "default" or "high"
-     * @return ExpoPushResponse with receipt ID or error
+     * @return ExpoPushTicket with receipt ID or error
      */
-    public ExpoPushResponse sendNotification(
+    public ExpoPushTicket sendNotification(
             String token,
             String title,
             String body,
@@ -44,79 +43,159 @@ public class ExpoPushService {
     ) {
         log.debug("Sending notification to token: {} with title: {}", token, title);
 
-        ExpoPushMessage message = ExpoPushMessage.builder()
-                .to(token)
-                .title(title)
-                .body(body)
-                .data(data)
-                .priority(priority)
-                .sound("default")
-                .build();
+        if (!PushClient.isExponentPushToken(token)) {
+            log.error("Invalid Expo push token format: {}", token);
+            ExpoPushTicket errorTicket = new ExpoPushTicket();
+            errorTicket.setStatus(Status.ERROR);
+            errorTicket.setMessage("Invalid Expo push token format");
+            return errorTicket;
+        }
+
+        ExpoPushMessage message = new ExpoPushMessage();
+        message.setTo(token);
+        message.setTitle(title);
+        message.setBody(body);
+        message.setData(data);
+        message.setPriority(priority != null && priority.equals("high") ? Priority.HIGH : Priority.DEFAULT);
+        message.setSound("default");
 
         try {
-            // Expo API expects an array of messages
             List<ExpoPushMessage> messages = List.of(message);
+            List<List<ExpoPushMessage>> chunks = pushClient.chunkPushNotifications(messages);
 
-            List<ExpoPushResponse> responses = expoWebClient.post()
-                    .bodyValue(messages)
-                    .retrieve()
-                    .bodyToMono(new org.springframework.core.ParameterizedTypeReference<List<ExpoPushResponse>>() {})
-                    .timeout(Duration.ofSeconds(TIMEOUT_SECONDS))
-                    .block();
+            List<CompletableFuture<List<ExpoPushTicket>>> messageRepliesFutures = new ArrayList<>();
 
-            if (responses != null && !responses.isEmpty()) {
-                ExpoPushResponse response = responses.get(0);
-                log.debug("Expo API response: {}", response);
-                return response;
+            for (List<ExpoPushMessage> chunk : chunks) {
+                messageRepliesFutures.add(pushClient.sendPushNotificationsAsync(chunk));
+            }
+
+            // Wait for all responses
+            List<ExpoPushTicket> allTickets = new ArrayList<>();
+            for (CompletableFuture<List<ExpoPushTicket>> future : messageRepliesFutures) {
+                allTickets.addAll(future.get());
+            }
+
+            if (!allTickets.isEmpty()) {
+                ExpoPushTicket ticket = allTickets.get(0);
+                log.debug("Expo API response: status={}, id={}", ticket.getStatus(), ticket.getId());
+                return ticket;
             } else {
                 log.error("Empty response from Expo API");
-                return ExpoPushResponse.builder()
-                        .status("error")
-                        .message("Empty response from Expo API")
-                        .build();
+                ExpoPushTicket errorTicket = new ExpoPushTicket();
+                errorTicket.setStatus(Status.ERROR);
+                errorTicket.setMessage("Empty response from Expo API");
+                return errorTicket;
             }
-        } catch (Exception e) {
+        } catch (InterruptedException | ExecutionException e) {
             log.error("Error sending notification to Expo API", e);
-            return ExpoPushResponse.builder()
-                    .status("error")
-                    .message("Exception: " + e.getMessage())
-                    .build();
+            ExpoPushTicket errorTicket = new ExpoPushTicket();
+            errorTicket.setStatus(Status.ERROR);
+            errorTicket.setMessage("Exception: " + e.getMessage());
+            return errorTicket;
         }
     }
 
     /**
      * Send multiple push notifications in a batch.
      * Expo supports up to 100 messages per request.
+     * The SDK automatically chunks messages into appropriate batch sizes.
      *
      * @param messages List of ExpoPushMessage objects
-     * @return List of ExpoPushResponse objects
+     * @return List of ExpoPushTicket objects
      */
-    public List<ExpoPushResponse> sendBatch(List<ExpoPushMessage> messages) {
+    public List<ExpoPushTicket> sendBatch(List<ExpoPushMessage> messages) {
         if (messages.isEmpty()) {
             log.warn("Attempted to send empty batch of notifications");
             return List.of();
         }
 
-        if (messages.size() > MAX_BATCH_SIZE) {
-            log.warn("Batch size {} exceeds maximum {}, splitting into multiple requests",
-                    messages.size(), MAX_BATCH_SIZE);
-            // In production, you might want to split this into multiple batches
-        }
-
         log.info("Sending batch of {} notifications", messages.size());
 
         try {
-            List<ExpoPushResponse> responses = expoWebClient.post()
-                    .bodyValue(messages)
-                    .retrieve()
-                    .bodyToMono(new org.springframework.core.ParameterizedTypeReference<List<ExpoPushResponse>>() {})
-                    .timeout(Duration.ofSeconds(TIMEOUT_SECONDS))
-                    .block();
+            // Chunk messages into batches of 100 (handled by SDK)
+            List<List<ExpoPushMessage>> chunks = pushClient.chunkPushNotifications(messages);
+            log.debug("Split {} messages into {} chunks", messages.size(), chunks.size());
 
-            log.info("Successfully sent batch of {} notifications", messages.size());
-            return responses != null ? responses : List.of();
-        } catch (Exception e) {
+            List<CompletableFuture<List<ExpoPushTicket>>> messageRepliesFutures = new ArrayList<>();
+
+            for (List<ExpoPushMessage> chunk : chunks) {
+                messageRepliesFutures.add(pushClient.sendPushNotificationsAsync(chunk));
+            }
+
+            // Wait for all responses
+            List<ExpoPushTicket> allTickets = new ArrayList<>();
+            for (CompletableFuture<List<ExpoPushTicket>> future : messageRepliesFutures) {
+                allTickets.addAll(future.get());
+            }
+
+            log.info("Successfully sent batch of {} notifications, received {} tickets",
+                    messages.size(), allTickets.size());
+            return allTickets;
+        } catch (InterruptedException | ExecutionException e) {
             log.error("Error sending batch notifications to Expo API", e);
+            return List.of();
+        }
+    }
+
+    /**
+     * Build an ExpoPushMessage from individual components.
+     *
+     * @param token    Expo Push Token
+     * @param title    Notification title
+     * @param body     Notification body
+     * @param data     Additional data payload
+     * @param priority Priority: "default" or "high"
+     * @return ExpoPushMessage ready to send
+     */
+    public ExpoPushMessage buildMessage(
+            String token,
+            String title,
+            String body,
+            Map<String, Object> data,
+            String priority
+    ) {
+        ExpoPushMessage message = new ExpoPushMessage();
+        message.setTo(token);
+        message.setTitle(title);
+        message.setBody(body);
+        message.setData(data);
+        message.setPriority(priority != null && priority.equals("high") ? Priority.HIGH : Priority.DEFAULT);
+        message.setSound("default");
+        return message;
+    }
+
+    /**
+     * Check delivery receipts for sent notifications.
+     *
+     * @param receiptIds List of receipt IDs from ExpoPushTicket
+     * @return List of ExpoPushReceipt objects with delivery status
+     */
+    public List<ExpoPushReceipt> getReceipts(List<String> receiptIds) {
+        if (receiptIds.isEmpty()) {
+            return List.of();
+        }
+
+        try {
+            log.debug("Checking receipts for {} notifications", receiptIds.size());
+            List<CompletableFuture<List<ExpoPushReceipt>>> receiptFutures = new ArrayList<>();
+
+            // Chunk receipt IDs (SDK handles this)
+            List<List<String>> chunks = pushClient.chunkPushNotificationReceiptIds(receiptIds);
+
+            for (List<String> chunk : chunks) {
+                receiptFutures.add(pushClient.getPushNotificationReceiptsAsync(chunk));
+            }
+
+            // Wait for all receipts
+            List<ExpoPushReceipt> allReceipts = new ArrayList<>();
+            for (CompletableFuture<List<ExpoPushReceipt>> future : receiptFutures) {
+                allReceipts.addAll(future.get());
+            }
+
+            log.debug("Retrieved {} receipts", allReceipts.size());
+            return allReceipts;
+        } catch (InterruptedException | ExecutionException e) {
+            log.error("Error retrieving receipts from Expo API", e);
             return List.of();
         }
     }
@@ -131,8 +210,6 @@ public class ExpoPushService {
         if (token == null || token.isEmpty()) {
             return false;
         }
-        // Expo tokens start with "ExponentPushToken[" and end with "]"
-        return token.startsWith("ExponentPushToken[") && token.endsWith("]");
+        return PushClient.isExponentPushToken(token);
     }
 }
-

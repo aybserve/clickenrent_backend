@@ -32,5 +32,10 @@ public interface PushTokenRepository extends JpaRepository<PushToken, Long> {
      * Check if a token exists
      */
     boolean existsByExpoPushToken(String expoPushToken);
+
+    /**
+     * Find a token by user external ID and device ID
+     */
+    Optional<PushToken> findByUserExternalIdAndDeviceId(String userExternalId, String deviceId);
 }
 

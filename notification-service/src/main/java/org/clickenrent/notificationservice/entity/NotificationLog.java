@@ -72,6 +72,17 @@ public class NotificationLog extends BaseAuditEntity {
     @Column(name = "error_message", columnDefinition = "TEXT")
     private String errorMessage;
 
+    @Builder.Default
+    @Column(name = "is_read", nullable = false)
+    private Boolean isRead = false;
+
+    @Column(name = "read_at")
+    private LocalDateTime readAt;
+
+    @Size(max = 20, message = "Delivery status must not exceed 20 characters")
+    @Column(name = "delivery_status", length = 20)
+    private String deliveryStatus;
+
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 

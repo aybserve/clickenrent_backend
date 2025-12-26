@@ -1,10 +1,11 @@
 package org.clickenrent.notificationservice.service;
 
+import io.github.jav.exposerversdk.ExpoPushTicket;
+import io.github.jav.exposerversdk.Status;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.clickenrent.contracts.notification.SendNotificationRequest;
 import org.clickenrent.contracts.notification.SendNotificationResponse;
-import org.clickenrent.notificationservice.dto.expo.ExpoPushResponse;
 import org.clickenrent.notificationservice.entity.NotificationLog;
 import org.clickenrent.notificationservice.entity.NotificationPreference;
 import org.clickenrent.notificationservice.entity.PushToken;
@@ -15,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Service for sending notifications with business logic.
@@ -70,7 +72,7 @@ public class NotificationService {
 
         for (PushToken token : activeTokens) {
             try {
-                ExpoPushResponse response = expoPushService.sendNotification(
+                ExpoPushTicket ticket = expoPushService.sendNotification(
                         token.getExpoPushToken(),
                         request.getTitle(),
                         request.getBody(),
@@ -78,18 +80,18 @@ public class NotificationService {
                         request.getPriority()
                 );
 
-                if ("ok".equals(response.getStatus())) {
+                if (ticket.getStatus() == Status.OK) {
                     log.info("Successfully sent notification to token: {}", token.getExpoPushToken());
-                    receiptId = response.getId();
+                    receiptId = ticket.getId();
                     overallSuccess = true;
                     token.setLastUsedAt(LocalDateTime.now());
                 } else {
                     log.error("Failed to send notification to token: {}, error: {}",
-                            token.getExpoPushToken(), response.getMessage());
-                    errorMessage = response.getMessage();
+                            token.getExpoPushToken(), ticket.getMessage());
+                    errorMessage = ticket.getMessage();
 
                     // Handle specific errors
-                    if (response.getDetails() != null && "DeviceNotRegistered".equals(response.getDetails().getError())) {
+                    if (ticket.getDetails() != null && "DeviceNotRegistered".equals(ticket.getDetails().getError())) {
                         log.info("Deactivating invalid token: {}", token.getExpoPushToken());
                         tokenManagementService.deactivateToken(token.getExpoPushToken());
                     }
@@ -113,6 +115,7 @@ public class NotificationService {
 
     /**
      * Check if a notification should be sent based on user preferences.
+     * Uses granular preference checking for rental notifications.
      *
      * @param userExternalId   User external ID
      * @param notificationType Notification type
@@ -122,18 +125,104 @@ public class NotificationService {
         NotificationPreference preference = preferenceRepository.findByUserExternalId(userExternalId)
                 .orElse(createDefaultPreferences(userExternalId));
 
-        // Map notification types to preference settings
+        // Map notification types to preference settings with granular rental controls
         return switch (notificationType) {
-            case "BIKE_UNLOCKED", "BIKE_LOCKED", "RIDE_STARTED", "RIDE_ENDED" ->
-                    preference.getRentalUpdatesEnabled();
+            // Rental start notifications
+            case "BIKE_UNLOCKED", "RIDE_STARTED" ->
+                    preference.getRentalUpdatesEnabled() && preference.getRentalStartEnabled();
+            
+            // Rental end reminders
+            case "RENTAL_ENDING_SOON", "RENTAL_ENDING_10MIN", "RENTAL_ENDING_30MIN" ->
+                    preference.getRentalUpdatesEnabled() && preference.getRentalEndRemindersEnabled();
+            
+            // Rental completion notifications
+            case "BIKE_LOCKED", "RIDE_ENDED" ->
+                    preference.getRentalUpdatesEnabled() && preference.getRentalCompletionEnabled();
+            
+            // Payment notifications
             case "PAYMENT_SUCCESS", "PAYMENT_FAILED", "REFUND_PROCESSED" ->
                     preference.getPaymentUpdatesEnabled();
+            
+            // Support notifications
             case "SUPPORT_MESSAGE", "TICKET_RESOLVED" ->
                     preference.getSupportMessagesEnabled();
+            
+            // Marketing notifications
             case "MARKETING", "PROMOTION" ->
                     preference.getMarketingEnabled();
+            
             default -> true; // Send by default for unknown types
         };
+    }
+
+    /**
+     * Mark a notification as read.
+     *
+     * @param notificationId Notification ID
+     * @param userExternalId User external ID (for security check)
+     * @return true if successfully marked as read
+     */
+    @Transactional
+    public boolean markAsRead(String notificationId, String userExternalId) {
+        try {
+            Long id = Long.parseLong(notificationId);
+            Optional<NotificationLog> logOptional = notificationLogRepository.findById(id);
+            
+            if (logOptional.isEmpty()) {
+                log.warn("Notification not found: {}", notificationId);
+                return false;
+            }
+            
+            NotificationLog notificationLog = logOptional.get();
+            
+            // Security check: ensure notification belongs to user
+            if (!notificationLog.getUserExternalId().equals(userExternalId)) {
+                log.warn("User {} attempted to mark notification {} as read, but it belongs to user {}",
+                        userExternalId, notificationId, notificationLog.getUserExternalId());
+                return false;
+            }
+            
+            // Mark as read
+            if (!notificationLog.getIsRead()) {
+                notificationLog.setIsRead(true);
+                notificationLog.setReadAt(LocalDateTime.now());
+                notificationLogRepository.save(notificationLog);
+                log.info("Marked notification {} as read for user {}", notificationId, userExternalId);
+            }
+            
+            return true;
+        } catch (NumberFormatException e) {
+            log.error("Invalid notification ID format: {}", notificationId);
+            return false;
+        }
+    }
+
+    /**
+     * Mark all notifications as read for a user.
+     *
+     * @param userExternalId User external ID
+     * @return Number of notifications marked as read
+     */
+    @Transactional
+    public int markAllAsRead(String userExternalId) {
+        List<NotificationLog> unreadNotifications = notificationLogRepository
+                .findByUserExternalIdAndIsReadFalse(userExternalId);
+        
+        LocalDateTime now = LocalDateTime.now();
+        int count = 0;
+        
+        for (NotificationLog notification : unreadNotifications) {
+            notification.setIsRead(true);
+            notification.setReadAt(now);
+            count++;
+        }
+        
+        if (count > 0) {
+            notificationLogRepository.saveAll(unreadNotifications);
+            log.info("Marked {} notifications as read for user {}", count, userExternalId);
+        }
+        
+        return count;
     }
 
     /**
@@ -146,6 +235,9 @@ public class NotificationService {
         NotificationPreference preference = NotificationPreference.builder()
                 .userExternalId(userExternalId)
                 .rentalUpdatesEnabled(true)
+                .rentalStartEnabled(true)
+                .rentalEndRemindersEnabled(true)
+                .rentalCompletionEnabled(true)
                 .paymentUpdatesEnabled(true)
                 .supportMessagesEnabled(true)
                 .marketingEnabled(false)

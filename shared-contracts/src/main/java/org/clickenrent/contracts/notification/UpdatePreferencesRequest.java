@@ -15,9 +15,24 @@ import lombok.NoArgsConstructor;
 public class UpdatePreferencesRequest {
 
     /**
-     * Enable/disable rental-related notifications (bike unlock, lock, ride start/end)
+     * Enable/disable all rental-related notifications (master toggle)
      */
     private Boolean rentalUpdatesEnabled;
+
+    /**
+     * Enable/disable rental start notifications (bike unlock, ride start)
+     */
+    private Boolean rentalStartEnabled;
+
+    /**
+     * Enable/disable rental end reminders (rental ending soon)
+     */
+    private Boolean rentalEndRemindersEnabled;
+
+    /**
+     * Enable/disable rental completion notifications (bike lock, ride end)
+     */
+    private Boolean rentalCompletionEnabled;
 
     /**
      * Enable/disable payment-related notifications

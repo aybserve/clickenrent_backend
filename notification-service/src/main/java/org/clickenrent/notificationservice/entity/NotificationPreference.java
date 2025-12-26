@@ -44,6 +44,18 @@ public class NotificationPreference extends BaseAuditEntity {
     private Boolean rentalUpdatesEnabled = true;
 
     @Builder.Default
+    @Column(name = "rental_start_enabled", nullable = false)
+    private Boolean rentalStartEnabled = true;
+
+    @Builder.Default
+    @Column(name = "rental_end_reminders_enabled", nullable = false)
+    private Boolean rentalEndRemindersEnabled = true;
+
+    @Builder.Default
+    @Column(name = "rental_completion_enabled", nullable = false)
+    private Boolean rentalCompletionEnabled = true;
+
+    @Builder.Default
     @Column(name = "payment_updates_enabled", nullable = false)
     private Boolean paymentUpdatesEnabled = true;
 
