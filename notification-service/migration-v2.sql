@@ -101,3 +101,4 @@ ORDER BY tablename, indexname;
 -- Migration complete
 SELECT 'Migration v2 completed successfully!' AS status;
 
+

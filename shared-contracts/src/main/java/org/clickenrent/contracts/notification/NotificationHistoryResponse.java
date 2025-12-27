@@ -47,3 +47,4 @@ public class NotificationHistoryResponse {
     private Integer totalPages;
 }
 
+

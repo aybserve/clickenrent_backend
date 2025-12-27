@@ -1384,3 +1384,4 @@ SELECT setval('rental_plan_id_seq', (SELECT COALESCE(MAX(id), 1) FROM rental_pla
 
 
 
+

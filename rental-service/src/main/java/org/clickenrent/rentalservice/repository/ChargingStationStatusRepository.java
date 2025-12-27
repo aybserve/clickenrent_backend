@@ -19,3 +19,4 @@ public interface ChargingStationStatusRepository extends JpaRepository<ChargingS
 
 
 
+

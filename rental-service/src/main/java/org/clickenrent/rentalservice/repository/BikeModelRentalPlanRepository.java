@@ -22,3 +22,4 @@ public interface BikeModelRentalPlanRepository extends JpaRepository<BikeModelRe
 
 
 
+

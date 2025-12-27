@@ -25,3 +25,4 @@ ALTER TABLE ride DROP COLUMN coordinates_id;
 CREATE INDEX idx_ride_start_coordinates ON ride(start_coordinates_id);
 CREATE INDEX idx_ride_end_coordinates ON ride(end_coordinates_id);
 
+

@@ -30,3 +30,4 @@ public class FavoriteLocationDTO {
     private Integer timesUsed;
 }
 
+

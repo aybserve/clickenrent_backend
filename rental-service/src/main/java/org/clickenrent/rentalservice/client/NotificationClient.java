@@ -22,3 +22,4 @@ public interface NotificationClient {
     SendNotificationResponse sendNotification(@RequestBody SendNotificationRequest request);
 }
 
+

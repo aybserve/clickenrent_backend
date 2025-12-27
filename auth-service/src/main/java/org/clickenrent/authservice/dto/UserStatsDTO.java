@@ -34,3 +34,4 @@ public class UserStatsDTO {
     private FavoriteLocationDTO favoriteLocation;
 }
 
+

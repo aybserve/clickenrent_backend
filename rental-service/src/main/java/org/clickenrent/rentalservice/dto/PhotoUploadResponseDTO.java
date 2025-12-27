@@ -18,3 +18,4 @@ public class PhotoUploadResponseDTO {
     private String message;
 }
 
+

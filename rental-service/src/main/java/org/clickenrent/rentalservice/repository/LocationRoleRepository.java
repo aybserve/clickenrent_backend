@@ -19,3 +19,4 @@ public interface LocationRoleRepository extends JpaRepository<LocationRole, Long
 
 
 
+

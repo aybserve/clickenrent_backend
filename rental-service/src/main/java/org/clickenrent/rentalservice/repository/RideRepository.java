@@ -22,3 +22,4 @@ public interface RideRepository extends JpaRepository<Ride, Long> {
 
 
 
+
