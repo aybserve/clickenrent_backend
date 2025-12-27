@@ -1,0 +1,293 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:15-alpine
+    container_name: clickenrent-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_MULTIPLE_DATABASES: clickenrent-auth,clickenrent-rental,clickenrent-payment,clickenrent-notification,clickenrent-support
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+      - ./docker/init-databases.sh:/docker-entrypoint-initdb.d/init-databases.sh
+      - ./auth-service/auth-service.sql:/docker-entrypoint-initdb.d/01-auth-service.sql
+      - ./rental-service/rental-service.sql:/docker-entrypoint-initdb.d/02-rental-service.sql
+      - ./payment-service/payment-service.sql:/docker-entrypoint-initdb.d/03-payment-service.sql
+      - ./notification-service/notification-service.sql:/docker-entrypoint-initdb.d/04-notification-service.sql
+      - ./support-service/support-service.sql:/docker-entrypoint-initdb.d/05-support-service.sql
+    ports:
+      - "5432:5432"
+    networks:
+      - backend-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Eureka Server - Service Discovery
+  eureka-server:
+    build:
+      context: .
+      dockerfile: eureka-server/Dockerfile
+    container_name: clickenrent-eureka
+    restart: unless-stopped
+    ports:
+      - "8761:8761"
+    networks:
+      - backend-network
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8761/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
+  # Auth Service
+  auth-service:
+    build:
+      context: .
+      dockerfile: auth-service/Dockerfile
+    container_name: clickenrent-auth
+    restart: unless-stopped
+    environment:
+      # Database
+      DB_URL: jdbc:postgresql://postgres:5432/clickenrent-auth
+      DB_USERNAME: ${POSTGRES_USER:-postgres}
+      DB_PASSWORD: ${POSTGRES_PASSWORD}
+      # JPA
+      JPA_DDL_AUTO: ${JPA_DDL_AUTO:-validate}
+      JPA_SHOW_SQL: ${JPA_SHOW_SQL:-false}
+      SQL_INIT_MODE: ${SQL_INIT_MODE:-never}
+      # JWT
+      JWT_SECRET: ${JWT_SECRET}
+      JWT_EXPIRATION: ${JWT_EXPIRATION:-86400000}
+      JWT_REFRESH_EXPIRATION: ${JWT_REFRESH_EXPIRATION:-604800000}
+      # Eureka
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka/
+      # OAuth2
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
+      GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET}
+    ports:
+      - "8081:8081"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      eureka-server:
+        condition: service_healthy
+    networks:
+      - backend-network
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8081/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 90s
+
+  # Rental Service
+  rental-service:
+    build:
+      context: .
+      dockerfile: rental-service/Dockerfile
+    container_name: clickenrent-rental
+    restart: unless-stopped
+    environment:
+      # Database
+      DB_URL: jdbc:postgresql://postgres:5432/clickenrent-rental
+      DB_USERNAME: ${POSTGRES_USER:-postgres}
+      DB_PASSWORD: ${POSTGRES_PASSWORD}
+      # JPA
+      JPA_DDL_AUTO: ${JPA_DDL_AUTO:-validate}
+      JPA_SHOW_SQL: ${JPA_SHOW_SQL:-false}
+      SQL_INIT_MODE: ${SQL_INIT_MODE:-never}
+      # JWT
+      JWT_SECRET: ${JWT_SECRET}
+      JWT_EXPIRATION: ${JWT_EXPIRATION:-86400000}
+      JWT_REFRESH_EXPIRATION: ${JWT_REFRESH_EXPIRATION:-604800000}
+      # Eureka
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka/
+      # Lock Encryption
+      LOCK_ENCRYPTION_KEY: ${LOCK_ENCRYPTION_KEY}
+      # Azure Storage
+      AZURE_STORAGE_CONNECTION_STRING: ${AZURE_STORAGE_CONNECTION_STRING}
+      AZURE_STORAGE_CONTAINER_NAME: ${AZURE_STORAGE_CONTAINER_NAME:-bike-rental-photos}
+    ports:
+      - "8082:8082"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      eureka-server:
+        condition: service_healthy
+    networks:
+      - backend-network
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8082/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 90s
+
+  # Support Service
+  support-service:
+    build:
+      context: .
+      dockerfile: support-service/Dockerfile
+    container_name: clickenrent-support
+    restart: unless-stopped
+    environment:
+      # Database
+      DB_URL: jdbc:postgresql://postgres:5432/clickenrent-support
+      DB_USERNAME: ${POSTGRES_USER:-postgres}
+      DB_PASSWORD: ${POSTGRES_PASSWORD}
+      # JPA
+      JPA_DDL_AUTO: ${JPA_DDL_AUTO:-validate}
+      JPA_SHOW_SQL: ${JPA_SHOW_SQL:-false}
+      SQL_INIT_MODE: ${SQL_INIT_MODE:-never}
+      # JWT
+      JWT_SECRET: ${JWT_SECRET}
+      JWT_EXPIRATION: ${JWT_EXPIRATION:-86400000}
+      JWT_REFRESH_EXPIRATION: ${JWT_REFRESH_EXPIRATION:-604800000}
+      # Eureka
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka/
+    ports:
+      - "8083:8083"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      eureka-server:
+        condition: service_healthy
+    networks:
+      - backend-network
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8083/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 90s
+
+  # Payment Service
+  payment-service:
+    build:
+      context: .
+      dockerfile: payment-service/Dockerfile
+    container_name: clickenrent-payment
+    restart: unless-stopped
+    environment:
+      # Database
+      DB_URL: jdbc:postgresql://postgres:5432/clickenrent-payment
+      DB_USERNAME: ${POSTGRES_USER:-postgres}
+      DB_PASSWORD: ${POSTGRES_PASSWORD}
+      # JPA
+      JPA_DDL_AUTO: ${JPA_DDL_AUTO:-validate}
+      JPA_SHOW_SQL: ${JPA_SHOW_SQL:-false}
+      SQL_INIT_MODE: ${SQL_INIT_MODE:-never}
+      # JWT
+      JWT_SECRET: ${JWT_SECRET}
+      JWT_EXPIRATION: ${JWT_EXPIRATION:-86400000}
+      JWT_REFRESH_EXPIRATION: ${JWT_REFRESH_EXPIRATION:-604800000}
+      # Eureka
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka/
+      # Stripe
+      STRIPE_API_KEY: ${STRIPE_API_KEY}
+      STRIPE_WEBHOOK_SECRET: ${STRIPE_WEBHOOK_SECRET}
+    ports:
+      - "8084:8084"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      eureka-server:
+        condition: service_healthy
+    networks:
+      - backend-network
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8084/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 90s
+
+  # Notification Service
+  notification-service:
+    build:
+      context: .
+      dockerfile: notification-service/Dockerfile
+    container_name: clickenrent-notification
+    restart: unless-stopped
+    environment:
+      # Database
+      DB_URL: jdbc:postgresql://postgres:5432/clickenrent-notification
+      DB_USERNAME: ${POSTGRES_USER:-postgres}
+      DB_PASSWORD: ${POSTGRES_PASSWORD}
+      # JPA
+      JPA_DDL_AUTO: ${JPA_DDL_AUTO:-validate}
+      JPA_SHOW_SQL: ${JPA_SHOW_SQL:-false}
+      SQL_INIT_MODE: ${SQL_INIT_MODE:-never}
+      # JWT
+      JWT_SECRET: ${JWT_SECRET}
+      JWT_EXPIRATION: ${JWT_EXPIRATION:-86400000}
+      JWT_REFRESH_EXPIRATION: ${JWT_REFRESH_EXPIRATION:-604800000}
+      # Eureka
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka/
+    ports:
+      - "8085:8085"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      eureka-server:
+        condition: service_healthy
+    networks:
+      - backend-network
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8085/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 90s
+
+  # Gateway - API Gateway
+  gateway:
+    build:
+      context: .
+      dockerfile: gateway/Dockerfile
+    container_name: clickenrent-gateway
+    restart: unless-stopped
+    environment:
+      # JWT
+      JWT_SECRET: ${JWT_SECRET}
+      # Eureka
+      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka/
+    ports:
+      - "8080:8080"
+    depends_on:
+      eureka-server:
+        condition: service_healthy
+      auth-service:
+        condition: service_healthy
+      rental-service:
+        condition: service_healthy
+      support-service:
+        condition: service_healthy
+      payment-service:
+        condition: service_healthy
+      notification-service:
+        condition: service_healthy
+    networks:
+      - backend-network
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:8080/actuator/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 120s
+
+networks:
+  backend-network:
+    driver: bridge
+
+volumes:
+  postgres-data:
+    driver: local
+
