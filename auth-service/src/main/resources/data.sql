@@ -113,6 +113,8 @@ CREATE TABLE users (
     is_email_verified           BOOLEAN DEFAULT false,
     is_accepted_terms           BOOLEAN DEFAULT false,
     is_accepted_privacy_policy  BOOLEAN DEFAULT false,
+    provider_id                 VARCHAR(50),
+    provider_user_id            VARCHAR(255),
     
     -- Audit fields
     date_created                TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -306,6 +308,7 @@ CREATE TABLE user_address (
 CREATE INDEX idx_user_external_id ON users(external_id);
 CREATE INDEX idx_user_email ON users(email);
 CREATE INDEX idx_user_username ON users(user_name);
+CREATE INDEX idx_user_provider ON users(provider_id, provider_user_id);
 
 -- Company table indexes
 CREATE INDEX idx_company_external_id ON company(external_id);
