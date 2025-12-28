@@ -1,40 +1,12 @@
-# Multi-stage build for Notification Service
-
-# Stage 1: Build
-FROM maven:3.9-eclipse-temurin-17-alpine AS build
-WORKDIR /app
-
-# Copy parent pom and shared-contracts first for better layer caching
-COPY pom.xml ./
-COPY shared-contracts/pom.xml ./shared-contracts/
-COPY shared-contracts/src ./shared-contracts/src
-
-# Copy notification-service
-COPY notification-service/pom.xml ./notification-service/
-COPY notification-service/src ./notification-service/src
-
-# Build shared-contracts first, then notification-service
-RUN mvn -pl shared-contracts clean install -DskipTests
-RUN mvn -pl notification-service clean package -DskipTests
-
-# Stage 2: Runtime
+# Simple Dockerfile - Copy pre-built JAR and run
 FROM eclipse-temurin:17-jre-alpine
 WORKDIR /app
 
-# Add non-root user for security
-RUN addgroup -S spring && adduser -S spring -G spring
-USER spring:spring
-
-# Copy JAR from build stage
-COPY --from=build /app/notification-service/target/*.jar app.jar
+# Copy the JAR file (must be built first!)
+COPY target/*.jar app.jar
 
 # Expose port
-EXPOSE 8084
+EXPOSE 8085
 
-# Health check
-HEALTHCHECK --interval=30s --timeout=10s --start-period=90s --retries=5 \
-  CMD wget --no-verbose --tries=1 --spider http://localhost:8084/actuator/health || exit 1
-
-# Run application
+# Run the application
 ENTRYPOINT ["java", "-jar", "app.jar"]
-

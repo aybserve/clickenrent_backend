@@ -20,3 +20,4 @@ public interface B2BSubscriptionOrderStatusRepository extends JpaRepository<B2BS
 
 
 
+

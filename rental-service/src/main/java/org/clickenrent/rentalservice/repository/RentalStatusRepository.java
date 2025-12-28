@@ -20,3 +20,4 @@ public interface RentalStatusRepository extends JpaRepository<RentalStatus, Long
 
 
 
+

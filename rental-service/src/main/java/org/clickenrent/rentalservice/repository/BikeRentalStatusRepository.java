@@ -20,3 +20,4 @@ public interface BikeRentalStatusRepository extends JpaRepository<BikeRentalStat
 
 
 
+

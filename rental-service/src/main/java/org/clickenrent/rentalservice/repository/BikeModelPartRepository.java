@@ -18,3 +18,4 @@ public interface BikeModelPartRepository extends JpaRepository<BikeModelPart, Lo
 
 
 
+

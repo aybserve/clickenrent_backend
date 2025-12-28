@@ -21,3 +21,4 @@ public interface RentalPlanRepository extends JpaRepository<RentalPlan, Long> {
 
 
 
+

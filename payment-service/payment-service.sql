@@ -590,3 +590,4 @@ SELECT setval('payout_fin_transactions_id_seq', (SELECT COALESCE(MAX(id), 1) FRO
 
 
 
+

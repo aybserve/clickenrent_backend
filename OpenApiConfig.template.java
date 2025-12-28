@@ -34,8 +34,8 @@ public class OpenApiConfig {
                         .version("1.0.0")
                         .contact(new Contact()
                                 .name("Vitaliy Shvetsov")
-                                .email("support@clickenrent.com")
-                                .url("https://clickenrent.com"))
+                                .email("vitaliy@clickenrent.com")
+                                .url("https://clickenrent.nl"))
                         .license(new License()
                                 .name("Apache 2.0")
                                 .url("https://www.apache.org/licenses/LICENSE-2.0.html")))
@@ -51,6 +51,7 @@ public class OpenApiConfig {
                         .addList(SECURITY_SCHEME_NAME));
     }
 }
+
 
 
 
