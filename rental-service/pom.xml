@@ -124,6 +124,18 @@
             <artifactId>azure-storage-blob</artifactId>
             <version>12.25.0</version>
         </dependency>
+
+        <!-- WebFlux for WebClient (Mapbox API calls) -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-webflux</artifactId>
+        </dependency>
+
+        <!-- Hibernate Spatial for PostGIS support -->
+        <dependency>
+            <groupId>org.hibernate.orm</groupId>
+            <artifactId>hibernate-spatial</artifactId>
+        </dependency>
     </dependencies>
 
     <build>

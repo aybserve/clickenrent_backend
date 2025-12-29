@@ -22,12 +22,10 @@ public class LocationDTO {
     private String name;
     private String address;
     private String description;
+    private String companyExternalId;
     private Boolean isPublic;
     private String directions;
     private Long coordinatesId;
-
-    // Cross-service externalId reference
-    private String companyExternalId;
 
     // Audit fields
     private LocalDateTime dateCreated;
@@ -35,7 +33,3 @@ public class LocationDTO {
     private String createdBy;
     private String lastModifiedBy;
 }
-
-
-
-

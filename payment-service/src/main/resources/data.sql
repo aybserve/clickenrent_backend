@@ -83,7 +83,16 @@ INSERT INTO user_payment_profiles (id, external_id, user_external_id, stripe_cus
 ON CONFLICT (id) DO NOTHING;
 
 -- ---------------------------------------------------------------------------------------------------------------------
--- 2.2 FINANCIAL TRANSACTIONS (Sample data)
+-- 2.2 USER PAYMENT METHODS (Sample data)
+-- ---------------------------------------------------------------------------------------------------------------------
+INSERT INTO user_payment_methods (id, external_id, user_payment_profile_id, payment_method_id, stripe_payment_method_id, is_default, is_active, created_at, updated_at, created_by, last_modified_by) VALUES
+(1, '550e8400-e29b-41d4-a716-446655440051', 1, 1, 'pm_test_card1', true, true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system'),
+(2, '550e8400-e29b-41d4-a716-446655440052', 1, 1, 'pm_test_card2', false, true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system'),
+(3, '550e8400-e29b-41d4-a716-446655440053', 2, 1, 'pm_test_card3', true, true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system')
+ON CONFLICT (id) DO NOTHING;
+
+-- ---------------------------------------------------------------------------------------------------------------------
+-- 2.3 FINANCIAL TRANSACTIONS (Sample data)
 -- ---------------------------------------------------------------------------------------------------------------------
 INSERT INTO financial_transactions (id, external_id, payer_external_id, recipient_external_id, amount, currency_id, date_time, payment_method_id, payment_status_id, service_provider_id, stripe_payment_intent_id, stripe_charge_id, date_created, last_date_modified, created_by, last_modified_by, is_deleted) VALUES
 (1, '550e8400-e29b-41d4-a716-446655440201', 'usr-ext-00007', 'company-ext-001', 25.00, 2, CURRENT_TIMESTAMP, 1, 2, 1, 'pi_test_001', 'ch_test_001', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
@@ -93,7 +102,7 @@ INSERT INTO financial_transactions (id, external_id, payer_external_id, recipien
 ON CONFLICT (id) DO NOTHING;
 
 -- ---------------------------------------------------------------------------------------------------------------------
--- 2.3 RENTAL FIN TRANSACTIONS (Sample data - references rentals from rental-service)
+-- 2.4 RENTAL FIN TRANSACTIONS (Sample data - references rentals from rental-service)
 -- ---------------------------------------------------------------------------------------------------------------------
 INSERT INTO rental_fin_transactions (id, external_id, rental_external_id, bike_rental_external_id, financial_transaction_id, date_created, last_date_modified, created_by, last_modified_by, is_deleted) VALUES
 (1, '550e8400-e29b-41d4-a716-446655440301', 'rental-ext-00101', 'bike-rental-ext-00101', 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
@@ -102,21 +111,21 @@ INSERT INTO rental_fin_transactions (id, external_id, rental_external_id, bike_r
 ON CONFLICT (id) DO NOTHING;
 
 -- ---------------------------------------------------------------------------------------------------------------------
--- 2.4 B2B SALE FIN TRANSACTIONS (Sample data - references B2B sales from rental-service)
+-- 2.5 B2B SALE FIN TRANSACTIONS (Sample data - references B2B sales from rental-service)
 -- ---------------------------------------------------------------------------------------------------------------------
 INSERT INTO b2b_sale_fin_transactions (id, external_id, b2b_sale_external_id, financial_transaction_id, date_created, last_date_modified, created_by, last_modified_by, is_deleted) VALUES
 (1, '550e8400-e29b-41d4-a716-446655440401', 'b2b-sale-ext-001', 4, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false)
 ON CONFLICT (id) DO NOTHING;
 
 -- ---------------------------------------------------------------------------------------------------------------------
--- 2.5 B2B SUBSCRIPTION FIN TRANSACTIONS (Sample data)
+-- 2.6 B2B SUBSCRIPTION FIN TRANSACTIONS (Sample data)
 -- ---------------------------------------------------------------------------------------------------------------------
 INSERT INTO b2b_subscription_fin_transactions (id, external_id, b2b_subscription_external_id, financial_transaction_id, date_created, last_date_modified, created_by, last_modified_by, is_deleted) VALUES
 (1, '550e8400-e29b-41d4-a716-446655440501', 'b2b-subscription-ext-001', 4, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false)
 ON CONFLICT (id) DO NOTHING;
 
 -- ---------------------------------------------------------------------------------------------------------------------
--- 2.6 B2B REVENUE SHARE PAYOUTS (Sample data - references companies from auth-service)
+-- 2.7 B2B REVENUE SHARE PAYOUTS (Sample data - references companies from auth-service)
 -- ---------------------------------------------------------------------------------------------------------------------
 INSERT INTO b2b_revenue_share_payouts (id, external_id, company_external_id, payment_status_id, due_date, total_amount, paid_amount, remaining_amount, date_created, last_date_modified, created_by, last_modified_by, is_deleted) VALUES
 (1, '550e8400-e29b-41d4-a716-446655440601', 'company-ext-001', 1, CURRENT_DATE + INTERVAL '30 days', 500.00, 0.00, 500.00, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
@@ -124,7 +133,7 @@ INSERT INTO b2b_revenue_share_payouts (id, external_id, company_external_id, pay
 ON CONFLICT (id) DO NOTHING;
 
 -- ---------------------------------------------------------------------------------------------------------------------
--- 2.7 B2B REVENUE SHARE PAYOUT ITEMS (Sample data)
+-- 2.8 B2B REVENUE SHARE PAYOUT ITEMS (Sample data)
 -- ---------------------------------------------------------------------------------------------------------------------
 INSERT INTO b2b_revenue_share_payout_items (id, external_id, b2b_revenue_share_payout_id, bike_rental_external_id, amount, date_created, last_date_modified, created_by, last_modified_by, is_deleted) VALUES
 (1, '550e8400-e29b-41d4-a716-446655440701', 1, 'bike-rental-ext-00101', 150.00, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
@@ -132,6 +141,13 @@ INSERT INTO b2b_revenue_share_payout_items (id, external_id, b2b_revenue_share_p
 (3, '550e8400-e29b-41d4-a716-446655440703', 1, 'bike-rental-ext-00103', 150.00, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
 (4, '550e8400-e29b-41d4-a716-446655440704', 2, 'bike-rental-ext-00104', 175.50, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
 (5, '550e8400-e29b-41d4-a716-446655440705', 2, 'bike-rental-ext-00105', 175.25, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false)
+ON CONFLICT (id) DO NOTHING;
+
+-- ---------------------------------------------------------------------------------------------------------------------
+-- 2.9 PAYOUT FIN TRANSACTIONS (Sample data - links payouts to financial transactions)
+-- ---------------------------------------------------------------------------------------------------------------------
+INSERT INTO payout_fin_transactions (id, external_id, b2b_revenue_share_payout_id, financial_transaction_id, created_at, updated_at, created_by, last_modified_by) VALUES
+(1, '550e8400-e29b-41d4-a716-446655440121', 2, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system')
 ON CONFLICT (id) DO NOTHING;
 
 -- =====================================================================================================================
@@ -145,12 +161,14 @@ SELECT setval('payment_methods_id_seq', (SELECT COALESCE(MAX(id), 1) FROM paymen
 SELECT setval('currencies_id_seq', (SELECT COALESCE(MAX(id), 1) FROM currencies));
 SELECT setval('service_providers_id_seq', (SELECT COALESCE(MAX(id), 1) FROM service_providers));
 SELECT setval('user_payment_profiles_id_seq', (SELECT COALESCE(MAX(id), 1) FROM user_payment_profiles));
+SELECT setval('user_payment_methods_id_seq', (SELECT COALESCE(MAX(id), 1) FROM user_payment_methods));
 SELECT setval('financial_transactions_id_seq', (SELECT COALESCE(MAX(id), 1) FROM financial_transactions));
 SELECT setval('rental_fin_transactions_id_seq', (SELECT COALESCE(MAX(id), 1) FROM rental_fin_transactions));
 SELECT setval('b2b_sale_fin_transactions_id_seq', (SELECT COALESCE(MAX(id), 1) FROM b2b_sale_fin_transactions));
 SELECT setval('b2b_subscription_fin_transactions_id_seq', (SELECT COALESCE(MAX(id), 1) FROM b2b_subscription_fin_transactions));
 SELECT setval('b2b_revenue_share_payouts_id_seq', (SELECT COALESCE(MAX(id), 1) FROM b2b_revenue_share_payouts));
 SELECT setval('b2b_revenue_share_payout_items_id_seq', (SELECT COALESCE(MAX(id), 1) FROM b2b_revenue_share_payout_items));
+SELECT setval('payout_fin_transactions_id_seq', (SELECT COALESCE(MAX(id), 1) FROM payout_fin_transactions));
 
 -- =====================================================================================================================
 -- END OF INITIALIZATION
@@ -159,9 +177,9 @@ SELECT setval('b2b_revenue_share_payout_items_id_seq', (SELECT COALESCE(MAX(id),
 -- 
 -- Summary:
 -- - Required lookup tables: payment_statuses (6), payment_methods (5), currencies (5), service_providers (3)
--- - Sample data: user_payment_profiles (3), financial_transactions (4), rental_fin_transactions (3)
--- - Sample data: b2b_sale_fin_transactions (1), b2b_subscription_fin_transactions (1)
--- - Sample data: b2b_revenue_share_payouts (2), b2b_revenue_share_payout_items (5)
+-- - Sample data: user_payment_profiles (3), user_payment_methods (3), financial_transactions (4)
+-- - Sample data: rental_fin_transactions (3), b2b_sale_fin_transactions (1), b2b_subscription_fin_transactions (1)
+-- - Sample data: b2b_revenue_share_payouts (2), b2b_revenue_share_payout_items (5), payout_fin_transactions (1)
 -- 
 -- Cross-Service References:
 -- - User External IDs: Referenced from auth-service (usr-ext-XXXXX)

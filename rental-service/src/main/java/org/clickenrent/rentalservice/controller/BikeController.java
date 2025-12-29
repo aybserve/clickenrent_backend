@@ -11,6 +11,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.clickenrent.rentalservice.dto.BikeDTO;
+import org.clickenrent.rentalservice.dto.NearbyBikesResponseDTO;
 import org.clickenrent.rentalservice.service.BikeService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -195,6 +196,43 @@ public class BikeController {
             @Parameter(description = "Bike ID", required = true) @PathVariable Long id) {
         bikeService.deleteBike(id);
         return ResponseEntity.noContent().build();
+    }
+
+    /**
+     * Find bikes nearby a given location.
+     * GET /api/bikes/nearby?lat=52.374&lng=4.9&radius=5&limit=50
+     */
+    @GetMapping("/nearby")
+    @PreAuthorize("isAuthenticated()")
+    @Operation(
+            summary = "Find nearby bikes",
+            description = "Returns bikes within a specified radius of a given location, sorted by distance"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Nearby bikes retrieved successfully",
+                    content = @Content(schema = @Schema(implementation = NearbyBikesResponseDTO.class))),
+            @ApiResponse(responseCode = "400", description = "Invalid parameters (coordinates or radius)"),
+            @ApiResponse(responseCode = "401", description = "Not authenticated")
+    })
+    public ResponseEntity<NearbyBikesResponseDTO> getNearbyBikes(
+            @Parameter(description = "Latitude of center point", required = true, example = "52.374")
+            @RequestParam("lat") Double latitude,
+            
+            @Parameter(description = "Longitude of center point", required = true, example = "4.9")
+            @RequestParam("lng") Double longitude,
+            
+            @Parameter(description = "Search radius in kilometers", required = true, example = "5")
+            @RequestParam("radius") Double radius,
+            
+            @Parameter(description = "Maximum number of results (default: 50, max: 200)", example = "50")
+            @RequestParam(value = "limit", required = false, defaultValue = "50") Integer limit,
+            
+            @Parameter(description = "Filter by bike status ID (optional)")
+            @RequestParam(value = "status", required = false) Long bikeStatusId) {
+        
+        NearbyBikesResponseDTO response = bikeService.findNearbyBikes(
+                latitude, longitude, radius, limit, bikeStatusId);
+        return ResponseEntity.ok(response);
     }
 }
 

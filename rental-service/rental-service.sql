@@ -226,10 +226,18 @@ CREATE TABLE charging_station_status (
 -- Table: coordinates
 -- Description: GPS coordinates shared by bikes, locations, hubs, rides, and charging stations
 -- ---------------------------------------------------------------------------------------------------------------------
+-- Enable PostGIS extension for spatial operations
+CREATE EXTENSION IF NOT EXISTS postgis;
+
+-- ---------------------------------------------------------------------------------------------------------------------
 CREATE TABLE coordinates (
     id                      BIGSERIAL PRIMARY KEY,
     latitude                DECIMAL(10, 8) NOT NULL,
     longitude               DECIMAL(11, 8) NOT NULL,
+    
+    -- PostGIS geometry column for spatial indexing and queries
+    -- Using geography type for accurate distance calculations on Earth's surface
+    geom                    GEOGRAPHY(POINT, 4326),
     
     -- Audit fields
     date_created            TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -238,6 +246,25 @@ CREATE TABLE coordinates (
     last_modified_by        VARCHAR(255),
     is_deleted              BOOLEAN NOT NULL DEFAULT false
 );
+
+-- Create spatial index on geometry column for fast proximity queries
+CREATE INDEX idx_coordinates_geom ON coordinates USING GIST (geom);
+
+-- Trigger function to automatically update geometry from latitude/longitude
+CREATE OR REPLACE FUNCTION update_coordinates_geom()
+RETURNS TRIGGER AS $$
+BEGIN
+    NEW.geom = ST_SetSRID(ST_MakePoint(NEW.longitude, NEW.latitude), 4326)::geography;
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+-- Trigger to auto-update geometry on insert or update
+CREATE TRIGGER trg_coordinates_geom_update
+    BEFORE INSERT OR UPDATE OF latitude, longitude
+    ON coordinates
+    FOR EACH ROW
+    EXECUTE FUNCTION update_coordinates_geom();
 
 -- =====================================================================================================================
 -- SECTION 3: LOCATIONS & HUBS
