@@ -222,8 +222,7 @@ public class BikeService {
         String name = (String) result[i++];
         Long bikeStatusId = result[i++] != null ? ((Number) result[i - 1]).longValue() : null;
         String bikeStatusName = (String) result[i++];
-        Long batteryChargeStatusId = result[i++] != null ? ((Number) result[i - 1]).longValue() : null;
-        String batteryChargeStatusName = (String) result[i++];
+        Integer batteryLevel = result[i++] != null ? ((Number) result[i - 1]).intValue() : null;
         BigDecimal latitude = (BigDecimal) result[i++];
         BigDecimal longitude = (BigDecimal) result[i++];
         Double distanceMeters = result[i++] != null ? ((Number) result[i - 1]).doubleValue() : null;
@@ -241,8 +240,7 @@ public class BikeService {
                 .name(name)
                 .bikeStatus(bikeStatusId)
                 .bikeStatusName(bikeStatusName)
-                .batteryChargeStatus(batteryChargeStatusId)
-                .batteryChargeStatusName(batteryChargeStatusName)
+                .batteryLevel(batteryLevel)
                 .location(GeoPointDTO.builder()
                         .latitude(latitude)
                         .longitude(longitude)

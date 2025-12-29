@@ -15,7 +15,7 @@ import lombok.NoArgsConstructor;
 public class LockResponseDTO {
 
     private Boolean success;
-    private String rentalStatus;
+    private String bikeRentalStatus;
 }
 
 

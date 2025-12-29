@@ -35,8 +35,7 @@ public interface BikeRepository extends JpaRepository<Bike, Long> {
             b.name,
             bs.id as bike_status_id,
             bs.name as bike_status_name,
-            bcs.id as battery_level_id,
-            bcs.name as battery_level_name,
+            b.battery_level,
             c.latitude,
             c.longitude,
             ST_Distance(c.geom, ST_SetSRID(ST_MakePoint(:longitude, :latitude), 4326)::geography) as distance_meters,
@@ -45,7 +44,6 @@ public interface BikeRepository extends JpaRepository<Bike, Long> {
         FROM product b
         INNER JOIN coordinates c ON b.coordinates_id = c.id
         LEFT JOIN bike_status bs ON b.bike_status_id = bs.id
-        LEFT JOIN battery_charge_status bcs ON b.battery_charge_status_id = bcs.id
         LEFT JOIN hub h ON b.hub_id = h.id
         WHERE b.dtype = 'BIKE'
             AND b.is_deleted = false
@@ -83,8 +81,7 @@ public interface BikeRepository extends JpaRepository<Bike, Long> {
             b.name,
             bs.id as bike_status_id,
             bs.name as bike_status_name,
-            bcs.id as battery_level_id,
-            bcs.name as battery_level_name,
+            b.battery_level,
             c.latitude,
             c.longitude,
             ST_Distance(c.geom, ST_SetSRID(ST_MakePoint(:longitude, :latitude), 4326)::geography) as distance_meters,
@@ -93,7 +90,6 @@ public interface BikeRepository extends JpaRepository<Bike, Long> {
         FROM product b
         INNER JOIN coordinates c ON b.coordinates_id = c.id
         LEFT JOIN bike_status bs ON b.bike_status_id = bs.id
-        LEFT JOIN battery_charge_status bcs ON b.battery_charge_status_id = bcs.id
         LEFT JOIN hub h ON b.hub_id = h.id
         WHERE b.dtype = 'BIKE'
             AND b.is_deleted = false

@@ -76,8 +76,7 @@ public class NotificationService {
                         token.getExpoPushToken(),
                         request.getTitle(),
                         request.getBody(),
-                        request.getData(),
-                        request.getPriority()
+                        request.getData()
                 );
 
                 if (ticket.getStatus() == Status.OK) {

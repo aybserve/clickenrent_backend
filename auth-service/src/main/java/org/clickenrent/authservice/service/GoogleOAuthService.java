@@ -1,5 +1,8 @@
 package org.clickenrent.authservice.service;
 
+import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
+import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
+import io.micrometer.core.instrument.Timer;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.clickenrent.authservice.dto.AuthResponse;
@@ -9,6 +12,7 @@ import org.clickenrent.authservice.entity.User;
 import org.clickenrent.authservice.entity.UserGlobalRole;
 import org.clickenrent.authservice.exception.UnauthorizedException;
 import org.clickenrent.authservice.mapper.UserMapper;
+import org.clickenrent.authservice.metrics.OAuthMetrics;
 import org.clickenrent.authservice.repository.GlobalRoleRepository;
 import org.clickenrent.authservice.repository.UserGlobalRoleRepository;
 import org.clickenrent.authservice.repository.UserRepository;
@@ -23,6 +27,8 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
+import java.io.IOException;
+import java.security.GeneralSecurityException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -44,7 +50,11 @@ public class GoogleOAuthService {
     private final JwtService jwtService;
     private final CustomUserDetailsService userDetailsService;
     private final UserMapper userMapper;
+    private final GoogleIdTokenVerifier googleIdTokenVerifier;
+    private final OAuthMetrics oAuthMetrics;
     private final RestTemplate restTemplate = new RestTemplate();
+    
+    private static final String PROVIDER_GOOGLE = "google";
     
     @Value("${oauth2.google.client-id}")
     private String clientId;
@@ -58,6 +68,9 @@ public class GoogleOAuthService {
     @Value("${oauth2.google.user-info-uri}")
     private String userInfoUri;
     
+    @Value("${oauth2.google.verify-id-token:true}")
+    private boolean verifyIdToken;
+    
     /**
      * Authenticate user with Google OAuth authorization code.
      * 
@@ -69,20 +82,30 @@ public class GoogleOAuthService {
     public AuthResponse authenticateWithGoogle(String code, String redirectUri) {
         log.info("Starting Google OAuth authentication");
         
+        // Start metrics timer
+        Timer.Sample timerSample = oAuthMetrics.startFlowTimer(PROVIDER_GOOGLE);
+        oAuthMetrics.recordLoginAttempt(PROVIDER_GOOGLE);
+        
         try {
             // Step 1: Exchange authorization code for access token
             GoogleTokenResponse tokenResponse = exchangeCodeForToken(code, redirectUri);
             log.debug("Successfully exchanged code for access token");
             
-            // Step 2: Fetch user info from Google
+            // Step 2: Verify ID token if available and verification is enabled
+            if (verifyIdToken && tokenResponse.getIdToken() != null) {
+                verifyGoogleIdToken(tokenResponse.getIdToken());
+                log.debug("Successfully verified Google ID token");
+            }
+            
+            // Step 3: Fetch user info from Google
             GoogleUserInfo googleUserInfo = fetchGoogleUserInfo(tokenResponse.getAccessToken());
             log.info("Fetched Google user info for email: {}", googleUserInfo.getEmail());
             
-            // Step 3: Find or create user
+            // Step 4: Find or create user
             User user = findOrCreateUser(googleUserInfo);
             log.info("User processed: ID={}, email={}", user.getId(), user.getEmail());
             
-            // Step 4: Generate JWT tokens
+            // Step 5: Generate JWT tokens
             UserDetails userDetails = userDetailsService.loadUserByUsername(user.getUserName());
             
             Map<String, Object> claims = new HashMap<>();
@@ -97,6 +120,10 @@ public class GoogleOAuthService {
             
             log.info("Successfully generated JWT tokens for user: {}", user.getEmail());
             
+            // Record success metrics
+            oAuthMetrics.recordLoginSuccess(PROVIDER_GOOGLE);
+            oAuthMetrics.recordFlowDuration(timerSample, PROVIDER_GOOGLE, "success");
+            
             return new AuthResponse(
                     accessToken,
                     refreshToken,
@@ -106,10 +133,54 @@ public class GoogleOAuthService {
             
         } catch (HttpClientErrorException e) {
             log.error("HTTP error during Google OAuth: {}", e.getMessage());
+            oAuthMetrics.recordLoginFailure(PROVIDER_GOOGLE, "http_error");
+            oAuthMetrics.recordFlowDuration(timerSample, PROVIDER_GOOGLE, "failure");
             throw new UnauthorizedException("Failed to authenticate with Google: " + e.getMessage());
+        } catch (UnauthorizedException e) {
+            log.error("Unauthorized during Google OAuth: {}", e.getMessage());
+            oAuthMetrics.recordLoginFailure(PROVIDER_GOOGLE, "unauthorized");
+            oAuthMetrics.recordFlowDuration(timerSample, PROVIDER_GOOGLE, "failure");
+            throw e;
         } catch (Exception e) {
             log.error("Error during Google OAuth authentication", e);
+            oAuthMetrics.recordLoginFailure(PROVIDER_GOOGLE, "internal_error");
+            oAuthMetrics.recordFlowDuration(timerSample, PROVIDER_GOOGLE, "failure");
             throw new UnauthorizedException("Failed to authenticate with Google: " + e.getMessage());
+        }
+    }
+    
+    /**
+     * Verify Google ID token.
+     * This adds an extra security layer by verifying the token signature and claims.
+     * 
+     * @param idTokenString ID token from Google
+     * @throws UnauthorizedException if token is invalid
+     */
+    private void verifyGoogleIdToken(String idTokenString) {
+        try {
+            GoogleIdToken idToken = googleIdTokenVerifier.verify(idTokenString);
+            if (idToken == null) {
+                throw new UnauthorizedException("Invalid Google ID token");
+            }
+            
+            GoogleIdToken.Payload payload = idToken.getPayload();
+            
+            // Verify the token is for our client
+            if (!clientId.equals(payload.getAudience())) {
+                throw new UnauthorizedException("ID token audience mismatch");
+            }
+            
+            // Verify the issuer
+            String issuer = payload.getIssuer();
+            if (!("accounts.google.com".equals(issuer) || "https://accounts.google.com".equals(issuer))) {
+                throw new UnauthorizedException("Invalid ID token issuer");
+            }
+            
+            log.debug("ID token verified for user: {}", payload.getEmail());
+            
+        } catch (GeneralSecurityException | IOException e) {
+            log.error("Failed to verify Google ID token", e);
+            throw new UnauthorizedException("Failed to verify Google ID token: " + e.getMessage());
         }
     }
     
@@ -175,7 +246,7 @@ public class GoogleOAuthService {
      * Implements auto-linking: if user with same email exists, link Google account.
      */
     private User findOrCreateUser(GoogleUserInfo googleUserInfo) {
-        String providerId = "google";
+        String providerId = PROVIDER_GOOGLE;
         String providerUserId = googleUserInfo.getId();
         String email = googleUserInfo.getEmail();
         
@@ -190,6 +261,17 @@ public class GoogleOAuthService {
         Optional<User> existingByEmail = userRepository.findByEmail(email);
         if (existingByEmail.isPresent()) {
             User user = existingByEmail.get();
+            
+            // Security: Only auto-link if the existing user's email is verified
+            // This prevents account takeover if someone registered with an unverified email
+            if (!user.getIsEmailVerified()) {
+                log.warn("Attempted to auto-link Google account to unverified email: {}", email);
+                throw new UnauthorizedException(
+                    "An account with this email already exists but is not verified. " +
+                    "Please verify your email first or contact support."
+                );
+            }
+            
             log.info("Auto-linking Google account to existing user: {}", email);
             
             // Link Google account to existing user
@@ -201,6 +283,9 @@ public class GoogleOAuthService {
             if (user.getImageUrl() == null && googleUserInfo.getPicture() != null) {
                 user.setImageUrl(googleUserInfo.getPicture());
             }
+            
+            // Record auto-linking metric
+            oAuthMetrics.recordAutoLinking(PROVIDER_GOOGLE);
             
             return userRepository.save(user);
         }
@@ -227,6 +312,9 @@ public class GoogleOAuthService {
         
         // Assign CUSTOMER role to new user
         assignDefaultRole(savedUser);
+        
+        // Record new user registration metric
+        oAuthMetrics.recordNewUserRegistration(PROVIDER_GOOGLE);
         
         return savedUser;
     }

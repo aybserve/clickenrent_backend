@@ -36,6 +36,25 @@ jwt.refresh-expiration=604800000
 logging.level.org.clickenrent=INFO
 logging.level.org.springframework.security=WARN
 
+#GOOGLE OAUTH2 CONFIGURATION
+# Set these via environment variables in production
+oauth2.google.client-id=${GOOGLE_CLIENT_ID}
+oauth2.google.client-secret=${GOOGLE_CLIENT_SECRET}
+oauth2.google.token-uri=https://oauth2.googleapis.com/token
+oauth2.google.user-info-uri=https://www.googleapis.com/oauth2/v2/userinfo
+# ID token verification (highly recommended for production)
+oauth2.google.verify-id-token=true
+
+#OAUTH2 RATE LIMITING CONFIGURATION
+# Enable rate limiting for OAuth endpoints (recommended for production)
+oauth2.rate-limit.enabled=true
+# Maximum number of requests allowed in burst (adjust based on traffic)
+oauth2.rate-limit.capacity=10
+# Number of tokens to refill
+oauth2.rate-limit.refill-tokens=10
+# Refill duration in minutes
+oauth2.rate-limit.refill-duration-minutes=1
+
 
 
 

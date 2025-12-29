@@ -270,7 +270,7 @@ public class BikeRentalService {
         }
 
         // Get rental status (could be "paused" if applicable)
-        String rentalStatus = bikeRental.getBikeRentalStatus() != null 
+        String bikeRentalStatus = bikeRental.getBikeRentalStatus() != null
                 ? bikeRental.getBikeRentalStatus().getName() 
                 : "active";
 
@@ -283,13 +283,13 @@ public class BikeRentalService {
                 Map.of(
                         "bikeRentalId", bikeRentalId,
                         "bikeId", bikeRental.getBike().getId(),
-                        "rentalStatus", rentalStatus
+                        "bikeRentalStatus", bikeRentalStatus
                 )
         );
 
         return LockResponseDTO.builder()
                 .success(true)
-                .rentalStatus(rentalStatus)
+                .bikeRentalStatus(bikeRentalStatus)
                 .build();
     }
 

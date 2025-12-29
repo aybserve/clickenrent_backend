@@ -31,15 +31,13 @@ public class ExpoPushService {
      * @param title    Notification title
      * @param body     Notification body
      * @param data     Additional data payload
-     * @param priority Priority: "default" or "high"
      * @return TicketResponse.Ticket with receipt ID or error
      */
     public TicketResponse.Ticket sendNotification(
             String token,
             String title,
             String body,
-            Map<String, Object> data,
-            String priority
+            Map<String, Object> data
     ) {
         log.debug("Sending notification to token: {} with title: {}", token, title);
 
@@ -58,8 +56,6 @@ public class ExpoPushService {
         pushNotification.setTitle(title);
         pushNotification.setBody(body);
         pushNotification.setData(data);
-        // Note: Priority setting removed - check SDK documentation for correct method
-        // pushNotification.setPriority(priority != null && priority.equals("high") ? "high" : "default");
         pushNotification.setSound("default");
 
         try {
@@ -121,15 +117,13 @@ public class ExpoPushService {
      * @param title    Notification title
      * @param body     Notification body
      * @param data     Additional data payload
-     * @param priority Priority: "default" or "high"
      * @return PushNotification ready to send
      */
     public PushNotification buildMessage(
             String token,
             String title,
             String body,
-            Map<String, Object> data,
-            String priority
+            Map<String, Object> data
     ) {
         PushNotification pushNotification = new PushNotification();
         List<String> recipients = new ArrayList<>();
@@ -138,8 +132,6 @@ public class ExpoPushService {
         pushNotification.setTitle(title);
         pushNotification.setBody(body);
         pushNotification.setData(data);
-        // Note: Priority setting removed - check SDK documentation for correct method
-        // pushNotification.setPriority(priority != null && priority.equals("high") ? "high" : "default");
         pushNotification.setSound("default");
         return pushNotification;
     }

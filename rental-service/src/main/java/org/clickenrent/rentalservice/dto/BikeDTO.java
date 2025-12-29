@@ -24,7 +24,7 @@ public class BikeDTO {
     private String qrCodeUrl;
     private String frameNumber;
     private Long bikeStatusId;
-    private Long batteryChargeStatusId;
+    private Integer batteryLevel;
     private Long lockId;
     private BigDecimal vat;
     private Boolean isVatInclude;

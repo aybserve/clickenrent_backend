@@ -107,7 +107,7 @@ public class BikeRentalController {
     @PreAuthorize("isAuthenticated()")
     @Operation(
             summary = "Lock bike",
-            description = "Confirm bike is locked and update rental status. Updates bike location if coordinates provided."
+            description = "Confirm bike is locked and update bike rental status. Updates bike location if coordinates provided."
     )
     public ResponseEntity<LockResponseDTO> lockBike(
             @PathVariable Long id,

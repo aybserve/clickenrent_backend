@@ -20,8 +20,7 @@ public class BikeLocationDTO {
     private String name;
     private Long bikeStatus;
     private String bikeStatusName;
-    private Long batteryChargeStatus;
-    private String batteryChargeStatusName;
+    private Integer batteryLevel;
     private GeoPointDTO location;
     private Double distance;
     private String distanceUnit;

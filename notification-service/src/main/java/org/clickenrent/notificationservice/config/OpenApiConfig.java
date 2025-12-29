@@ -27,7 +27,7 @@ public class OpenApiConfig {
                         .url("http://localhost:8080")
                         .description("Gateway Server (Development)"))
                 .addServersItem(new Server()
-                        .url("http://localhost:8084")
+                        .url("http://localhost:8085")
                         .description("Notification Service Direct (Development)"))
                 .info(new Info()
                         .title("Click & Rent Notification Service API")

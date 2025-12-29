@@ -173,7 +173,7 @@ http://localhost:8082/v3/api-docs
 - Bike, ChargingStation, Part, ServiceProduct
 
 **Status/Type Entities**:
-- BikeType, BikeStatus, BatteryChargeStatus, ChargingStationStatus
+- BikeType, BikeStatus, ChargingStationStatus
 - PartType, RideStatus, RentalStatus, RentalUnit
 - LocationRole, B2BSaleStatus, B2BSubscriptionStatus
 
@@ -228,8 +228,7 @@ curl -X GET "http://localhost:8082/api/bikes/nearby?lat=52.374&lng=4.9&radius=5&
       "name": "Zigma E-bike",
       "bikeStatus": 1,
       "bikeStatusName": "Available",
-      "batteryChargeStatus": 2,
-      "batteryChargeStatusName": "Charging",
+      "batteryLevel": 75,
       "location": {
         "latitude": 52.374,
         "longitude": 4.901

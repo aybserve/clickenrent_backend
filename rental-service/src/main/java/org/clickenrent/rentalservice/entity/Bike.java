@@ -42,9 +42,9 @@ public class Bike extends Product {
     @JoinColumn(name = "bike_status_id", nullable = true)
     private BikeStatus bikeStatus;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "battery_charge_status_id")
-    private BatteryChargeStatus batteryChargeStatus;
+    @Builder.Default
+    @Column(name = "battery_level", nullable = false)
+    private Integer batteryLevel = 0;
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "lock_id")

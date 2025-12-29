@@ -58,7 +58,6 @@ DROP TABLE IF EXISTS location_role CASCADE;
 DROP TABLE IF EXISTS ride_status CASCADE;
 DROP TABLE IF EXISTS rental_unit CASCADE;
 DROP TABLE IF EXISTS rental_status CASCADE;
-DROP TABLE IF EXISTS battery_charge_status CASCADE;
 DROP TABLE IF EXISTS bike_rental_status CASCADE;
 DROP TABLE IF EXISTS bike_status CASCADE;
 DROP TABLE IF EXISTS bike_type CASCADE;
@@ -99,17 +98,6 @@ CREATE TABLE bike_rental_status (
     name                VARCHAR(50) NOT NULL UNIQUE,
     
     CONSTRAINT chk_bike_rental_status_name_not_empty CHECK (name <> '')
-);
-
--- ---------------------------------------------------------------------------------------------------------------------
--- Table: battery_charge_status
--- Description: Battery charge status values
--- ---------------------------------------------------------------------------------------------------------------------
-CREATE TABLE battery_charge_status (
-    id                  BIGSERIAL PRIMARY KEY,
-    name                VARCHAR(50) NOT NULL UNIQUE,
-    
-    CONSTRAINT chk_battery_charge_status_name_not_empty CHECK (name <> '')
 );
 
 -- ---------------------------------------------------------------------------------------------------------------------
@@ -548,7 +536,7 @@ CREATE TABLE product (
     -- Bike-specific fields
     frame_number                    VARCHAR(100),
     bike_status_id                  BIGINT,
-    battery_charge_status_id        BIGINT,
+    battery_level                   INTEGER NOT NULL DEFAULT 0,
     lock_id                         BIGINT,
     bike_type_id                    BIGINT,
     currency_id                     BIGINT,
@@ -585,8 +573,6 @@ CREATE TABLE product (
         REFERENCES hub(id) ON DELETE SET NULL,
     CONSTRAINT fk_product_bike_status FOREIGN KEY (bike_status_id) 
         REFERENCES bike_status(id) ON DELETE SET NULL,
-    CONSTRAINT fk_product_battery_charge_status FOREIGN KEY (battery_charge_status_id) 
-        REFERENCES battery_charge_status(id) ON DELETE SET NULL,
     CONSTRAINT fk_product_bike_type FOREIGN KEY (bike_type_id) 
         REFERENCES bike_type(id) ON DELETE SET NULL,
     CONSTRAINT fk_product_bike_model FOREIGN KEY (bike_model_id) 
@@ -1229,16 +1215,6 @@ INSERT INTO bike_rental_status (id, name) VALUES
 (3, 'Cancelled')
 ON CONFLICT (id) DO NOTHING;
 
-INSERT INTO battery_charge_status (id, name) VALUES
-(1, 'Idle'),
-(2, 'Identifying'),
-(3, 'Pre charging'),
-(4, 'Charging'),
-(5, 'Fully charged'),
-(6, 'Error'),
-(7, 'Idle on ride')
-ON CONFLICT (id) DO NOTHING;
-
 INSERT INTO rental_status (id, name) VALUES
 (1, 'Pending'),
 (2, 'Active'),
@@ -1378,7 +1354,6 @@ ON CONFLICT (id) DO NOTHING;
 SELECT setval('bike_type_id_seq', (SELECT COALESCE(MAX(id), 1) FROM bike_type));
 SELECT setval('bike_status_id_seq', (SELECT COALESCE(MAX(id), 1) FROM bike_status));
 SELECT setval('bike_rental_status_id_seq', (SELECT COALESCE(MAX(id), 1) FROM bike_rental_status));
-SELECT setval('battery_charge_status_id_seq', (SELECT COALESCE(MAX(id), 1) FROM battery_charge_status));
 SELECT setval('rental_status_id_seq', (SELECT COALESCE(MAX(id), 1) FROM rental_status));
 SELECT setval('rental_unit_id_seq', (SELECT COALESCE(MAX(id), 1) FROM rental_unit));
 SELECT setval('ride_status_id_seq', (SELECT COALESCE(MAX(id), 1) FROM ride_status));
@@ -1401,7 +1376,7 @@ SELECT setval('rental_plan_id_seq', (SELECT COALESCE(MAX(id), 1) FROM rental_pla
 -- END OF SCHEMA
 -- =====================================================================================================================
 -- Schema created successfully!
--- Total tables: 52
+-- Total tables: 51
 -- Product inheritance: SINGLE_TABLE strategy with discriminator column
 -- Test data: Sample locations, hubs, bikes, and rental plans
 -- =====================================================================================================================
