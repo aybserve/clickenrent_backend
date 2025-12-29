@@ -47,7 +47,6 @@ public class BikeRentalMapper {
                 .rentalUnitId(bikeRental.getRentalUnit() != null ? bikeRental.getRentalUnit().getId() : null)
                 .bikeRentalStatusId(bikeRental.getBikeRentalStatus() != null ? bikeRental.getBikeRentalStatus().getId() : null)
                 .isRevenueSharePaid(bikeRental.getIsRevenueSharePaid())
-                .isB2BRentable(bikeRental.getIsB2BRentable())
                 .photoUrl(bikeRental.getPhotoUrl())
                 .price(bikeRental.getPrice())
                 .totalPrice(bikeRental.getTotalPrice())
@@ -69,7 +68,6 @@ public class BikeRentalMapper {
                 .startDateTime(dto.getStartDateTime())
                 .endDateTime(dto.getEndDateTime())
                 .isRevenueSharePaid(dto.getIsRevenueSharePaid())
-                .isB2BRentable(dto.getIsB2BRentable())
                 .photoUrl(dto.getPhotoUrl())
                 .price(dto.getPrice())
                 .totalPrice(dto.getTotalPrice());

@@ -548,9 +548,9 @@ ON CONFLICT (id) DO NOTHING^;
 -- ---------------------------------------------------------------------------------------------------------------------
 -- 9.2 BIKE RENTALS (HAS audit fields)
 -- ---------------------------------------------------------------------------------------------------------------------
-INSERT INTO bike_rental (id, external_id, bike_id, bike_external_id, location_id, location_external_id, rental_id, rental_external_id, start_date_time, end_date_time, rental_unit_id, bike_rental_status_id, is_revenue_share_paid, is_b2b_rentable, photo_url, price, total_price, date_created, last_date_modified, created_by, last_modified_by, is_deleted) VALUES
-(1, 'bike-rental-ext-00101', 1, '550e8400-e29b-41d4-a716-446655440401', 1, '550e8400-e29b-41d4-a716-446655440101', 1, 'rental-ext-00101', CURRENT_TIMESTAMP - INTERVAL '2 days', CURRENT_TIMESTAMP - INTERVAL '1 day', 2, 2, true, false, NULL, 25.00, 25.00, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
-(2, 'bike-rental-ext-00102', 2, '550e8400-e29b-41d4-a716-446655440402', 1, '550e8400-e29b-41d4-a716-446655440101', 2, 'rental-ext-00102', CURRENT_TIMESTAMP - INTERVAL '5 days', CURRENT_TIMESTAMP - INTERVAL '1 day', 1, 2, true, false, NULL, 5.00, 20.00, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false)
+INSERT INTO bike_rental (id, external_id, bike_id, bike_external_id, location_id, location_external_id, rental_id, rental_external_id, start_date_time, end_date_time, rental_unit_id, bike_rental_status_id, is_revenue_share_paid, photo_url, price, total_price, date_created, last_date_modified, created_by, last_modified_by, is_deleted) VALUES
+(1, 'bike-rental-ext-00101', 1, '550e8400-e29b-41d4-a716-446655440401', 1, '550e8400-e29b-41d4-a716-446655440101', 1, 'rental-ext-00101', CURRENT_TIMESTAMP - INTERVAL '2 days', CURRENT_TIMESTAMP - INTERVAL '1 day', 2, 2, true, NULL, 25.00, 25.00, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(2, 'bike-rental-ext-00102', 2, '550e8400-e29b-41d4-a716-446655440402', 1, '550e8400-e29b-41d4-a716-446655440101', 2, 'rental-ext-00102', CURRENT_TIMESTAMP - INTERVAL '5 days', CURRENT_TIMESTAMP - INTERVAL '1 day', 1, 2, true, NULL, 5.00, 20.00, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false)
 ON CONFLICT (id) DO NOTHING^;
 
 -- ---------------------------------------------------------------------------------------------------------------------

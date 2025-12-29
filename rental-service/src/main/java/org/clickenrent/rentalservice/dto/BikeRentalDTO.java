@@ -27,7 +27,6 @@ public class BikeRentalDTO {
     private Long rentalUnitId;
     private Long bikeRentalStatusId;
     private Boolean isRevenueSharePaid;
-    private Boolean isB2BRentable;
     private String photoUrl;
     private BigDecimal price;
     private BigDecimal totalPrice;
