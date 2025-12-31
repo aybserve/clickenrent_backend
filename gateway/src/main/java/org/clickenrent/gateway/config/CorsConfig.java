@@ -23,12 +23,16 @@ public class CorsConfig {
 
         CorsConfiguration corsConfig = new CorsConfiguration();
         
-        // Allow development origins
+        // Allow development and staging origins
         corsConfig.setAllowedOrigins(Arrays.asList(
                 "http://localhost:8080",
                 "http://localhost:3000",
                 "http://127.0.0.1:8080",
-                "http://127.0.0.1:3000"
+                "http://127.0.0.1:3000",
+                "http://staging.api.clickenrent.nl",
+                "http://staging.api.clickenrent.nl:8080",
+                "http://api.clickenrent.nl",
+                "http://api.clickenrent.nl:8080"
         ));
         
         // Allow all HTTP methods
@@ -76,7 +80,7 @@ public class CorsConfig {
         source.registerCorsConfiguration("/swagger-ui/**", corsConfig);
         source.registerCorsConfiguration("/webjars/**", corsConfig);
         
-        log.info("CORS filter configured successfully for development origins");
+        log.info("CORS filter configured successfully for development and staging origins");
         
         return new CorsWebFilter(source);
     }

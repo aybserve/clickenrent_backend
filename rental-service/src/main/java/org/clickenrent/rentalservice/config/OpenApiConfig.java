@@ -24,8 +24,8 @@ public class OpenApiConfig {
     public OpenAPI rentalServiceOpenAPI() {
         return new OpenAPI()
                 .addServersItem(new Server()
-                        .url("http://localhost:8080")
-                        .description("Gateway Server (Development)"))
+                        .url("/")
+                        .description("Current Server"))
                 .info(new Info()
                         .title("Click & Rent Rental Service API")
                         .description("Rental Management Service for Click & Rent Platform. " +

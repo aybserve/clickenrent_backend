@@ -24,11 +24,8 @@ public class OpenApiConfig {
     public OpenAPI notificationServiceOpenAPI() {
         return new OpenAPI()
                 .addServersItem(new Server()
-                        .url("http://localhost:8080")
-                        .description("Gateway Server (Development)"))
-                .addServersItem(new Server()
-                        .url("http://localhost:8085")
-                        .description("Notification Service Direct (Development)"))
+                        .url("/")
+                        .description("Current Server"))
                 .info(new Info()
                         .title("Click & Rent Notification Service API")
                         .description("Push Notification Service for Click & Rent Platform. " +

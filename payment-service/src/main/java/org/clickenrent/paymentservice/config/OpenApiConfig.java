@@ -24,8 +24,8 @@ public class OpenApiConfig {
     public OpenAPI paymentServiceOpenAPI() {
         return new OpenAPI()
                 .addServersItem(new Server()
-                        .url("http://localhost:8080")
-                        .description("Gateway Server (Development)"))
+                        .url("/")
+                        .description("Current Server"))
                 .info(new Info()
                         .title("Click & Rent Payment Service API")
                         .description("Payment Management Service for Click & Rent Platform. " +
