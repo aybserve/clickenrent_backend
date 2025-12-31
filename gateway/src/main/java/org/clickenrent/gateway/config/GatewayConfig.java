@@ -458,6 +458,21 @@ public class GatewayConfig {
                         .uri("lb://support-service"))
 
 
+                // NOTIFICATION SERVICE ROUTES
+
+                // Route for fetching notification-service API docs (SpringDoc will aggregate)
+                .route("notification-service-api-docs", r -> r
+                        .path("/notification-service/v3/api-docs")
+                        .filters(f -> f.rewritePath("/notification-service/v3/api-docs", "/v3/api-docs"))
+                        .uri("lb://notification-service"))
+
+                // Notification Management Routes
+                .route("notifications", r -> r
+                        .path("/api/notifications/**")
+                        .filters(f -> f.filter(jwtAuthenticationFilter))
+                        .uri("lb://notification-service"))
+
+
                 // PAYMENT SERVICE ROUTES
 
                 // Route for fetching payment-service API docs (SpringDoc will aggregate)
