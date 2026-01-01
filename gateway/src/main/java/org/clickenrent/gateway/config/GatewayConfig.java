@@ -77,10 +77,9 @@ public class GatewayConfig {
                         .filters(f -> f.filter(jwtAuthenticationFilter))
                         .uri("lb://auth-service"))
 
-                // Address Management Routes (Countries, Cities, Addresses, User-Addresses)
+                // Address Management Routes (Countries, Addresses, User-Addresses)
                 .route("address-resources", r -> r
-                        .path("/api/countries/**", "/api/cities/**", 
-                              "/api/addresses/**", "/api/user-addresses/**")
+                        .path("/api/countries/**", "/api/addresses/**", "/api/user-addresses/**")
                         .filters(f -> f.filter(jwtAuthenticationFilter))
                         .uri("lb://auth-service"))
                 
@@ -198,14 +197,14 @@ public class GatewayConfig {
                         .filters(f -> f.filter(jwtAuthenticationFilter))
                         .uri("lb://rental-service"))
 
-                // Parts & Accessories Management Routes
-                .route("parts", r -> r
-                        .path("/api/parts/**")
+                .route("bike-model-parts", r -> r
+                        .path("/api/bike-model-parts/**")
                         .filters(f -> f.filter(jwtAuthenticationFilter))
                         .uri("lb://rental-service"))
 
-                .route("part-types", r -> r
-                        .path("/api/part-types/**")
+                // Parts & Accessories Management Routes
+                .route("parts", r -> r
+                        .path("/api/parts/**")
                         .filters(f -> f.filter(jwtAuthenticationFilter))
                         .uri("lb://rental-service"))
 
@@ -216,11 +215,6 @@ public class GatewayConfig {
 
                 .route("part-brands", r -> r
                         .path("/api/part-brands/**")
-                        .filters(f -> f.filter(jwtAuthenticationFilter))
-                        .uri("lb://rental-service"))
-
-                .route("part-models", r -> r
-                        .path("/api/part-models/**")
                         .filters(f -> f.filter(jwtAuthenticationFilter))
                         .uri("lb://rental-service"))
 
@@ -245,14 +239,9 @@ public class GatewayConfig {
                         .filters(f -> f.filter(jwtAuthenticationFilter))
                         .uri("lb://rental-service"))
 
-                .route("battery-charge-statuses", r -> r
-                        .path("/api/battery-charge-statuses/**")
-                        .filters(f -> f.filter(jwtAuthenticationFilter))
-                        .uri("lb://rental-service"))
-
                 // Location & Hub Management Routes
-                .route("locations", r -> r
-                        .path("/api/locations/**")
+                .route("location", r -> r
+                        .path("/api/location/**")
                         .filters(f -> f.filter(jwtAuthenticationFilter))
                         .uri("lb://rental-service"))
 
@@ -340,14 +329,18 @@ public class GatewayConfig {
                         .filters(f -> f.filter(jwtAuthenticationFilter))
                         .uri("lb://rental-service"))
 
-                .route("keys", r -> r
-                        .path("/api/keys/**")
+                .route("lock-providers", r -> r
+                        .path("/api/lock-providers/**")
                         .filters(f -> f.filter(jwtAuthenticationFilter))
                         .uri("lb://rental-service"))
 
-                // Bike Parts Routes
-                .route("bike-parts", r -> r
-                        .path("/api/bike-parts/**")
+                .route("lock-statuses", r -> r
+                        .path("/api/lock-statuses/**")
+                        .filters(f -> f.filter(jwtAuthenticationFilter))
+                        .uri("lb://rental-service"))
+
+                .route("keys", r -> r
+                        .path("/api/keys/**")
                         .filters(f -> f.filter(jwtAuthenticationFilter))
                         .uri("lb://rental-service"))
 
@@ -467,6 +460,12 @@ public class GatewayConfig {
                         .uri("lb://notification-service"))
 
                 // Notification Management Routes
+                // More specific routes first
+                .route("notification-preferences", r -> r
+                        .path("/api/notifications/preferences/**")
+                        .filters(f -> f.filter(jwtAuthenticationFilter))
+                        .uri("lb://notification-service"))
+
                 .route("notifications", r -> r
                         .path("/api/notifications/**")
                         .filters(f -> f.filter(jwtAuthenticationFilter))
