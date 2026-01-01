@@ -21,7 +21,8 @@ MERGE INTO global_role (id, name) KEY(id) VALUES
 (1, 'SUPERADMIN'),
 (2, 'ADMIN'),
 (3, 'B2B'),
-(4, 'CUSTOMER');
+(4, 'CUSTOMER'),
+(5, 'DEV');
 
 -- Company Types
 MERGE INTO company_type (id, name) KEY(id) VALUES

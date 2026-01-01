@@ -29,15 +29,7 @@ public class OpenApiConfig {
                 .info(new Info()
                         .title("Click & Rent Notification Service API")
                         .description("Push Notification Service for Click & Rent Platform. " +
-                                "Manages Expo Push Notifications, user notification preferences, and notification history.\n\n" +
-                                "**Authentication:** Most endpoints require JWT authentication. " +
-                                "Click the 'Authorize' button (🔓) above and enter your JWT token to test protected endpoints.\n\n" +
-                                "**How to get a token:**\n" +
-                                "1. Login via auth-service: POST http://localhost:8080/api/auth/login\n" +
-                                "2. Copy the 'accessToken' from the response\n" +
-                                "3. Click 'Authorize' and paste the token (no 'Bearer' prefix needed)\n" +
-                                "4. Click 'Authorize' to save\n\n" +
-                                "Now you can test all protected endpoints directly from Swagger UI!")
+                                "Manages Expo Push Notifications, user notification preferences, and notification history.")
                         .version("1.0.0")
                         .contact(new Contact()
                                 .name("Vitaliy Shvetsov")

@@ -52,6 +52,24 @@
 			<scope>runtime</scope>
 		</dependency>
 
+	<!-- Spring Security for Reactive (WebFlux) -->
+	<dependency>
+		<groupId>org.springframework.boot</groupId>
+		<artifactId>spring-boot-starter-security</artifactId>
+	</dependency>
+
+	<!-- WebClient for HTTP calls to auth-service -->
+	<dependency>
+		<groupId>org.springframework.boot</groupId>
+		<artifactId>spring-boot-starter-webflux</artifactId>
+	</dependency>
+
+	<!-- Caffeine Cache for authentication caching -->
+	<dependency>
+		<groupId>com.github.ben-manes.caffeine</groupId>
+		<artifactId>caffeine</artifactId>
+	</dependency>
+
 	<!-- Utils -->
 	<dependency>
 		<groupId>org.projectlombok</groupId>

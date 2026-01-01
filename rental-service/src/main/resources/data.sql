@@ -23,7 +23,7 @@
 -- =====================================================================================================================
 
 -- Enable PostGIS extension for spatial operations
-CREATE EXTENSION IF NOT EXISTS postgis;
+CREATE EXTENSION IF NOT EXISTS postgis;;;
 
 -- Add geometry column to coordinates table (if not exists)
 -- Note: This runs after Hibernate creates the table
@@ -35,7 +35,7 @@ BEGIN
     ) THEN
         ALTER TABLE coordinates ADD COLUMN geom GEOGRAPHY(POINT, 4326);
     END IF;
-END $$;
+END $$;;;
 
 -- Create spatial index on geometry column (if not exists)
 DO $$
@@ -46,7 +46,7 @@ BEGIN
     ) THEN
         CREATE INDEX idx_coordinates_geom ON coordinates USING GIST (geom);
     END IF;
-END $$;
+END $$;;;
 
 -- Create trigger function to automatically update geometry from latitude/longitude
 CREATE OR REPLACE FUNCTION update_coordinates_geom()

@@ -350,7 +350,8 @@ INSERT INTO global_role (id, name) VALUES
 (1, 'SUPERADMIN'),
 (2, 'ADMIN'),
 (3, 'B2B'),
-(4, 'CUSTOMER')
+(4, 'CUSTOMER'),
+(5, 'DEV')
 ON CONFLICT (id) DO NOTHING;
 
 -- Company Types
