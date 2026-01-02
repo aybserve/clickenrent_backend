@@ -24,6 +24,10 @@ public class CompanyType {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Size(max = 100, message = "External ID must not exceed 100 characters")
+    @Column(name = "external_id", unique = true, length = 100)
+    private String externalId;
+
     @NotBlank(message = "Company type name is required")
     @Size(max = 100, message = "Company type name must not exceed 100 characters")
     @Column(name = "name", nullable = false, unique = true, length = 100)

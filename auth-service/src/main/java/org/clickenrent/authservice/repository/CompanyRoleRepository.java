@@ -19,6 +19,8 @@ public interface CompanyRoleRepository extends JpaRepository<CompanyRole, Long> 
      * @return Optional containing the role if found
      */
     Optional<CompanyRole> findByNameIgnoreCase(String name);
+    
+    Optional<CompanyRole> findByExternalId(String externalId);
 }
 
 

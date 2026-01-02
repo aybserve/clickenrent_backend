@@ -46,6 +46,13 @@ public class UserGlobalRoleService {
     }
     
     @Transactional(readOnly = true)
+    public UserGlobalRoleDTO getUserGlobalRoleByExternalId(String externalId) {
+        UserGlobalRole userGlobalRole = userGlobalRoleRepository.findByExternalId(externalId)
+                .orElseThrow(() -> new ResourceNotFoundException("UserGlobalRole", "externalId", externalId));
+        return userGlobalRoleMapper.toDto(userGlobalRole);
+    }
+    
+    @Transactional(readOnly = true)
     public List<UserGlobalRoleDTO> getUserGlobalRoles(Long userId) {
         // Verify user exists
         userRepository.findById(userId)

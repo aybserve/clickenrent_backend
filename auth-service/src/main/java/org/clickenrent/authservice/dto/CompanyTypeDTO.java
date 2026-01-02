@@ -16,6 +16,7 @@ import lombok.NoArgsConstructor;
 public class CompanyTypeDTO {
 
     private Long id;
+    private String externalId;
     private String name;
 }
 

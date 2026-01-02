@@ -17,6 +17,7 @@ public class AddressMapper {
         
         return AddressDTO.builder()
                 .id(address.getId())
+                .externalId(address.getExternalId())
                 .city(address.getCity())
                 .countryId(address.getCountry() != null ? address.getCountry().getId() : null)
                 .street(address.getStreet())
@@ -35,6 +36,7 @@ public class AddressMapper {
         
         return Address.builder()
                 .id(dto.getId())
+                .externalId(dto.getExternalId())
                 .city(dto.getCity())
                 .street(dto.getStreet())
                 .postcode(dto.getPostcode())
@@ -46,6 +48,9 @@ public class AddressMapper {
             return;
         }
         
+        if (dto.getExternalId() != null) {
+            address.setExternalId(dto.getExternalId());
+        }
         if (dto.getCity() != null) {
             address.setCity(dto.getCity());
         }

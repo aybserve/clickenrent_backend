@@ -36,6 +36,13 @@ public class LanguageService {
         return languageMapper.toDto(language);
     }
     
+    @Transactional(readOnly = true)
+    public LanguageDTO getLanguageByExternalId(String externalId) {
+        Language language = languageRepository.findByExternalId(externalId)
+                .orElseThrow(() -> new ResourceNotFoundException("Language", "externalId", externalId));
+        return languageMapper.toDto(language);
+    }
+    
     @Transactional
     public LanguageDTO createLanguage(LanguageDTO languageDTO) {
         Language language = languageMapper.toEntity(languageDTO);

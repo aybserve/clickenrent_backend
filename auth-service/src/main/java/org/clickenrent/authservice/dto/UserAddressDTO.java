@@ -18,6 +18,7 @@ import java.time.LocalDateTime;
 public class UserAddressDTO {
 
     private Long id;
+    private String externalId;
     private Long userId;
     private Long addressId;
 

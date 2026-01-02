@@ -38,6 +38,7 @@ DROP TABLE IF EXISTS language CASCADE;
 -- ---------------------------------------------------------------------------------------------------------------------
 CREATE TABLE language (
     id                  BIGSERIAL PRIMARY KEY,
+    external_id         VARCHAR(100) UNIQUE,
     name                VARCHAR(50) NOT NULL UNIQUE,
     
     CONSTRAINT chk_language_name_not_empty CHECK (name <> '')
@@ -49,6 +50,7 @@ CREATE TABLE language (
 -- ---------------------------------------------------------------------------------------------------------------------
 CREATE TABLE global_role (
     id                  BIGSERIAL PRIMARY KEY,
+    external_id         VARCHAR(100) UNIQUE,
     name                VARCHAR(50) NOT NULL UNIQUE,
     
     CONSTRAINT chk_global_role_name_not_empty CHECK (name <> '')
@@ -60,6 +62,7 @@ CREATE TABLE global_role (
 -- ---------------------------------------------------------------------------------------------------------------------
 CREATE TABLE company_type (
     id                  BIGSERIAL PRIMARY KEY,
+    external_id         VARCHAR(100) UNIQUE,
     name                VARCHAR(100) NOT NULL UNIQUE,
     
     CONSTRAINT chk_company_type_name_not_empty CHECK (name <> '')
@@ -71,6 +74,7 @@ CREATE TABLE company_type (
 -- ---------------------------------------------------------------------------------------------------------------------
 CREATE TABLE company_role (
     id                  BIGSERIAL PRIMARY KEY,
+    external_id         VARCHAR(100) UNIQUE,
     name                VARCHAR(50) NOT NULL UNIQUE,
     
     CONSTRAINT chk_company_role_name_not_empty CHECK (name <> '')
@@ -82,6 +86,7 @@ CREATE TABLE company_role (
 -- ---------------------------------------------------------------------------------------------------------------------
 CREATE TABLE country (
     id                  BIGSERIAL PRIMARY KEY,
+    external_id         VARCHAR(100) UNIQUE,
     name                VARCHAR(100) NOT NULL UNIQUE,
     
     CONSTRAINT chk_country_name_not_empty CHECK (name <> '')
@@ -166,6 +171,7 @@ CREATE TABLE company (
 -- ---------------------------------------------------------------------------------------------------------------------
 CREATE TABLE address (
     id                          BIGSERIAL PRIMARY KEY,
+    external_id                 VARCHAR(100) UNIQUE,
     city                        VARCHAR(100) NOT NULL,
     country_id                  BIGINT NOT NULL,
     street                      VARCHAR(255),
@@ -229,6 +235,7 @@ CREATE TABLE invitation (
 -- ---------------------------------------------------------------------------------------------------------------------
 CREATE TABLE user_global_role (
     id                          BIGSERIAL PRIMARY KEY,
+    external_id                 VARCHAR(100) UNIQUE,
     user_id                     BIGINT NOT NULL,
     global_role_id              BIGINT NOT NULL,
     
@@ -254,6 +261,7 @@ CREATE TABLE user_global_role (
 -- ---------------------------------------------------------------------------------------------------------------------
 CREATE TABLE user_company (
     id                          BIGSERIAL PRIMARY KEY,
+    external_id                 VARCHAR(100) UNIQUE,
     user_id                     BIGINT NOT NULL,
     company_id                  BIGINT NOT NULL,
     company_role_id             BIGINT NOT NULL,
@@ -282,6 +290,7 @@ CREATE TABLE user_company (
 -- ---------------------------------------------------------------------------------------------------------------------
 CREATE TABLE user_address (
     id                          BIGSERIAL PRIMARY KEY,
+    external_id                 VARCHAR(100) UNIQUE,
     user_id                     BIGINT NOT NULL,
     address_id                  BIGINT NOT NULL,
     
@@ -313,11 +322,34 @@ CREATE INDEX idx_user_provider ON users(provider_id, provider_user_id);
 -- Company table indexes
 CREATE INDEX idx_company_external_id ON company(external_id);
 
+-- Language table indexes
+CREATE INDEX idx_language_external_id ON language(external_id);
+
+-- Global role table indexes
+CREATE INDEX idx_global_role_external_id ON global_role(external_id);
+
+-- Company type table indexes
+CREATE INDEX idx_company_type_external_id ON company_type(external_id);
+
+-- Company role table indexes
+CREATE INDEX idx_company_role_external_id ON company_role(external_id);
+
 -- Country table indexes
+CREATE INDEX idx_country_external_id ON country(external_id);
 CREATE INDEX idx_country_name ON country(name);
 
 -- Address table indexes
+CREATE INDEX idx_address_external_id ON address(external_id);
 CREATE INDEX idx_address_country ON address(country_id);
+
+-- User global role table indexes
+CREATE INDEX idx_user_global_role_external_id ON user_global_role(external_id);
+
+-- User company table indexes
+CREATE INDEX idx_user_company_external_id ON user_company(external_id);
+
+-- User address table indexes
+CREATE INDEX idx_user_address_external_id ON user_address(external_id);
 
 -- Invitation table indexes
 CREATE INDEX idx_invitation_token ON invitation(token);

@@ -56,6 +56,13 @@ public class UserCompanyService {
     }
     
     @Transactional(readOnly = true)
+    public UserCompanyDTO getUserCompanyByExternalId(String externalId) {
+        UserCompany userCompany = userCompanyRepository.findByExternalId(externalId)
+                .orElseThrow(() -> new ResourceNotFoundException("UserCompany", "externalId", externalId));
+        return userCompanyMapper.toDto(userCompany);
+    }
+    
+    @Transactional(readOnly = true)
     public List<UserCompanyDetailDTO> getUserCompanies(Long userId) {
         // Security check: Only admins or the user themselves can view their companies
         Long currentUserId = securityService.getCurrentUserId();

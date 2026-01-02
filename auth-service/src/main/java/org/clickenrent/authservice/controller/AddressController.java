@@ -52,6 +52,19 @@ public class AddressController {
     }
     
     /**
+     * Get address by external ID.
+     * GET /api/addresses/external/{externalId}
+     * Access: SUPERADMIN/ADMIN can see all, B2B/CUSTOMER can see only their own addresses
+     */
+    @GetMapping("/external/{externalId}")
+    @PreAuthorize("hasAnyRole('SUPERADMIN', 'ADMIN', 'B2B', 'CUSTOMER')")
+    @Operation(summary = "Get address by external ID", description = "Retrieve a specific address by its external ID")
+    public ResponseEntity<AddressDTO> getAddressByExternalId(@PathVariable String externalId) {
+        AddressDTO address = addressService.getAddressByExternalId(externalId);
+        return ResponseEntity.ok(address);
+    }
+    
+    /**
      * Create a new address.
      * POST /api/addresses
      */

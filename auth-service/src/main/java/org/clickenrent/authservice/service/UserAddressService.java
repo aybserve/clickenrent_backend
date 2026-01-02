@@ -43,6 +43,13 @@ public class UserAddressService {
     }
     
     @Transactional(readOnly = true)
+    public UserAddressDTO getUserAddressByExternalId(String externalId) {
+        UserAddress userAddress = userAddressRepository.findByExternalId(externalId)
+                .orElseThrow(() -> new ResourceNotFoundException("UserAddress", "externalId", externalId));
+        return userAddressMapper.toDto(userAddress);
+    }
+    
+    @Transactional(readOnly = true)
     public List<UserAddressDTO> getUserAddressesByUserId(Long userId) {
         return userAddressRepository.findByUserId(userId).stream()
                 .map(userAddressMapper::toDto)

@@ -48,6 +48,17 @@ public class CompanyRoleController {
     }
     
     /**
+     * Get company role by external ID.
+     * GET /api/company-roles/external/{externalId}
+     */
+    @GetMapping("/external/{externalId}")
+    @PreAuthorize("hasAnyRole('SUPERADMIN', 'ADMIN', 'B2B')")
+    public ResponseEntity<CompanyRoleDTO> getCompanyRoleByExternalId(@PathVariable String externalId) {
+        CompanyRoleDTO companyRole = companyRoleService.getCompanyRoleByExternalId(externalId);
+        return ResponseEntity.ok(companyRole);
+    }
+    
+    /**
      * Create a new company role.
      * POST /api/company-roles
      */

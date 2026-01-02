@@ -57,6 +57,19 @@ public class AddressService {
         return addressMapper.toDto(address);
     }
     
+    @Transactional(readOnly = true)
+    public AddressDTO getAddressByExternalId(String externalId) {
+        Address address = addressRepository.findByExternalId(externalId)
+                .orElseThrow(() -> new ResourceNotFoundException("Address", "externalId", externalId));
+        
+        // Defense in depth: Secondary access check (primary check is in controller @PreAuthorize)
+        if (!securityService.hasAccessToAddress(address.getId())) {
+            throw new AccessDeniedException("You don't have permission to access this address");
+        }
+        
+        return addressMapper.toDto(address);
+    }
+    
     @Transactional
     public AddressDTO createAddress(AddressDTO addressDTO) {
         Address address = addressMapper.toEntity(addressDTO);

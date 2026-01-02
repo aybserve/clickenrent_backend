@@ -19,6 +19,8 @@ public interface GlobalRoleRepository extends JpaRepository<GlobalRole, Long> {
      * @return Optional containing the role if found
      */
     Optional<GlobalRole> findByNameIgnoreCase(String name);
+    
+    Optional<GlobalRole> findByExternalId(String externalId);
 }
 
 

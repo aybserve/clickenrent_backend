@@ -48,6 +48,17 @@ public class LanguageController {
     }
     
     /**
+     * Get language by external ID.
+     * GET /api/languages/external/{externalId}
+     */
+    @GetMapping("/external/{externalId}")
+    @PreAuthorize("hasAnyRole('SUPERADMIN', 'ADMIN', 'B2B', 'CUSTOMER')")
+    public ResponseEntity<LanguageDTO> getLanguageByExternalId(@PathVariable String externalId) {
+        LanguageDTO language = languageService.getLanguageByExternalId(externalId);
+        return ResponseEntity.ok(language);
+    }
+    
+    /**
      * Create a new language.
      * POST /api/languages
      */

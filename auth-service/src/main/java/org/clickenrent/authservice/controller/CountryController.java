@@ -63,6 +63,18 @@ public class CountryController {
     }
     
     /**
+     * Get country by external ID.
+     * GET /api/countries/external/{externalId}
+     */
+    @GetMapping("/external/{externalId}")
+    @PreAuthorize("hasAnyRole('SUPERADMIN', 'ADMIN', 'B2B', 'CUSTOMER')")
+    @Operation(summary = "Get country by external ID", description = "Retrieve a country by its external ID")
+    public ResponseEntity<CountryDTO> getCountryByExternalId(@PathVariable String externalId) {
+        CountryDTO country = countryService.getCountryByExternalId(externalId);
+        return ResponseEntity.ok(country);
+    }
+    
+    /**
      * Create a new country.
      * POST /api/countries
      */

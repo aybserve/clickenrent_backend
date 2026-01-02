@@ -51,6 +51,18 @@ public class UserCompanyController {
     }
     
     /**
+     * Get user-company link by external ID.
+     * GET /api/user-companies/external/{externalId}
+     * Requires: Authentication
+     */
+    @GetMapping("/external/{externalId}")
+    @PreAuthorize("hasAnyRole('SUPERADMIN', 'ADMIN', 'B2B')")
+    public ResponseEntity<UserCompanyDTO> getUserCompanyByExternalId(@PathVariable String externalId) {
+        UserCompanyDTO userCompany = userCompanyService.getUserCompanyByExternalId(externalId);
+        return ResponseEntity.ok(userCompany);
+    }
+    
+    /**
      * Get all company associations for a specific user with full details.
      * GET /api/user-companies/user/{userId}
      * Requires: Authentication

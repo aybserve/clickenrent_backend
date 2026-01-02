@@ -36,6 +36,13 @@ public class CompanyTypeService {
         return companyTypeMapper.toDto(companyType);
     }
     
+    @Transactional(readOnly = true)
+    public CompanyTypeDTO getCompanyTypeByExternalId(String externalId) {
+        CompanyType companyType = companyTypeRepository.findByExternalId(externalId)
+                .orElseThrow(() -> new ResourceNotFoundException("CompanyType", "externalId", externalId));
+        return companyTypeMapper.toDto(companyType);
+    }
+    
     @Transactional
     public CompanyTypeDTO createCompanyType(CompanyTypeDTO companyTypeDTO) {
         CompanyType companyType = companyTypeMapper.toEntity(companyTypeDTO);

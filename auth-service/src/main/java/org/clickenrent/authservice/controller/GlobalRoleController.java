@@ -48,6 +48,17 @@ public class GlobalRoleController {
     }
     
     /**
+     * Get global role by external ID.
+     * GET /api/global-roles/external/{externalId}
+     */
+    @GetMapping("/external/{externalId}")
+    @PreAuthorize("hasAnyRole('SUPERADMIN', 'ADMIN')")
+    public ResponseEntity<GlobalRoleDTO> getGlobalRoleByExternalId(@PathVariable String externalId) {
+        GlobalRoleDTO globalRole = globalRoleService.getGlobalRoleByExternalId(externalId);
+        return ResponseEntity.ok(globalRole);
+    }
+    
+    /**
      * Create a new global role.
      * POST /api/global-roles
      */

@@ -18,6 +18,7 @@ import java.time.LocalDateTime;
 public class UserCompanyDTO {
 
     private Long id;
+    private String externalId;
     private Long userId;
     private Long companyId;
     private Long companyRoleId;

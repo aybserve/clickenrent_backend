@@ -48,6 +48,17 @@ public class CompanyTypeController {
     }
     
     /**
+     * Get company type by external ID.
+     * GET /api/company-types/external/{externalId}
+     */
+    @GetMapping("/external/{externalId}")
+    @PreAuthorize("hasAnyRole('SUPERADMIN', 'ADMIN')")
+    public ResponseEntity<CompanyTypeDTO> getCompanyTypeByExternalId(@PathVariable String externalId) {
+        CompanyTypeDTO companyType = companyTypeService.getCompanyTypeByExternalId(externalId);
+        return ResponseEntity.ok(companyType);
+    }
+    
+    /**
      * Create a new company type.
      * POST /api/company-types
      */

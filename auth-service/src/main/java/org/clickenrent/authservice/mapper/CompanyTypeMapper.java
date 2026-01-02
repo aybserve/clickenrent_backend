@@ -17,6 +17,7 @@ public class CompanyTypeMapper {
         
         return CompanyTypeDTO.builder()
                 .id(companyType.getId())
+                .externalId(companyType.getExternalId())
                 .name(companyType.getName())
                 .build();
     }
@@ -28,6 +29,7 @@ public class CompanyTypeMapper {
         
         return CompanyType.builder()
                 .id(dto.getId())
+                .externalId(dto.getExternalId())
                 .name(dto.getName())
                 .build();
     }
@@ -37,6 +39,9 @@ public class CompanyTypeMapper {
             return;
         }
         
+        if (dto.getExternalId() != null) {
+            companyType.setExternalId(dto.getExternalId());
+        }
         if (dto.getName() != null) {
             companyType.setName(dto.getName());
         }

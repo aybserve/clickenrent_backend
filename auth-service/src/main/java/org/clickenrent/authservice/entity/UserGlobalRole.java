@@ -2,6 +2,7 @@ package org.clickenrent.authservice.entity;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 import org.hibernate.annotations.SQLDelete;
@@ -34,6 +35,10 @@ public class UserGlobalRole extends BaseAuditEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Size(max = 100, message = "External ID must not exceed 100 characters")
+    @Column(name = "external_id", unique = true, length = 100)
+    private String externalId;
 
     @NotNull(message = "User is required")
     @ManyToOne(fetch = FetchType.LAZY)

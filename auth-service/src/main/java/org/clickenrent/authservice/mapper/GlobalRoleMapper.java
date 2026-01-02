@@ -17,6 +17,7 @@ public class GlobalRoleMapper {
         
         return GlobalRoleDTO.builder()
                 .id(globalRole.getId())
+                .externalId(globalRole.getExternalId())
                 .name(globalRole.getName())
                 .build();
     }
@@ -28,6 +29,7 @@ public class GlobalRoleMapper {
         
         return GlobalRole.builder()
                 .id(dto.getId())
+                .externalId(dto.getExternalId())
                 .name(dto.getName())
                 .build();
     }
@@ -37,6 +39,9 @@ public class GlobalRoleMapper {
             return;
         }
         
+        if (dto.getExternalId() != null) {
+            globalRole.setExternalId(dto.getExternalId());
+        }
         if (dto.getName() != null) {
             globalRole.setName(dto.getName());
         }

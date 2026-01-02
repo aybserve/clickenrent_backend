@@ -17,6 +17,7 @@ public class UserAddressMapper {
         
         return UserAddressDTO.builder()
                 .id(userAddress.getId())
+                .externalId(userAddress.getExternalId())
                 .userId(userAddress.getUser() != null ? userAddress.getUser().getId() : null)
                 .addressId(userAddress.getAddress() != null ? userAddress.getAddress().getId() : null)
                 .dateCreated(userAddress.getDateCreated())
@@ -33,6 +34,7 @@ public class UserAddressMapper {
         
         return UserAddress.builder()
                 .id(dto.getId())
+                .externalId(dto.getExternalId())
                 .build();
     }
     

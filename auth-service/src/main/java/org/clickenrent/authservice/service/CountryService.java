@@ -43,6 +43,13 @@ public class CountryService {
         return countryMapper.toDto(country);
     }
     
+    @Transactional(readOnly = true)
+    public CountryDTO getCountryByExternalId(String externalId) {
+        Country country = countryRepository.findByExternalId(externalId)
+                .orElseThrow(() -> new ResourceNotFoundException("Country", "externalId", externalId));
+        return countryMapper.toDto(country);
+    }
+    
     @Transactional
     public CountryDTO createCountry(CountryDTO countryDTO) {
         Country country = countryMapper.toEntity(countryDTO);

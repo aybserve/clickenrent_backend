@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Repository interface for UserCompany entity.
@@ -28,5 +29,7 @@ public interface UserCompanyRepository extends JpaRepository<UserCompany, Long> 
      * Find all user associations for a company by company ID.
      */
     List<UserCompany> findByCompanyId(Long companyId);
+    
+    Optional<UserCompany> findByExternalId(String externalId);
 }
 

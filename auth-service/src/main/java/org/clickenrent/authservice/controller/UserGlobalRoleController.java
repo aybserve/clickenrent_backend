@@ -47,6 +47,18 @@ public class UserGlobalRoleController {
     }
     
     /**
+     * Get user-global role link by external ID.
+     * GET /api/user-global-roles/external/{externalId}
+     * Requires: SUPERADMIN or ADMIN role
+     */
+    @GetMapping("/external/{externalId}")
+    @PreAuthorize("hasAnyRole('SUPERADMIN', 'ADMIN')")
+    public ResponseEntity<UserGlobalRoleDTO> getUserGlobalRoleByExternalId(@PathVariable String externalId) {
+        UserGlobalRoleDTO userGlobalRole = userGlobalRoleService.getUserGlobalRoleByExternalId(externalId);
+        return ResponseEntity.ok(userGlobalRole);
+    }
+    
+    /**
      * Get all global roles for a specific user.
      * GET /api/user-global-roles/user/{userId}
      * Requires: SUPERADMIN or ADMIN role
