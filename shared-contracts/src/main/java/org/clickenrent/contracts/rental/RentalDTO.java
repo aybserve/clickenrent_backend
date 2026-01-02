@@ -24,8 +24,6 @@ public class RentalDTO {
 
     private Long id;
     private String externalId;
-    private Long userId;
-    private Long companyId;
     private Long rentalStatusId;
     private String erpRentalOrderId;
 

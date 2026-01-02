@@ -24,13 +24,14 @@ public class LocationDTO {
 
     private Long id;
     private String externalId;
+    private String erpPartnerId;
     private String name;
-    private Long addressId;
-    private Long companyId;
-
-    // Cross-service externalId references
-    private String addressExternalId;
+    private String address;
+    private String description;
     private String companyExternalId;
+    private Boolean isPublic;
+    private String directions;
+    private Long coordinatesId;
 
     // Audit fields
     private LocalDateTime dateCreated;

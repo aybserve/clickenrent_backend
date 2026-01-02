@@ -24,11 +24,19 @@ public class BikeRentalFeedbackDTO {
 
     private Long id;
     private String externalId;
-    private String userExternalId;
-    private String bikeRentalExternalId;
     private Integer rate;
     private String comment;
     private LocalDateTime dateTime;
+
+    // Cross-service externalId references
+    private String userExternalId;
+    private String bikeRentalExternalId;
+
+    // Audit fields
+    private LocalDateTime dateCreated;
+    private LocalDateTime lastDateModified;
+    private String createdBy;
+    private String lastModifiedBy;
 }
 
 

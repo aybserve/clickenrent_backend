@@ -26,4 +26,10 @@ public class RideDTO {
     private Long startCoordinatesId;
     private Long endCoordinatesId;
     private Long rideStatusId;
+
+    // Audit fields
+    private LocalDateTime dateCreated;
+    private LocalDateTime lastDateModified;
+    private String createdBy;
+    private String lastModifiedBy;
 }

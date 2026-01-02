@@ -34,6 +34,10 @@ public class RideMapper {
                 .startCoordinatesId(ride.getStartCoordinates() != null ? ride.getStartCoordinates().getId() : null)
                 .endCoordinatesId(ride.getEndCoordinates() != null ? ride.getEndCoordinates().getId() : null)
                 .rideStatusId(ride.getRideStatus() != null ? ride.getRideStatus().getId() : null)
+                .dateCreated(ride.getDateCreated())
+                .lastDateModified(ride.getLastDateModified())
+                .createdBy(ride.getCreatedBy())
+                .lastModifiedBy(ride.getLastModifiedBy())
                 .build();
     }
 
