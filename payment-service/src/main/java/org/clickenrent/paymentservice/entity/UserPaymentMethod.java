@@ -2,13 +2,8 @@ package org.clickenrent.paymentservice.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.springframework.data.annotation.CreatedBy;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedBy;
-import org.springframework.data.annotation.LastModifiedDate;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+import lombok.experimental.SuperBuilder;
 
-import java.time.LocalDateTime;
 import java.util.UUID;
 
 /**
@@ -16,13 +11,12 @@ import java.util.UUID;
  */
 @Entity
 @Table(name = "user_payment_methods")
-@EntityListeners(AuditingEntityListener.class)
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
-public class UserPaymentMethod {
+@SuperBuilder
+public class UserPaymentMethod extends BaseAuditEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -42,26 +36,13 @@ public class UserPaymentMethod {
     @Column(length = 255)
     private String stripePaymentMethodId;
 
+    @Builder.Default
     @Column(nullable = false)
     private Boolean isDefault = false;
 
+    @Builder.Default
     @Column(nullable = false)
     private Boolean isActive = true;
-
-    @CreatedDate
-    @Column(nullable = false, updatable = false)
-    private LocalDateTime createdAt;
-
-    @LastModifiedDate
-    @Column(nullable = false)
-    private LocalDateTime updatedAt;
-
-    @CreatedBy
-    @Column(updatable = false)
-    private String createdBy;
-
-    @LastModifiedBy
-    private String lastModifiedBy;
 
     @PrePersist
     public void prePersist() {

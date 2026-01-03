@@ -54,6 +54,12 @@ public class FinancialTransactionDTO {
     private String stripeRefundId;
     
     private Long originalTransactionId;
+    
+    // Audit fields
+    private LocalDateTime dateCreated;
+    private LocalDateTime lastDateModified;
+    private String createdBy;
+    private String lastModifiedBy;
 }
 
 

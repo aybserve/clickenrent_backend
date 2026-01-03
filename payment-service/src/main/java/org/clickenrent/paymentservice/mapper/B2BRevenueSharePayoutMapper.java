@@ -34,6 +34,10 @@ public class B2BRevenueSharePayoutMapper {
                 .paidAmount(entity.getPaidAmount())
                 .remainingAmount(entity.getRemainingAmount())
                 .payoutItems(payoutItemMapper.toDTOList(entity.getPayoutItems()))
+                .dateCreated(entity.getDateCreated())
+                .lastDateModified(entity.getLastDateModified())
+                .createdBy(entity.getCreatedBy())
+                .lastModifiedBy(entity.getLastModifiedBy())
                 .build();
     }
 

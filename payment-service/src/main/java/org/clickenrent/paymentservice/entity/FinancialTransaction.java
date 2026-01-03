@@ -31,7 +31,6 @@ public class FinancialTransaction extends BaseAuditEntity {
     @Column(name = "external_id", unique = true, length = 100)
     private String externalId;
 
-    // Cross-service reference fields using externalId
     @Column(name = "payer_external_id", length = 100)
     private String payerExternalId;
 

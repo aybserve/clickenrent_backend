@@ -27,6 +27,10 @@ public class B2BSaleFinTransactionMapper {
                 .externalId(entity.getExternalId())
                 .b2bSaleExternalId(entity.getB2bSaleExternalId())
                 .financialTransaction(financialTransactionMapper.toDTO(entity.getFinancialTransaction()))
+                .dateCreated(entity.getDateCreated())
+                .lastDateModified(entity.getLastDateModified())
+                .createdBy(entity.getCreatedBy())
+                .lastModifiedBy(entity.getLastModifiedBy())
                 .build();
     }
 

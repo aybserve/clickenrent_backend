@@ -62,8 +62,8 @@ public class RentalFinTransactionService {
         RentalFinTransaction transaction = rentalFinTransactionMapper.toEntity(dto);
         
         // External IDs are provided directly in the DTO
-        log.debug("Creating rental transaction with rentalExternalId: {}, bikeRentalExternalId: {}", 
-                dto.getRentalExternalId(), dto.getBikeRentalExternalId());
+        log.debug("Creating rental transaction with rentalExternalId: {}", 
+                dto.getRentalExternalId());
         
         RentalFinTransaction savedTransaction = rentalFinTransactionRepository.save(transaction);
         return rentalFinTransactionMapper.toDTO(savedTransaction);
@@ -79,7 +79,6 @@ public class RentalFinTransactionService {
                 .orElseThrow(() -> new ResourceNotFoundException("RentalFinTransaction", "id", id));
         
         existingTransaction.setRentalExternalId(dto.getRentalExternalId());
-        existingTransaction.setBikeRentalExternalId(dto.getBikeRentalExternalId());
         
         RentalFinTransaction updatedTransaction = rentalFinTransactionRepository.save(existingTransaction);
         return rentalFinTransactionMapper.toDTO(updatedTransaction);

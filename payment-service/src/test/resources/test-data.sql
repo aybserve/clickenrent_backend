@@ -83,14 +83,14 @@ VALUES (3, '550e8400-e29b-41d4-a716-446655440043', 3, 'cus_test_user3', true, CU
 -- ========================================
 -- 6. USER PAYMENT METHODS
 -- ========================================
-INSERT INTO user_payment_methods (id, external_id, user_payment_profile_id, stripe_payment_method_id, is_default, is_active, created_at, updated_at, created_by, last_modified_by)
-VALUES (1, '550e8400-e29b-41d4-a716-446655440051', 1, 'pm_test_card1', true, true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system');
+INSERT INTO user_payment_methods (id, external_id, user_payment_profile_id, payment_method_id, stripe_payment_method_id, is_default, is_active, date_created, last_date_modified, created_by, last_modified_by, is_deleted)
+VALUES (1, '550e8400-e29b-41d4-a716-446655440051', 1, 1, 'pm_test_card1', true, true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false);
 
-INSERT INTO user_payment_methods (id, external_id, user_payment_profile_id, stripe_payment_method_id, is_default, is_active, created_at, updated_at, created_by, last_modified_by)
-VALUES (2, '550e8400-e29b-41d4-a716-446655440052', 1, 'pm_test_card2', false, true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system');
+INSERT INTO user_payment_methods (id, external_id, user_payment_profile_id, payment_method_id, stripe_payment_method_id, is_default, is_active, date_created, last_date_modified, created_by, last_modified_by, is_deleted)
+VALUES (2, '550e8400-e29b-41d4-a716-446655440052', 1, 1, 'pm_test_card2', false, true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false);
 
-INSERT INTO user_payment_methods (id, external_id, user_payment_profile_id, stripe_payment_method_id, is_default, is_active, created_at, updated_at, created_by, last_modified_by)
-VALUES (3, '550e8400-e29b-41d4-a716-446655440053', 2, 'pm_test_card3', true, true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system');
+INSERT INTO user_payment_methods (id, external_id, user_payment_profile_id, payment_method_id, stripe_payment_method_id, is_default, is_active, date_created, last_date_modified, created_by, last_modified_by, is_deleted)
+VALUES (3, '550e8400-e29b-41d4-a716-446655440053', 2, 1, 'pm_test_card3', true, true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false);
 
 -- ========================================
 -- 7. FINANCIAL TRANSACTIONS
@@ -152,8 +152,8 @@ VALUES (3, '550e8400-e29b-41d4-a716-446655440113', 2, 1, 125.00, CURRENT_TIMESTA
 -- ========================================
 -- 13. PAYOUT FIN TRANSACTIONS
 -- ========================================
-INSERT INTO payout_fin_transactions (id, external_id, b2b_revenue_share_payout_id, financial_transaction_id, created_at, updated_at, created_by, last_modified_by)
-VALUES (1, '550e8400-e29b-41d4-a716-446655440121', 2, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system');
+INSERT INTO payout_fin_transactions (id, external_id, b2b_revenue_share_payout_id, financial_transaction_id, date_created, last_date_modified, created_by, last_modified_by, is_deleted)
+VALUES (1, '550e8400-e29b-41d4-a716-446655440121', 2, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', FALSE);
 
 
 

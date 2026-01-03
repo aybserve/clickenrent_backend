@@ -24,6 +24,10 @@ public class UserPaymentProfileMapper {
                 .userExternalId(entity.getUserExternalId())
                 .stripeCustomerId(entity.getStripeCustomerId())
                 .isActive(entity.getIsActive())
+                .dateCreated(entity.getDateCreated())
+                .lastDateModified(entity.getLastDateModified())
+                .createdBy(entity.getCreatedBy())
+                .lastModifiedBy(entity.getLastModifiedBy())
                 .build();
     }
 

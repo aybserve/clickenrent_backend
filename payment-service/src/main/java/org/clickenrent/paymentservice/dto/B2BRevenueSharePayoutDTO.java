@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -49,6 +50,12 @@ public class B2BRevenueSharePayoutDTO {
     
     @Builder.Default
     private List<B2BRevenueSharePayoutItemDTO> payoutItems = new ArrayList<>();
+    
+    // Audit fields
+    private LocalDateTime dateCreated;
+    private LocalDateTime lastDateModified;
+    private String createdBy;
+    private String lastModifiedBy;
 }
 
 

@@ -31,6 +31,10 @@ public class UserPaymentMethodMapper {
                 .stripePaymentMethodId(entity.getStripePaymentMethodId())
                 .isDefault(entity.getIsDefault())
                 .isActive(entity.getIsActive())
+                .dateCreated(entity.getDateCreated())
+                .lastDateModified(entity.getLastDateModified())
+                .createdBy(entity.getCreatedBy())
+                .lastModifiedBy(entity.getLastModifiedBy())
                 .build();
     }
 

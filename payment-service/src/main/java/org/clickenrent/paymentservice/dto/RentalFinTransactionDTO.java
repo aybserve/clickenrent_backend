@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
 
 /**
  * DTO for RentalFinTransaction entity
@@ -24,10 +25,14 @@ public class RentalFinTransactionDTO {
     @NotNull(message = "Rental external ID is required")
     private String rentalExternalId;
     
-    private String bikeRentalExternalId; // Optional: References specific bike rental within the rental
-    
     @NotNull(message = "Financial transaction is required")
     private FinancialTransactionDTO financialTransaction;
+    
+    // Audit fields
+    private LocalDateTime dateCreated;
+    private LocalDateTime lastDateModified;
+    private String createdBy;
+    private String lastModifiedBy;
 }
 
 

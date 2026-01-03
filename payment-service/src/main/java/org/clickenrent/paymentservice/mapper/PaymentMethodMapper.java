@@ -24,6 +24,10 @@ public class PaymentMethodMapper {
                 .code(entity.getCode())
                 .name(entity.getName())
                 .isActive(entity.getIsActive())
+                .dateCreated(entity.getDateCreated())
+                .lastDateModified(entity.getLastDateModified())
+                .createdBy(entity.getCreatedBy())
+                .lastModifiedBy(entity.getLastModifiedBy())
                 .build();
     }
 

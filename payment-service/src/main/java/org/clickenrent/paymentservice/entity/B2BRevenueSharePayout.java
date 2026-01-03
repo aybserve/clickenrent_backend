@@ -33,7 +33,6 @@ public class B2BRevenueSharePayout extends BaseAuditEntity {
     @Column(name = "external_id", unique = true, length = 100)
     private String externalId;
 
-    // Cross-service reference field using externalId
     @Column(name = "company_external_id", length = 100)
     private String companyExternalId;
 

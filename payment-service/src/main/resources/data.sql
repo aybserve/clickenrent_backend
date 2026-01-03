@@ -85,10 +85,10 @@ ON CONFLICT (id) DO NOTHING;
 -- ---------------------------------------------------------------------------------------------------------------------
 -- 2.2 USER PAYMENT METHODS (Sample data)
 -- ---------------------------------------------------------------------------------------------------------------------
-INSERT INTO user_payment_methods (id, external_id, user_payment_profile_id, payment_method_id, stripe_payment_method_id, is_default, is_active, created_at, updated_at, created_by, last_modified_by) VALUES
-(1, '550e8400-e29b-41d4-a716-446655440051', 1, 1, 'pm_test_card1', true, true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system'),
-(2, '550e8400-e29b-41d4-a716-446655440052', 1, 1, 'pm_test_card2', false, true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system'),
-(3, '550e8400-e29b-41d4-a716-446655440053', 2, 1, 'pm_test_card3', true, true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system')
+INSERT INTO user_payment_methods (id, external_id, user_payment_profile_id, payment_method_id, stripe_payment_method_id, is_default, is_active, date_created, last_date_modified, created_by, last_modified_by, is_deleted) VALUES
+(1, '550e8400-e29b-41d4-a716-446655440051', 1, 1, 'pm_test_card1', true, true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(2, '550e8400-e29b-41d4-a716-446655440052', 1, 1, 'pm_test_card2', false, true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(3, '550e8400-e29b-41d4-a716-446655440053', 2, 1, 'pm_test_card3', true, true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false)
 ON CONFLICT (id) DO NOTHING;
 
 -- ---------------------------------------------------------------------------------------------------------------------
@@ -104,10 +104,10 @@ ON CONFLICT (id) DO NOTHING;
 -- ---------------------------------------------------------------------------------------------------------------------
 -- 2.4 RENTAL FIN TRANSACTIONS (Sample data - references rentals from rental-service)
 -- ---------------------------------------------------------------------------------------------------------------------
-INSERT INTO rental_fin_transactions (id, external_id, rental_external_id, bike_rental_external_id, financial_transaction_id, date_created, last_date_modified, created_by, last_modified_by, is_deleted) VALUES
-(1, '550e8400-e29b-41d4-a716-446655440301', 'rental-ext-00101', 'bike-rental-ext-00101', 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
-(2, '550e8400-e29b-41d4-a716-446655440302', 'rental-ext-00102', 'bike-rental-ext-00102', 2, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
-(3, '550e8400-e29b-41d4-a716-446655440303', 'rental-ext-00103', 'bike-rental-ext-00103', 3, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false)
+INSERT INTO rental_fin_transactions (id, external_id, rental_external_id, financial_transaction_id, date_created, last_date_modified, created_by, last_modified_by, is_deleted) VALUES
+(1, '550e8400-e29b-41d4-a716-446655440301', 'rental-ext-00101', 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(2, '550e8400-e29b-41d4-a716-446655440302', 'rental-ext-00102', 2, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(3, '550e8400-e29b-41d4-a716-446655440303', 'rental-ext-00103', 3, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false)
 ON CONFLICT (id) DO NOTHING;
 
 -- ---------------------------------------------------------------------------------------------------------------------
@@ -146,8 +146,8 @@ ON CONFLICT (id) DO NOTHING;
 -- ---------------------------------------------------------------------------------------------------------------------
 -- 2.9 PAYOUT FIN TRANSACTIONS (Sample data - links payouts to financial transactions)
 -- ---------------------------------------------------------------------------------------------------------------------
-INSERT INTO payout_fin_transactions (id, external_id, b2b_revenue_share_payout_id, financial_transaction_id, created_at, updated_at, created_by, last_modified_by) VALUES
-(1, '550e8400-e29b-41d4-a716-446655440121', 2, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system')
+INSERT INTO payout_fin_transactions (id, external_id, b2b_revenue_share_payout_id, financial_transaction_id, date_created, last_date_modified, created_by, last_modified_by, is_deleted) VALUES
+(1, '550e8400-e29b-41d4-a716-446655440121', 2, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', FALSE)
 ON CONFLICT (id) DO NOTHING;
 
 -- =====================================================================================================================

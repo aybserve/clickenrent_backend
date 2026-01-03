@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
 
 /**
  * DTO for ServiceProvider entity
@@ -25,6 +26,12 @@ public class ServiceProviderDTO {
     
     @NotBlank(message = "Service provider name is required")
     private String name;
+    
+    // Audit fields
+    private LocalDateTime dateCreated;
+    private LocalDateTime lastDateModified;
+    private String createdBy;
+    private String lastModifiedBy;
 }
 
 

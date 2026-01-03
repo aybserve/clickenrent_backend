@@ -7,6 +7,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
 
 /**
  * DTO for Currency entity
@@ -27,6 +28,12 @@ public class CurrencyDTO {
     
     @NotBlank(message = "Currency name is required")
     private String name;
+    
+    // Audit fields
+    private LocalDateTime dateCreated;
+    private LocalDateTime lastDateModified;
+    private String createdBy;
+    private String lastModifiedBy;
 }
 
 

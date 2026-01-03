@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
 
 /**
  * DTO for UserPaymentProfile entity
@@ -28,6 +29,12 @@ public class UserPaymentProfileDTO {
     
     @NotNull(message = "Active status is required")
     private Boolean isActive;
+    
+    // Audit fields
+    private LocalDateTime dateCreated;
+    private LocalDateTime lastDateModified;
+    private String createdBy;
+    private String lastModifiedBy;
 }
 
 

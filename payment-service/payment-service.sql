@@ -153,14 +153,15 @@ CREATE TABLE user_payment_methods (
     is_active                   BOOLEAN NOT NULL DEFAULT true,
     
     -- Audit fields
-    created_at                  TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at                  TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    date_created                TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    last_date_modified          TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     created_by                  VARCHAR(255),
     last_modified_by            VARCHAR(255),
+    is_deleted                  BOOLEAN NOT NULL DEFAULT FALSE,
     
     CONSTRAINT fk_user_payment_method_profile FOREIGN KEY (user_payment_profile_id) 
         REFERENCES user_payment_profiles(id) ON DELETE CASCADE,
-    CONSTRAINT fk_user_payment_method_payment_method FOREIGN KEY (payment_method_id) 
+    CONSTRAINT fk_user_payment_method_method FOREIGN KEY (payment_method_id) 
         REFERENCES payment_methods(id) ON DELETE RESTRICT
 );
 
@@ -226,18 +227,18 @@ CREATE TABLE financial_transactions (
 CREATE TABLE rental_fin_transactions (
     id                          BIGSERIAL PRIMARY KEY,
     external_id                 UUID NOT NULL UNIQUE,
-    rental_id                   BIGINT NOT NULL,
+    rental_external_id          VARCHAR(100),
     financial_transaction_id    BIGINT NOT NULL,
     
     -- Audit fields
-    created_at                  TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at                  TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    date_created                TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    last_date_modified          TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     created_by                  VARCHAR(255),
     last_modified_by            VARCHAR(255),
+    is_deleted                  BOOLEAN NOT NULL DEFAULT FALSE,
     
     CONSTRAINT fk_rental_fin_transaction FOREIGN KEY (financial_transaction_id) 
-        REFERENCES financial_transactions(id) ON DELETE CASCADE,
-    CONSTRAINT chk_rental_id CHECK (rental_id > 0)
+        REFERENCES financial_transactions(id) ON DELETE CASCADE
 );
 
 -- ---------------------------------------------------------------------------------------------------------------------
@@ -349,10 +350,11 @@ CREATE TABLE payout_fin_transactions (
     financial_transaction_id        BIGINT NOT NULL,
     
     -- Audit fields
-    created_at                      TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at                      TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    date_created                    TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    last_date_modified              TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     created_by                      VARCHAR(255),
     last_modified_by                VARCHAR(255),
+    is_deleted                      BOOLEAN NOT NULL DEFAULT FALSE,
     
     CONSTRAINT fk_payout_fin_transaction_payout FOREIGN KEY (b2b_revenue_share_payout_id) 
         REFERENCES b2b_revenue_share_payouts(id) ON DELETE CASCADE,
@@ -404,7 +406,7 @@ CREATE INDEX idx_financial_transactions_date_time ON financial_transactions(date
 
 -- Rental Fin Transactions indexes
 CREATE INDEX idx_rental_fin_transactions_external_id ON rental_fin_transactions(external_id);
-CREATE INDEX idx_rental_fin_transactions_rental_id ON rental_fin_transactions(rental_id);
+CREATE INDEX idx_rental_fin_transactions_rental_external_id ON rental_fin_transactions(rental_external_id);
 CREATE INDEX idx_rental_fin_transactions_fin_transaction_id ON rental_fin_transactions(financial_transaction_id);
 
 -- B2B Sale Fin Transactions indexes
@@ -493,10 +495,10 @@ ON CONFLICT (id) DO NOTHING;
 -- ---------------------------------------------------------------------------------------------------------------------
 -- 7.6 USER PAYMENT METHODS
 -- ---------------------------------------------------------------------------------------------------------------------
-INSERT INTO user_payment_methods (id, external_id, user_payment_profile_id, payment_method_id, stripe_payment_method_id, is_default, is_active, created_at, updated_at, created_by, last_modified_by) VALUES
-(1, '550e8400-e29b-41d4-a716-446655440051'::uuid, 1, 1, 'pm_test_card1', true, true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system'),
-(2, '550e8400-e29b-41d4-a716-446655440052'::uuid, 1, 1, 'pm_test_card2', false, true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system'),
-(3, '550e8400-e29b-41d4-a716-446655440053'::uuid, 2, 1, 'pm_test_card3', true, true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system')
+INSERT INTO user_payment_methods (id, external_id, user_payment_profile_id, payment_method_id, stripe_payment_method_id, is_default, is_active, date_created, last_date_modified, created_by, last_modified_by, is_deleted) VALUES
+(1, '550e8400-e29b-41d4-a716-446655440051'::uuid, 1, 1, 'pm_test_card1', true, true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', FALSE),
+(2, '550e8400-e29b-41d4-a716-446655440052'::uuid, 1, 1, 'pm_test_card2', false, true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', FALSE),
+(3, '550e8400-e29b-41d4-a716-446655440053'::uuid, 2, 1, 'pm_test_card3', true, true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', FALSE)
 ON CONFLICT (id) DO NOTHING;
 
 -- ---------------------------------------------------------------------------------------------------------------------
@@ -511,9 +513,9 @@ ON CONFLICT (id) DO NOTHING;
 -- ---------------------------------------------------------------------------------------------------------------------
 -- 7.8 RENTAL FIN TRANSACTIONS
 -- ---------------------------------------------------------------------------------------------------------------------
-INSERT INTO rental_fin_transactions (id, external_id, rental_id, financial_transaction_id, created_at, updated_at, created_by, last_modified_by) VALUES
-(1, '550e8400-e29b-41d4-a716-446655440071'::uuid, 1, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system'),
-(2, '550e8400-e29b-41d4-a716-446655440072'::uuid, 2, 2, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system')
+INSERT INTO rental_fin_transactions (id, external_id, rental_external_id, financial_transaction_id, date_created, last_date_modified, created_by, last_modified_by, is_deleted) VALUES
+(1, '550e8400-e29b-41d4-a716-446655440071'::uuid, 'rental-ext-00101', 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', FALSE),
+(2, '550e8400-e29b-41d4-a716-446655440072'::uuid, 'rental-ext-00102', 2, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', FALSE)
 ON CONFLICT (id) DO NOTHING;
 
 -- ---------------------------------------------------------------------------------------------------------------------
@@ -551,8 +553,8 @@ ON CONFLICT (id) DO NOTHING;
 -- ---------------------------------------------------------------------------------------------------------------------
 -- 7.13 PAYOUT FIN TRANSACTIONS
 -- ---------------------------------------------------------------------------------------------------------------------
-INSERT INTO payout_fin_transactions (id, external_id, b2b_revenue_share_payout_id, financial_transaction_id, created_at, updated_at, created_by, last_modified_by) VALUES
-(1, '550e8400-e29b-41d4-a716-446655440121'::uuid, 2, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system')
+INSERT INTO payout_fin_transactions (id, external_id, b2b_revenue_share_payout_id, financial_transaction_id, date_created, last_date_modified, created_by, last_modified_by, is_deleted) VALUES
+(1, '550e8400-e29b-41d4-a716-446655440121'::uuid, 2, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', FALSE)
 ON CONFLICT (id) DO NOTHING;
 
 -- =====================================================================================================================

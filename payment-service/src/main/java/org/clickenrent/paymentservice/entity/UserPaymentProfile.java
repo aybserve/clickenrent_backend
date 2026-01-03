@@ -29,7 +29,6 @@ public class UserPaymentProfile extends BaseAuditEntity {
     @Column(name = "external_id", unique = true, length = 100)
     private String externalId;
 
-    // Cross-service reference field using externalId
     @Column(name = "user_external_id", length = 100)
     private String userExternalId;
 

@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
 
 /**
  * DTO for B2BSaleFinTransaction entity
@@ -25,6 +26,12 @@ public class B2BSaleFinTransactionDTO {
     
     @NotNull(message = "Financial transaction is required")
     private FinancialTransactionDTO financialTransaction;
+    
+    // Audit fields
+    private LocalDateTime dateCreated;
+    private LocalDateTime lastDateModified;
+    private String createdBy;
+    private String lastModifiedBy;
 }
 
 

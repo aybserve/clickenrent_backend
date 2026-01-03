@@ -25,6 +25,10 @@ public class B2BRevenueSharePayoutItemMapper {
                         entity.getB2bRevenueSharePayout().getId() : null)
                 .bikeRentalExternalId(entity.getBikeRentalExternalId())
                 .amount(entity.getAmount())
+                .dateCreated(entity.getDateCreated())
+                .lastDateModified(entity.getLastDateModified())
+                .createdBy(entity.getCreatedBy())
+                .lastModifiedBy(entity.getLastModifiedBy())
                 .build();
     }
 

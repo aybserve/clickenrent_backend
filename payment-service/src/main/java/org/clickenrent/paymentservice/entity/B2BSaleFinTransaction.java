@@ -30,7 +30,7 @@ public class B2BSaleFinTransaction extends BaseAuditEntity {
     private String externalId;
 
     @Column(name = "b2b_sale_external_id", length = 100)
-    private String b2bSaleExternalId; // References B2B sale in rental-service
+    private String b2bSaleExternalId;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "financial_transaction_id", nullable = false)

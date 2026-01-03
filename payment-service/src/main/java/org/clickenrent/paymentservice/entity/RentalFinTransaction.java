@@ -29,12 +29,8 @@ public class RentalFinTransaction extends BaseAuditEntity {
     @Column(name = "external_id", unique = true, length = 100)
     private String externalId;
 
-    // Cross-service reference fields using externalId
     @Column(name = "rental_external_id", length = 100)
     private String rentalExternalId;
-
-    @Column(name = "bike_rental_external_id", length = 100)
-    private String bikeRentalExternalId;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "financial_transaction_id", nullable = false)

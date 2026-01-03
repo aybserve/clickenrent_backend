@@ -35,7 +35,7 @@ public class B2BRevenueSharePayoutItem extends BaseAuditEntity {
     private B2BRevenueSharePayout b2bRevenueSharePayout;
 
     @Column(name = "bike_rental_external_id", length = 100)
-    private String bikeRentalExternalId; // References bike rental in rental-service
+    private String bikeRentalExternalId;
 
     @Column(nullable = false, precision = 19, scale = 2)
     private BigDecimal amount;

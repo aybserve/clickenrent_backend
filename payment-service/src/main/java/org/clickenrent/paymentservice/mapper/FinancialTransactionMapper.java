@@ -40,6 +40,10 @@ public class FinancialTransactionMapper {
                 .stripeChargeId(entity.getStripeChargeId())
                 .stripeRefundId(entity.getStripeRefundId())
                 .originalTransactionId(entity.getOriginalTransactionId())
+                .dateCreated(entity.getDateCreated())
+                .lastDateModified(entity.getLastDateModified())
+                .createdBy(entity.getCreatedBy())
+                .lastModifiedBy(entity.getLastModifiedBy())
                 .build();
     }
 
