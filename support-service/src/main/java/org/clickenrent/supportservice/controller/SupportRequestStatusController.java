@@ -40,6 +40,13 @@ public class SupportRequestStatusController {
         return ResponseEntity.ok(supportRequestStatusService.getById(id));
     }
 
+    @GetMapping("/external/{externalId}")
+    @PreAuthorize("isAuthenticated()")
+    @Operation(summary = "Get support request status by external ID")
+    public ResponseEntity<SupportRequestStatusDTO> getByExternalId(@PathVariable String externalId) {
+        return ResponseEntity.ok(supportRequestStatusService.getByExternalId(externalId));
+    }
+
     @GetMapping("/name/{name}")
     @PreAuthorize("isAuthenticated()")
     @Operation(summary = "Get support request status by name")

@@ -53,6 +53,21 @@ public class SupportRequestBikeIssueService {
     }
 
     @Transactional(readOnly = true)
+    public SupportRequestBikeIssueDTO getByExternalId(String externalId) {
+        SupportRequestBikeIssue entity = supportRequestBikeIssueRepository.findByExternalId(externalId)
+                .orElseThrow(() -> new ResourceNotFoundException("SupportRequestBikeIssue", "externalId", externalId));
+        
+        if (!securityService.isAdmin()) {
+            String userExternalId = entity.getSupportRequest().getUserExternalId();
+            if (!securityService.hasAccessToUserByExternalId(userExternalId)) {
+                throw new UnauthorizedException("You don't have permission to access this issue");
+            }
+        }
+        
+        return supportRequestBikeIssueMapper.toDto(entity);
+    }
+
+    @Transactional(readOnly = true)
     public List<SupportRequestBikeIssueDTO> getBySupportRequestId(Long supportRequestId) {
         if (!securityService.isAdmin()) {
             var supportRequest = supportRequestRepository.findById(supportRequestId)

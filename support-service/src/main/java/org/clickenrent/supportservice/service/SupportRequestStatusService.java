@@ -39,6 +39,13 @@ public class SupportRequestStatusService {
     }
 
     @Transactional(readOnly = true)
+    public SupportRequestStatusDTO getByExternalId(String externalId) {
+        SupportRequestStatus entity = supportRequestStatusRepository.findByExternalId(externalId)
+                .orElseThrow(() -> new ResourceNotFoundException("SupportRequestStatus", "externalId", externalId));
+        return supportRequestStatusMapper.toDto(entity);
+    }
+
+    @Transactional(readOnly = true)
     public SupportRequestStatusDTO getByName(String name) {
         SupportRequestStatus entity = supportRequestStatusRepository.findByName(name)
                 .orElseThrow(() -> new ResourceNotFoundException("SupportRequestStatus", "name", name));

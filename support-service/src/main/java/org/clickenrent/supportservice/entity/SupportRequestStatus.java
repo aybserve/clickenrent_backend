@@ -28,6 +28,9 @@ public class SupportRequestStatus extends BaseAuditEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "external_id", length = 100, unique = true)
+    private String externalId;
+
     @NotBlank(message = "Name is required")
     @Size(max = 100, message = "Name must not exceed 100 characters")
     @Column(name = "name", nullable = false, unique = true, length = 100)

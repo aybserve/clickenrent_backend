@@ -41,6 +41,7 @@ class ResponsiblePersonControllerTest {
     void setUp() {
         responsiblePersonDTO = ResponsiblePersonDTO.builder()
                 .id(1L)
+                .externalId("person-uuid-1")
                 .name("John Mechanic")
                 .build();
     }

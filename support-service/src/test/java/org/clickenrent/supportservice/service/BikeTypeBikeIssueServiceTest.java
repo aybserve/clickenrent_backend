@@ -50,12 +50,14 @@ class BikeTypeBikeIssueServiceTest {
 
         testJunction = BikeTypeBikeIssue.builder()
                 .id(1L)
+                .externalId("junction-uuid-1")
                 .bikeTypeExternalId("bike-type-uuid-1")
                 .bikeIssue(testBikeIssue)
                 .build();
 
         testJunctionDTO = BikeTypeBikeIssueDTO.builder()
                 .id(1L)
+                .externalId("junction-uuid-1")
                 .bikeTypeExternalId("bike-type-uuid-1")
                 .build();
     }
@@ -192,6 +194,7 @@ class BikeTypeBikeIssueServiceTest {
         assertThrows(UnauthorizedException.class, () -> bikeTypeBikeIssueService.delete(1L));
     }
 }
+
 
 
 

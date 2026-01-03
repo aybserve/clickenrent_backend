@@ -61,12 +61,14 @@ class SupportRequestBikeIssueServiceTest {
 
         testJunction = SupportRequestBikeIssue.builder()
                 .id(1L)
+                .externalId("junction-uuid-1")
                 .supportRequest(testRequest)
                 .bikeIssue(testBikeIssue)
                 .build();
 
         testJunctionDTO = SupportRequestBikeIssueDTO.builder()
                 .id(1L)
+                .externalId("junction-uuid-1")
                 .supportRequestId(1L)
                 .build();
     }

@@ -60,6 +60,21 @@ public class BikeRentalFeedbackService {
     }
 
     @Transactional(readOnly = true)
+    public BikeRentalFeedbackDTO getByExternalId(String externalId) {
+        BikeRentalFeedback entity = bikeRentalFeedbackRepository.findByExternalId(externalId)
+                .orElseThrow(() -> new ResourceNotFoundException("BikeRentalFeedback", "externalId", externalId));
+        
+        if (!securityService.isAdmin()) {
+            String currentUserExternalId = securityService.getCurrentUserExternalId();
+            if (currentUserExternalId == null || !currentUserExternalId.equals(entity.getUserExternalId())) {
+                throw new UnauthorizedException("You don't have permission to access this feedback");
+            }
+        }
+        
+        return bikeRentalFeedbackMapper.toDto(entity);
+    }
+
+    @Transactional(readOnly = true)
     public BikeRentalFeedbackDTO getByBikeRentalExternalId(String bikeRentalExternalId) {
         BikeRentalFeedback entity = bikeRentalFeedbackRepository.findByBikeRentalExternalId(bikeRentalExternalId)
                 .orElseThrow(() -> new ResourceNotFoundException("BikeRentalFeedback", "bikeRentalExternalId", bikeRentalExternalId));

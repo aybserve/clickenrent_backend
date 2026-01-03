@@ -12,6 +12,8 @@ import java.util.Optional;
 @Repository
 public interface SupportRequestStatusRepository extends JpaRepository<SupportRequestStatus, Long> {
     
+    Optional<SupportRequestStatus> findByExternalId(String externalId);
+    
     Optional<SupportRequestStatus> findByName(String name);
 }
 

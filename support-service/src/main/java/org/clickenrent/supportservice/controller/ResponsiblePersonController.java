@@ -40,6 +40,13 @@ public class ResponsiblePersonController {
         return ResponseEntity.ok(responsiblePersonService.getById(id));
     }
 
+    @GetMapping("/external/{externalId}")
+    @PreAuthorize("isAuthenticated()")
+    @Operation(summary = "Get responsible person by external ID")
+    public ResponseEntity<ResponsiblePersonDTO> getByExternalId(@PathVariable String externalId) {
+        return ResponseEntity.ok(responsiblePersonService.getByExternalId(externalId));
+    }
+
     @PostMapping
     @PreAuthorize("hasAnyRole('SUPERADMIN', 'ADMIN')")
     @Operation(summary = "Create responsible person")

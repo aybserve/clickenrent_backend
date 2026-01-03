@@ -40,6 +40,13 @@ public class BikeRentalFeedbackController {
         return ResponseEntity.ok(bikeRentalFeedbackService.getById(id));
     }
 
+    @GetMapping("/external/{externalId}")
+    @PreAuthorize("isAuthenticated()")
+    @Operation(summary = "Get bike rental feedback by external ID")
+    public ResponseEntity<BikeRentalFeedbackDTO> getByExternalId(@PathVariable String externalId) {
+        return ResponseEntity.ok(bikeRentalFeedbackService.getByExternalId(externalId));
+    }
+
     @GetMapping("/bike-rental/{bikeRentalExternalId}")
     @PreAuthorize("isAuthenticated()")
     @Operation(summary = "Get bike rental feedback by bike rental external ID")

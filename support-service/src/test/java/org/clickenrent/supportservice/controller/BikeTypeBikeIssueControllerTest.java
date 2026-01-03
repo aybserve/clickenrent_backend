@@ -40,6 +40,7 @@ class BikeTypeBikeIssueControllerTest {
     void setUp() {
         junctionDTO = BikeTypeBikeIssueDTO.builder()
                 .id(1L)
+                .externalId("junction-uuid-1")
                 .bikeTypeExternalId("bike-type-uuid-1")
                 .build();
     }

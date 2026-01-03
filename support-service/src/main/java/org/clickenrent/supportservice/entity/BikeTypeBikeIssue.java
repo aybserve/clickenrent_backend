@@ -28,6 +28,9 @@ public class BikeTypeBikeIssue {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "external_id", length = 100, unique = true)
+    private String externalId;
+
     @Column(name = "bike_type_external_id", length = 100)
     private String bikeTypeExternalId;
 

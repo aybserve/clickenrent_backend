@@ -38,6 +38,13 @@ public class ResponsiblePersonService {
         return responsiblePersonMapper.toDto(entity);
     }
 
+    @Transactional(readOnly = true)
+    public ResponsiblePersonDTO getByExternalId(String externalId) {
+        ResponsiblePerson entity = responsiblePersonRepository.findByExternalId(externalId)
+                .orElseThrow(() -> new ResourceNotFoundException("ResponsiblePerson", "externalId", externalId));
+        return responsiblePersonMapper.toDto(entity);
+    }
+
     @Transactional
     public ResponsiblePersonDTO create(ResponsiblePersonDTO dto) {
         if (!securityService.isAdmin()) {

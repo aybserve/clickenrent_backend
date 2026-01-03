@@ -26,20 +26,20 @@
 -- ---------------------------------------------------------------------------------------------------------------------
 -- 1.1 SUPPORT REQUEST STATUS
 -- ---------------------------------------------------------------------------------------------------------------------
-INSERT INTO support_request_status (id, name, date_created, last_date_modified, created_by, last_modified_by, is_deleted) VALUES
-(1, 'OPEN', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
-(2, 'IN_PROGRESS', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
-(3, 'RESOLVED', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
-(4, 'CLOSED', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false)
+INSERT INTO support_request_status (id, external_id, name, date_created, last_date_modified, created_by, last_modified_by, is_deleted) VALUES
+(1, '550e8400-e29b-41d4-a716-446655440010', 'OPEN', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(2, '550e8400-e29b-41d4-a716-446655440011', 'IN_PROGRESS', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(3, '550e8400-e29b-41d4-a716-446655440012', 'RESOLVED', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(4, '550e8400-e29b-41d4-a716-446655440013', 'CLOSED', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false)
 ON CONFLICT (id) DO NOTHING;
 
 -- ---------------------------------------------------------------------------------------------------------------------
 -- 1.2 RESPONSIBLE PERSON
 -- ---------------------------------------------------------------------------------------------------------------------
-INSERT INTO responsible_person (id, name, date_created, last_date_modified, created_by, last_modified_by, is_deleted) VALUES
-(1, 'Mechanical Team', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
-(2, 'Electrical Team', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
-(3, 'Support Staff', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false)
+INSERT INTO responsible_person (id, external_id, name, date_created, last_date_modified, created_by, last_modified_by, is_deleted) VALUES
+(1, '550e8400-e29b-41d4-a716-446655440001', 'Mechanical Team', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(2, '550e8400-e29b-41d4-a716-446655440002', 'Electrical Team', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(3, '550e8400-e29b-41d4-a716-446655440003', 'Support Staff', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false)
 ON CONFLICT (id) DO NOTHING;
 
 -- =====================================================================================================================
@@ -148,47 +148,47 @@ ON CONFLICT (id) DO NOTHING;
 -- ---------------------------------------------------------------------------------------------------------------------
 -- 3.4 BIKE TYPE BIKE ISSUE (Junction Table - references bike types from rental-service)
 -- ---------------------------------------------------------------------------------------------------------------------
-INSERT INTO bike_type_bike_issue (id, bike_type_external_id, bike_issue_id) VALUES
-(1, 'bike-type-ext-001', 1),
-(2, 'bike-type-ext-001', 2),
-(3, 'bike-type-ext-001', 3),
-(4, 'bike-type-ext-002', 1),
-(5, 'bike-type-ext-002', 3),
-(6, 'bike-type-ext-002', 4),
-(7, 'bike-type-ext-003', 2),
-(8, 'bike-type-ext-003', 3),
-(9, 'bike-type-ext-003', 5)
+INSERT INTO bike_type_bike_issue (id, external_id, bike_type_external_id, bike_issue_id) VALUES
+(1, '550e8400-e29b-41d4-a716-446655440601', 'bike-type-ext-001', 1),
+(2, '550e8400-e29b-41d4-a716-446655440602', 'bike-type-ext-001', 2),
+(3, '550e8400-e29b-41d4-a716-446655440603', 'bike-type-ext-001', 3),
+(4, '550e8400-e29b-41d4-a716-446655440604', 'bike-type-ext-002', 1),
+(5, '550e8400-e29b-41d4-a716-446655440605', 'bike-type-ext-002', 3),
+(6, '550e8400-e29b-41d4-a716-446655440606', 'bike-type-ext-002', 4),
+(7, '550e8400-e29b-41d4-a716-446655440607', 'bike-type-ext-003', 2),
+(8, '550e8400-e29b-41d4-a716-446655440608', 'bike-type-ext-003', 3),
+(9, '550e8400-e29b-41d4-a716-446655440609', 'bike-type-ext-003', 5)
 ON CONFLICT (id) DO NOTHING;
 
 -- ---------------------------------------------------------------------------------------------------------------------
 -- 3.5 SUPPORT REQUEST BIKE ISSUE (Junction Table)
 -- ---------------------------------------------------------------------------------------------------------------------
-INSERT INTO support_request_bike_issue (id, support_request_id, bike_issue_id) VALUES
-(1, 1, 1),
-(2, 1, 6),
-(3, 2, 3),
-(4, 2, 12),
-(5, 3, 2),
-(6, 4, 7),
-(7, 5, 9)
+INSERT INTO support_request_bike_issue (id, external_id, support_request_id, bike_issue_id) VALUES
+(1, '550e8400-e29b-41d4-a716-446655440701', 1, 1),
+(2, '550e8400-e29b-41d4-a716-446655440702', 1, 6),
+(3, '550e8400-e29b-41d4-a716-446655440703', 2, 3),
+(4, '550e8400-e29b-41d4-a716-446655440704', 2, 12),
+(5, '550e8400-e29b-41d4-a716-446655440705', 3, 2),
+(6, '550e8400-e29b-41d4-a716-446655440706', 4, 7),
+(7, '550e8400-e29b-41d4-a716-446655440707', 5, 9)
 ON CONFLICT (id) DO NOTHING;
 
 -- ---------------------------------------------------------------------------------------------------------------------
 -- 3.6 SUPPORT REQUEST GUIDE ITEM (Sample troubleshooting guides)
 -- ---------------------------------------------------------------------------------------------------------------------
-INSERT INTO support_request_guide_item (id, item_index, description, bike_issue_id, support_request_status_id, date_created, last_date_modified, created_by, last_modified_by, is_deleted) VALUES
-(1, 1, 'Check if battery is properly connected to the bike frame', 1, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
-(2, 2, 'Verify battery charge level on the display panel', 1, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
-(3, 3, 'Try charging battery for at least 2 hours using the provided charger', 1, 2, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
-(4, 4, 'If battery still not working, contact support for replacement', 1, 2, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
-(5, 1, 'Test brake lever responsiveness - should engage smoothly', 2, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
-(6, 2, 'Check brake pads for wear and proper alignment with rim/disc', 2, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
-(7, 3, 'Adjust brake cable tension if brakes feel loose', 2, 2, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
-(8, 4, 'If brakes still not working properly, bring bike to service center', 2, 2, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
-(9, 1, 'Power cycle the bike - turn off completely and wait 30 seconds', 3, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
-(10, 2, 'Check for error codes displayed on the bike screen', 3, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
-(11, 3, 'Ensure battery is fully charged and properly connected', 3, 2, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
-(12, 4, 'If motor still not starting, contact technical support immediately', 3, 2, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false)
+INSERT INTO support_request_guide_item (id, external_id, item_index, description, bike_issue_id, support_request_status_id, date_created, last_date_modified, created_by, last_modified_by, is_deleted) VALUES
+(1, '550e8400-e29b-41d4-a716-446655440801', 1, 'Check if battery is properly connected to the bike frame', 1, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(2, '550e8400-e29b-41d4-a716-446655440802', 2, 'Verify battery charge level on the display panel', 1, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(3, '550e8400-e29b-41d4-a716-446655440803', 3, 'Try charging battery for at least 2 hours using the provided charger', 1, 2, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(4, '550e8400-e29b-41d4-a716-446655440804', 4, 'If battery still not working, contact support for replacement', 1, 2, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(5, '550e8400-e29b-41d4-a716-446655440805', 1, 'Test brake lever responsiveness - should engage smoothly', 2, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(6, '550e8400-e29b-41d4-a716-446655440806', 2, 'Check brake pads for wear and proper alignment with rim/disc', 2, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(7, '550e8400-e29b-41d4-a716-446655440807', 3, 'Adjust brake cable tension if brakes feel loose', 2, 2, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(8, '550e8400-e29b-41d4-a716-446655440808', 4, 'If brakes still not working properly, bring bike to service center', 2, 2, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(9, '550e8400-e29b-41d4-a716-446655440809', 1, 'Power cycle the bike - turn off completely and wait 30 seconds', 3, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(10, '550e8400-e29b-41d4-a716-446655440810', 2, 'Check for error codes displayed on the bike screen', 3, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(11, '550e8400-e29b-41d4-a716-446655440811', 3, 'Ensure battery is fully charged and properly connected', 3, 2, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(12, '550e8400-e29b-41d4-a716-446655440812', 4, 'If motor still not starting, contact technical support immediately', 3, 2, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false)
 ON CONFLICT (id) DO NOTHING;
 
 -- =====================================================================================================================

@@ -28,6 +28,9 @@ public class SupportRequestBikeIssue {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "external_id", length = 100, unique = true)
+    private String externalId;
+
     @NotNull(message = "Support request is required")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "support_request_id", nullable = false)

@@ -43,11 +43,13 @@ class SupportRequestStatusServiceTest {
     void setUp() {
         testStatus = SupportRequestStatus.builder()
                 .id(1L)
+                .externalId("status-uuid-1")
                 .name("OPEN")
                 .build();
 
         testStatusDTO = SupportRequestStatusDTO.builder()
                 .id(1L)
+                .externalId("status-uuid-1")
                 .name("OPEN")
                 .build();
     }

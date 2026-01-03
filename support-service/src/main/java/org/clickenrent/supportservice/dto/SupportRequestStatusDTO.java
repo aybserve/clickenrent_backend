@@ -17,6 +17,7 @@ import java.time.LocalDateTime;
 public class SupportRequestStatusDTO {
 
     private Long id;
+    private String externalId;
     private String name;
 
     // Audit fields

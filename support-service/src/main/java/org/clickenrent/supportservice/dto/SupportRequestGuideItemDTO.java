@@ -17,6 +17,7 @@ import java.time.LocalDateTime;
 public class SupportRequestGuideItemDTO {
 
     private Long id;
+    private String externalId;
     private Integer itemIndex;
     private String description;
     private Long bikeIssueId;

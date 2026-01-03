@@ -40,6 +40,13 @@ public class SupportRequestGuideItemController {
         return ResponseEntity.ok(supportRequestGuideItemService.getById(id));
     }
 
+    @GetMapping("/external/{externalId}")
+    @PreAuthorize("isAuthenticated()")
+    @Operation(summary = "Get guide item by external ID")
+    public ResponseEntity<SupportRequestGuideItemDTO> getByExternalId(@PathVariable String externalId) {
+        return ResponseEntity.ok(supportRequestGuideItemService.getByExternalId(externalId));
+    }
+
     @GetMapping("/bike-issue/{bikeIssueId}")
     @PreAuthorize("isAuthenticated()")
     @Operation(summary = "Get guide items by bike issue ID")

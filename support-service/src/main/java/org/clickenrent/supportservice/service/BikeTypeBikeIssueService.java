@@ -39,6 +39,13 @@ public class BikeTypeBikeIssueService {
     }
 
     @Transactional(readOnly = true)
+    public BikeTypeBikeIssueDTO getByExternalId(String externalId) {
+        BikeTypeBikeIssue entity = bikeTypeBikeIssueRepository.findByExternalId(externalId)
+                .orElseThrow(() -> new ResourceNotFoundException("BikeTypeBikeIssue", "externalId", externalId));
+        return bikeTypeBikeIssueMapper.toDto(entity);
+    }
+
+    @Transactional(readOnly = true)
     public List<BikeTypeBikeIssueDTO> getByBikeTypeExternalId(String bikeTypeExternalId) {
         return bikeTypeBikeIssueRepository.findByBikeTypeExternalId(bikeTypeExternalId).stream()
                 .map(bikeTypeBikeIssueMapper::toDto)

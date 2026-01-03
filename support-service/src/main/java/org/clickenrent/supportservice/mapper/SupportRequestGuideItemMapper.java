@@ -24,6 +24,7 @@ public class SupportRequestGuideItemMapper {
 
         return SupportRequestGuideItemDTO.builder()
                 .id(entity.getId())
+                .externalId(entity.getExternalId())
                 .itemIndex(entity.getItemIndex())
                 .description(entity.getDescription())
                 .bikeIssueId(entity.getBikeIssue() != null ? entity.getBikeIssue().getId() : null)
@@ -44,6 +45,7 @@ public class SupportRequestGuideItemMapper {
 
         SupportRequestGuideItem.SupportRequestGuideItemBuilder<?, ?> builder = SupportRequestGuideItem.builder()
                 .id(dto.getId())
+                .externalId(dto.getExternalId())
                 .itemIndex(dto.getItemIndex())
                 .description(dto.getDescription());
 
@@ -62,6 +64,9 @@ public class SupportRequestGuideItemMapper {
             return;
         }
 
+        if (dto.getExternalId() != null) {
+            entity.setExternalId(dto.getExternalId());
+        }
         if (dto.getItemIndex() != null) {
             entity.setItemIndex(dto.getItemIndex());
         }

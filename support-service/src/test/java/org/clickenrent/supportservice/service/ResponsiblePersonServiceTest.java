@@ -43,11 +43,13 @@ class ResponsiblePersonServiceTest {
     void setUp() {
         testPerson = ResponsiblePerson.builder()
                 .id(1L)
+                .externalId("person-uuid-1")
                 .name("John Mechanic")
                 .build();
 
         testPersonDTO = ResponsiblePersonDTO.builder()
                 .id(1L)
+                .externalId("person-uuid-1")
                 .name("John Mechanic")
                 .build();
     }

@@ -39,6 +39,13 @@ public class SupportRequestGuideItemService {
     }
 
     @Transactional(readOnly = true)
+    public SupportRequestGuideItemDTO getByExternalId(String externalId) {
+        SupportRequestGuideItem entity = supportRequestGuideItemRepository.findByExternalId(externalId)
+                .orElseThrow(() -> new ResourceNotFoundException("SupportRequestGuideItem", "externalId", externalId));
+        return supportRequestGuideItemMapper.toDto(entity);
+    }
+
+    @Transactional(readOnly = true)
     public List<SupportRequestGuideItemDTO> getByBikeIssueId(Long bikeIssueId) {
         return supportRequestGuideItemRepository.findByBikeIssueId(bikeIssueId).stream()
                 .map(supportRequestGuideItemMapper::toDto)
@@ -89,6 +96,7 @@ public class SupportRequestGuideItemService {
         supportRequestGuideItemRepository.delete(entity);
     }
 }
+
 
 
 

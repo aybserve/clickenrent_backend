@@ -13,6 +13,8 @@ import java.util.Optional;
 @Repository
 public interface BikeRentalFeedbackRepository extends JpaRepository<BikeRentalFeedback, Long> {
     
+    Optional<BikeRentalFeedback> findByExternalId(String externalId);
+    
     List<BikeRentalFeedback> findByUserExternalId(String userExternalId);
     
     Optional<BikeRentalFeedback> findByBikeRentalExternalId(String bikeRentalExternalId);

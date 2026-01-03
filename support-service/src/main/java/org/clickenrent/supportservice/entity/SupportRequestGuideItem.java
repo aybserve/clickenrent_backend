@@ -34,6 +34,9 @@ public class SupportRequestGuideItem extends BaseAuditEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "external_id", length = 100, unique = true)
+    private String externalId;
+
     @NotNull(message = "Index is required")
     @Column(name = "item_index", nullable = false)
     private Integer itemIndex;

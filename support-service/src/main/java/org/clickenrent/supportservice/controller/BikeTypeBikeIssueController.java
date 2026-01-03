@@ -40,6 +40,13 @@ public class BikeTypeBikeIssueController {
         return ResponseEntity.ok(bikeTypeBikeIssueService.getById(id));
     }
 
+    @GetMapping("/external/{externalId}")
+    @PreAuthorize("isAuthenticated()")
+    @Operation(summary = "Get bike type bike issue link by external ID")
+    public ResponseEntity<BikeTypeBikeIssueDTO> getByExternalId(@PathVariable String externalId) {
+        return ResponseEntity.ok(bikeTypeBikeIssueService.getByExternalId(externalId));
+    }
+
     @GetMapping("/bike-type/{bikeTypeExternalId}")
     @PreAuthorize("isAuthenticated()")
     @Operation(summary = "Get bike issues by bike type external ID")

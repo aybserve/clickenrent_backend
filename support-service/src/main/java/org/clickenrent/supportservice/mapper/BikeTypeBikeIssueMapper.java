@@ -22,6 +22,7 @@ public class BikeTypeBikeIssueMapper {
 
         return BikeTypeBikeIssueDTO.builder()
                 .id(entity.getId())
+                .externalId(entity.getExternalId())
                 .bikeTypeExternalId(entity.getBikeTypeExternalId())
                 .bikeIssueId(entity.getBikeIssue() != null ? entity.getBikeIssue().getId() : null)
                 .bikeIssueName(entity.getBikeIssue() != null ? entity.getBikeIssue().getName() : null)
@@ -35,6 +36,7 @@ public class BikeTypeBikeIssueMapper {
 
         BikeTypeBikeIssue.BikeTypeBikeIssueBuilder builder = BikeTypeBikeIssue.builder()
                 .id(dto.getId())
+                .externalId(dto.getExternalId())
                 .bikeTypeExternalId(dto.getBikeTypeExternalId());
 
         if (dto.getBikeIssueId() != null) {
@@ -49,6 +51,9 @@ public class BikeTypeBikeIssueMapper {
             return;
         }
 
+        if (dto.getExternalId() != null) {
+            entity.setExternalId(dto.getExternalId());
+        }
         if (dto.getBikeTypeExternalId() != null) {
             entity.setBikeTypeExternalId(dto.getBikeTypeExternalId());
         }
