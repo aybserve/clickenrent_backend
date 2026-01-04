@@ -21,7 +21,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/bike-brands")
 @RequiredArgsConstructor
-@Tag(name = "BikeBrand", description = "Bike brand management")
+@Tag(name = "Bike Brands", description = "Bike brand management")
 @SecurityRequirement(name = "bearerAuth")
 public class BikeBrandController {
 

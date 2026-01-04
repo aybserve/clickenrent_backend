@@ -11,6 +11,7 @@ import org.clickenrent.authservice.entity.User;
 import org.clickenrent.authservice.exception.ResourceNotFoundException;
 import org.clickenrent.authservice.repository.UserRepository;
 import org.clickenrent.contracts.rental.BikeRentalDTO;
+import org.clickenrent.contracts.rental.LocationDTO;
 import org.clickenrent.contracts.rental.RentalDTO;
 import org.clickenrent.contracts.rental.RideDTO;
 import org.clickenrent.contracts.support.BikeRentalFeedbackDTO;
@@ -178,12 +179,12 @@ public class UserStatisticsService {
             return null;
         }
 
-        // Count occurrences of each location by external ID
-        Map<String, Long> locationCounts = bikeRentals.stream()
-                .map(BikeRentalDTO::getLocationExternalId)
+        // Count occurrences of each location by ID
+        Map<Long, Long> locationCounts = bikeRentals.stream()
+                .map(BikeRentalDTO::getLocationId)
                 .filter(Objects::nonNull)
                 .collect(Collectors.groupingBy(
-                        locationExternalId -> locationExternalId,
+                        locationId -> locationId,
                         Collectors.counting()
                 ));
 
@@ -192,7 +193,7 @@ public class UserStatisticsService {
         }
 
         // Find the location with the maximum count
-        Map.Entry<String, Long> maxEntry = locationCounts.entrySet().stream()
+        Map.Entry<Long, Long> maxEntry = locationCounts.entrySet().stream()
                 .max(Map.Entry.comparingByValue())
                 .orElse(null);
 
@@ -200,26 +201,26 @@ public class UserStatisticsService {
             return null;
         }
 
-        String favoriteLocationExternalId = maxEntry.getKey();
+        Long favoriteLocationId = maxEntry.getKey();
         Integer timesUsed = maxEntry.getValue().intValue();
 
-        // Get location name from the first bike rental with this location
-        String locationName = bikeRentals.stream()
-                .filter(br -> favoriteLocationExternalId.equals(br.getLocationExternalId()))
-                .findFirst()
-                .map(br -> {
-                    // Note: BikeRentalDTO doesn't have location name directly
-                    // We would need to fetch it from rental-service or include it in the DTO
-                    // For now, we'll use a placeholder or the externalId
-                    return "Location"; // Placeholder - ideally fetch from location service
-                })
-                .orElse("Unknown Location");
-
-        return FavoriteLocationDTO.builder()
-                .externalId(favoriteLocationExternalId)
-                .name(locationName)
-                .timesUsed(timesUsed)
-                .build();
+        // Fetch location details from rental-service
+        try {
+            LocationDTO location = rentalServiceClient.getLocationById(favoriteLocationId);
+            return FavoriteLocationDTO.builder()
+                    .externalId(location.getExternalId())
+                    .name(location.getName())
+                    .timesUsed(timesUsed)
+                    .build();
+        } catch (FeignException e) {
+            log.warn("Failed to fetch location details for locationId={}: {}", favoriteLocationId, e.getMessage());
+            // Return with minimal information if location fetch fails
+            return FavoriteLocationDTO.builder()
+                    .externalId("unknown")
+                    .name("Location #" + favoriteLocationId)
+                    .timesUsed(timesUsed)
+                    .build();
+        }
     }
 
     /**

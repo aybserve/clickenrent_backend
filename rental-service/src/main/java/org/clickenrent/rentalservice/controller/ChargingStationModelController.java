@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/charging-station-models")
 @RequiredArgsConstructor
-@Tag(name = "ChargingStationModel", description = "Charging station model management")
+@Tag(name = "Charging Station Models", description = "Charging station model management")
 @SecurityRequirement(name = "bearerAuth")
 public class ChargingStationModelController {
 

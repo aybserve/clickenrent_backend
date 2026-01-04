@@ -2,6 +2,7 @@ package org.clickenrent.authservice.client;
 
 import org.clickenrent.authservice.config.FeignConfig;
 import org.clickenrent.contracts.rental.BikeRentalDTO;
+import org.clickenrent.contracts.rental.LocationDTO;
 import org.clickenrent.contracts.rental.RentalDTO;
 import org.clickenrent.contracts.rental.RideDTO;
 import org.springframework.cloud.openfeign.FeignClient;
@@ -34,5 +35,11 @@ public interface RentalServiceClient {
      */
     @GetMapping("/rides/by-bike-rental/external/{bikeRentalExternalId}")
     List<RideDTO> getRidesByBikeRentalExternalId(@PathVariable("bikeRentalExternalId") String bikeRentalExternalId);
+
+    /**
+     * Get location by ID
+     */
+    @GetMapping("/locations/{id}")
+    LocationDTO getLocationById(@PathVariable("id") Long id);
 }
 

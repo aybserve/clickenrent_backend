@@ -21,7 +21,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/part-brands")
 @RequiredArgsConstructor
-@Tag(name = "PartBrand", description = "Part brand management")
+@Tag(name = "Part Brands", description = "Part brand management")
 @SecurityRequirement(name = "bearerAuth")
 public class PartBrandController {
 

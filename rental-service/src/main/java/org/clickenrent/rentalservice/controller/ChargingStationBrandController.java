@@ -21,7 +21,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/charging-station-brands")
 @RequiredArgsConstructor
-@Tag(name = "ChargingStationBrand", description = "Charging station brand management")
+@Tag(name = "Charging Station Brands", description = "Charging station brand management")
 @SecurityRequirement(name = "bearerAuth")
 public class ChargingStationBrandController {
 

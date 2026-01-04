@@ -240,8 +240,8 @@ public class GatewayConfig {
                         .uri("lb://rental-service"))
 
                 // Location & Hub Management Routes
-                .route("location", r -> r
-                        .path("/api/location/**")
+                .route("locations", r -> r
+                        .path("/api/locations/**")
                         .filters(f -> f.filter(jwtAuthenticationFilter))
                         .uri("lb://rental-service"))
 
@@ -307,8 +307,8 @@ public class GatewayConfig {
                         .filters(f -> f.filter(jwtAuthenticationFilter))
                         .uri("lb://rental-service"))
 
-                .route("b2b-sale-products", r -> r
-                        .path("/api/b2b-sale-products/**")
+                .route("b2b-sale-items", r -> r
+                        .path("/api/b2b-sale-items/**")
                         .filters(f -> f.filter(jwtAuthenticationFilter))
                         .uri("lb://rental-service"))
 
@@ -370,8 +370,8 @@ public class GatewayConfig {
                         .filters(f -> f.filter(jwtAuthenticationFilter))
                         .uri("lb://rental-service"))
 
-                .route("b2b-sale-order-product-models", r -> r
-                        .path("/api/b2b-sale-order-product-models/**")
+                .route("b2b-sale-order-items", r -> r
+                        .path("/api/b2b-sale-order-items/**")
                         .filters(f -> f.filter(jwtAuthenticationFilter))
                         .uri("lb://rental-service"))
 

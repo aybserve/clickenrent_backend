@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/service-products")
 @RequiredArgsConstructor
-@Tag(name = "ServiceProduct", description = "Service product management")
+@Tag(name = "Service Products", description = "Service product management")
 @SecurityRequirement(name = "bearerAuth")
 public class ServiceProductController {
 
