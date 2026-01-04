@@ -15,7 +15,12 @@ import java.time.LocalDateTime;
  * Source: rental-service
  * Consumers: payment-service
  * 
- * @version 1.0.0
+ * @version 2.0.0
+ * 
+ * BREAKING CHANGES in v2.0.0:
+ * - Removed bikeExternalId (use bikeId to fetch from rental-service)
+ * - Removed locationExternalId (use locationId to fetch from rental-service)
+ * - Removed rentalExternalId (use rentalId to fetch from rental-service)
  */
 @Data
 @Builder
@@ -36,11 +41,6 @@ public class BikeRentalDTO {
     private String photoUrl;
     private BigDecimal price;
     private BigDecimal totalPrice;
-
-    // Cross-service externalId references
-    private String bikeExternalId;
-    private String locationExternalId;
-    private String rentalExternalId;
 
     // Audit fields
     private LocalDateTime dateCreated;

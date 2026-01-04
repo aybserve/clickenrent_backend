@@ -5,6 +5,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
+
 /**
  * Shared contract DTO for BikeType entity.
  * Used for cross-service communication.
@@ -12,7 +14,7 @@ import lombok.NoArgsConstructor;
  * Source: rental-service
  * Consumers: support-service
  * 
- * @version 1.0.0
+ * @version 2.0.0
  */
 @Data
 @Builder
@@ -23,6 +25,12 @@ public class BikeTypeDTO {
     private Long id;
     private String externalId;
     private String name;
+
+    // Audit fields
+    private LocalDateTime dateCreated;
+    private LocalDateTime lastDateModified;
+    private String createdBy;
+    private String lastModifiedBy;
 }
 
 

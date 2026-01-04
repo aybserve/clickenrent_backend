@@ -1,7 +1,28 @@
 # Shared Contracts Module
 
-**Version**: 1.0.0  
+**Version**: 2.0.0  
 **Purpose**: Single source of truth for cross-service DTOs
+
+---
+
+## ⚠️ Version 2.0.0 Breaking Changes
+
+**Released**: January 4, 2026
+
+### BikeRentalDTO - Removed Redundant Fields
+- ❌ Removed `bikeExternalId` - Use `bikeId` to fetch bike details from rental-service
+- ❌ Removed `locationExternalId` - Use `locationId` to fetch location details from rental-service
+- ❌ Removed `rentalExternalId` - Use `rentalId` to fetch rental details from rental-service
+
+**Migration Guide**: If your service uses these fields, update to fetch the related entities using the ID fields instead.
+
+### BikeTypeDTO - Added Audit Fields
+- ✅ Added `dateCreated`
+- ✅ Added `lastDateModified`
+- ✅ Added `createdBy`
+- ✅ Added `lastModifiedBy`
+
+**Migration Guide**: These are optional fields, no changes required in consumer services.
 
 ---
 
@@ -35,12 +56,14 @@ org.clickenrent.contracts/
 
 ### Rental Service Contracts (`org.clickenrent.contracts.rental`)
 
-| DTO | Purpose | Fields |
-|-----|---------|--------|
-| `RentalDTO` | Rental transaction | id, externalId, userId, companyId, rentalStatusId, erpRentalOrderId, etc. |
-| `BikeDTO` | Bike/vehicle details | id, externalId, code, qrCodeUrl, frameNumber, bikeStatusId, etc. |
-| `BikeRentalDTO` | Bike rental details | id, externalId, bikeId, locationId, rentalId, startDateTime, endDateTime, price |
-| `LocationDTO` | Location/hub data | id, externalId, name, addressId, companyId, etc. |
+| DTO | Purpose | Fields | Version |
+|-----|---------|--------|---------|
+| `RentalDTO` | Rental transaction | id, externalId, userId, companyId, rentalStatusId, erpRentalOrderId, audit fields | 1.0.0 |
+| `BikeDTO` | Bike/vehicle details | id, externalId, code, qrCodeUrl, frameNumber, bikeStatusId, audit fields | 1.0.0 |
+| `BikeRentalDTO` | Bike rental details | id, externalId, bikeId, locationId, rentalId, startDateTime, endDateTime, price, audit fields | **2.0.0** |
+| `BikeTypeDTO` | Bike type/category | id, externalId, name, audit fields | **2.0.0** |
+| `LocationDTO` | Location/hub data | id, externalId, name, address, companyId, audit fields | 1.0.0 |
+| `RideDTO` | Ride tracking | id, externalId, bikeRentalId, startDateTime, endDateTime, coordinates, audit fields | 1.0.0 |
 
 **Owner**: rental-service  
 **Consumers**: payment-service, support-service
@@ -140,7 +163,14 @@ public class RentalFinTransactionService {
 
 ## Versioning
 
-Current version: **1.0.0**
+Current version: **2.0.0**
+
+### Version History
+
+| Version | Date | Changes |
+|---------|------|---------|
+| **2.0.0** | 2026-01-04 | **BREAKING**: Removed redundant externalId fields from BikeRentalDTO; Added audit fields to BikeTypeDTO |
+| **1.0.0** | 2024-12-18 | Initial release |
 
 ### Version Format: MAJOR.MINOR.PATCH
 
@@ -152,7 +182,7 @@ Current version: **1.0.0**
 
 1. Update `shared-contracts/pom.xml`:
 ```xml
-<version>1.1.0</version>
+<version>2.0.0</version>
 ```
 
 2. Update parent `pom.xml` dependencyManagement:
@@ -160,7 +190,7 @@ Current version: **1.0.0**
 <dependency>
     <groupId>org.clickenrent</groupId>
     <artifactId>shared-contracts</artifactId>
-    <version>1.1.0</version>
+    <version>2.0.0</version>
 </dependency>
 ```
 
@@ -376,8 +406,9 @@ For questions or issues:
 ---
 
 **Module**: shared-contracts  
-**Version**: 1.0.0  
-**Last Updated**: December 18, 2024
+**Version**: 2.0.0  
+**Last Updated**: January 4, 2026
+
 
 
 
