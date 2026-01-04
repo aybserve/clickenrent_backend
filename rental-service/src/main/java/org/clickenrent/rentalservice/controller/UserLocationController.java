@@ -51,6 +51,13 @@ public class UserLocationController {
         userLocationService.removeUserFromLocation(id);
         return ResponseEntity.noContent().build();
     }
+
+    @GetMapping("/external/{externalId}")
+    @PreAuthorize("isAuthenticated()")
+    @Operation(summary = "Get user location by external ID", description = "Retrieve user location by external ID for cross-service communication")
+    public ResponseEntity<UserLocationDTO> getByExternalId(@PathVariable String externalId) {
+        return ResponseEntity.ok(userLocationService.getUserLocationByExternalId(externalId));
+    }
 }
 
 

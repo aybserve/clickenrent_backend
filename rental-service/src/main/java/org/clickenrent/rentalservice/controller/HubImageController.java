@@ -58,6 +58,13 @@ public class HubImageController {
         hubImageService.deleteImage(id);
         return ResponseEntity.noContent().build();
     }
+
+    @GetMapping("/external/{externalId}")
+    @PreAuthorize("isAuthenticated()")
+    @Operation(summary = "Get hub image by external ID", description = "Retrieve hub image by external ID for cross-service communication")
+    public ResponseEntity<HubImageDTO> getByExternalId(@PathVariable String externalId) {
+        return ResponseEntity.ok(hubImageService.getImageByExternalId(externalId));
+    }
 }
 
 

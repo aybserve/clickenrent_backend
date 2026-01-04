@@ -27,6 +27,10 @@ public class BikeReservationMapper {
                 .endDateTime(bikeReservation.getEndDateTime())
                 .userExternalId(bikeReservation.getUserExternalId())
                 .bikeId(bikeReservation.getBike() != null ? bikeReservation.getBike().getId() : null)
+                .dateCreated(bikeReservation.getDateCreated())
+                .lastDateModified(bikeReservation.getLastDateModified())
+                .createdBy(bikeReservation.getCreatedBy())
+                .lastModifiedBy(bikeReservation.getLastModifiedBy())
                 .build();
     }
 
@@ -40,7 +44,11 @@ public class BikeReservationMapper {
                 .externalId(dto.getExternalId())
                 .startDateTime(dto.getStartDateTime())
                 .endDateTime(dto.getEndDateTime())
-                .userExternalId(dto.getUserExternalId());
+                .userExternalId(dto.getUserExternalId())
+                .dateCreated(dto.getDateCreated())
+                .lastDateModified(dto.getLastDateModified())
+                .createdBy(dto.getCreatedBy())
+                .lastModifiedBy(dto.getLastModifiedBy());
 
         if (dto.getBikeId() != null) {
             builder.bike(bikeRepository.findById(dto.getBikeId()).orElse(null));

@@ -83,6 +83,13 @@ public class ChargingStationBrandService {
                 .orElseThrow(() -> new ResourceNotFoundException("ChargingStationBrand", "id", id));
         chargingStationBrandRepository.delete(brand);
     }
+
+    @Transactional(readOnly = true)
+    public ChargingStationBrandDTO getChargingStationBrandByExternalId(String externalId) {
+        ChargingStationBrand brand = chargingStationBrandRepository.findByExternalId(externalId)
+                .orElseThrow(() -> new ResourceNotFoundException("ChargingStationBrand", "externalId", externalId));
+        return chargingStationBrandMapper.toDto(brand);
+    }
 }
 
 

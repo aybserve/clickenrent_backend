@@ -4,6 +4,7 @@ import org.clickenrent.rentalservice.dto.B2BSaleItemDTO;
 import org.clickenrent.rentalservice.entity.B2BSale;
 import org.clickenrent.rentalservice.entity.B2BSaleItem;
 import org.clickenrent.rentalservice.entity.Location;
+import org.clickenrent.rentalservice.entity.Product;
 import org.clickenrent.rentalservice.exception.ResourceNotFoundException;
 import org.clickenrent.rentalservice.mapper.B2BSaleItemMapper;
 import org.clickenrent.rentalservice.repository.B2BSaleItemRepository;
@@ -45,6 +46,7 @@ class B2BSaleItemServiceTest {
     private B2BSaleItemDTO testItemDTO;
     private B2BSale testSale;
     private Location testLocation;
+    private Product testProduct;
 
     @BeforeEach
     void setUp() {
@@ -59,11 +61,15 @@ class B2BSaleItemServiceTest {
         .location(testLocation)
         .build();
 
+        testProduct = mock(Product.class);
+        when(testProduct.getId()).thenReturn(1L);
+        when(testProduct.getExternalId()).thenReturn("PROD001");
+
         testItem = B2BSaleItem.builder()
         .id(1L)
         .externalId("B2BSI001")
         .b2bSale(testSale)
-        .productId(1L)
+        .product(testProduct)
         .quantity(10)
         .price(new BigDecimal("250.00"))
         .totalPrice(new BigDecimal("2500.00"))

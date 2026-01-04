@@ -26,6 +26,7 @@ import org.springframework.web.bind.annotation.*;
 public class LocationController {
 
     private final MapboxService mapboxService;
+    private final org.clickenrent.rentalservice.service.LocationService locationService;
 
     /**
      * Geocode an address to coordinates.
@@ -94,5 +95,12 @@ public class LocationController {
             @Valid @RequestBody DirectionsRequestDTO request) {
         DirectionsResponseDTO response = mapboxService.getDirections(request);
         return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/external/{externalId}")
+    @PreAuthorize("isAuthenticated()")
+    @Operation(summary = "Get location by external ID", description = "Retrieve location by external ID for cross-service communication")
+    public ResponseEntity<LocationDTO> getByExternalId(@PathVariable String externalId) {
+        return ResponseEntity.ok(locationService.getLocationByExternalId(externalId));
     }
 }

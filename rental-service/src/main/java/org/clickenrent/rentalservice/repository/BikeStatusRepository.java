@@ -12,6 +12,7 @@ import java.util.Optional;
 @Repository
 public interface BikeStatusRepository extends JpaRepository<BikeStatus, Long> {
     Optional<BikeStatus> findByName(String name);
+    Optional<BikeStatus> findByExternalId(String externalId);
 }
 
 

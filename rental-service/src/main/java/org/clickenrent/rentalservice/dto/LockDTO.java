@@ -24,4 +24,10 @@ public class LockDTO {
     private Integer batteryLevel;
     private LocalDateTime lastSeenAt;
     private String firmwareVersion;
+
+    // Audit fields
+    private LocalDateTime dateCreated;
+    private LocalDateTime lastDateModified;
+    private String createdBy;
+    private String lastModifiedBy;
 }

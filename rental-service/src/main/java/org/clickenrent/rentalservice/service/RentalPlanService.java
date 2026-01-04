@@ -87,6 +87,13 @@ public class RentalPlanService {
 
         rentalPlanRepository.delete(rentalPlan);
     }
+
+    @Transactional(readOnly = true)
+    public RentalPlanDTO getRentalPlanByExternalId(String externalId) {
+        RentalPlan rentalPlan = rentalPlanRepository.findByExternalId(externalId)
+                .orElseThrow(() -> new ResourceNotFoundException("RentalPlan", "externalId", externalId));
+        return rentalPlanMapper.toDto(rentalPlan);
+    }
 }
 
 

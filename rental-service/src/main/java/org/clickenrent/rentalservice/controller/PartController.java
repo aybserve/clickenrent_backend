@@ -61,6 +61,13 @@ public class PartController {
         partService.deletePart(id);
         return ResponseEntity.noContent().build();
     }
+
+    @GetMapping("/external/{externalId}")
+    @PreAuthorize("isAuthenticated()")
+    @Operation(summary = "Get part by external ID", description = "Retrieve part by external ID for cross-service communication")
+    public ResponseEntity<PartDTO> getByExternalId(@PathVariable String externalId) {
+        return ResponseEntity.ok(partService.findByExternalId(externalId));
+    }
 }
 
 

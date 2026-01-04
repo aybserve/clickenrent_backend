@@ -61,6 +61,13 @@ public class LockProviderController {
         lockProviderService.deleteLockProvider(id);
         return ResponseEntity.noContent().build();
     }
+
+    @GetMapping("/external/{externalId}")
+    @PreAuthorize("isAuthenticated()")
+    @Operation(summary = "Get lock provider by external ID", description = "Retrieve lock provider by external ID for cross-service communication")
+    public ResponseEntity<LockProviderDTO> getByExternalId(@PathVariable String externalId) {
+        return ResponseEntity.ok(lockProviderService.findByExternalId(externalId));
+    }
 }
 
 

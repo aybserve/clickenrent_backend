@@ -56,4 +56,11 @@ public class LocationRoleService {
                 .orElseThrow(() -> new ResourceNotFoundException("LocationRole", "id", id));
         locationRoleRepository.delete(role);
     }
+
+    @Transactional(readOnly = true)
+    public LocationRoleDTO findByExternalId(String externalId) {
+        LocationRole role = locationRoleRepository.findByExternalId(externalId)
+                .orElseThrow(() -> new ResourceNotFoundException("LocationRole", "externalId", externalId));
+        return locationRoleMapper.toDto(role);
+    }
 }

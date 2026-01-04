@@ -82,4 +82,11 @@ public class B2BSubscriptionItemService {
                 .orElseThrow(() -> new ResourceNotFoundException("B2BSubscriptionItem", "id", id));
         b2bSubscriptionItemRepository.delete(item);
     }
+
+    @Transactional(readOnly = true)
+    public B2BSubscriptionItemDTO getB2BSubscriptionItemByExternalId(String externalId) {
+        B2BSubscriptionItem item = b2bSubscriptionItemRepository.findByExternalId(externalId)
+                .orElseThrow(() -> new ResourceNotFoundException("B2BSubscriptionItem", "externalId", externalId));
+        return b2bSubscriptionItemMapper.toDto(item);
+    }
 }

@@ -61,6 +61,13 @@ public class ChargingStationModelController {
         chargingStationModelService.deleteModel(id);
         return ResponseEntity.noContent().build();
     }
+
+    @GetMapping("/external/{externalId}")
+    @PreAuthorize("isAuthenticated()")
+    @Operation(summary = "Get charging station model by external ID", description = "Retrieve model by external ID for cross-service communication")
+    public ResponseEntity<ChargingStationModelDTO> getByExternalId(@PathVariable String externalId) {
+        return ResponseEntity.ok(chargingStationModelService.findByExternalId(externalId));
+    }
 }
 
 

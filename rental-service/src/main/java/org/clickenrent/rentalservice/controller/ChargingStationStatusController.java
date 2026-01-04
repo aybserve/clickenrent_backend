@@ -34,6 +34,13 @@ public class ChargingStationStatusController {
     public ResponseEntity<ChargingStationStatusDTO> getStatusById(@PathVariable Long id) {
         return ResponseEntity.ok(chargingStationStatusService.getStatusById(id));
     }
+
+    @GetMapping("/external/{externalId}")
+    @PreAuthorize("isAuthenticated()")
+    @Operation(summary = "Get charging station status by external ID", description = "Retrieve status by external ID for cross-service communication")
+    public ResponseEntity<ChargingStationStatusDTO> getByExternalId(@PathVariable String externalId) {
+        return ResponseEntity.ok(chargingStationStatusService.findByExternalId(externalId));
+    }
 }
 
 

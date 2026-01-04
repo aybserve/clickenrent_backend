@@ -70,6 +70,13 @@ public class PartBrandController {
         partBrandService.deleteBrand(id);
         return ResponseEntity.noContent().build();
     }
+
+    @GetMapping("/external/{externalId}")
+    @PreAuthorize("isAuthenticated()")
+    @Operation(summary = "Get part brand by external ID", description = "Retrieve part brand by external ID for cross-service communication")
+    public ResponseEntity<PartBrandDTO> getByExternalId(@PathVariable String externalId) {
+        return ResponseEntity.ok(partBrandService.getPartBrandByExternalId(externalId));
+    }
 }
 
 

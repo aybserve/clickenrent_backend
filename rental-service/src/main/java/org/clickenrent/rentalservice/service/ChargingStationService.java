@@ -72,6 +72,13 @@ public class ChargingStationService {
                 .orElseThrow(() -> new ResourceNotFoundException("ChargingStation", "id", id));
         chargingStationRepository.delete(chargingStation);
     }
+
+    @Transactional(readOnly = true)
+    public ChargingStationDTO findByExternalId(String externalId) {
+        ChargingStation chargingStation = chargingStationRepository.findByExternalId(externalId)
+                .orElseThrow(() -> new ResourceNotFoundException("ChargingStation", "externalId", externalId));
+        return chargingStationMapper.toDto(chargingStation);
+    }
 }
 
 

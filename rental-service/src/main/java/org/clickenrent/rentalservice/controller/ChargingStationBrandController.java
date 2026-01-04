@@ -70,6 +70,13 @@ public class ChargingStationBrandController {
         chargingStationBrandService.deleteBrand(id);
         return ResponseEntity.noContent().build();
     }
+
+    @GetMapping("/external/{externalId}")
+    @PreAuthorize("isAuthenticated()")
+    @Operation(summary = "Get charging station brand by external ID", description = "Retrieve brand by external ID for cross-service communication")
+    public ResponseEntity<ChargingStationBrandDTO> getByExternalId(@PathVariable String externalId) {
+        return ResponseEntity.ok(chargingStationBrandService.getChargingStationBrandByExternalId(externalId));
+    }
 }
 
 

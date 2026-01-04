@@ -25,4 +25,10 @@ public class B2BSaleDTO {
     // Cross-service externalId references
     private String sellerCompanyExternalId;
     private String buyerCompanyExternalId;
+
+    // Audit fields
+    private LocalDateTime dateCreated;
+    private LocalDateTime lastDateModified;
+    private String createdBy;
+    private String lastModifiedBy;
 }

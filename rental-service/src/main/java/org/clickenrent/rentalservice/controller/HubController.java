@@ -119,6 +119,13 @@ public class HubController {
         hubService.deleteHub(id);
         return ResponseEntity.noContent().build();
     }
+
+    @GetMapping("/external/{externalId}")
+    @PreAuthorize("isAuthenticated()")
+    @Operation(summary = "Get hub by external ID", description = "Retrieve hub by external ID for cross-service communication")
+    public ResponseEntity<HubDTO> getByExternalId(@PathVariable String externalId) {
+        return ResponseEntity.ok(hubService.getHubByExternalId(externalId));
+    }
 }
 
 

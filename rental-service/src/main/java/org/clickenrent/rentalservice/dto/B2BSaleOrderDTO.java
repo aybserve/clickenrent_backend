@@ -24,6 +24,12 @@ public class B2BSaleOrderDTO {
     private Long locationId;
     private Long b2bSaleId;
     private LocalDateTime dateTime;
+
+    // Audit fields
+    private LocalDateTime dateCreated;
+    private LocalDateTime lastDateModified;
+    private String createdBy;
+    private String lastModifiedBy;
 }
 
 

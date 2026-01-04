@@ -73,4 +73,11 @@ public class LockController {
         LockStatusResponseDTO response = lockService.getLockStatus(lockId);
         return ResponseEntity.ok(response);
     }
+
+    @GetMapping("/external/{externalId}")
+    @PreAuthorize("isAuthenticated()")
+    @Operation(summary = "Get lock by external ID", description = "Retrieve lock by external ID for cross-service communication")
+    public ResponseEntity<LockDTO> getByExternalId(@PathVariable String externalId) {
+        return ResponseEntity.ok(lockService.findByExternalId(externalId));
+    }
 }

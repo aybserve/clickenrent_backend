@@ -77,6 +77,13 @@ public class B2BSaleOrderController {
         b2bSaleOrderService.deleteOrder(id);
         return ResponseEntity.noContent().build();
     }
+
+    @GetMapping("/external/{externalId}")
+    @PreAuthorize("isAuthenticated()")
+    @Operation(summary = "Get B2B sale order by external ID", description = "Retrieve order by external ID for cross-service communication")
+    public ResponseEntity<B2BSaleOrderDTO> getByExternalId(@PathVariable String externalId) {
+        return ResponseEntity.ok(b2bSaleOrderService.getB2BSaleOrderByExternalId(externalId));
+    }
 }
 
 

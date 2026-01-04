@@ -4,6 +4,7 @@ import org.clickenrent.rentalservice.dto.B2BSubscriptionItemDTO;
 import org.clickenrent.rentalservice.entity.B2BSubscription;
 import org.clickenrent.rentalservice.entity.B2BSubscriptionItem;
 import org.clickenrent.rentalservice.entity.Location;
+import org.clickenrent.rentalservice.entity.Product;
 import org.clickenrent.rentalservice.exception.ResourceNotFoundException;
 import org.clickenrent.rentalservice.mapper.B2BSubscriptionItemMapper;
 import org.clickenrent.rentalservice.repository.B2BSubscriptionItemRepository;
@@ -46,6 +47,7 @@ class B2BSubscriptionItemServiceTest {
     private B2BSubscriptionItemDTO testItemDTO;
     private B2BSubscription testSubscription;
     private Location testLocation;
+    private Product testProduct;
 
     @BeforeEach
     void setUp() {
@@ -60,11 +62,15 @@ class B2BSubscriptionItemServiceTest {
         .location(testLocation)
         .build();
 
+        testProduct = mock(Product.class);
+        when(testProduct.getId()).thenReturn(1L);
+        when(testProduct.getExternalId()).thenReturn("PROD001");
+
         testItem = B2BSubscriptionItem.builder()
         .id(1L)
         .externalId("BSUBI001")
         .b2bSubscription(testSubscription)
-        .productId(1L)
+        .product(testProduct)
         .startDateTime(LocalDateTime.now())
         .endDateTime(LocalDateTime.now().plusMonths(1))
         .price(new BigDecimal("100.00"))

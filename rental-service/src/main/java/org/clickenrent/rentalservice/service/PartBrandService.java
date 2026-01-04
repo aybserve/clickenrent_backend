@@ -83,6 +83,13 @@ public class PartBrandService {
                 .orElseThrow(() -> new ResourceNotFoundException("PartBrand", "id", id));
         partBrandRepository.delete(brand);
     }
+
+    @Transactional(readOnly = true)
+    public PartBrandDTO getPartBrandByExternalId(String externalId) {
+        PartBrand partBrand = partBrandRepository.findByExternalId(externalId)
+                .orElseThrow(() -> new ResourceNotFoundException("PartBrand", "externalId", externalId));
+        return partBrandMapper.toDto(partBrand);
+    }
 }
 
 

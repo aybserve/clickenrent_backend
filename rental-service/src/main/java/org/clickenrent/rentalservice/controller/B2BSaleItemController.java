@@ -58,5 +58,12 @@ public class B2BSaleItemController {
         b2bSaleItemService.deleteItem(id);
         return ResponseEntity.noContent().build();
     }
+
+    @GetMapping("/external/{externalId}")
+    @PreAuthorize("isAuthenticated()")
+    @Operation(summary = "Get B2B sale item by external ID", description = "Retrieve item by external ID for cross-service communication")
+    public ResponseEntity<B2BSaleItemDTO> getByExternalId(@PathVariable String externalId) {
+        return ResponseEntity.ok(b2bSaleItemService.getB2BSaleItemByExternalId(externalId));
+    }
 }
 

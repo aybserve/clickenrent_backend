@@ -79,6 +79,13 @@ public class UserLocationService {
 
         userLocationRepository.delete(userLocation);
     }
+
+    @Transactional(readOnly = true)
+    public UserLocationDTO getUserLocationByExternalId(String externalId) {
+        UserLocation userLocation = userLocationRepository.findByExternalId(externalId)
+                .orElseThrow(() -> new ResourceNotFoundException("UserLocation", "externalId", externalId));
+        return userLocationMapper.toDto(userLocation);
+    }
 }
 
 

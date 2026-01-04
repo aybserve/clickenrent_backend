@@ -57,6 +57,13 @@ public class ServiceProductService {
                 .orElseThrow(() -> new ResourceNotFoundException("ServiceProduct", "id", id));
         serviceProductRepository.delete(serviceProduct);
     }
+
+    @Transactional(readOnly = true)
+    public ServiceProductDTO findByExternalId(String externalId) {
+        ServiceProduct serviceProduct = serviceProductRepository.findByExternalId(externalId)
+                .orElseThrow(() -> new ResourceNotFoundException("ServiceProduct", "externalId", externalId));
+        return serviceProductMapper.toDto(serviceProduct);
+    }
 }
 
 

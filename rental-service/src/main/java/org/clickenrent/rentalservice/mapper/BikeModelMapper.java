@@ -34,6 +34,10 @@ public class BikeModelMapper {
                 .bikeEngineId(bikeModel.getBikeEngine() != null ? bikeModel.getBikeEngine().getId() : null)
                 .b2bSalePrice(bikeModel.getB2bSalePrice())
                 .b2bSubscriptionPrice(bikeModel.getB2bSubscriptionPrice())
+                .dateCreated(bikeModel.getDateCreated())
+                .lastDateModified(bikeModel.getLastDateModified())
+                .createdBy(bikeModel.getCreatedBy())
+                .lastModifiedBy(bikeModel.getLastModifiedBy())
                 .build();
     }
 
@@ -48,7 +52,11 @@ public class BikeModelMapper {
                 .name(dto.getName())
                 .imageUrl(dto.getImageUrl())
                 .b2bSalePrice(dto.getB2bSalePrice())
-                .b2bSubscriptionPrice(dto.getB2bSubscriptionPrice());
+                .b2bSubscriptionPrice(dto.getB2bSubscriptionPrice())
+                .dateCreated(dto.getDateCreated())
+                .lastDateModified(dto.getLastDateModified())
+                .createdBy(dto.getCreatedBy())
+                .lastModifiedBy(dto.getLastModifiedBy());
 
         if (dto.getBikeBrandId() != null) {
             builder.bikeBrand(bikeBrandRepository.findById(dto.getBikeBrandId()).orElse(null));

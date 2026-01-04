@@ -33,6 +33,10 @@ public class B2BSaleOrderMapper {
                 .locationId(b2bSaleOrder.getLocation() != null ? b2bSaleOrder.getLocation().getId() : null)
                 .b2bSaleId(b2bSaleOrder.getB2bSale() != null ? b2bSaleOrder.getB2bSale().getId() : null)
                 .dateTime(b2bSaleOrder.getDateTime())
+                .dateCreated(b2bSaleOrder.getDateCreated())
+                .lastDateModified(b2bSaleOrder.getLastDateModified())
+                .createdBy(b2bSaleOrder.getCreatedBy())
+                .lastModifiedBy(b2bSaleOrder.getLastModifiedBy())
                 .build();
     }
 
@@ -46,7 +50,11 @@ public class B2BSaleOrderMapper {
                 .externalId(dto.getExternalId())
                 .sellerCompanyExternalId(dto.getSellerCompanyExternalId())
                 .buyerCompanyExternalId(dto.getBuyerCompanyExternalId())
-                .dateTime(dto.getDateTime());
+                .dateTime(dto.getDateTime())
+                .dateCreated(dto.getDateCreated())
+                .lastDateModified(dto.getLastDateModified())
+                .createdBy(dto.getCreatedBy())
+                .lastModifiedBy(dto.getLastModifiedBy());
 
         if (dto.getB2bSaleOrderStatusId() != null) {
             builder.b2bSaleOrderStatus(b2bSaleOrderStatusRepository.findById(dto.getB2bSaleOrderStatusId()).orElse(null));

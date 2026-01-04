@@ -29,6 +29,10 @@ public class B2BSaleOrderItemMapper {
                 .quantity(item.getQuantity())
                 .price(item.getPrice())
                 .totalPrice(item.getTotalPrice())
+                .dateCreated(item.getDateCreated())
+                .lastDateModified(item.getLastDateModified())
+                .createdBy(item.getCreatedBy())
+                .lastModifiedBy(item.getLastModifiedBy())
                 .build();
     }
 
@@ -42,7 +46,11 @@ public class B2BSaleOrderItemMapper {
                 .externalId(dto.getExternalId())
                 .quantity(dto.getQuantity())
                 .price(dto.getPrice())
-                .totalPrice(dto.getTotalPrice());
+                .totalPrice(dto.getTotalPrice())
+                .dateCreated(dto.getDateCreated())
+                .lastDateModified(dto.getLastDateModified())
+                .createdBy(dto.getCreatedBy())
+                .lastModifiedBy(dto.getLastModifiedBy());
 
         if (dto.getB2bSaleOrderId() != null) {
             builder.b2bSaleOrder(b2bSaleOrderRepository.findById(dto.getB2bSaleOrderId()).orElse(null));

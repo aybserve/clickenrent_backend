@@ -105,6 +105,13 @@ public class B2BSaleOrderService {
                 .orElseThrow(() -> new ResourceNotFoundException("B2BSaleOrder", "id", id));
         b2bSaleOrderRepository.delete(order);
     }
+
+    @Transactional(readOnly = true)
+    public B2BSaleOrderDTO getB2BSaleOrderByExternalId(String externalId) {
+        B2BSaleOrder order = b2bSaleOrderRepository.findByExternalId(externalId)
+                .orElseThrow(() -> new ResourceNotFoundException("B2BSaleOrder", "externalId", externalId));
+        return b2bSaleOrderMapper.toDto(order);
+    }
 }
 
 

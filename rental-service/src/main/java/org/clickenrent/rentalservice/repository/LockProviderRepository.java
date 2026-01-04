@@ -9,6 +9,7 @@ import java.util.Optional;
 @Repository
 public interface LockProviderRepository extends JpaRepository<LockProvider, Long> {
     Optional<LockProvider> findByName(String name);
+    Optional<LockProvider> findByExternalId(String externalId);
 }
 
 

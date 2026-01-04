@@ -9,6 +9,7 @@ import java.util.Optional;
 @Repository
 public interface LockStatusRepository extends JpaRepository<LockStatus, Long> {
     Optional<LockStatus> findByName(String name);
+    Optional<LockStatus> findByExternalId(String externalId);
 }
 
 

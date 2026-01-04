@@ -44,7 +44,7 @@ class ServiceProductControllerTest {
                 .id(1L)
                 .externalId("SP001")
                 .serviceId(1L)
-                .productId(1L)
+                .relatedProductId(1L)
                 .isB2BRentable(true)
                 .build();
     }

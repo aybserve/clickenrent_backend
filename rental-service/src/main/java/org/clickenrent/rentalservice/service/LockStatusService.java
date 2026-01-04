@@ -74,6 +74,13 @@ public class LockStatusService {
                 .orElseThrow(() -> new ResourceNotFoundException("LockStatus", "id", id));
         lockStatusRepository.delete(lockStatus);
     }
+
+    @Transactional(readOnly = true)
+    public LockStatusDTO findByExternalId(String externalId) {
+        LockStatus lockStatus = lockStatusRepository.findByExternalId(externalId)
+                .orElseThrow(() -> new ResourceNotFoundException("LockStatus", "externalId", externalId));
+        return lockStatusMapper.toDto(lockStatus);
+    }
 }
 
 

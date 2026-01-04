@@ -79,6 +79,13 @@ public class B2BSubscriptionOrderService {
                 .orElseThrow(() -> new ResourceNotFoundException("B2BSubscriptionOrder", "id", id));
         b2bSubscriptionOrderRepository.delete(order);
     }
+
+    @Transactional(readOnly = true)
+    public B2BSubscriptionOrderDTO findByExternalId(String externalId) {
+        B2BSubscriptionOrder order = b2bSubscriptionOrderRepository.findByExternalId(externalId)
+                .orElseThrow(() -> new ResourceNotFoundException("B2BSubscriptionOrder", "externalId", externalId));
+        return b2bSubscriptionOrderMapper.toDto(order);
+    }
 }
 
 

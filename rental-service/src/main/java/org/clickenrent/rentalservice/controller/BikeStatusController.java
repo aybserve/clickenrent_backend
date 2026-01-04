@@ -58,6 +58,13 @@ public class BikeStatusController {
         bikeStatusService.deleteBikeStatus(id);
         return ResponseEntity.noContent().build();
     }
+
+    @GetMapping("/external/{externalId}")
+    @PreAuthorize("isAuthenticated()")
+    @Operation(summary = "Get bike status by external ID", description = "Retrieve status by external ID for cross-service communication")
+    public ResponseEntity<BikeStatusDTO> getByExternalId(@PathVariable String externalId) {
+        return ResponseEntity.ok(bikeStatusService.findByExternalId(externalId));
+    }
 }
 
 

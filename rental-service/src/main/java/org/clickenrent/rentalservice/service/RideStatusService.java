@@ -31,6 +31,13 @@ public class RideStatusService {
                 .orElseThrow(() -> new ResourceNotFoundException("RideStatus", "id", id));
         return rideStatusMapper.toDto(status);
     }
+
+    @Transactional(readOnly = true)
+    public RideStatusDTO findByExternalId(String externalId) {
+        RideStatus status = rideStatusRepository.findByExternalId(externalId)
+                .orElseThrow(() -> new ResourceNotFoundException("RideStatus", "externalId", externalId));
+        return rideStatusMapper.toDto(status);
+    }
 }
 
 

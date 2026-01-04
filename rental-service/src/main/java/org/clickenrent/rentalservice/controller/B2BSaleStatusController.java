@@ -34,6 +34,13 @@ public class B2BSaleStatusController {
     public ResponseEntity<B2BSaleStatusDTO> getStatusById(@PathVariable Long id) {
         return ResponseEntity.ok(b2bSaleStatusService.getStatusById(id));
     }
+
+    @GetMapping("/external/{externalId}")
+    @PreAuthorize("isAuthenticated()")
+    @Operation(summary = "Get B2B sale status by external ID", description = "Retrieve status by external ID for cross-service communication")
+    public ResponseEntity<B2BSaleStatusDTO> getByExternalId(@PathVariable String externalId) {
+        return ResponseEntity.ok(b2bSaleStatusService.findByExternalId(externalId));
+    }
 }
 
 

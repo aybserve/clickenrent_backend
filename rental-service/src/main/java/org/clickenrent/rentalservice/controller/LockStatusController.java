@@ -61,6 +61,13 @@ public class LockStatusController {
         lockStatusService.deleteLockStatus(id);
         return ResponseEntity.noContent().build();
     }
+
+    @GetMapping("/external/{externalId}")
+    @PreAuthorize("isAuthenticated()")
+    @Operation(summary = "Get lock status by external ID", description = "Retrieve status by external ID for cross-service communication")
+    public ResponseEntity<LockStatusDTO> getByExternalId(@PathVariable String externalId) {
+        return ResponseEntity.ok(lockStatusService.findByExternalId(externalId));
+    }
 }
 
 

@@ -70,6 +70,13 @@ public class RentalPlanController {
         rentalPlanService.deleteRentalPlan(id);
         return ResponseEntity.noContent().build();
     }
+
+    @GetMapping("/external/{externalId}")
+    @PreAuthorize("isAuthenticated()")
+    @Operation(summary = "Get rental plan by external ID", description = "Retrieve rental plan by external ID for cross-service communication")
+    public ResponseEntity<RentalPlanDTO> getByExternalId(@PathVariable String externalId) {
+        return ResponseEntity.ok(rentalPlanService.getRentalPlanByExternalId(externalId));
+    }
 }
 
 

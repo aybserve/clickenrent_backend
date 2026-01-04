@@ -22,6 +22,12 @@ public class BikeReservationDTO {
     private LocalDateTime endDateTime;
     private String userExternalId;
     private Long bikeId;
+
+    // Audit fields
+    private LocalDateTime dateCreated;
+    private LocalDateTime lastDateModified;
+    private String createdBy;
+    private String lastModifiedBy;
 }
 
 

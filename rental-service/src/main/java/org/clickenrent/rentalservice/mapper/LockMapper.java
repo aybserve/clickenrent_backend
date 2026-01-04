@@ -33,6 +33,10 @@ public class LockMapper {
                 .batteryLevel(lock.getBatteryLevel())
                 .lastSeenAt(lock.getLastSeenAt())
                 .firmwareVersion(lock.getFirmwareVersion())
+                .dateCreated(lock.getDateCreated())
+                .lastDateModified(lock.getLastDateModified())
+                .createdBy(lock.getCreatedBy())
+                .lastModifiedBy(lock.getLastModifiedBy())
                 .build();
     }
 
@@ -47,7 +51,11 @@ public class LockMapper {
                 .macAddress(dto.getMacAddress())
                 .batteryLevel(dto.getBatteryLevel())
                 .lastSeenAt(dto.getLastSeenAt())
-                .firmwareVersion(dto.getFirmwareVersion());
+                .firmwareVersion(dto.getFirmwareVersion())
+                .dateCreated(dto.getDateCreated())
+                .lastDateModified(dto.getLastDateModified())
+                .createdBy(dto.getCreatedBy())
+                .lastModifiedBy(dto.getLastModifiedBy());
 
         if (dto.getLockStatus() != null && dto.getLockStatus().getId() != null) {
             builder.lockStatus(lockStatusService.getLockStatusByName(dto.getLockStatus().getName()));

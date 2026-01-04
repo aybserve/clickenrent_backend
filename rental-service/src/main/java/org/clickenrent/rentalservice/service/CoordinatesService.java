@@ -63,4 +63,11 @@ public class CoordinatesService {
             return coordinatesRepository.save(newCoordinates);
         }
     }
+
+    @Transactional(readOnly = true)
+    public CoordinatesDTO findByExternalId(String externalId) {
+        Coordinates coordinates = coordinatesRepository.findByExternalId(externalId)
+                .orElseThrow(() -> new ResourceNotFoundException("Coordinates", "externalId", externalId));
+        return coordinatesMapper.toDto(coordinates);
+    }
 }

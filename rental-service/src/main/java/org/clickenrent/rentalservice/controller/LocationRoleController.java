@@ -56,4 +56,11 @@ public class LocationRoleController {
         locationRoleService.deleteLocationRole(id);
         return ResponseEntity.noContent().build();
     }
+
+    @GetMapping("/external/{externalId}")
+    @PreAuthorize("isAuthenticated()")
+    @Operation(summary = "Get location role by external ID", description = "Retrieve location role by external ID for cross-service communication")
+    public ResponseEntity<LocationRoleDTO> getByExternalId(@PathVariable String externalId) {
+        return ResponseEntity.ok(locationRoleService.findByExternalId(externalId));
+    }
 }

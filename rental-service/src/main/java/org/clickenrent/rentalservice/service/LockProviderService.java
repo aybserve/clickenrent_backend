@@ -82,6 +82,13 @@ public class LockProviderService {
                 .orElseThrow(() -> new ResourceNotFoundException("LockProvider", "id", id));
         lockProviderRepository.delete(lockProvider);
     }
+
+    @Transactional(readOnly = true)
+    public LockProviderDTO findByExternalId(String externalId) {
+        LockProvider lockProvider = lockProviderRepository.findByExternalId(externalId)
+                .orElseThrow(() -> new ResourceNotFoundException("LockProvider", "externalId", externalId));
+        return lockProviderMapper.toDto(lockProvider);
+    }
 }
 
 

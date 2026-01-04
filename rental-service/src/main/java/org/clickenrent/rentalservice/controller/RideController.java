@@ -77,6 +77,13 @@ public class RideController {
         rideService.deleteRide(id);
         return ResponseEntity.noContent().build();
     }
+
+    @GetMapping("/external/{externalId}")
+    @PreAuthorize("isAuthenticated()")
+    @Operation(summary = "Get ride by external ID", description = "Retrieve ride by external ID for cross-service communication")
+    public ResponseEntity<RideDTO> getByExternalId(@PathVariable String externalId) {
+        return ResponseEntity.ok(rideService.getRideByExternalId(externalId));
+    }
 }
 
 

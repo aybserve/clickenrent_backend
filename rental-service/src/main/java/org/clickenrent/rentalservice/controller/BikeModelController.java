@@ -61,6 +61,13 @@ public class BikeModelController {
         bikeModelService.deleteBikeModel(id);
         return ResponseEntity.noContent().build();
     }
+
+    @GetMapping("/external/{externalId}")
+    @PreAuthorize("isAuthenticated()")
+    @Operation(summary = "Get bike model by external ID", description = "Retrieve bike model by external ID for cross-service communication")
+    public ResponseEntity<BikeModelDTO> getByExternalId(@PathVariable String externalId) {
+        return ResponseEntity.ok(bikeModelService.findByExternalId(externalId));
+    }
 }
 
 

@@ -1,7 +1,6 @@
 package org.clickenrent.rentalservice.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -58,6 +57,13 @@ public class LocationImageController {
     public ResponseEntity<Void> deleteImage(@PathVariable Long id) {
         locationImageService.deleteImage(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/external/{externalId}")
+    @PreAuthorize("isAuthenticated()")
+    @Operation(summary = "Get location image by external ID", description = "Retrieve location image by external ID for cross-service communication")
+    public ResponseEntity<LocationImageDTO> getByExternalId(@PathVariable String externalId) {
+        return ResponseEntity.ok(locationImageService.getImageByExternalId(externalId));
     }
 }
 

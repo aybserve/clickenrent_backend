@@ -31,6 +31,13 @@ public class B2BSaleStatusService {
                 .orElseThrow(() -> new ResourceNotFoundException("B2BSaleStatus", "id", id));
         return b2bSaleStatusMapper.toDto(status);
     }
+
+    @Transactional(readOnly = true)
+    public B2BSaleStatusDTO findByExternalId(String externalId) {
+        B2BSaleStatus status = b2bSaleStatusRepository.findByExternalId(externalId)
+                .orElseThrow(() -> new ResourceNotFoundException("B2BSaleStatus", "externalId", externalId));
+        return b2bSaleStatusMapper.toDto(status);
+    }
 }
 
 

@@ -61,6 +61,13 @@ public class ServiceController {
         serviceService.deleteService(id);
         return ResponseEntity.noContent().build();
     }
+
+    @GetMapping("/external/{externalId}")
+    @PreAuthorize("isAuthenticated()")
+    @Operation(summary = "Get service by external ID", description = "Retrieve service by external ID for cross-service communication")
+    public ResponseEntity<ServiceDTO> getByExternalId(@PathVariable String externalId) {
+        return ResponseEntity.ok(serviceService.findByExternalId(externalId));
+    }
 }
 
 

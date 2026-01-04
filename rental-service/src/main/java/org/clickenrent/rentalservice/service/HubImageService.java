@@ -91,6 +91,13 @@ public class HubImageService {
 
         hubImageRepository.delete(hubImage);
     }
+
+    @Transactional(readOnly = true)
+    public HubImageDTO getImageByExternalId(String externalId) {
+        HubImage hubImage = hubImageRepository.findByExternalId(externalId)
+                .orElseThrow(() -> new ResourceNotFoundException("HubImage", "externalId", externalId));
+        return hubImageMapper.toDto(hubImage);
+    }
 }
 
 

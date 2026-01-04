@@ -94,4 +94,11 @@ public class LockService {
                 .lastSeen(lock.getLastSeenAt())
                 .build();
     }
+
+    @Transactional(readOnly = true)
+    public LockDTO findByExternalId(String externalId) {
+        Lock lock = lockRepository.findByExternalId(externalId)
+                .orElseThrow(() -> new ResourceNotFoundException("Lock", "externalId", externalId));
+        return lockMapper.toDto(lock);
+    }
 }

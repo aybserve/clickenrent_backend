@@ -61,6 +61,13 @@ public class B2BSubscriptionOrderController {
         b2bSubscriptionOrderService.deleteOrder(id);
         return ResponseEntity.noContent().build();
     }
+
+    @GetMapping("/external/{externalId}")
+    @PreAuthorize("isAuthenticated()")
+    @Operation(summary = "Get B2B subscription order by external ID", description = "Retrieve order by external ID for cross-service communication")
+    public ResponseEntity<B2BSubscriptionOrderDTO> getByExternalId(@PathVariable String externalId) {
+        return ResponseEntity.ok(b2bSubscriptionOrderService.findByExternalId(externalId));
+    }
 }
 
 

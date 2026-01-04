@@ -69,6 +69,13 @@ public class KeyService {
                 .orElseThrow(() -> new ResourceNotFoundException("Key", "id", id));
         keyRepository.delete(key);
     }
+
+    @Transactional(readOnly = true)
+    public KeyDTO findByExternalId(String externalId) {
+        Key key = keyRepository.findByExternalId(externalId)
+                .orElseThrow(() -> new ResourceNotFoundException("Key", "externalId", externalId));
+        return keyMapper.toDto(key);
+    }
 }
 
 

@@ -84,6 +84,13 @@ public class BikeBrandService {
 
         bikeBrandRepository.delete(bikeBrand);
     }
+
+    @Transactional(readOnly = true)
+    public BikeBrandDTO getBikeBrandByExternalId(String externalId) {
+        BikeBrand bikeBrand = bikeBrandRepository.findByExternalId(externalId)
+                .orElseThrow(() -> new ResourceNotFoundException("BikeBrand", "externalId", externalId));
+        return bikeBrandMapper.toDto(bikeBrand);
+    }
 }
 
 

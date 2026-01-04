@@ -34,6 +34,13 @@ public class BikeRentalStatusController {
     public ResponseEntity<BikeRentalStatusDTO> getStatusById(@PathVariable Long id) {
         return ResponseEntity.ok(bikeRentalStatusService.getStatusById(id));
     }
+
+    @GetMapping("/external/{externalId}")
+    @PreAuthorize("isAuthenticated()")
+    @Operation(summary = "Get bike rental status by external ID", description = "Retrieve status by external ID for cross-service communication")
+    public ResponseEntity<BikeRentalStatusDTO> getByExternalId(@PathVariable String externalId) {
+        return ResponseEntity.ok(bikeRentalStatusService.findByExternalId(externalId));
+    }
 }
 
 

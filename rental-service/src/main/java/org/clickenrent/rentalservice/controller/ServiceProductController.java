@@ -54,6 +54,13 @@ public class ServiceProductController {
         serviceProductService.deleteServiceProduct(id);
         return ResponseEntity.noContent().build();
     }
+
+    @GetMapping("/external/{externalId}")
+    @PreAuthorize("isAuthenticated()")
+    @Operation(summary = "Get service product by external ID", description = "Retrieve service product by external ID for cross-service communication")
+    public ResponseEntity<ServiceProductDTO> getByExternalId(@PathVariable String externalId) {
+        return ResponseEntity.ok(serviceProductService.findByExternalId(externalId));
+    }
 }
 
 

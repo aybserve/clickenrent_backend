@@ -29,6 +29,10 @@ public class HubMapper {
                 .locationId(hub.getLocation() != null ? hub.getLocation().getId() : null)
                 .directions(hub.getDirections())
                 .coordinatesId(hub.getCoordinates() != null ? hub.getCoordinates().getId() : null)
+                .dateCreated(hub.getDateCreated())
+                .lastDateModified(hub.getLastDateModified())
+                .createdBy(hub.getCreatedBy())
+                .lastModifiedBy(hub.getLastModifiedBy())
                 .build();
     }
 
@@ -41,7 +45,11 @@ public class HubMapper {
                 .id(dto.getId())
                 .externalId(dto.getExternalId())
                 .name(dto.getName())
-                .directions(dto.getDirections());
+                .directions(dto.getDirections())
+                .dateCreated(dto.getDateCreated())
+                .lastDateModified(dto.getLastDateModified())
+                .createdBy(dto.getCreatedBy())
+                .lastModifiedBy(dto.getLastModifiedBy());
 
         if (dto.getLocationId() != null) {
             builder.location(locationRepository.findById(dto.getLocationId()).orElse(null));

@@ -21,4 +21,10 @@ public class B2BSubscriptionDTO {
     private Long locationId;
     private LocalDateTime endDateTime;
     private Long b2bSubscriptionStatusId;
+
+    // Audit fields
+    private LocalDateTime dateCreated;
+    private LocalDateTime lastDateModified;
+    private String createdBy;
+    private String lastModifiedBy;
 }

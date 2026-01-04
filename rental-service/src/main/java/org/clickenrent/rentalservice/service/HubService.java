@@ -106,6 +106,13 @@ public class HubService {
 
         hubRepository.delete(hub);
     }
+
+    @Transactional(readOnly = true)
+    public HubDTO getHubByExternalId(String externalId) {
+        Hub hub = hubRepository.findByExternalId(externalId)
+                .orElseThrow(() -> new ResourceNotFoundException("Hub", "externalId", externalId));
+        return hubMapper.toDto(hub);
+    }
 }
 
 

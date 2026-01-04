@@ -30,6 +30,10 @@ public class B2BSaleMapper {
                 .dateTime(b2bSale.getDateTime())
                 .sellerCompanyExternalId(b2bSale.getSellerCompanyExternalId())
                 .buyerCompanyExternalId(b2bSale.getBuyerCompanyExternalId())
+                .dateCreated(b2bSale.getDateCreated())
+                .lastDateModified(b2bSale.getLastDateModified())
+                .createdBy(b2bSale.getCreatedBy())
+                .lastModifiedBy(b2bSale.getLastModifiedBy())
                 .build();
     }
 
@@ -43,7 +47,11 @@ public class B2BSaleMapper {
                 .externalId(dto.getExternalId())
                 .dateTime(dto.getDateTime())
                 .sellerCompanyExternalId(dto.getSellerCompanyExternalId())
-                .buyerCompanyExternalId(dto.getBuyerCompanyExternalId());
+                .buyerCompanyExternalId(dto.getBuyerCompanyExternalId())
+                .dateCreated(dto.getDateCreated())
+                .lastDateModified(dto.getLastDateModified())
+                .createdBy(dto.getCreatedBy())
+                .lastModifiedBy(dto.getLastModifiedBy());
 
         if (dto.getLocationId() != null) {
             builder.location(locationRepository.findById(dto.getLocationId()).orElse(null));

@@ -220,6 +220,13 @@ public class RideService {
             log.error("Failed to send notification for bike rental: {}", bikeRental.getId(), e);
         }
     }
+
+    @Transactional(readOnly = true)
+    public RideDTO getRideByExternalId(String externalId) {
+        Ride ride = rideRepository.findByExternalId(externalId)
+                .orElseThrow(() -> new ResourceNotFoundException("Ride", "externalId", externalId));
+        return rideMapper.toDto(ride);
+    }
 }
 
 

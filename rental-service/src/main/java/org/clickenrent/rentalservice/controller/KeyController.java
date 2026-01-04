@@ -51,6 +51,13 @@ public class KeyController {
         keyService.deleteKey(id);
         return ResponseEntity.noContent().build();
     }
+
+    @GetMapping("/external/{externalId}")
+    @PreAuthorize("isAuthenticated()")
+    @Operation(summary = "Get key by external ID", description = "Retrieve key by external ID for cross-service communication")
+    public ResponseEntity<KeyDTO> getByExternalId(@PathVariable String externalId) {
+        return ResponseEntity.ok(keyService.findByExternalId(externalId));
+    }
 }
 
 

@@ -23,6 +23,12 @@ public class B2BSubscriptionOrderItemDTO {
     private Integer quantity;
     private BigDecimal price;
     private BigDecimal totalPrice;
+
+    // Audit fields
+    private java.time.LocalDateTime dateCreated;
+    private java.time.LocalDateTime lastDateModified;
+    private String createdBy;
+    private String lastModifiedBy;
 }
 
 

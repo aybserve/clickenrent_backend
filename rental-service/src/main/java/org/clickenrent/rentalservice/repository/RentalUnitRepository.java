@@ -12,6 +12,7 @@ import java.util.Optional;
 @Repository
 public interface RentalUnitRepository extends JpaRepository<RentalUnit, Long> {
     Optional<RentalUnit> findByName(String name);
+    Optional<RentalUnit> findByExternalId(String externalId);
 }
 
 

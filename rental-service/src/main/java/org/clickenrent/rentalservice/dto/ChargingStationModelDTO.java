@@ -23,4 +23,10 @@ public class ChargingStationModelDTO {
     private String imageUrl;
     private BigDecimal b2bSalePrice;
     private BigDecimal b2bSubscriptionPrice;
+
+    // Audit fields
+    private java.time.LocalDateTime dateCreated;
+    private java.time.LocalDateTime lastDateModified;
+    private String createdBy;
+    private String lastModifiedBy;
 }

@@ -49,6 +49,13 @@ public class CoordinatesController {
         coordinatesService.deleteCoordinates(id);
         return ResponseEntity.noContent().build();
     }
+
+    @GetMapping("/external/{externalId}")
+    @PreAuthorize("isAuthenticated()")
+    @Operation(summary = "Get coordinates by external ID", description = "Retrieve coordinates by external ID for cross-service communication")
+    public ResponseEntity<CoordinatesDTO> getByExternalId(@PathVariable String externalId) {
+        return ResponseEntity.ok(coordinatesService.findByExternalId(externalId));
+    }
 }
 
 

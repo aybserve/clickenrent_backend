@@ -20,6 +20,12 @@ public class HubDTO {
     private Long locationId;
     private String directions;
     private Long coordinatesId;
+
+    // Audit fields
+    private java.time.LocalDateTime dateCreated;
+    private java.time.LocalDateTime lastDateModified;
+    private String createdBy;
+    private String lastModifiedBy;
 }
 
 

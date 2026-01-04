@@ -91,6 +91,13 @@ public class LocationImageService {
 
         locationImageRepository.delete(locationImage);
     }
+
+    @Transactional(readOnly = true)
+    public LocationImageDTO getImageByExternalId(String externalId) {
+        LocationImage locationImage = locationImageRepository.findByExternalId(externalId)
+                .orElseThrow(() -> new ResourceNotFoundException("LocationImage", "externalId", externalId));
+        return locationImageMapper.toDto(locationImage);
+    }
 }
 
 

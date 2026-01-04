@@ -19,55 +19,13 @@
 -- =====================================================================================================================
 -- SECTION 0: POSTGIS SETUP (REQUIRED FOR LOCATION FEATURES)
 -- =====================================================================================================================
--- Note: Using standard semicolon (;) as statement separator
+-- Note: PostGIS extension is enabled here. 
+-- The geom column, triggers, and indexes should be managed separately via migration scripts
+-- or database management tools to avoid SQL parsing issues with Spring Boot's script executor.
 -- =====================================================================================================================
 
 -- Enable PostGIS extension for spatial operations
-CREATE EXTENSION IF NOT EXISTS postgis;;;
-
--- Add geometry column to coordinates table (if not exists)
--- Note: This runs after Hibernate creates the table
-DO $$
-BEGIN
-    IF NOT EXISTS (
-        SELECT 1 FROM information_schema.columns 
-        WHERE table_name = 'coordinates' AND column_name = 'geom'
-    ) THEN
-        ALTER TABLE coordinates ADD COLUMN geom GEOGRAPHY(POINT, 4326);
-    END IF;
-END $$;;;
-
--- Create spatial index on geometry column (if not exists)
-DO $$
-BEGIN
-    IF NOT EXISTS (
-        SELECT 1 FROM pg_indexes 
-        WHERE tablename = 'coordinates' AND indexname = 'idx_coordinates_geom'
-    ) THEN
-        CREATE INDEX idx_coordinates_geom ON coordinates USING GIST (geom);
-    END IF;
-END $$;;;
-
--- Create trigger function to automatically update geometry from latitude/longitude
-CREATE OR REPLACE FUNCTION update_coordinates_geom()
-RETURNS TRIGGER AS $$
-BEGIN
-    NEW.geom = ST_SetSRID(ST_MakePoint(NEW.longitude, NEW.latitude), 4326)::geography;
-    RETURN NEW;
-END;
-$$ LANGUAGE plpgsql;
-
--- Create trigger (drop first if exists to avoid errors)
-DROP TRIGGER IF EXISTS trg_coordinates_geom_update ON coordinates;
-
-CREATE TRIGGER trg_coordinates_geom_update
-    BEFORE INSERT OR UPDATE OF latitude, longitude
-    ON coordinates
-    FOR EACH ROW
-    EXECUTE FUNCTION update_coordinates_geom();
-
--- Update existing coordinates to populate geometry column
-UPDATE coordinates SET geom = ST_SetSRID(ST_MakePoint(longitude, latitude), 4326)::geography WHERE geom IS NULL;
+CREATE EXTENSION IF NOT EXISTS postgis;
 
 -- =====================================================================================================================
 -- SECTION 1: STATUS & LOOKUP TABLES (REQUIRED)
@@ -216,73 +174,91 @@ ON CONFLICT (id) DO NOTHING;
 -- ---------------------------------------------------------------------------------------------------------------------
 -- 2.1 BIKE BRANDS (NO audit fields)
 -- ---------------------------------------------------------------------------------------------------------------------
-INSERT INTO bike_brand (id, external_id, name, company_external_id) VALUES
-(1, '550e8400-e29b-41d4-a716-446655440001', 'Trek', 'company-ext-001'),
-(2, '550e8400-e29b-41d4-a716-446655440002', 'Giant', 'company-ext-001'),
-(3, '550e8400-e29b-41d4-a716-446655440003', 'Specialized', 'company-ext-001'),
-(4, '550e8400-e29b-41d4-a716-446655440004', 'Cannondale', 'company-ext-001'),
-(5, '550e8400-e29b-41d4-a716-446655440005', 'Scott', 'company-ext-002')
+INSERT INTO bike_brand (id, external_id, name, company_external_id, date_created, last_date_modified, created_by, last_modified_by, is_deleted) VALUES
+(1, '550e8400-e29b-41d4-a716-446655440001', 'Trek', 'company-ext-001', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(2, '550e8400-e29b-41d4-a716-446655440002', 'Giant', 'company-ext-001', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(3, '550e8400-e29b-41d4-a716-446655440003', 'Specialized', 'company-ext-001', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(4, '550e8400-e29b-41d4-a716-446655440004', 'Cannondale', 'company-ext-001', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(5, '550e8400-e29b-41d4-a716-446655440005', 'Scott', 'company-ext-002', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false)
 ON CONFLICT (id) DO NOTHING;
 
 -- ---------------------------------------------------------------------------------------------------------------------
 -- 2.2 BIKE ENGINES (NO audit fields)
 -- ---------------------------------------------------------------------------------------------------------------------
-INSERT INTO bike_engine (id, external_id, name) VALUES
-(1, '550e8400-e29b-41d4-a716-446655440031', 'Bosch Performance CX'),
-(2, '550e8400-e29b-41d4-a716-446655440032', 'Shimano EP8'),
-(3, '550e8400-e29b-41d4-a716-446655440033', 'Yamaha PW-X3'),
-(4, '550e8400-e29b-41d4-a716-446655440034', 'Brose Drive S Mag')
+INSERT INTO bike_engine (id, external_id, name, date_created, last_date_modified, created_by, last_modified_by, is_deleted) VALUES
+(1, '550e8400-e29b-41d4-a716-446655440031', 'Bosch Performance CX', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(2, '550e8400-e29b-41d4-a716-446655440032', 'Shimano EP8', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(3, '550e8400-e29b-41d4-a716-446655440033', 'Yamaha PW-X3', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(4, '550e8400-e29b-41d4-a716-446655440034', 'Brose Drive S Mag', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false)
 ON CONFLICT (id) DO NOTHING;
 
 -- ---------------------------------------------------------------------------------------------------------------------
--- 2.3 BIKE MODELS (HAS audit fields)
+-- 2.3 BIKE MODELS (Extends Product - JOINED inheritance)
 -- ---------------------------------------------------------------------------------------------------------------------
-INSERT INTO bike_model (id, external_id, name, bike_brand_id, bike_type_id, bike_engine_id, image_url, b2b_sale_price, b2b_subscription_price, date_created, last_date_modified, created_by, last_modified_by, is_deleted) VALUES
-(1, '550e8400-e29b-41d4-a716-446655440301', 'FX 3 Disc', 1, 2, NULL, 'https://images.example.com/bikes/trek-fx3.jpg', 800.00, 50.00, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
-(2, '550e8400-e29b-41d4-a716-446655440302', 'Marlin 7', 1, 2, NULL, 'https://images.example.com/bikes/trek-marlin7.jpg', 950.00, 75.00, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
-(3, '550e8400-e29b-41d4-a716-446655440303', 'Escape 3', 2, 2, NULL, 'https://images.example.com/bikes/giant-escape3.jpg', 600.00, 40.00, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
-(4, '550e8400-e29b-41d4-a716-446655440304', 'Turbo Vado', 3, 1, 1, 'https://images.example.com/bikes/specialized-vado.jpg', 999.00, 99.00, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
-(5, '550e8400-e29b-41d4-a716-446655440305', 'Rail 9.9', 1, 1, 1, 'https://images.example.com/bikes/trek-rail.jpg', 999.00, 99.00, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false)
+-- First insert into product table (parent) - Using IDs 1001-1005 for BikeModels
+INSERT INTO product (id, external_id, product_type, is_b2b_rentable, date_created, last_date_modified, created_by, last_modified_by, is_deleted) VALUES
+(1001, '550e8400-e29b-41d4-a716-446655440301', 'BIKE_MODEL', false, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(1002, '550e8400-e29b-41d4-a716-446655440302', 'BIKE_MODEL', false, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(1003, '550e8400-e29b-41d4-a716-446655440303', 'BIKE_MODEL', false, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(1004, '550e8400-e29b-41d4-a716-446655440304', 'BIKE_MODEL', false, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(1005, '550e8400-e29b-41d4-a716-446655440305', 'BIKE_MODEL', false, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false)
+ON CONFLICT (id) DO NOTHING;
+
+-- Then insert into bike_model table (subclass)
+INSERT INTO bike_model (id, name, bike_brand_id, bike_type_id, bike_engine_id, image_url, b2b_sale_price, b2b_subscription_price) VALUES
+(1001, 'FX 3 Disc', 1, 2, NULL, 'https://images.example.com/bikes/trek-fx3.jpg', 800.00, 50.00),
+(1002, 'Marlin 7', 1, 2, NULL, 'https://images.example.com/bikes/trek-marlin7.jpg', 950.00, 75.00),
+(1003, 'Escape 3', 2, 2, NULL, 'https://images.example.com/bikes/giant-escape3.jpg', 600.00, 40.00),
+(1004, 'Turbo Vado', 3, 1, 1, 'https://images.example.com/bikes/specialized-vado.jpg', 999.00, 99.00),
+(1005, 'Rail 9.9', 1, 1, 1, 'https://images.example.com/bikes/trek-rail.jpg', 999.00, 99.00)
 ON CONFLICT (id) DO NOTHING;
 
 -- ---------------------------------------------------------------------------------------------------------------------
 -- 2.4 PART BRANDS (NO audit fields, requires company_external_id)
 -- ---------------------------------------------------------------------------------------------------------------------
-INSERT INTO part_brand (id, external_id, name, company_external_id) VALUES
-(1, '550e8400-e29b-41d4-a716-446655440011', 'Shimano', 'company-001'),
-(2, '550e8400-e29b-41d4-a716-446655440012', 'SRAM', 'company-001'),
-(3, '550e8400-e29b-41d4-a716-446655440013', 'Continental', 'company-001'),
-(4, '550e8400-e29b-41d4-a716-446655440014', 'Schwalbe', 'company-002'),
-(5, '550e8400-e29b-41d4-a716-446655440015', 'Bosch', 'company-002')
+INSERT INTO part_brand (id, external_id, name, company_external_id, date_created, last_date_modified, created_by, last_modified_by, is_deleted) VALUES
+(1, '550e8400-e29b-41d4-a716-446655440011', 'Shimano', 'company-001', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(2, '550e8400-e29b-41d4-a716-446655440012', 'SRAM', 'company-001', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(3, '550e8400-e29b-41d4-a716-446655440013', 'Continental', 'company-001', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(4, '550e8400-e29b-41d4-a716-446655440014', 'Schwalbe', 'company-002', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(5, '550e8400-e29b-41d4-a716-446655440015', 'Bosch', 'company-002', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false)
 ON CONFLICT (id) DO NOTHING;
 
 -- ---------------------------------------------------------------------------------------------------------------------
 -- 2.5 PART CATEGORIES (NO audit fields)
 -- ---------------------------------------------------------------------------------------------------------------------
-INSERT INTO part_category (id, external_id, name, parent_category_id) VALUES
-(1, '550e8400-e29b-41d4-a716-446655440041', 'Battery', NULL),
-(2, '550e8400-e29b-41d4-a716-446655440042', 'Tire', NULL),
-(3, '550e8400-e29b-41d4-a716-446655440043', 'Lock', NULL),
-(4, '550e8400-e29b-41d4-a716-446655440044', 'Saddle', NULL),
-(5, '550e8400-e29b-41d4-a716-446655440045', 'Pedals', NULL)
+INSERT INTO part_category (id, external_id, name, parent_category_id, date_created, last_date_modified, created_by, last_modified_by, is_deleted) VALUES
+(1, '550e8400-e29b-41d4-a716-446655440041', 'Battery', NULL, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(2, '550e8400-e29b-41d4-a716-446655440042', 'Tire', NULL, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(3, '550e8400-e29b-41d4-a716-446655440043', 'Lock', NULL, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(4, '550e8400-e29b-41d4-a716-446655440044', 'Saddle', NULL, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(5, '550e8400-e29b-41d4-a716-446655440045', 'Pedals', NULL, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false)
 ON CONFLICT (id) DO NOTHING;
 
 -- ---------------------------------------------------------------------------------------------------------------------
 -- 2.6 CHARGING STATION BRANDS (NO audit fields, requires company_external_id)
 -- ---------------------------------------------------------------------------------------------------------------------
-INSERT INTO charging_station_brand (id, external_id, name, company_external_id) VALUES
-(1, '550e8400-e29b-41d4-a716-446655440021', 'Bosch', 'company-001'),
-(2, '550e8400-e29b-41d4-a716-446655440022', 'Shimano STEPS', 'company-001'),
-(3, '550e8400-e29b-41d4-a716-446655440023', 'Yamaha', 'company-002')
+INSERT INTO charging_station_brand (id, external_id, name, company_external_id, date_created, last_date_modified, created_by, last_modified_by, is_deleted) VALUES
+(1, '550e8400-e29b-41d4-a716-446655440021', 'Bosch', 'company-001', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(2, '550e8400-e29b-41d4-a716-446655440022', 'Shimano STEPS', 'company-001', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(3, '550e8400-e29b-41d4-a716-446655440023', 'Yamaha', 'company-002', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false)
 ON CONFLICT (id) DO NOTHING;
 
 -- ---------------------------------------------------------------------------------------------------------------------
--- 2.7 CHARGING STATION MODELS (HAS audit fields, requires b2b_sale_price and b2b_subscription_price)
+-- 2.7 CHARGING STATION MODELS (Extends Product - JOINED inheritance)
 -- ---------------------------------------------------------------------------------------------------------------------
-INSERT INTO charging_station_model (id, external_id, name, charging_station_brand_id, image_url, b2b_sale_price, b2b_subscription_price, date_created, last_date_modified, created_by, last_modified_by, is_deleted) VALUES
-(1, '550e8400-e29b-41d4-a716-446655440051', 'PowerPack 500', 1, 'https://images.example.com/chargers/bosch-500.jpg', 450.00, 30.00, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
-(2, '550e8400-e29b-41d4-a716-446655440052', 'PowerTube 625', 1, 'https://images.example.com/chargers/bosch-625.jpg', 550.00, 35.00, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
-(3, '550e8400-e29b-41d4-a716-446655440053', 'BT-E8036', 2, 'https://images.example.com/chargers/shimano-e8036.jpg', 480.00, 32.00, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false)
+-- First insert into product table (parent) - Using IDs 2001-2003 for ChargingStationModels
+INSERT INTO product (id, external_id, product_type, is_b2b_rentable, date_created, last_date_modified, created_by, last_modified_by, is_deleted) VALUES
+(2001, '550e8400-e29b-41d4-a716-446655440051', 'CHARGING_STATION_MODEL', false, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(2002, '550e8400-e29b-41d4-a716-446655440052', 'CHARGING_STATION_MODEL', false, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(2003, '550e8400-e29b-41d4-a716-446655440053', 'CHARGING_STATION_MODEL', false, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false)
+ON CONFLICT (id) DO NOTHING;
+
+-- Then insert into charging_station_model table (subclass)
+INSERT INTO charging_station_model (id, name, charging_station_brand_id, image_url, b2b_sale_price, b2b_subscription_price) VALUES
+(2001, 'PowerPack 500', 1, 'https://images.example.com/chargers/bosch-500.jpg', 450.00, 30.00),
+(2002, 'PowerTube 625', 1, 'https://images.example.com/chargers/bosch-625.jpg', 550.00, 35.00),
+(2003, 'BT-E8036', 2, 'https://images.example.com/chargers/shimano-e8036.jpg', 480.00, 32.00)
 ON CONFLICT (id) DO NOTHING;
 
 -- =====================================================================================================================
@@ -358,44 +334,56 @@ INSERT INTO key_entity (id, external_id, lock_id, date_created, last_date_modifi
 ON CONFLICT (id) DO NOTHING;
 
 -- =====================================================================================================================
--- SECTION 5: PRODUCTS (SINGLE_TABLE Inheritance)
+-- SECTION 5: PRODUCTS (JOINED Inheritance)
 -- =====================================================================================================================
 
 -- ---------------------------------------------------------------------------------------------------------------------
--- 5.1 BIKE PRODUCTS (Product extends BaseAuditEntity)
--- Fields: code, qr_code_url, vat, is_vat_include, in_service_date, hub_id, coordinates_id,
---         frame_number, bike_status_id, battery_level, lock_id, bike_type_id, 
---         currency_external_id, bike_model_id, revenue_share_percent
--- Note: Due to SINGLE_TABLE inheritance, Part's required fields must be provided: name, b2b_sale_price, part_brand_id, part_category_id
+-- 5.1 BIKE PRODUCTS (Extends Product - JOINED inheritance)
 -- ---------------------------------------------------------------------------------------------------------------------
-INSERT INTO product (id, external_id, product_type, is_b2b_rentable, code, qr_code_url, vat, is_vat_include, in_service_date, hub_id, coordinates_id, frame_number, bike_status_id, battery_level, lock_id, bike_type_id, currency_external_id, bike_model_id, revenue_share_percent, name, b2b_sale_price, part_brand_id, part_category_id, date_created, last_date_modified, created_by, last_modified_by, is_deleted) VALUES
-(1, '550e8400-e29b-41d4-a716-446655440401', 'BIKE', true, 'BIKE-001', 'https://qr.example.com/bike/001', 20.00, true, CURRENT_DATE - INTERVAL '6 months', 1, NULL, 'TREK-FX3-001', 1, 85, 1, 2, 'currency-ext-eur', 1, 10.00, 'Trek FX 3 Disc #001', 0.00, 1, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
-(2, '550e8400-e29b-41d4-a716-446655440402', 'BIKE', true, 'BIKE-002', 'https://qr.example.com/bike/002', 20.00, true, CURRENT_DATE - INTERVAL '6 months', 1, NULL, 'TREK-FX3-002', 1, 92, 2, 2, 'currency-ext-eur', 1, 10.00, 'Trek FX 3 Disc #002', 0.00, 1, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
-(3, '550e8400-e29b-41d4-a716-446655440403', 'BIKE', true, 'BIKE-003', 'https://qr.example.com/bike/003', 20.00, true, CURRENT_DATE - INTERVAL '4 months', 2, NULL, 'TREK-M7-001', 1, 100, 3, 2, 'currency-ext-eur', 2, 10.00, 'Trek Marlin 7 #001', 0.00, 1, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false)
+-- First insert into product table (parent) - Using IDs 1-100 for Bikes
+INSERT INTO product (id, external_id, product_type, is_b2b_rentable, date_created, last_date_modified, created_by, last_modified_by, is_deleted) VALUES
+(1, '550e8400-e29b-41d4-a716-446655440401', 'BIKE', true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(2, '550e8400-e29b-41d4-a716-446655440402', 'BIKE', true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(3, '550e8400-e29b-41d4-a716-446655440403', 'BIKE', true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false)
+ON CONFLICT (id) DO NOTHING;
+
+-- Then insert into bike table (subclass) - referencing bike_model_id 1001, 1001, 1002
+INSERT INTO bike (id, code, qr_code_url, vat, is_vat_include, in_service_date, hub_id, coordinates_id, frame_number, bike_status_id, battery_level, lock_id, bike_type_id, currency_external_id, bike_model_id, revenue_share_percent) VALUES
+(1, 'BIKE-001', 'https://qr.example.com/bike/001', 20.00, true, CURRENT_DATE - INTERVAL '6 months', 1, NULL, 'TREK-FX3-001', 1, 85, 1, 2, 'currency-ext-eur', 1001, 10.00),
+(2, 'BIKE-002', 'https://qr.example.com/bike/002', 20.00, true, CURRENT_DATE - INTERVAL '6 months', 1, NULL, 'TREK-FX3-002', 1, 92, 2, 2, 'currency-ext-eur', 1001, 10.00),
+(3, 'BIKE-003', 'https://qr.example.com/bike/003', 20.00, true, CURRENT_DATE - INTERVAL '4 months', 2, NULL, 'TREK-M7-001', 1, 100, 3, 2, 'currency-ext-eur', 1002, 10.00)
 ON CONFLICT (id) DO NOTHING;
 
 -- ---------------------------------------------------------------------------------------------------------------------
--- 5.2 CHARGING STATION PRODUCTS
--- Fields: code, qr_code_url, vat, is_vat_include, in_service_date, hub_id, coordinates_id,
---         charging_station_status_id, charging_station_model_id, is_active
--- Note: Due to SINGLE_TABLE inheritance, Part's required fields must be provided: name, b2b_sale_price, part_brand_id, part_category_id
---       Also need to provide battery_level with default 0 for non-bike products
+-- 5.2 CHARGING STATION PRODUCTS (Extends Product - JOINED inheritance)
 -- ---------------------------------------------------------------------------------------------------------------------
-INSERT INTO product (id, external_id, product_type, is_b2b_rentable, code, qr_code_url, vat, is_vat_include, in_service_date, hub_id, coordinates_id, charging_station_status_id, charging_station_model_id, is_active, battery_level, name, b2b_sale_price, part_brand_id, part_category_id, date_created, last_date_modified, created_by, last_modified_by, is_deleted) VALUES
-(4, '550e8400-e29b-41d4-a716-446655440404', 'CHARGING_STATION', false, 'CS-001', 'https://qr.example.com/cs/001', 20.00, true, CURRENT_DATE, 1, 4, 1, 1, true, 0, 'Charging Station #001', 0.00, 1, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
-(5, '550e8400-e29b-41d4-a716-446655440405', 'CHARGING_STATION', false, 'CS-002', 'https://qr.example.com/cs/002', 20.00, true, CURRENT_DATE, 3, 5, 1, 2, true, 0, 'Charging Station #002', 0.00, 1, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false)
+-- First insert into product table (parent) - Using IDs 101-200 for ChargingStations
+INSERT INTO product (id, external_id, product_type, is_b2b_rentable, date_created, last_date_modified, created_by, last_modified_by, is_deleted) VALUES
+(101, '550e8400-e29b-41d4-a716-446655440404', 'CHARGING_STATION', false, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(102, '550e8400-e29b-41d4-a716-446655440405', 'CHARGING_STATION', false, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false)
+ON CONFLICT (id) DO NOTHING;
+
+-- Then insert into charging_station table (subclass) - referencing charging_station_model_id 2001, 2002
+INSERT INTO charging_station (id, code, qr_code_url, vat, is_vat_include, in_service_date, hub_id, coordinates_id, charging_station_status_id, charging_station_model_id, is_active) VALUES
+(101, 'CS-001', 'https://qr.example.com/cs/001', 20.00, true, CURRENT_DATE, 1, 4, 1, 2001, true),
+(102, 'CS-002', 'https://qr.example.com/cs/002', 20.00, true, CURRENT_DATE, 3, 5, 1, 2002, true)
 ON CONFLICT (id) DO NOTHING;
 
 -- ---------------------------------------------------------------------------------------------------------------------
--- 5.3 PART PRODUCTS
--- Fields: vat, is_vat_include, name, part_brand_id, image_url, part_category_id, hub_id, b2b_sale_price, quantity
--- Note: Due to SINGLE_TABLE inheritance, Bike's required field 'code' must be provided
---       Also need to provide battery_level with default 0 for non-bike products
+-- 5.3 PART PRODUCTS (Extends Product - JOINED inheritance)
 -- ---------------------------------------------------------------------------------------------------------------------
-INSERT INTO product (id, external_id, product_type, is_b2b_rentable, code, vat, is_vat_include, battery_level, name, part_brand_id, image_url, part_category_id, hub_id, b2b_sale_price, quantity, date_created, last_date_modified, created_by, last_modified_by, is_deleted) VALUES
-(6, '550e8400-e29b-41d4-a716-446655440406', 'PART', false, 'PART-001', 20.00, true, 0, 'Bosch PowerPack 500', 5, 'https://images.example.com/parts/battery-500.jpg', 1, 1, 450.00, 5, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
-(7, '550e8400-e29b-41d4-a716-446655440407', 'PART', false, 'PART-002', 20.00, true, 0, 'Continental Contact Plus', 3, 'https://images.example.com/parts/tire-contact.jpg', 2, 1, 35.00, 20, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
-(8, '550e8400-e29b-41d4-a716-446655440408', 'PART', false, 'PART-003', 20.00, true, 0, 'Schwalbe Marathon', 4, 'https://images.example.com/parts/tire-marathon.jpg', 2, 2, 42.00, 15, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false)
+-- First insert into product table (parent) - Using IDs 201-300 for Parts
+INSERT INTO product (id, external_id, product_type, is_b2b_rentable, date_created, last_date_modified, created_by, last_modified_by, is_deleted) VALUES
+(201, '550e8400-e29b-41d4-a716-446655440406', 'PART', true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(202, '550e8400-e29b-41d4-a716-446655440407', 'PART', true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(203, '550e8400-e29b-41d4-a716-446655440408', 'PART', true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false)
+ON CONFLICT (id) DO NOTHING;
+
+-- Then insert into part table (subclass)
+INSERT INTO part (id, vat, is_vat_include, name, part_brand_id, image_url, part_category_id, hub_id, b2b_sale_price, quantity) VALUES
+(201, 20.00, true, 'Bosch PowerPack 500', 5, 'https://images.example.com/parts/battery-500.jpg', 1, 1, 450.00, 5),
+(202, 20.00, true, 'Continental Contact Plus', 3, 'https://images.example.com/parts/tire-contact.jpg', 2, 1, 35.00, 20),
+(203, 20.00, true, 'Schwalbe Marathon', 4, 'https://images.example.com/parts/tire-marathon.jpg', 2, 2, 42.00, 15)
 ON CONFLICT (id) DO NOTHING;
 
 -- ---------------------------------------------------------------------------------------------------------------------
@@ -419,13 +407,18 @@ INSERT INTO service (id, external_id, name, b2b_subscription_price, date_created
 ON CONFLICT (id) DO NOTHING;
 
 -- ---------------------------------------------------------------------------------------------------------------------
--- 6.2 SERVICE PRODUCTS (service_id field)
--- Note: Due to SINGLE_TABLE inheritance, must provide ALL required fields from ALL subclasses
---       Also need to provide battery_level with default 0 for non-bike products
+-- 6.2 SERVICE PRODUCTS (Extends Product - JOINED inheritance)
 -- ---------------------------------------------------------------------------------------------------------------------
-INSERT INTO product (id, external_id, product_type, is_b2b_rentable, code, battery_level, name, b2b_sale_price, part_brand_id, part_category_id, service_id, date_created, last_date_modified, created_by, last_modified_by, is_deleted) VALUES
-(9, '550e8400-e29b-41d4-a716-446655440409', 'SERVICE_PRODUCT', false, 'SVC-001', 0, 'Basic Maintenance Service', 0.00, 1, 1, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
-(10, '550e8400-e29b-41d4-a716-446655440410', 'SERVICE_PRODUCT', false, 'SVC-002', 0, 'Full Tune-Up Service', 0.00, 1, 1, 2, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false)
+-- First insert into product table (parent) - Using IDs 301-400 for ServiceProducts
+INSERT INTO product (id, external_id, product_type, is_b2b_rentable, date_created, last_date_modified, created_by, last_modified_by, is_deleted) VALUES
+(301, '550e8400-e29b-41d4-a716-446655440409', 'SERVICE_PRODUCT', false, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(302, '550e8400-e29b-41d4-a716-446655440410', 'SERVICE_PRODUCT', false, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false)
+ON CONFLICT (id) DO NOTHING;
+
+-- Then insert into service_product table (subclass)
+INSERT INTO service_product (id, service_id, related_product_id) VALUES
+(301, 1, NULL),
+(302, 2, NULL)
 ON CONFLICT (id) DO NOTHING;
 
 -- =====================================================================================================================
@@ -446,11 +439,11 @@ ON CONFLICT (id) DO NOTHING;
 -- 7.2 BIKE MODEL RENTAL PLAN (HAS audit fields and external_id, needs price field)
 -- ---------------------------------------------------------------------------------------------------------------------
 INSERT INTO bike_model_rental_plan (id, external_id, bike_model_id, rental_plan_id, price, date_created, last_date_modified, created_by, last_modified_by, is_deleted) VALUES
-(1, '550e8400-e29b-41d4-a716-446655440721', 1, 1, 5.00, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
-(2, '550e8400-e29b-41d4-a716-446655440722', 1, 2, 15.00, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
-(3, '550e8400-e29b-41d4-a716-446655440723', 1, 3, 25.00, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
-(4, '550e8400-e29b-41d4-a716-446655440724', 2, 1, 5.00, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
-(5, '550e8400-e29b-41d4-a716-446655440725', 2, 3, 25.00, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false)
+(1, '550e8400-e29b-41d4-a716-446655440721', 1001, 1, 5.00, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(2, '550e8400-e29b-41d4-a716-446655440722', 1001, 2, 15.00, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(3, '550e8400-e29b-41d4-a716-446655440723', 1001, 3, 25.00, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(4, '550e8400-e29b-41d4-a716-446655440724', 1002, 1, 5.00, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(5, '550e8400-e29b-41d4-a716-446655440725', 1002, 3, 25.00, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false)
 ON CONFLICT (id) DO NOTHING;
 
 -- ---------------------------------------------------------------------------------------------------------------------
@@ -485,15 +478,17 @@ ON CONFLICT (id) DO NOTHING;
 -- ---------------------------------------------------------------------------------------------------------------------
 -- 8.3 B2B SALE PRODUCTS (NO audit fields)
 -- ---------------------------------------------------------------------------------------------------------------------
-INSERT INTO b2b_sale_item (id, external_id, b2b_sale_id, product_id, price, quantity, total_price) VALUES
-(1, '550e8400-e29b-41d4-a716-446655440821', 1, 1, 800.00, 5, 800.00),
-(2, '550e8400-e29b-41d4-a716-446655440822', 1, 2, 800.00, 5, 800.00),
-(3, '550e8400-e29b-41d4-a716-446655440823', 2, 3, 950.00, 8, 950.00)
+-- Note: product_id references Bike products (IDs 1, 2, 3)
+INSERT INTO b2b_sale_item (id, external_id, b2b_sale_id, product_id, price, quantity, total_price, date_created, last_date_modified, created_by, last_modified_by, is_deleted) VALUES
+(1, '550e8400-e29b-41d4-a716-446655440821', 1, 1, 800.00, 5, 800.00, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(2, '550e8400-e29b-41d4-a716-446655440822', 1, 2, 800.00, 5, 800.00, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(3, '550e8400-e29b-41d4-a716-446655440823', 2, 3, 950.00, 8, 950.00, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false)
 ON CONFLICT (id) DO NOTHING;
 
 -- ---------------------------------------------------------------------------------------------------------------------
 -- 8.4 B2B SALE ORDER PRODUCT MODELS (HAS audit fields, uses product_id not bike_model_id, price and total_price not unit_price)
 -- ---------------------------------------------------------------------------------------------------------------------
+-- Note: product_id references Bike products (IDs 1, 3)
 INSERT INTO b2b_sale_order_item (id, external_id, b2b_sale_order_id, product_id, quantity, price, total_price, date_created, last_date_modified, created_by, last_modified_by, is_deleted) VALUES
 (1, '550e8400-e29b-41d4-a716-446655440851', 1, 1, 5, 800.00, 4000.00, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
 (2, '550e8400-e29b-41d4-a716-446655440852', 2, 3, 10, 950.00, 9500.00, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false)
@@ -510,10 +505,11 @@ ON CONFLICT (id) DO NOTHING;
 -- ---------------------------------------------------------------------------------------------------------------------
 -- 8.6 B2B SUBSCRIPTION ITEMS (NO audit fields, uses product_id, start_date_time, end_date_time, price, total_price)
 -- ---------------------------------------------------------------------------------------------------------------------
-INSERT INTO b2b_subscription_item (id, external_id, b2b_subscription_id, product_id, start_date_time, end_date_time, price, total_price) VALUES
-(1, '550e8400-e29b-41d4-a716-446655440861', 1, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP + INTERVAL '12 months', 50.00, 600.00),
-(2, '550e8400-e29b-41d4-a716-446655440862', 1, 4, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP + INTERVAL '12 months', 99.00, 1188.00),
-(3, '550e8400-e29b-41d4-a716-446655440863', 2, 2, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP + INTERVAL '24 months', 75.00, 1800.00)
+-- Note: product_id references Bike products (IDs 1, 2) and ChargingStation product (ID 101)
+INSERT INTO b2b_subscription_item (id, external_id, b2b_subscription_id, product_id, start_date_time, end_date_time, price, total_price, date_created, last_date_modified, created_by, last_modified_by, is_deleted) VALUES
+(1, '550e8400-e29b-41d4-a716-446655440861', 1, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP + INTERVAL '12 months', 50.00, 600.00, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(2, '550e8400-e29b-41d4-a716-446655440862', 1, 101, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP + INTERVAL '12 months', 99.00, 1188.00, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(3, '550e8400-e29b-41d4-a716-446655440863', 2, 2, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP + INTERVAL '24 months', 75.00, 1800.00, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false)
 ON CONFLICT (id) DO NOTHING;
 
 -- ---------------------------------------------------------------------------------------------------------------------
@@ -527,6 +523,7 @@ ON CONFLICT (id) DO NOTHING;
 -- ---------------------------------------------------------------------------------------------------------------------
 -- 8.8 B2B SUBSCRIPTION ORDER ITEMS (HAS audit fields, uses product_id not bike_model_id, price and total_price not unit_price)
 -- ---------------------------------------------------------------------------------------------------------------------
+-- Note: product_id references Bike products (IDs 1, 2)
 INSERT INTO b2b_subscription_order_item (id, external_id, b2b_subscription_order_id, product_id, quantity, price, total_price, date_created, last_date_modified, created_by, last_modified_by, is_deleted) VALUES
 (1, '550e8400-e29b-41d4-a716-446655440871', 1, 1, 10, 50.00, 500.00, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
 (2, '550e8400-e29b-41d4-a716-446655440872', 2, 2, 20, 75.00, 1500.00, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false)
@@ -579,9 +576,10 @@ ON CONFLICT (id) DO NOTHING;
 -- ---------------------------------------------------------------------------------------------------------------------
 -- 10.1 STOCK MOVEMENTS (HAS audit fields)
 -- ---------------------------------------------------------------------------------------------------------------------
+-- Note: product_id references Part products (IDs 202, 203)
 INSERT INTO stock_movement (id, external_id, product_id, from_hub_id, to_hub_id, date_time, date_created, last_date_modified, created_by, last_modified_by, is_deleted) VALUES
-(1, 'stock-mov-00101', 7, 1, 2, CURRENT_TIMESTAMP - INTERVAL '3 days', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
-(2, 'stock-mov-00102', 8, 2, 1, CURRENT_TIMESTAMP - INTERVAL '1 day', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false)
+(1, 'stock-mov-00101', 202, 1, 2, CURRENT_TIMESTAMP - INTERVAL '3 days', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(2, 'stock-mov-00102', 203, 2, 1, CURRENT_TIMESTAMP - INTERVAL '1 day', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false)
 ON CONFLICT (id) DO NOTHING;
 
 -- ---------------------------------------------------------------------------------------------------------------------
@@ -593,9 +591,9 @@ ON CONFLICT (id) DO NOTHING;
 -- 10.3 BIKE MODEL PARTS (HAS audit fields and external_id)
 -- ---------------------------------------------------------------------------------------------------------------------
 INSERT INTO bike_model_part (id, external_id, bike_model_id, part_id, date_created, last_date_modified, created_by, last_modified_by, is_deleted) VALUES
-(1, '550e8400-e29b-41d4-a716-446655440731', 1, 7, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
-(2, '550e8400-e29b-41d4-a716-446655440732', 2, 8, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
-(3, '550e8400-e29b-41d4-a716-446655440733', 3, 7, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false)
+(1, '550e8400-e29b-41d4-a716-446655440731', 1001, 202, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(2, '550e8400-e29b-41d4-a716-446655440732', 1002, 203, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(3, '550e8400-e29b-41d4-a716-446655440733', 1003, 202, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false)
 ON CONFLICT (id) DO NOTHING;
 
 -- =====================================================================================================================
@@ -618,11 +616,11 @@ SELECT setval('lock_status_id_seq', (SELECT COALESCE(MAX(id), 1) FROM lock_statu
 SELECT setval('lock_provider_id_seq', (SELECT COALESCE(MAX(id), 1) FROM lock_provider));
 SELECT setval('bike_brand_id_seq', (SELECT COALESCE(MAX(id), 1) FROM bike_brand));
 SELECT setval('bike_engine_id_seq', (SELECT COALESCE(MAX(id), 1) FROM bike_engine));
-SELECT setval('bike_model_id_seq', (SELECT COALESCE(MAX(id), 1) FROM bike_model));
+-- bike_model_id_seq removed - BikeModel now uses product_id_seq (JOINED inheritance)
 SELECT setval('part_brand_id_seq', (SELECT COALESCE(MAX(id), 1) FROM part_brand));
 SELECT setval('part_category_id_seq', (SELECT COALESCE(MAX(id), 1) FROM part_category));
 SELECT setval('charging_station_brand_id_seq', (SELECT COALESCE(MAX(id), 1) FROM charging_station_brand));
-SELECT setval('charging_station_model_id_seq', (SELECT COALESCE(MAX(id), 1) FROM charging_station_model));
+-- charging_station_model_id_seq removed - ChargingStationModel now uses product_id_seq (JOINED inheritance)
 SELECT setval('coordinates_id_seq', (SELECT COALESCE(MAX(id), 1) FROM coordinates));
 SELECT setval('location_id_seq', (SELECT COALESCE(MAX(id), 1) FROM location));
 SELECT setval('location_image_id_seq', (SELECT COALESCE(MAX(id), 1) FROM location_image));
