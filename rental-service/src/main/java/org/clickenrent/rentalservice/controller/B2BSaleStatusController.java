@@ -15,7 +15,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/b2b-sale-statuses")
 @RequiredArgsConstructor
-@Tag(name = "B2BSaleStatus", description = "B2B sale status management")
+@Tag(name = "B2B Sale Status", description = "B2B sale status management")
 @SecurityRequirement(name = "bearerAuth")
 public class B2BSaleStatusController {
 

@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/lock-statuses")
 @RequiredArgsConstructor
-@Tag(name = "LockStatus", description = "Lock status management (Admin only)")
+@Tag(name = "Lock Status", description = "Lock status management (Admin only)")
 @SecurityRequirement(name = "bearerAuth")
 public class LockStatusController {
 

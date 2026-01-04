@@ -21,7 +21,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/stock-movements")
 @RequiredArgsConstructor
-@Tag(name = "StockMovement", description = "Stock movement tracking between hubs")
+@Tag(name = "Stock Movement", description = "Stock movement tracking between hubs")
 @SecurityRequirement(name = "bearerAuth")
 public class StockMovementController {
 

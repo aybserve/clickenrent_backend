@@ -24,7 +24,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/user-global-roles")
 @RequiredArgsConstructor
-@Tag(name = "User-Global Role", description = "User-Global Role management endpoints")
+@Tag(name = "User Global Role", description = "User Global Role management endpoints")
 @SecurityRequirement(name = "bearerAuth")
 public class UserGlobalRoleController {
     

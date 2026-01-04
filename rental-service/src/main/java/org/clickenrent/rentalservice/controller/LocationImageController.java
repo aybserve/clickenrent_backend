@@ -17,7 +17,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/location-images")
 @RequiredArgsConstructor
-@Tag(name = "LocationImage", description = "Location image management endpoints")
+@Tag(name = "Location Image", description = "Location image management endpoints")
 @SecurityRequirement(name = "bearerAuth")
 public class LocationImageController {
 

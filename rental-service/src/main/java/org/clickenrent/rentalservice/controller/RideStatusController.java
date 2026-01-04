@@ -15,7 +15,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/ride-statuses")
 @RequiredArgsConstructor
-@Tag(name = "RideStatus", description = "Ride status management (Active, Finished)")
+@Tag(name = "Ride Status", description = "Ride status management (Active, Finished)")
 @SecurityRequirement(name = "bearerAuth")
 public class RideStatusController {
 

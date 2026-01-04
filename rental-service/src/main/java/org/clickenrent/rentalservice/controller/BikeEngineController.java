@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/bike-engines")
 @RequiredArgsConstructor
-@Tag(name = "BikeEngine", description = "Bike engine management")
+@Tag(name = "Bike Engine", description = "Bike engine management")
 @SecurityRequirement(name = "bearerAuth")
 public class BikeEngineController {
 

@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/part-categories")
 @RequiredArgsConstructor
-@Tag(name = "PartCategory", description = "Part category management with hierarchical structure")
+@Tag(name = "Part Category", description = "Part category management with hierarchical structure")
 @SecurityRequirement(name = "bearerAuth")
 public class PartCategoryController {
 

@@ -21,7 +21,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/bike-reservations")
 @RequiredArgsConstructor
-@Tag(name = "BikeReservation", description = "Bike reservation management")
+@Tag(name = "Bike Reservation", description = "Bike reservation management")
 @SecurityRequirement(name = "bearerAuth")
 public class BikeReservationController {
 

@@ -22,7 +22,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/bike-rentals")
 @RequiredArgsConstructor
-@Tag(name = "BikeRental", description = "Bike rental management with revenue sharing")
+@Tag(name = "Bike Rental", description = "Bike rental management with revenue sharing")
 @SecurityRequirement(name = "bearerAuth")
 public class BikeRentalController {
 

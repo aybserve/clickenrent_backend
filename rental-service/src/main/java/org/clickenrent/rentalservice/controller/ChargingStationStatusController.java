@@ -15,7 +15,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/charging-station-statuses")
 @RequiredArgsConstructor
-@Tag(name = "ChargingStationStatus", description = "Charging station status management")
+@Tag(name = "Charging Station Status", description = "Charging station status management")
 @SecurityRequirement(name = "bearerAuth")
 public class ChargingStationStatusController {
 

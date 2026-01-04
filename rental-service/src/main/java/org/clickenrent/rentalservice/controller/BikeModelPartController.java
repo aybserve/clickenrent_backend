@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/bike-model-parts")
 @RequiredArgsConstructor
-@Tag(name = "BikeModelPart", description = "Bike model part relationship management")
+@Tag(name = "Bike Model Part", description = "Bike model part relationship management")
 @SecurityRequirement(name = "bearerAuth")
 public class BikeModelPartController {
 

@@ -17,7 +17,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/bike-types")
 @RequiredArgsConstructor
-@Tag(name = "BikeType", description = "Bike type management (Electric bike, Non-electric bike)")
+@Tag(name = "Bike Type", description = "Bike type management (Electric bike, Non-electric bike)")
 @SecurityRequirement(name = "bearerAuth")
 public class BikeTypeController {
 

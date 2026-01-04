@@ -15,7 +15,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/bike-rental-statuses")
 @RequiredArgsConstructor
-@Tag(name = "BikeRentalStatus", description = "Bike rental status management")
+@Tag(name = "Bike Rental Status", description = "Bike rental status management")
 @SecurityRequirement(name = "bearerAuth")
 public class BikeRentalStatusController {
 

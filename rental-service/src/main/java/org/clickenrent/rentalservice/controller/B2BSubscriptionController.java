@@ -21,7 +21,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/b2b-subscriptions")
 @RequiredArgsConstructor
-@Tag(name = "B2BSubscription", description = "B2B subscription management")
+@Tag(name = "B2B Subscription", description = "B2B subscription management")
 @SecurityRequirement(name = "bearerAuth")
 public class B2BSubscriptionController {
 

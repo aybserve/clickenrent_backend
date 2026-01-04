@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/lock-providers")
 @RequiredArgsConstructor
-@Tag(name = "LockProvider", description = "Lock provider/manufacturer management (Admin only)")
+@Tag(name = "Lock Provider", description = "Lock provider/manufacturer management (Admin only)")
 @SecurityRequirement(name = "bearerAuth")
 public class LockProviderController {
 

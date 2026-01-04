@@ -17,7 +17,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/hub-images")
 @RequiredArgsConstructor
-@Tag(name = "HubImage", description = "Hub image management endpoints")
+@Tag(name = "Hub Image", description = "Hub image management endpoints")
 @SecurityRequirement(name = "bearerAuth")
 public class HubImageController {
 

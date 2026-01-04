@@ -21,7 +21,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/b2b-sale-orders")
 @RequiredArgsConstructor
-@Tag(name = "B2BSaleOrder", description = "B2B sale order management")
+@Tag(name = "B2B Sale Order", description = "B2B sale order management")
 @SecurityRequirement(name = "bearerAuth")
 public class B2BSaleOrderController {
 

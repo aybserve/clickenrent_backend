@@ -27,7 +27,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/user-companies")
 @RequiredArgsConstructor
-@Tag(name = "User-Company", description = "User-Company management endpoints")
+@Tag(name = "User Company", description = "User Company management endpoints")
 @SecurityRequirement(name = "bearerAuth")
 public class UserCompanyController {
     

@@ -17,7 +17,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/user-locations")
 @RequiredArgsConstructor
-@Tag(name = "UserLocation", description = "User-location assignment endpoints")
+@Tag(name = "User Location", description = "User location assignment endpoints")
 @SecurityRequirement(name = "bearerAuth")
 public class UserLocationController {
 

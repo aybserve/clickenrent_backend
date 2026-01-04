@@ -15,7 +15,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/location-roles")
 @RequiredArgsConstructor
-@Tag(name = "LocationRole", description = "Location role management (Admin, Manager, Staff)")
+@Tag(name = "Location Role", description = "Location role management (Admin, Manager, Staff)")
 @SecurityRequirement(name = "bearerAuth")
 public class LocationRoleController {
 

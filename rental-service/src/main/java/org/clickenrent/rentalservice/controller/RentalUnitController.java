@@ -17,7 +17,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/rental-units")
 @RequiredArgsConstructor
-@Tag(name = "RentalUnit", description = "Rental unit management (Day, Hour, Week)")
+@Tag(name = "Rental Unit", description = "Rental unit management (Day, Hour, Week)")
 @SecurityRequirement(name = "bearerAuth")
 public class RentalUnitController {
 
