@@ -46,7 +46,6 @@ public class BikeReservation extends BaseAuditEntity {
     @Column(name = "end_date_time", nullable = false)
     private LocalDateTime endDateTime;
 
-    // Cross-service reference field using externalId
     @NotNull(message = "User external ID is required")
     @Column(name = "user_external_id", nullable = false, length = 100)
     private String userExternalId;

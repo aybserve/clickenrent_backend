@@ -11,7 +11,7 @@ import java.math.BigDecimal;
 
 /**
  * Entity representing a part (extends Product).
- * Uses SINGLE_TABLE inheritance.
+ * Uses JOINED inheritance.
  */
 @Entity
 @DiscriminatorValue("PART")
@@ -22,7 +22,7 @@ import java.math.BigDecimal;
 @SuperBuilder
 @ToString(callSuper = true)
 @EqualsAndHashCode(callSuper = true)
-public class Part extends Product implements ProductModelType {
+public class Part extends Product {
 
     @Column(name = "vat", precision = 5, scale = 2)
     private BigDecimal vat;
@@ -61,9 +61,4 @@ public class Part extends Product implements ProductModelType {
 
     @Column(name = "quantity")
     private Integer quantity;
-
-    @Override
-    public String getProductModelTypeName() {
-        return "PART";
-    }
 }

@@ -28,6 +28,9 @@ public class RentalUnit extends BaseAuditEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "external_id", unique = true, length = 100)
+    private String externalId;
+
     @NotBlank(message = "Rental unit name is required")
     @Size(max = 50, message = "Rental unit name must not exceed 50 characters")
     @Column(name = "name", nullable = false, unique = true, length = 50)

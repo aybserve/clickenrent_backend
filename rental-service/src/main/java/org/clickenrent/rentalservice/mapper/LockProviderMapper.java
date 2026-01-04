@@ -11,11 +11,16 @@ public class LockProviderMapper {
         if (entity == null) return null;
         return LockProviderDTO.builder()
                 .id(entity.getId())
+                .externalId(entity.getExternalId())
                 .name(entity.getName())
                 .apiEndpoint(entity.getApiEndpoint())
                 .apiKey(entity.getApiKey())
                 .encryptionKey(entity.getEncryptionKey())
                 .isActive(entity.getIsActive())
+                .dateCreated(entity.getDateCreated())
+                .lastDateModified(entity.getLastDateModified())
+                .createdBy(entity.getCreatedBy())
+                .lastModifiedBy(entity.getLastModifiedBy())
                 .build();
     }
 
@@ -23,6 +28,7 @@ public class LockProviderMapper {
         if (dto == null) return null;
         return LockProvider.builder()
                 .id(dto.getId())
+                .externalId(dto.getExternalId())
                 .name(dto.getName())
                 .apiEndpoint(dto.getApiEndpoint())
                 .apiKey(dto.getApiKey())
@@ -33,6 +39,9 @@ public class LockProviderMapper {
 
     public void updateEntityFromDto(LockProviderDTO dto, LockProvider entity) {
         if (dto == null || entity == null) return;
+        if (dto.getExternalId() != null) {
+            entity.setExternalId(dto.getExternalId());
+        }
         if (dto.getName() != null) {
             entity.setName(dto.getName());
         }

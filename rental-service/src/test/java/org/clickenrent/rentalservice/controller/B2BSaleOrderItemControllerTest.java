@@ -1,8 +1,8 @@
 package org.clickenrent.rentalservice.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.clickenrent.rentalservice.dto.B2BSaleOrderProductModelDTO;
-import org.clickenrent.rentalservice.service.B2BSaleOrderProductModelService;
+import org.clickenrent.rentalservice.dto.B2BSaleOrderItemDTO;
+import org.clickenrent.rentalservice.service.B2BSaleOrderItemService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,9 +24,9 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@WebMvcTest(B2BSaleOrderProductModelController.class)
+@WebMvcTest(B2BSaleOrderItemController.class)
 @AutoConfigureMockMvc
-class B2BSaleOrderProductModelControllerTest {
+class B2BSaleOrderItemControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
@@ -35,13 +35,13 @@ class B2BSaleOrderProductModelControllerTest {
     private ObjectMapper objectMapper;
 
     @MockBean
-    private B2BSaleOrderProductModelService b2bSaleOrderProductModelService;
+    private B2BSaleOrderItemService b2bSaleOrderItemService;
 
-    private B2BSaleOrderProductModelDTO productModelDTO;
+    private B2BSaleOrderItemDTO itemDTO;
 
     @BeforeEach
     void setUp() {
-        productModelDTO = B2BSaleOrderProductModelDTO.builder()
+        itemDTO = B2BSaleOrderItemDTO.builder()
                 .id(1L)
                 .b2bSaleOrderId(1L)
                 .build();
@@ -49,58 +49,51 @@ class B2BSaleOrderProductModelControllerTest {
 
     @Test
     @WithMockUser(roles = "ADMIN")
-    void getAllProductModels_ReturnsOk() throws Exception {
-        Page<B2BSaleOrderProductModelDTO> page = new PageImpl<>(Collections.singletonList(productModelDTO));
-        when(b2bSaleOrderProductModelService.getAllProductModels(any())).thenReturn(page);
+    void getAllItems_ReturnsOk() throws Exception {
+        Page<B2BSaleOrderItemDTO> page = new PageImpl<>(Collections.singletonList(itemDTO));
+        when(b2bSaleOrderItemService.getAllItems(any())).thenReturn(page);
 
-        mockMvc.perform(get("/api/b2b-sale-order-product-models").with(csrf()))
+        mockMvc.perform(get("/api/b2b-sale-order-items").with(csrf()))
                 .andExpect(status().isOk());
     }
 
     @Test
     @WithMockUser(roles = "ADMIN")
-    void getProductModelsByOrderId_ReturnsOk() throws Exception {
-        List<B2BSaleOrderProductModelDTO> productModels = Collections.singletonList(productModelDTO);
-        when(b2bSaleOrderProductModelService.getProductModelsByOrderId(1L)).thenReturn(productModels);
+    void getItemsByOrderId_ReturnsOk() throws Exception {
+        List<B2BSaleOrderItemDTO> items = Collections.singletonList(itemDTO);
+        when(b2bSaleOrderItemService.getItemsByOrderId(1L)).thenReturn(items);
 
-        mockMvc.perform(get("/api/b2b-sale-order-product-models/by-order/1").with(csrf()))
+        mockMvc.perform(get("/api/b2b-sale-order-items/by-order/1").with(csrf()))
                 .andExpect(status().isOk());
     }
 
     @Test
     @WithMockUser(roles = "ADMIN")
-    void getProductModelById_ReturnsOk() throws Exception {
-        when(b2bSaleOrderProductModelService.getProductModelById(1L)).thenReturn(productModelDTO);
+    void getItemById_ReturnsOk() throws Exception {
+        when(b2bSaleOrderItemService.getItemById(1L)).thenReturn(itemDTO);
 
-        mockMvc.perform(get("/api/b2b-sale-order-product-models/1").with(csrf()))
+        mockMvc.perform(get("/api/b2b-sale-order-items/1").with(csrf()))
                 .andExpect(status().isOk());
     }
 
     @Test
     @WithMockUser(roles = "ADMIN")
-    void createProductModel_ReturnsCreated() throws Exception {
-        when(b2bSaleOrderProductModelService.createProductModel(any())).thenReturn(productModelDTO);
+    void createItem_ReturnsCreated() throws Exception {
+        when(b2bSaleOrderItemService.createItem(any())).thenReturn(itemDTO);
 
-        mockMvc.perform(post("/api/b2b-sale-order-product-models")
+        mockMvc.perform(post("/api/b2b-sale-order-items")
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(productModelDTO)))
+                        .content(objectMapper.writeValueAsString(itemDTO)))
                 .andExpect(status().isCreated());
     }
     @Test
     @WithMockUser(roles = "ADMIN")
-    void deleteProductModel_ReturnsNoContent() throws Exception {
-        doNothing().when(b2bSaleOrderProductModelService).deleteProductModel(1L);
+    void deleteItem_ReturnsNoContent() throws Exception {
+        doNothing().when(b2bSaleOrderItemService).deleteItem(1L);
 
-        mockMvc.perform(delete("/api/b2b-sale-order-product-models/1").with(csrf()))
+        mockMvc.perform(delete("/api/b2b-sale-order-items/1").with(csrf()))
                 .andExpect(status().isNoContent());
     }
 }
-
-
-
-
-
-
-
 

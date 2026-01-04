@@ -20,6 +20,12 @@ public class ChargingStationBrandDTO {
 
     // Cross-service externalId reference
     private String companyExternalId;
+
+    // Audit fields
+    private java.time.LocalDateTime dateCreated;
+    private java.time.LocalDateTime lastDateModified;
+    private String createdBy;
+    private String lastModifiedBy;
 }
 
 

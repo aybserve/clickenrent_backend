@@ -5,6 +5,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
+
 /**
  * Data Transfer Object for B2BSaleStatus entity.
  */
@@ -15,5 +17,12 @@ import lombok.NoArgsConstructor;
 public class B2BSaleStatusDTO {
 
     private Long id;
+    private String externalId;
     private String name;
+
+    // Audit fields
+    private LocalDateTime dateCreated;
+    private LocalDateTime lastDateModified;
+    private String createdBy;
+    private String lastModifiedBy;
 }

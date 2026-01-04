@@ -39,7 +39,6 @@ public class B2BSaleOrder extends BaseAuditEntity {
     @Column(name = "external_id", unique = true, length = 100)
     private String externalId;
 
-    // Cross-service reference fields using externalId
     @NotNull(message = "Seller company external ID is required")
     @Column(name = "seller_company_external_id", nullable = false, length = 100)
     private String sellerCompanyExternalId;

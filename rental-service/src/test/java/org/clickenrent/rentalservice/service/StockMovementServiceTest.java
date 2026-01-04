@@ -2,6 +2,7 @@ package org.clickenrent.rentalservice.service;
 
 import org.clickenrent.rentalservice.dto.StockMovementDTO;
 import org.clickenrent.rentalservice.entity.Hub;
+import org.clickenrent.rentalservice.entity.Product;
 import org.clickenrent.rentalservice.entity.StockMovement;
 import org.clickenrent.rentalservice.exception.ResourceNotFoundException;
 import org.clickenrent.rentalservice.mapper.StockMovementMapper;
@@ -49,6 +50,7 @@ class StockMovementServiceTest {
     private StockMovementDTO testMovementDTO;
     private Hub testFromHub;
     private Hub testToHub;
+    private Product testProduct;
 
     @BeforeEach
     void setUp() {
@@ -60,10 +62,15 @@ class StockMovementServiceTest {
         .id(2L)
         .build();
 
+        // Note: Product is abstract, so in a real test you'd use a concrete subclass
+        // For this test, we'll use a mock or assume a concrete implementation
+        testProduct = mock(Product.class);
+        when(testProduct.getId()).thenReturn(1L);
+
         testMovement = StockMovement.builder()
         .id(1L)
         .externalId("SM001")
-        .productId(1L)
+        .product(testProduct)
         .fromHub(testFromHub)
         .toHub(testToHub)
         .dateTime(LocalDateTime.now())

@@ -19,7 +19,7 @@ public class ServiceProductDTO {
     private Long id;
     private String externalId;
     private Long serviceId;
-    private Long productId;
+    private Long relatedProductId;
     private Boolean isB2BRentable;
 
     // Audit fields

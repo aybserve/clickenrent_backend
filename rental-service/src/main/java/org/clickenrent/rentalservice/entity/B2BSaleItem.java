@@ -3,28 +3,28 @@ package org.clickenrent.rentalservice.entity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 
 import java.math.BigDecimal;
 
 /**
- * Entity representing products in a B2B sale.
+ * Entity representing items in a B2B sale.
  */
 @Entity
 @Table(
-    name = "b2b_sale_product",
+    name = "b2b_sale_item",
     indexes = {
-        @Index(name = "idx_b2b_sale_product_external_id", columnList = "external_id"),
-        @Index(name = "idx_b2b_sale_product_product_id", columnList = "product_id")
+        @Index(name = "idx_b2b_sale_item_external_id", columnList = "external_id"),
+        @Index(name = "idx_b2b_sale_item_product_id", columnList = "product_id")
     }
 )
 @Getter
 @Setter
 @NoArgsConstructor
-@AllArgsConstructor
-@Builder
-@ToString
-@EqualsAndHashCode(of = "id")
-public class B2BSaleProduct {
+@SuperBuilder
+@ToString(callSuper = true)
+@EqualsAndHashCode(of = "id", callSuper = false)
+public class B2BSaleItem extends BaseAuditEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -38,9 +38,10 @@ public class B2BSaleProduct {
     @JoinColumn(name = "b2b_sale_id", nullable = false)
     private B2BSale b2bSale;
 
-    @NotNull(message = "Product ID is required")
-    @Column(name = "product_id", nullable = false)
-    private Long productId;
+    @NotNull(message = "Product is required")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "product_id", nullable = false)
+    private Product product;
 
     @NotNull(message = "Price is required")
     @Column(name = "price", nullable = false, precision = 10, scale = 2)
@@ -55,3 +56,4 @@ public class B2BSaleProduct {
     @Column(name = "total_price", nullable = false, precision = 10, scale = 2)
     private BigDecimal totalPrice;
 }
+

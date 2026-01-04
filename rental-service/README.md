@@ -192,7 +192,7 @@ http://localhost:8082/v3/api-docs
 - Ride, Lock, Key
 
 **B2B System**:
-- B2BSale, B2BSaleProduct, B2BSubscription, B2BSubscriptionItem
+- B2BSale, B2BSaleItem, B2BSaleOrder, B2BSaleOrderItem, B2BSubscription, B2BSubscriptionItem
 
 **Other**:
 - Service

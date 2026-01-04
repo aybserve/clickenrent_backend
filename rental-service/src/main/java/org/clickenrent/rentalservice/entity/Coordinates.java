@@ -29,6 +29,9 @@ public class Coordinates extends BaseAuditEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "external_id", unique = true, length = 100)
+    private String externalId;
+
     @NotNull(message = "Latitude is required")
     @Column(name = "latitude", nullable = false, precision = 10, scale = 8)
     private BigDecimal latitude;

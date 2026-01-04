@@ -59,7 +59,6 @@ public class Location extends BaseAuditEntity {
     @Column(name = "description", length = 1000)
     private String description;
 
-    // Cross-service reference field using externalId
     @NotNull(message = "Company external ID is required")
     @Column(name = "company_external_id", nullable = false, length = 100)
     private String companyExternalId;

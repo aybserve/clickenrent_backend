@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 
 /**
  * Entity representing lock providers/manufacturers.
@@ -19,15 +20,17 @@ import lombok.*;
 @Getter
 @Setter
 @NoArgsConstructor
-@AllArgsConstructor
-@Builder
-@ToString
-@EqualsAndHashCode(of = "id")
-public class LockProvider {
+@SuperBuilder
+@ToString(callSuper = true)
+@EqualsAndHashCode(of = "id", callSuper = false)
+public class LockProvider extends BaseAuditEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Column(name = "external_id", unique = true, length = 100)
+    private String externalId;
 
     @NotBlank(message = "Lock provider name is required")
     @Size(max = 100, message = "Lock provider name must not exceed 100 characters")

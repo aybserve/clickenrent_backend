@@ -10,8 +10,8 @@ import java.util.UUID;
 
 /**
  * Abstract base class for all product types.
- * Uses SINGLE_TABLE inheritance strategy for best performance.
- * Subclasses: Bike, ChargingStation, Part, ServiceProduct
+ * Uses JOINED inheritance strategy for clean separation of concerns.
+ * Subclasses: BikeModel, ChargingStationModel, Part, ServiceProduct, Bike, ChargingStation
  */
 @Entity
 @Table(
@@ -21,7 +21,7 @@ import java.util.UUID;
         @Index(name = "idx_product_type", columnList = "product_type")
     }
 )
-@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+@Inheritance(strategy = InheritanceType.JOINED)
 @DiscriminatorColumn(name = "product_type", discriminatorType = DiscriminatorType.STRING)
 @SQLDelete(sql = "UPDATE product SET is_deleted = true WHERE id = ?")
 @Where(clause = "is_deleted = false")

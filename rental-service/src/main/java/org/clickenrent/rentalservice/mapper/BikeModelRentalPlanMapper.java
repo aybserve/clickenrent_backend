@@ -24,9 +24,14 @@ public class BikeModelRentalPlanMapper {
 
         return BikeModelRentalPlanDTO.builder()
                 .id(bikeModelRentalPlan.getId())
+                .externalId(bikeModelRentalPlan.getExternalId())
                 .bikeModelId(bikeModelRentalPlan.getBikeModel() != null ? bikeModelRentalPlan.getBikeModel().getId() : null)
                 .rentalPlanId(bikeModelRentalPlan.getRentalPlan() != null ? bikeModelRentalPlan.getRentalPlan().getId() : null)
                 .price(bikeModelRentalPlan.getPrice())
+                .dateCreated(bikeModelRentalPlan.getDateCreated())
+                .lastDateModified(bikeModelRentalPlan.getLastDateModified())
+                .createdBy(bikeModelRentalPlan.getCreatedBy())
+                .lastModifiedBy(bikeModelRentalPlan.getLastModifiedBy())
                 .build();
     }
 
@@ -37,6 +42,7 @@ public class BikeModelRentalPlanMapper {
 
         BikeModelRentalPlan.BikeModelRentalPlanBuilder builder = BikeModelRentalPlan.builder()
                 .id(dto.getId())
+                .externalId(dto.getExternalId())
                 .price(dto.getPrice());
 
         if (dto.getBikeModelId() != null) {
@@ -54,6 +60,9 @@ public class BikeModelRentalPlanMapper {
             return;
         }
 
+        if (dto.getExternalId() != null) {
+            entity.setExternalId(dto.getExternalId());
+        }
         if (dto.getPrice() != null) {
             entity.setPrice(dto.getPrice());
         }

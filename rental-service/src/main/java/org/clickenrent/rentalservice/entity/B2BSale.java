@@ -54,7 +54,6 @@ public class B2BSale extends BaseAuditEntity {
     @Column(name = "date_time", nullable = false)
     private LocalDateTime dateTime;
 
-    // Cross-service reference fields using externalId
     @NotNull(message = "Seller company external ID is required")
     @Column(name = "seller_company_external_id", nullable = false, length = 100)
     private String sellerCompanyExternalId;

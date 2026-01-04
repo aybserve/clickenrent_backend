@@ -30,6 +30,9 @@ public class Service extends BaseAuditEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "external_id", unique = true, length = 100)
+    private String externalId;
+
     @NotBlank(message = "Service name is required")
     @Size(max = 100, message = "Service name must not exceed 100 characters")
     @Column(name = "name", nullable = false, length = 100)

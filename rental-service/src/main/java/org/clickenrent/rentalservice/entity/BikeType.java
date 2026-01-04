@@ -4,12 +4,14 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 
 import java.util.UUID;
 
 /**
  * Entity representing bike types.
  * Examples: Electric bike, Non-electric bike
+ * This is a taxonomy/category entity, not a product.
  */
 @Entity
 @Table(
@@ -21,11 +23,10 @@ import java.util.UUID;
 @Getter
 @Setter
 @NoArgsConstructor
-@AllArgsConstructor
-@Builder
-@ToString
-@EqualsAndHashCode(of = "id")
-public class BikeType implements ProductModelType {
+@SuperBuilder
+@ToString(callSuper = true)
+@EqualsAndHashCode(of = "id", callSuper = false)
+public class BikeType extends BaseAuditEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -44,10 +45,5 @@ public class BikeType implements ProductModelType {
         if (externalId == null || externalId.isEmpty()) {
             externalId = UUID.randomUUID().toString();
         }
-    }
-
-    @Override
-    public String getProductModelTypeName() {
-        return "BIKE_TYPE";
     }
 }

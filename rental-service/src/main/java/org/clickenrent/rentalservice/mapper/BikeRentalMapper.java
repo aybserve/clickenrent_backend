@@ -28,20 +28,8 @@ public class BikeRentalMapper {
                 .id(bikeRental.getId())
                 .externalId(bikeRental.getExternalId())
                 .bikeId(bikeRental.getBike() != null ? bikeRental.getBike().getId() : null)
-                // Use persisted externalId if available, otherwise fall back to relationship
-                .bikeExternalId(bikeRental.getBikeExternalId() != null ? 
-                        bikeRental.getBikeExternalId() : 
-                        (bikeRental.getBike() != null ? bikeRental.getBike().getExternalId() : null))
                 .locationId(bikeRental.getLocation() != null ? bikeRental.getLocation().getId() : null)
-                // Use persisted externalId if available, otherwise fall back to relationship
-                .locationExternalId(bikeRental.getLocationExternalId() != null ? 
-                        bikeRental.getLocationExternalId() : 
-                        (bikeRental.getLocation() != null ? bikeRental.getLocation().getExternalId() : null))
                 .rentalId(bikeRental.getRental() != null ? bikeRental.getRental().getId() : null)
-                // Use persisted externalId if available, otherwise fall back to relationship
-                .rentalExternalId(bikeRental.getRentalExternalId() != null ? 
-                        bikeRental.getRentalExternalId() : 
-                        (bikeRental.getRental() != null ? bikeRental.getRental().getExternalId() : null))
                 .startDateTime(bikeRental.getStartDateTime())
                 .endDateTime(bikeRental.getEndDateTime())
                 .rentalUnitId(bikeRental.getRentalUnit() != null ? bikeRental.getRentalUnit().getId() : null)

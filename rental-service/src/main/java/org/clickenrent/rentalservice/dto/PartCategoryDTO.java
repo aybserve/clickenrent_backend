@@ -18,6 +18,12 @@ public class PartCategoryDTO {
     private String externalId;
     private String name;
     private Long parentCategoryId;
+
+    // Audit fields
+    private java.time.LocalDateTime dateCreated;
+    private java.time.LocalDateTime lastDateModified;
+    private String createdBy;
+    private String lastModifiedBy;
 }
 
 

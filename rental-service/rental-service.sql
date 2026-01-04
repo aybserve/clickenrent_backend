@@ -28,8 +28,8 @@ DROP TABLE IF EXISTS b2b_subscription_order_item CASCADE;
 DROP TABLE IF EXISTS b2b_subscription_order CASCADE;
 DROP TABLE IF EXISTS b2b_subscription_item CASCADE;
 DROP TABLE IF EXISTS b2b_subscription CASCADE;
-DROP TABLE IF EXISTS b2b_sale_order_product_model CASCADE;
-DROP TABLE IF EXISTS b2b_sale_product CASCADE;
+DROP TABLE IF EXISTS b2b_sale_order_item CASCADE;
+DROP TABLE IF EXISTS b2b_sale_item CASCADE;
 DROP TABLE IF EXISTS b2b_sale_order CASCADE;
 DROP TABLE IF EXISTS b2b_sale CASCADE;
 DROP TABLE IF EXISTS bike_model_rental_plan CASCADE;
@@ -740,44 +740,57 @@ CREATE TABLE b2b_sale_order (
 );
 
 -- ---------------------------------------------------------------------------------------------------------------------
--- Table: b2b_sale_product
--- Description: Products in B2B sales
+-- Table: b2b_sale_item
+-- Description: Items in B2B sales
 -- ---------------------------------------------------------------------------------------------------------------------
-CREATE TABLE b2b_sale_product (
+CREATE TABLE b2b_sale_item (
     id                      BIGSERIAL PRIMARY KEY,
+    external_id             VARCHAR(100) UNIQUE,
     b2b_sale_id             BIGINT NOT NULL,
     product_id              BIGINT NOT NULL,
     quantity                INTEGER NOT NULL,
-    unit_price              DECIMAL(10, 2) NOT NULL,
+    price                   DECIMAL(10, 2) NOT NULL,
+    total_price             DECIMAL(10, 2) NOT NULL,
+    date_created            TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    last_date_modified      TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    created_by              VARCHAR(255),
+    last_modified_by        VARCHAR(255),
     is_deleted              BOOLEAN NOT NULL DEFAULT false,
     
-    CONSTRAINT fk_b2b_sale_product_sale FOREIGN KEY (b2b_sale_id) 
+    CONSTRAINT fk_b2b_sale_item_sale FOREIGN KEY (b2b_sale_id) 
         REFERENCES b2b_sale(id) ON DELETE CASCADE,
-    CONSTRAINT fk_b2b_sale_product_product FOREIGN KEY (product_id) 
+    CONSTRAINT fk_b2b_sale_item_product FOREIGN KEY (product_id) 
         REFERENCES product(id) ON DELETE RESTRICT,
-    CONSTRAINT chk_b2b_sale_product_quantity CHECK (quantity > 0),
-    CONSTRAINT chk_b2b_sale_product_unit_price CHECK (unit_price >= 0)
+    CONSTRAINT chk_b2b_sale_item_quantity CHECK (quantity > 0),
+    CONSTRAINT chk_b2b_sale_item_price CHECK (price >= 0)
 );
 
+CREATE INDEX idx_b2b_sale_item_external_id ON b2b_sale_item(external_id);
+CREATE INDEX idx_b2b_sale_item_product_id ON b2b_sale_item(product_id);
+
 -- ---------------------------------------------------------------------------------------------------------------------
--- Table: b2b_sale_order_product_model
--- Description: Product models in sale orders
+-- Table: b2b_sale_order_item
+-- Description: Items in B2B sale orders
 -- ---------------------------------------------------------------------------------------------------------------------
-CREATE TABLE b2b_sale_order_product_model (
+CREATE TABLE b2b_sale_order_item (
     id                      BIGSERIAL PRIMARY KEY,
+    external_id             VARCHAR(100) UNIQUE,
     b2b_sale_order_id       BIGINT NOT NULL,
-    bike_model_id           BIGINT NOT NULL,
+    product_id              BIGINT NOT NULL,
     quantity                INTEGER NOT NULL,
-    unit_price              DECIMAL(10, 2) NOT NULL,
+    price                   DECIMAL(10, 2) NOT NULL,
+    total_price             DECIMAL(10, 2) NOT NULL,
     is_deleted              BOOLEAN NOT NULL DEFAULT false,
     
-    CONSTRAINT fk_b2b_sale_order_product_model_order FOREIGN KEY (b2b_sale_order_id) 
+    CONSTRAINT fk_b2b_sale_order_item_order FOREIGN KEY (b2b_sale_order_id) 
         REFERENCES b2b_sale_order(id) ON DELETE CASCADE,
-    CONSTRAINT fk_b2b_sale_order_product_model_model FOREIGN KEY (bike_model_id) 
-        REFERENCES bike_model(id) ON DELETE RESTRICT,
-    CONSTRAINT chk_b2b_sale_order_product_model_quantity CHECK (quantity > 0),
-    CONSTRAINT chk_b2b_sale_order_product_model_unit_price CHECK (unit_price >= 0)
+    CONSTRAINT fk_b2b_sale_order_item_product FOREIGN KEY (product_id) 
+        REFERENCES product(id) ON DELETE RESTRICT,
+    CONSTRAINT chk_b2b_sale_order_item_quantity CHECK (quantity > 0),
+    CONSTRAINT chk_b2b_sale_order_item_price CHECK (price >= 0)
 );
+
+CREATE INDEX idx_b2b_sale_order_item_external_id ON b2b_sale_order_item(external_id);
 
 -- ---------------------------------------------------------------------------------------------------------------------
 -- Table: b2b_subscription

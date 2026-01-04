@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 
 /**
  * Entity representing bike engine types.
@@ -18,11 +19,10 @@ import lombok.*;
 @Getter
 @Setter
 @NoArgsConstructor
-@AllArgsConstructor
-@Builder
-@ToString
-@EqualsAndHashCode(of = "id")
-public class BikeEngine {
+@SuperBuilder
+@ToString(callSuper = true)
+@EqualsAndHashCode(of = "id", callSuper = false)
+public class BikeEngine extends BaseAuditEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

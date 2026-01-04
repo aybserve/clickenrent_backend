@@ -11,7 +11,12 @@ public class LockStatusMapper {
         if (entity == null) return null;
         return LockStatusDTO.builder()
                 .id(entity.getId())
+                .externalId(entity.getExternalId())
                 .name(entity.getName())
+                .dateCreated(entity.getDateCreated())
+                .lastDateModified(entity.getLastDateModified())
+                .createdBy(entity.getCreatedBy())
+                .lastModifiedBy(entity.getLastModifiedBy())
                 .build();
     }
 
@@ -19,12 +24,16 @@ public class LockStatusMapper {
         if (dto == null) return null;
         return LockStatus.builder()
                 .id(dto.getId())
+                .externalId(dto.getExternalId())
                 .name(dto.getName())
                 .build();
     }
 
     public void updateEntityFromDto(LockStatusDTO dto, LockStatus entity) {
         if (dto == null || entity == null) return;
+        if (dto.getExternalId() != null) {
+            entity.setExternalId(dto.getExternalId());
+        }
         if (dto.getName() != null) {
             entity.setName(dto.getName());
         }

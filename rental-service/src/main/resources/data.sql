@@ -74,139 +74,139 @@ UPDATE coordinates SET geom = ST_SetSRID(ST_MakePoint(longitude, latitude), 4326
 -- =====================================================================================================================
 
 -- ---------------------------------------------------------------------------------------------------------------------
--- 1.1 BIKE TYPE (NO audit fields)
+-- 1.1 BIKE TYPE (HAS audit fields and external_id)
 -- ---------------------------------------------------------------------------------------------------------------------
-INSERT INTO bike_type (id, name) VALUES
-(1, 'Electric'),
-(2, 'Non-electric')
+INSERT INTO bike_type (id, external_id, name, date_created, last_date_modified, created_by, last_modified_by, is_deleted) VALUES
+(1, '550e8400-e29b-41d4-a716-446655440071', 'Electric', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(2, '550e8400-e29b-41d4-a716-446655440072', 'Non-electric', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false)
 ON CONFLICT (id) DO NOTHING;
 
 -- ---------------------------------------------------------------------------------------------------------------------
--- 1.2 BIKE STATUS (NO audit fields)
+-- 1.2 BIKE STATUS (HAS audit fields and external_id)
 -- ---------------------------------------------------------------------------------------------------------------------
-INSERT INTO bike_status (id, name) VALUES
-(1, 'Available'),
-(2, 'In use'),
-(3, 'Reserved'),
-(4, 'Broken'),
-(5, 'Disabled')
+INSERT INTO bike_status (id, external_id, name, date_created, last_date_modified, created_by, last_modified_by, is_deleted) VALUES
+(1, '550e8400-e29b-41d4-a716-446655440081', 'Available', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(2, '550e8400-e29b-41d4-a716-446655440082', 'In use', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(3, '550e8400-e29b-41d4-a716-446655440083', 'Reserved', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(4, '550e8400-e29b-41d4-a716-446655440084', 'Broken', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(5, '550e8400-e29b-41d4-a716-446655440085', 'Disabled', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false)
 ON CONFLICT (id) DO NOTHING;
 
 -- ---------------------------------------------------------------------------------------------------------------------
--- 1.3 BIKE RENTAL STATUS (NO audit fields)
+-- 1.3 BIKE RENTAL STATUS (HAS audit fields and external_id)
 -- ---------------------------------------------------------------------------------------------------------------------
-INSERT INTO bike_rental_status (id, name) VALUES
-(1, 'Active'),
-(2, 'Completed'),
-(3, 'Cancelled')
+INSERT INTO bike_rental_status (id, external_id, name, date_created, last_date_modified, created_by, last_modified_by, is_deleted) VALUES
+(1, '550e8400-e29b-41d4-a716-446655440091', 'Active', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(2, '550e8400-e29b-41d4-a716-446655440092', 'Completed', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(3, '550e8400-e29b-41d4-a716-446655440093', 'Cancelled', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false)
 ON CONFLICT (id) DO NOTHING;
 
 -- ---------------------------------------------------------------------------------------------------------------------
--- 1.4 RENTAL STATUS (NO audit fields)
+-- 1.4 RENTAL STATUS (HAS audit fields and external_id)
 -- ---------------------------------------------------------------------------------------------------------------------
-INSERT INTO rental_status (id, name) VALUES
-(1, 'Pending'),
-(2, 'Active'),
-(3, 'Completed'),
-(4, 'Cancelled')
+INSERT INTO rental_status (id, external_id, name, date_created, last_date_modified, created_by, last_modified_by, is_deleted) VALUES
+(1, '550e8400-e29b-41d4-a716-446655440061', 'Pending', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(2, '550e8400-e29b-41d4-a716-446655440062', 'Active', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(3, '550e8400-e29b-41d4-a716-446655440063', 'Completed', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(4, '550e8400-e29b-41d4-a716-446655440064', 'Cancelled', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false)
 ON CONFLICT (id) DO NOTHING;
 
 -- ---------------------------------------------------------------------------------------------------------------------
--- 1.5 RENTAL UNIT (HAS audit fields)
+-- 1.5 RENTAL UNIT (HAS audit fields and external_id)
 -- ---------------------------------------------------------------------------------------------------------------------
-INSERT INTO rental_unit (id, name, date_created, last_date_modified, created_by, last_modified_by, is_deleted) VALUES
-(1, 'Hour', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
-(2, 'Day', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
-(3, 'Week', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
-(4, 'Month', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false)
+INSERT INTO rental_unit (id, external_id, name, date_created, last_date_modified, created_by, last_modified_by, is_deleted) VALUES
+(1, '550e8400-e29b-41d4-a716-446655440051', 'Hour', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(2, '550e8400-e29b-41d4-a716-446655440052', 'Day', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(3, '550e8400-e29b-41d4-a716-446655440053', 'Week', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(4, '550e8400-e29b-41d4-a716-446655440054', 'Month', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false)
 ON CONFLICT (id) DO NOTHING;
 
 -- ---------------------------------------------------------------------------------------------------------------------
--- 1.6 RIDE STATUS (NO audit fields)
+-- 1.6 RIDE STATUS (HAS audit fields and external_id)
 -- ---------------------------------------------------------------------------------------------------------------------
-INSERT INTO ride_status (id, name) VALUES
-(1, 'Active'),
-(2, 'Finished'),
-(3, 'Paused')
+INSERT INTO ride_status (id, external_id, name, date_created, last_date_modified, created_by, last_modified_by, is_deleted) VALUES
+(1, '550e8400-e29b-41d4-a716-446655440141', 'Active', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(2, '550e8400-e29b-41d4-a716-446655440142', 'Finished', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(3, '550e8400-e29b-41d4-a716-446655440143', 'Paused', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false)
 ON CONFLICT (id) DO NOTHING;
 
 -- ---------------------------------------------------------------------------------------------------------------------
--- 1.7 LOCATION ROLE (NO audit fields)
+-- 1.7 LOCATION ROLE (HAS audit fields and external_id)
 -- ---------------------------------------------------------------------------------------------------------------------
-INSERT INTO location_role (id, name) VALUES
-(1, 'Admin'),
-(2, 'Manager'),
-(3, 'Staff'),
-(4, 'Viewer')
+INSERT INTO location_role (id, external_id, name, date_created, last_date_modified, created_by, last_modified_by, is_deleted) VALUES
+(1, '550e8400-e29b-41d4-a716-446655440131', 'Admin', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(2, '550e8400-e29b-41d4-a716-446655440132', 'Manager', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(3, '550e8400-e29b-41d4-a716-446655440133', 'Staff', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(4, '550e8400-e29b-41d4-a716-446655440134', 'Viewer', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false)
 ON CONFLICT (id) DO NOTHING;
 
 -- ---------------------------------------------------------------------------------------------------------------------
--- 1.8 B2B SALE STATUS (NO audit fields)
+-- 1.8 B2B SALE STATUS (HAS audit fields and external_id)
 -- ---------------------------------------------------------------------------------------------------------------------
-INSERT INTO b2b_sale_status (id, name) VALUES
-(1, 'Draft'),
-(2, 'Active'),
-(3, 'Completed'),
-(4, 'Cancelled')
+INSERT INTO b2b_sale_status (id, external_id, name, date_created, last_date_modified, created_by, last_modified_by, is_deleted) VALUES
+(1, '550e8400-e29b-41d4-a716-446655440151', 'Draft', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(2, '550e8400-e29b-41d4-a716-446655440152', 'Active', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(3, '550e8400-e29b-41d4-a716-446655440153', 'Completed', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(4, '550e8400-e29b-41d4-a716-446655440154', 'Cancelled', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false)
 ON CONFLICT (id) DO NOTHING;
 
 -- ---------------------------------------------------------------------------------------------------------------------
--- 1.9 B2B SALE ORDER STATUS (NO audit fields)
+-- 1.9 B2B SALE ORDER STATUS (HAS audit fields and external_id)
 -- ---------------------------------------------------------------------------------------------------------------------
-INSERT INTO b2b_sale_order_status (id, name) VALUES
-(1, 'Pending'),
-(2, 'Confirmed'),
-(3, 'Shipped'),
-(4, 'Delivered'),
-(5, 'Cancelled')
+INSERT INTO b2b_sale_order_status (id, external_id, name, date_created, last_date_modified, created_by, last_modified_by, is_deleted) VALUES
+(1, '550e8400-e29b-41d4-a716-446655440161', 'Pending', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(2, '550e8400-e29b-41d4-a716-446655440162', 'Confirmed', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(3, '550e8400-e29b-41d4-a716-446655440163', 'Shipped', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(4, '550e8400-e29b-41d4-a716-446655440164', 'Delivered', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(5, '550e8400-e29b-41d4-a716-446655440165', 'Cancelled', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false)
 ON CONFLICT (id) DO NOTHING;
 
 -- ---------------------------------------------------------------------------------------------------------------------
--- 1.10 B2B SUBSCRIPTION STATUS (NO audit fields)
+-- 1.10 B2B SUBSCRIPTION STATUS (HAS audit fields and external_id)
 -- ---------------------------------------------------------------------------------------------------------------------
-INSERT INTO b2b_subscription_status (id, name) VALUES
-(1, 'Active'),
-(2, 'Inactive'),
-(3, 'Suspended'),
-(4, 'Cancelled')
+INSERT INTO b2b_subscription_status (id, external_id, name, date_created, last_date_modified, created_by, last_modified_by, is_deleted) VALUES
+(1, '550e8400-e29b-41d4-a716-446655440171', 'Active', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(2, '550e8400-e29b-41d4-a716-446655440172', 'Inactive', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(3, '550e8400-e29b-41d4-a716-446655440173', 'Suspended', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(4, '550e8400-e29b-41d4-a716-446655440174', 'Cancelled', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false)
 ON CONFLICT (id) DO NOTHING;
 
 -- ---------------------------------------------------------------------------------------------------------------------
--- 1.11 B2B SUBSCRIPTION ORDER STATUS (NO audit fields)
+-- 1.11 B2B SUBSCRIPTION ORDER STATUS (HAS audit fields and external_id)
 -- ---------------------------------------------------------------------------------------------------------------------
-INSERT INTO b2b_subscription_order_status (id, name) VALUES
-(1, 'Pending'),
-(2, 'Confirmed'),
-(3, 'Fulfilled'),
-(4, 'Cancelled')
+INSERT INTO b2b_subscription_order_status (id, external_id, name, date_created, last_date_modified, created_by, last_modified_by, is_deleted) VALUES
+(1, '550e8400-e29b-41d4-a716-446655440181', 'Pending', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(2, '550e8400-e29b-41d4-a716-446655440182', 'Confirmed', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(3, '550e8400-e29b-41d4-a716-446655440183', 'Fulfilled', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(4, '550e8400-e29b-41d4-a716-446655440184', 'Cancelled', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false)
 ON CONFLICT (id) DO NOTHING;
 
 -- ---------------------------------------------------------------------------------------------------------------------
--- 1.12 CHARGING STATION STATUS (NO audit fields)
+-- 1.12 CHARGING STATION STATUS (HAS audit fields and external_id)
 -- ---------------------------------------------------------------------------------------------------------------------
-INSERT INTO charging_station_status (id, name) VALUES
-(1, 'Available'),
-(2, 'In use'),
-(3, 'Broken'),
-(4, 'Disabled')
+INSERT INTO charging_station_status (id, external_id, name, date_created, last_date_modified, created_by, last_modified_by, is_deleted) VALUES
+(1, '550e8400-e29b-41d4-a716-446655440191', 'Available', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(2, '550e8400-e29b-41d4-a716-446655440192', 'In use', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(3, '550e8400-e29b-41d4-a716-446655440193', 'Broken', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(4, '550e8400-e29b-41d4-a716-446655440194', 'Disabled', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false)
 ON CONFLICT (id) DO NOTHING;
 
 -- ---------------------------------------------------------------------------------------------------------------------
--- 1.13 LOCK STATUS (NO audit fields)
+-- 1.13 LOCK STATUS (HAS audit fields and external_id)
 -- ---------------------------------------------------------------------------------------------------------------------
-INSERT INTO lock_status (id, name) VALUES
-(1, 'Locked'),
-(2, 'Unlocked'),
-(3, 'Unknown')
+INSERT INTO lock_status (id, external_id, name, date_created, last_date_modified, created_by, last_modified_by, is_deleted) VALUES
+(1, '550e8400-e29b-41d4-a716-446655440121', 'Locked', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(2, '550e8400-e29b-41d4-a716-446655440122', 'Unlocked', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(3, '550e8400-e29b-41d4-a716-446655440123', 'Unknown', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false)
 ON CONFLICT (id) DO NOTHING;
 
 -- ---------------------------------------------------------------------------------------------------------------------
--- 1.14 LOCK PROVIDER (NO audit fields)
+-- 1.14 LOCK PROVIDER (HAS audit fields and external_id)
 -- ---------------------------------------------------------------------------------------------------------------------
-INSERT INTO lock_provider (id, name, api_endpoint, is_active) VALUES
-(1, 'AXA', 'https://api.axa-locks.com', true),
-(2, 'OMNI', 'https://api.omni-locks.com', true),
-(3, 'Generic BLE', NULL, true)
+INSERT INTO lock_provider (id, external_id, name, api_endpoint, is_active, date_created, last_date_modified, created_by, last_modified_by, is_deleted) VALUES
+(1, '550e8400-e29b-41d4-a716-446655440111', 'AXA', 'https://api.axa-locks.com', true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(2, '550e8400-e29b-41d4-a716-446655440112', 'OMNI', 'https://api.omni-locks.com', true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(3, '550e8400-e29b-41d4-a716-446655440113', 'Generic BLE', NULL, true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false)
 ON CONFLICT (id) DO NOTHING;
 
 -- =====================================================================================================================
@@ -290,14 +290,14 @@ ON CONFLICT (id) DO NOTHING;
 -- =====================================================================================================================
 
 -- ---------------------------------------------------------------------------------------------------------------------
--- 3.1 COORDINATES (HAS audit fields)
+-- 3.1 COORDINATES (HAS audit fields and external_id)
 -- ---------------------------------------------------------------------------------------------------------------------
-INSERT INTO coordinates (id, latitude, longitude, date_created, last_date_modified, created_by, last_modified_by, is_deleted) VALUES
-(1, 50.45010000, 30.52340000, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
-(2, 50.45470000, 30.52380000, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
-(3, 49.83970000, 24.02970000, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
-(4, 50.45020000, 30.52350000, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
-(5, 50.45480000, 30.52400000, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false)
+INSERT INTO coordinates (id, external_id, latitude, longitude, date_created, last_date_modified, created_by, last_modified_by, is_deleted) VALUES
+(1, '550e8400-e29b-41d4-a716-446655440501', 50.45010000, 30.52340000, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(2, '550e8400-e29b-41d4-a716-446655440502', 50.45470000, 30.52380000, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(3, '550e8400-e29b-41d4-a716-446655440503', 49.83970000, 24.02970000, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(4, '550e8400-e29b-41d4-a716-446655440504', 50.45020000, 30.52350000, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(5, '550e8400-e29b-41d4-a716-446655440505', 50.45480000, 30.52400000, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false)
 ON CONFLICT (id) DO NOTHING;
 
 -- ---------------------------------------------------------------------------------------------------------------------
@@ -410,12 +410,12 @@ ON CONFLICT (id) DO NOTHING;
 -- =====================================================================================================================
 
 -- ---------------------------------------------------------------------------------------------------------------------
--- 6.1 SERVICES (HAS audit fields, only has name and b2b_subscription_price)
+-- 6.1 SERVICES (HAS audit fields and external_id, only has name and b2b_subscription_price)
 -- ---------------------------------------------------------------------------------------------------------------------
-INSERT INTO service (id, name, b2b_subscription_price, date_created, last_date_modified, created_by, last_modified_by, is_deleted) VALUES
-(1, 'Basic Tune-Up', 25.00, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
-(2, 'Full Service', 75.00, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
-(3, 'Tire Replacement', 30.00, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false)
+INSERT INTO service (id, external_id, name, b2b_subscription_price, date_created, last_date_modified, created_by, last_modified_by, is_deleted) VALUES
+(1, '550e8400-e29b-41d4-a716-446655440701', 'Basic Tune-Up', 25.00, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(2, '550e8400-e29b-41d4-a716-446655440702', 'Full Service', 75.00, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(3, '550e8400-e29b-41d4-a716-446655440703', 'Tire Replacement', 30.00, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false)
 ON CONFLICT (id) DO NOTHING;
 
 -- ---------------------------------------------------------------------------------------------------------------------
@@ -433,33 +433,33 @@ ON CONFLICT (id) DO NOTHING;
 -- =====================================================================================================================
 
 -- ---------------------------------------------------------------------------------------------------------------------
--- 7.1 RENTAL PLANS (NO audit fields)
+-- 7.1 RENTAL PLANS (HAS audit fields and external_id)
 -- ---------------------------------------------------------------------------------------------------------------------
-INSERT INTO rental_plan (id, name, rental_unit_id, min_unit, max_unit, location_id, default_price) VALUES
-(1, 'Hourly Plan', 1, 1, 24, 1, 5.00),
-(2, 'Half Day', 1, 4, 8, 1, 15.00),
-(3, 'Full Day', 2, 1, 7, 1, 25.00),
-(4, 'Weekly Plan', 3, 1, 4, 2, 120.00)
+INSERT INTO rental_plan (id, external_id, name, rental_unit_id, min_unit, max_unit, location_id, default_price, date_created, last_date_modified, created_by, last_modified_by, is_deleted) VALUES
+(1, '550e8400-e29b-41d4-a716-446655440711', 'Hourly Plan', 1, 1, 24, 1, 5.00, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(2, '550e8400-e29b-41d4-a716-446655440712', 'Half Day', 1, 4, 8, 1, 15.00, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(3, '550e8400-e29b-41d4-a716-446655440713', 'Full Day', 2, 1, 7, 1, 25.00, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(4, '550e8400-e29b-41d4-a716-446655440714', 'Weekly Plan', 3, 1, 4, 2, 120.00, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false)
 ON CONFLICT (id) DO NOTHING;
 
 -- ---------------------------------------------------------------------------------------------------------------------
--- 7.2 BIKE MODEL RENTAL PLAN (HAS audit fields, needs price field)
+-- 7.2 BIKE MODEL RENTAL PLAN (HAS audit fields and external_id, needs price field)
 -- ---------------------------------------------------------------------------------------------------------------------
-INSERT INTO bike_model_rental_plan (id, bike_model_id, rental_plan_id, price, date_created, last_date_modified, created_by, last_modified_by, is_deleted) VALUES
-(1, 1, 1, 5.00, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
-(2, 1, 2, 15.00, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
-(3, 1, 3, 25.00, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
-(4, 2, 1, 5.00, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
-(5, 2, 3, 25.00, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false)
+INSERT INTO bike_model_rental_plan (id, external_id, bike_model_id, rental_plan_id, price, date_created, last_date_modified, created_by, last_modified_by, is_deleted) VALUES
+(1, '550e8400-e29b-41d4-a716-446655440721', 1, 1, 5.00, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(2, '550e8400-e29b-41d4-a716-446655440722', 1, 2, 15.00, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(3, '550e8400-e29b-41d4-a716-446655440723', 1, 3, 25.00, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(4, '550e8400-e29b-41d4-a716-446655440724', 2, 1, 5.00, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(5, '550e8400-e29b-41d4-a716-446655440725', 2, 3, 25.00, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false)
 ON CONFLICT (id) DO NOTHING;
 
 -- ---------------------------------------------------------------------------------------------------------------------
--- 7.3 USER LOCATION (NO audit fields)
+-- 7.3 USER LOCATION (HAS audit fields and external_id)
 -- ---------------------------------------------------------------------------------------------------------------------
-INSERT INTO user_location (id, external_id, user_external_id, location_id, location_role_id) VALUES
-(1, '550e8400-e29b-41d4-a716-446655440901', 'usr-ext-00001', 1, 1),
-(2, '550e8400-e29b-41d4-a716-446655440902', 'usr-ext-00002', 1, 2),
-(3, '550e8400-e29b-41d4-a716-446655440903', 'usr-ext-00003', 2, 3)
+INSERT INTO user_location (id, external_id, user_external_id, location_id, location_role_id, date_created, last_date_modified, created_by, last_modified_by, is_deleted) VALUES
+(1, '550e8400-e29b-41d4-a716-446655440901', 'usr-ext-00001', 1, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(2, '550e8400-e29b-41d4-a716-446655440902', 'usr-ext-00002', 1, 2, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(3, '550e8400-e29b-41d4-a716-446655440903', 'usr-ext-00003', 2, 3, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false)
 ON CONFLICT (id) DO NOTHING;
 
 -- =====================================================================================================================
@@ -485,7 +485,7 @@ ON CONFLICT (id) DO NOTHING;
 -- ---------------------------------------------------------------------------------------------------------------------
 -- 8.3 B2B SALE PRODUCTS (NO audit fields)
 -- ---------------------------------------------------------------------------------------------------------------------
-INSERT INTO b2b_sale_product (id, external_id, b2b_sale_id, product_id, price, quantity, total_price) VALUES
+INSERT INTO b2b_sale_item (id, external_id, b2b_sale_id, product_id, price, quantity, total_price) VALUES
 (1, '550e8400-e29b-41d4-a716-446655440821', 1, 1, 800.00, 5, 800.00),
 (2, '550e8400-e29b-41d4-a716-446655440822', 1, 2, 800.00, 5, 800.00),
 (3, '550e8400-e29b-41d4-a716-446655440823', 2, 3, 950.00, 8, 950.00)
@@ -494,7 +494,7 @@ ON CONFLICT (id) DO NOTHING;
 -- ---------------------------------------------------------------------------------------------------------------------
 -- 8.4 B2B SALE ORDER PRODUCT MODELS (HAS audit fields, uses product_id not bike_model_id, price and total_price not unit_price)
 -- ---------------------------------------------------------------------------------------------------------------------
-INSERT INTO b2b_sale_order_product_model (id, external_id, b2b_sale_order_id, product_id, quantity, price, total_price, date_created, last_date_modified, created_by, last_modified_by, is_deleted) VALUES
+INSERT INTO b2b_sale_order_item (id, external_id, b2b_sale_order_id, product_id, quantity, price, total_price, date_created, last_date_modified, created_by, last_modified_by, is_deleted) VALUES
 (1, '550e8400-e29b-41d4-a716-446655440851', 1, 1, 5, 800.00, 4000.00, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
 (2, '550e8400-e29b-41d4-a716-446655440852', 2, 3, 10, 950.00, 9500.00, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false)
 ON CONFLICT (id) DO NOTHING;
@@ -547,10 +547,12 @@ ON CONFLICT (id) DO NOTHING;
 
 -- ---------------------------------------------------------------------------------------------------------------------
 -- 9.2 BIKE RENTALS (HAS audit fields)
+-- Note: Removed redundant bike_external_id, location_external_id, rental_external_id fields
+--       These can be accessed through relationships: bike.getExternalId(), location.getExternalId(), rental.getExternalId()
 -- ---------------------------------------------------------------------------------------------------------------------
-INSERT INTO bike_rental (id, external_id, bike_id, bike_external_id, location_id, location_external_id, rental_id, rental_external_id, start_date_time, end_date_time, rental_unit_id, bike_rental_status_id, is_revenue_share_paid, photo_url, price, total_price, date_created, last_date_modified, created_by, last_modified_by, is_deleted) VALUES
-(1, 'bike-rental-ext-00101', 1, '550e8400-e29b-41d4-a716-446655440401', 1, '550e8400-e29b-41d4-a716-446655440101', 1, 'rental-ext-00101', CURRENT_TIMESTAMP - INTERVAL '2 days', CURRENT_TIMESTAMP - INTERVAL '1 day', 2, 2, true, NULL, 25.00, 25.00, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
-(2, 'bike-rental-ext-00102', 2, '550e8400-e29b-41d4-a716-446655440402', 1, '550e8400-e29b-41d4-a716-446655440101', 2, 'rental-ext-00102', CURRENT_TIMESTAMP - INTERVAL '5 days', CURRENT_TIMESTAMP - INTERVAL '1 day', 1, 2, true, NULL, 5.00, 20.00, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false)
+INSERT INTO bike_rental (id, external_id, bike_id, location_id, rental_id, start_date_time, end_date_time, rental_unit_id, bike_rental_status_id, is_revenue_share_paid, photo_url, price, total_price, date_created, last_date_modified, created_by, last_modified_by, is_deleted) VALUES
+(1, 'bike-rental-ext-00101', 1, 1, 1, CURRENT_TIMESTAMP - INTERVAL '2 days', CURRENT_TIMESTAMP - INTERVAL '1 day', 2, 2, true, NULL, 25.00, 25.00, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(2, 'bike-rental-ext-00102', 2, 1, 2, CURRENT_TIMESTAMP - INTERVAL '5 days', CURRENT_TIMESTAMP - INTERVAL '1 day', 1, 2, true, NULL, 5.00, 20.00, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false)
 ON CONFLICT (id) DO NOTHING;
 
 -- ---------------------------------------------------------------------------------------------------------------------
@@ -588,12 +590,12 @@ ON CONFLICT (id) DO NOTHING;
 -- Note: There is no bike_part table. The relationship is handled through BikeModelPart entity.
 
 -- ---------------------------------------------------------------------------------------------------------------------
--- 10.3 BIKE MODEL PARTS (HAS audit fields)
+-- 10.3 BIKE MODEL PARTS (HAS audit fields and external_id)
 -- ---------------------------------------------------------------------------------------------------------------------
-INSERT INTO bike_model_part (id, bike_model_id, part_id, date_created, last_date_modified, created_by, last_modified_by, is_deleted) VALUES
-(1, 1, 7, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
-(2, 2, 8, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
-(3, 3, 7, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false)
+INSERT INTO bike_model_part (id, external_id, bike_model_id, part_id, date_created, last_date_modified, created_by, last_modified_by, is_deleted) VALUES
+(1, '550e8400-e29b-41d4-a716-446655440731', 1, 7, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(2, '550e8400-e29b-41d4-a716-446655440732', 2, 8, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(3, '550e8400-e29b-41d4-a716-446655440733', 3, 7, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false)
 ON CONFLICT (id) DO NOTHING;
 
 -- =====================================================================================================================
@@ -635,8 +637,8 @@ SELECT setval('bike_model_rental_plan_id_seq', (SELECT COALESCE(MAX(id), 1) FROM
 SELECT setval('user_location_id_seq', (SELECT COALESCE(MAX(id), 1) FROM user_location));
 SELECT setval('b2b_sale_id_seq', (SELECT COALESCE(MAX(id), 1) FROM b2b_sale));
 SELECT setval('b2b_sale_order_id_seq', (SELECT COALESCE(MAX(id), 1) FROM b2b_sale_order));
-SELECT setval('b2b_sale_product_id_seq', (SELECT COALESCE(MAX(id), 1) FROM b2b_sale_product));
-SELECT setval('b2b_sale_order_product_model_id_seq', (SELECT COALESCE(MAX(id), 1) FROM b2b_sale_order_product_model));
+SELECT setval('b2b_sale_item_id_seq', (SELECT COALESCE(MAX(id), 1) FROM b2b_sale_item));
+SELECT setval('b2b_sale_order_item_id_seq', (SELECT COALESCE(MAX(id), 1) FROM b2b_sale_order_item));
 SELECT setval('b2b_subscription_id_seq', (SELECT COALESCE(MAX(id), 1) FROM b2b_subscription));
 SELECT setval('b2b_subscription_item_id_seq', (SELECT COALESCE(MAX(id), 1) FROM b2b_subscription_item));
 SELECT setval('b2b_subscription_order_id_seq', (SELECT COALESCE(MAX(id), 1) FROM b2b_subscription_order));

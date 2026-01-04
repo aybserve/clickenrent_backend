@@ -41,7 +41,6 @@ public class Rental extends BaseAuditEntity {
     @Column(name = "external_id", unique = true, length = 100)
     private String externalId;
 
-    // Cross-service reference fields using externalId
     @NotNull(message = "User external ID is required")
     @Column(name = "user_external_id", nullable = false, length = 100)
     private String userExternalId;

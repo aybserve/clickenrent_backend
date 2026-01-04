@@ -47,7 +47,6 @@ class ServiceProductServiceTest {
         testServiceProduct = ServiceProduct.builder()
         .id(1L)
         .externalId("SP001")
-        .productId(1L)
         .isB2BRentable(true)
         .build();
 
@@ -55,7 +54,7 @@ class ServiceProductServiceTest {
         .id(1L)
         .externalId("SP001")
         .serviceId(1L)
-        .productId(1L)
+        .relatedProductId(1L)
         .isB2BRentable(true)
         .build();
     }

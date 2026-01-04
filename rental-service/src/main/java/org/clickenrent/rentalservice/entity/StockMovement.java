@@ -37,9 +37,10 @@ public class StockMovement extends BaseAuditEntity {
     @Column(name = "external_id", unique = true, length = 100)
     private String externalId;
 
-    @NotNull(message = "Product ID is required")
-    @Column(name = "product_id", nullable = false)
-    private Long productId;
+    @NotNull(message = "Product is required")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "product_id", nullable = false)
+    private Product product;
 
     @NotNull(message = "From hub is required")
     @ManyToOne(fetch = FetchType.LAZY)

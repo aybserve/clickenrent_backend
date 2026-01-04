@@ -17,8 +17,15 @@ import java.math.BigDecimal;
 public class CoordinatesDTO {
 
     private Long id;
+    private String externalId;
     private BigDecimal latitude;
     private BigDecimal longitude;
+
+    // Audit fields
+    private java.time.LocalDateTime dateCreated;
+    private java.time.LocalDateTime lastDateModified;
+    private String createdBy;
+    private String lastModifiedBy;
 }
 
 

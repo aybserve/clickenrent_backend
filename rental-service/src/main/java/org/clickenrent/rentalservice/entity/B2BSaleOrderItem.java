@@ -10,19 +10,19 @@ import org.hibernate.annotations.Where;
 import java.math.BigDecimal;
 
 /**
- * Entity representing B2B sale order products.
- * Links orders to products that implement ProductModelType interface.
+ * Entity representing B2B sale order items.
+ * Links orders to any Product subtype (BikeModel, ChargingStationModel, Part, ServiceProduct).
  */
 @Entity
 @Table(
-    name = "b2b_sale_order_product_model",
+    name = "b2b_sale_order_item",
     indexes = {
-        @Index(name = "idx_b2b_sale_order_pm_external_id", columnList = "external_id"),
-        @Index(name = "idx_b2b_sale_order_pm_order_id", columnList = "b2b_sale_order_id"),
-        @Index(name = "idx_b2b_sale_order_pm_product_id", columnList = "product_id")
+        @Index(name = "idx_b2b_sale_order_item_external_id", columnList = "external_id"),
+        @Index(name = "idx_b2b_sale_order_item_order_id", columnList = "b2b_sale_order_id"),
+        @Index(name = "idx_b2b_sale_order_item_product_id", columnList = "product_id")
     }
 )
-@SQLDelete(sql = "UPDATE b2b_sale_order_product_model SET is_deleted = true WHERE id = ?")
+@SQLDelete(sql = "UPDATE b2b_sale_order_item SET is_deleted = true WHERE id = ?")
 @Where(clause = "is_deleted = false")
 @Getter
 @Setter
@@ -30,7 +30,7 @@ import java.math.BigDecimal;
 @SuperBuilder
 @ToString(callSuper = true)
 @EqualsAndHashCode(of = "id", callSuper = false)
-public class B2BSaleOrderProductModel extends BaseAuditEntity {
+public class B2BSaleOrderItem extends BaseAuditEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -61,7 +61,4 @@ public class B2BSaleOrderProductModel extends BaseAuditEntity {
     @Column(name = "total_price", nullable = false, precision = 10, scale = 2)
     private BigDecimal totalPrice;
 }
-
-
-
 

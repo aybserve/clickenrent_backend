@@ -131,21 +131,10 @@ public class BikeRentalService {
 
         BikeRental bikeRental = bikeRentalMapper.toEntity(dto);
         
-        // DUAL-WRITE: Populate cross-service externalId reference fields
-        if (bike.getExternalId() != null) {
-            bikeRental.setBikeExternalId(bike.getExternalId());
-            log.debug("Populated bikeExternalId: {} for bike rental", bike.getExternalId());
-        }
-        
-        if (bikeRental.getLocation() != null && bikeRental.getLocation().getExternalId() != null) {
-            bikeRental.setLocationExternalId(bikeRental.getLocation().getExternalId());
-            log.debug("Populated locationExternalId: {} for bike rental", bikeRental.getLocation().getExternalId());
-        }
-        
-        if (rental.getExternalId() != null) {
-            bikeRental.setRentalExternalId(rental.getExternalId());
-            log.debug("Populated rentalExternalId: {} for bike rental", rental.getExternalId());
-        }
+        // Note: External IDs are now accessed through relationships:
+        // - bike.getExternalId() instead of bikeRental.getBikeExternalId()
+        // - location.getExternalId() instead of bikeRental.getLocationExternalId()
+        // - rental.getExternalId() instead of bikeRental.getRentalExternalId()
         
         // Calculate revenue share if B2B rentable
         if (bike.getIsB2BRentable() && bike.getRevenueSharePercent() != null) {

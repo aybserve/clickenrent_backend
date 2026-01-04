@@ -21,6 +21,12 @@ public class UserLocationDTO {
 
     // Cross-service externalId reference
     private String userExternalId;
+
+    // Audit fields
+    private java.time.LocalDateTime dateCreated;
+    private java.time.LocalDateTime lastDateModified;
+    private String createdBy;
+    private String lastModifiedBy;
 }
 
 

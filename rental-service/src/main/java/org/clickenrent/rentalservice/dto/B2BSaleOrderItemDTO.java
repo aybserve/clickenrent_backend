@@ -8,19 +8,20 @@ import lombok.NoArgsConstructor;
 import java.math.BigDecimal;
 
 /**
- * Data Transfer Object for B2BSaleProduct entity.
+ * Data Transfer Object for B2BSaleOrderItem entity.
  */
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class B2BSaleProductDTO {
+public class B2BSaleOrderItemDTO {
 
     private Long id;
     private String externalId;
-    private Long b2bSaleId;
+    private Long b2bSaleOrderId;
     private Long productId;
-    private BigDecimal price;
     private Integer quantity;
+    private BigDecimal price;
     private BigDecimal totalPrice;
 }
+

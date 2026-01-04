@@ -17,9 +17,16 @@ import java.math.BigDecimal;
 public class BikeModelRentalPlanDTO {
 
     private Long id;
+    private String externalId;
     private Long bikeModelId;
     private Long rentalPlanId;
     private BigDecimal price;
+
+    // Audit fields
+    private java.time.LocalDateTime dateCreated;
+    private java.time.LocalDateTime lastDateModified;
+    private String createdBy;
+    private String lastModifiedBy;
 }
 
 

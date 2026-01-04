@@ -37,7 +37,6 @@ public class Bike extends Product {
     @Column(name = "frame_number", length = 100)
     private String frameNumber;
 
-//    @NotNull(message = "Bike status is required")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "bike_status_id", nullable = true)
     private BikeStatus bikeStatus;
@@ -65,19 +64,16 @@ public class Bike extends Product {
     @JoinColumn(name = "coordinates_id")
     private Coordinates coordinates;
 
-//    @NotNull(message = "Bike type is required")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "bike_type_id", nullable = true)
     private BikeType bikeType;
 
-    // Cross-service reference field using externalId
     @Column(name = "currency_external_id", length = 100)
     private String currencyExternalId;
 
     @Column(name = "in_service_date")
     private LocalDate inServiceDate;
 
-//    @NotNull(message = "Bike model is required")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "bike_model_id", nullable = true)
     private BikeModel bikeModel;

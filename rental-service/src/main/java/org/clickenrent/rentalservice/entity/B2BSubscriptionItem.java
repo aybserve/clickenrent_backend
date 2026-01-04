@@ -3,6 +3,7 @@ package org.clickenrent.rentalservice.entity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -21,11 +22,10 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @NoArgsConstructor
-@AllArgsConstructor
-@Builder
-@ToString
-@EqualsAndHashCode(of = "id")
-public class B2BSubscriptionItem {
+@SuperBuilder
+@ToString(callSuper = true)
+@EqualsAndHashCode(of = "id", callSuper = false)
+public class B2BSubscriptionItem extends BaseAuditEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -39,9 +39,10 @@ public class B2BSubscriptionItem {
     @JoinColumn(name = "b2b_subscription_id", nullable = false)
     private B2BSubscription b2bSubscription;
 
-    @NotNull(message = "Product ID is required")
-    @Column(name = "product_id", nullable = false)
-    private Long productId;
+    @NotNull(message = "Product is required")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "product_id", nullable = false)
+    private Product product;
 
     @NotNull(message = "Start date time is required")
     @Column(name = "start_date_time", nullable = false)

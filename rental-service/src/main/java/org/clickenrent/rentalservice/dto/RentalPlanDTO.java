@@ -17,10 +17,17 @@ import java.math.BigDecimal;
 public class RentalPlanDTO {
 
     private Long id;
+    private String externalId;
     private String name;
     private Long rentalUnitId;
     private Integer minUnit;
     private Integer maxUnit;
     private Long locationId;
     private BigDecimal defaultPrice;
+
+    // Audit fields
+    private java.time.LocalDateTime dateCreated;
+    private java.time.LocalDateTime lastDateModified;
+    private String createdBy;
+    private String lastModifiedBy;
 }

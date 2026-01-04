@@ -17,6 +17,7 @@ import java.time.LocalDateTime;
 public class BikeModelPartDTO {
 
     private Long id;
+    private String externalId;
     private Long bikeModelId;
     private Long partId;
 

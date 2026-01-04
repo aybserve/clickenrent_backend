@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 
 /**
  * Entity representing part categories with hierarchical structure.
@@ -19,11 +20,10 @@ import lombok.*;
 @Getter
 @Setter
 @NoArgsConstructor
-@AllArgsConstructor
-@Builder
-@ToString(exclude = {"parentCategory"})
-@EqualsAndHashCode(of = "id")
-public class PartCategory {
+@SuperBuilder
+@ToString(exclude = {"parentCategory"}, callSuper = true)
+@EqualsAndHashCode(of = "id", callSuper = false)
+public class PartCategory extends BaseAuditEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

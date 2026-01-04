@@ -28,6 +28,9 @@ public class BikeModelRentalPlan extends BaseAuditEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "external_id", unique = true, length = 100)
+    private String externalId;
+
     @NotNull(message = "Bike model is required")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "bike_model_id", nullable = false)

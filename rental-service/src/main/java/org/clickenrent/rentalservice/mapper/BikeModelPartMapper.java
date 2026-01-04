@@ -24,6 +24,7 @@ public class BikeModelPartMapper {
 
         return BikeModelPartDTO.builder()
                 .id(bikeModelPart.getId())
+                .externalId(bikeModelPart.getExternalId())
                 .bikeModelId(bikeModelPart.getBikeModel() != null ? bikeModelPart.getBikeModel().getId() : null)
                 .partId(bikeModelPart.getPart() != null ? bikeModelPart.getPart().getId() : null)
                 .dateCreated(bikeModelPart.getDateCreated())
@@ -39,7 +40,8 @@ public class BikeModelPartMapper {
         }
 
         BikeModelPart.BikeModelPartBuilder<?, ?> builder = BikeModelPart.builder()
-                .id(dto.getId());
+                .id(dto.getId())
+                .externalId(dto.getExternalId());
 
         if (dto.getBikeModelId() != null) {
             builder.bikeModel(bikeModelRepository.findById(dto.getBikeModelId()).orElse(null));

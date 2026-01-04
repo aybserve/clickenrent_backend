@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 
 /**
  * Entity representing B2B subscription status.
@@ -14,15 +15,17 @@ import lombok.*;
 @Getter
 @Setter
 @NoArgsConstructor
-@AllArgsConstructor
-@Builder
-@ToString
-@EqualsAndHashCode(of = "id")
-public class B2BSubscriptionStatus {
+@SuperBuilder
+@ToString(callSuper = true)
+@EqualsAndHashCode(of = "id", callSuper = false)
+public class B2BSubscriptionStatus extends BaseAuditEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Column(name = "external_id", unique = true, length = 100)
+    private String externalId;
 
     @NotBlank(message = "B2B subscription status name is required")
     @Size(max = 50, message = "B2B subscription status name must not exceed 50 characters")

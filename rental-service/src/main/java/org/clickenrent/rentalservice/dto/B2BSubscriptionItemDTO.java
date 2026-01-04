@@ -25,4 +25,10 @@ public class B2BSubscriptionItemDTO {
     private LocalDateTime endDateTime;
     private BigDecimal price;
     private BigDecimal totalPrice;
+
+    // Audit fields
+    private LocalDateTime dateCreated;
+    private LocalDateTime lastDateModified;
+    private String createdBy;
+    private String lastModifiedBy;
 }

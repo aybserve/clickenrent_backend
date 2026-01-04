@@ -31,11 +31,6 @@ public class BikeRentalDTO {
     private BigDecimal price;
     private BigDecimal totalPrice;
 
-    // Cross-service externalId references
-    private String bikeExternalId;
-    private String locationExternalId;
-    private String rentalExternalId;
-
     // Audit fields
     private LocalDateTime dateCreated;
     private LocalDateTime lastDateModified;

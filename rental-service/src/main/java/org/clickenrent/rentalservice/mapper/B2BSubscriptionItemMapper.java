@@ -14,6 +14,7 @@ import org.springframework.stereotype.Component;
 public class B2BSubscriptionItemMapper {
 
     private final B2BSubscriptionRepository b2bSubscriptionRepository;
+    private final org.clickenrent.rentalservice.repository.ProductRepository productRepository;
 
     public B2BSubscriptionItemDTO toDto(B2BSubscriptionItem item) {
         if (item == null) {
@@ -24,11 +25,15 @@ public class B2BSubscriptionItemMapper {
                 .id(item.getId())
                 .externalId(item.getExternalId())
                 .b2bSubscriptionId(item.getB2bSubscription() != null ? item.getB2bSubscription().getId() : null)
-                .productId(item.getProductId())
+                .productId(item.getProduct() != null ? item.getProduct().getId() : null)
                 .startDateTime(item.getStartDateTime())
                 .endDateTime(item.getEndDateTime())
                 .price(item.getPrice())
                 .totalPrice(item.getTotalPrice())
+                .dateCreated(item.getDateCreated())
+                .lastDateModified(item.getLastDateModified())
+                .createdBy(item.getCreatedBy())
+                .lastModifiedBy(item.getLastModifiedBy())
                 .build();
     }
 
@@ -40,7 +45,6 @@ public class B2BSubscriptionItemMapper {
         B2BSubscriptionItem.B2BSubscriptionItemBuilder builder = B2BSubscriptionItem.builder()
                 .id(dto.getId())
                 .externalId(dto.getExternalId())
-                .productId(dto.getProductId())
                 .startDateTime(dto.getStartDateTime())
                 .endDateTime(dto.getEndDateTime())
                 .price(dto.getPrice())
@@ -48,6 +52,9 @@ public class B2BSubscriptionItemMapper {
 
         if (dto.getB2bSubscriptionId() != null) {
             builder.b2bSubscription(b2bSubscriptionRepository.findById(dto.getB2bSubscriptionId()).orElse(null));
+        }
+        if (dto.getProductId() != null) {
+            builder.product(productRepository.findById(dto.getProductId()).orElse(null));
         }
 
         return builder.build();

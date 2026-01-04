@@ -15,5 +15,12 @@ import lombok.NoArgsConstructor;
 public class ChargingStationStatusDTO {
 
     private Long id;
+    private String externalId;
     private String name;
+
+    // Audit fields
+    private java.time.LocalDateTime dateCreated;
+    private java.time.LocalDateTime lastDateModified;
+    private String createdBy;
+    private String lastModifiedBy;
 }

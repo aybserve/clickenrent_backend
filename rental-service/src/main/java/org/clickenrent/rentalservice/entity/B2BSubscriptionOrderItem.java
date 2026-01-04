@@ -11,7 +11,7 @@ import java.math.BigDecimal;
 
 /**
  * Entity representing B2B subscription order items.
- * Links subscription orders to products that implement ProductModelType interface.
+ * Links subscription orders to any Product subtype (BikeModel, ChargingStationModel, Part, ServiceProduct).
  */
 @Entity
 @Table(

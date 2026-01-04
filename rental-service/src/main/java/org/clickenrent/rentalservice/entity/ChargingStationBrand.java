@@ -5,6 +5,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 
 import java.util.UUID;
 
@@ -22,11 +23,10 @@ import java.util.UUID;
 @Getter
 @Setter
 @NoArgsConstructor
-@AllArgsConstructor
-@Builder
-@ToString
-@EqualsAndHashCode(of = "id")
-public class ChargingStationBrand {
+@SuperBuilder
+@ToString(callSuper = true)
+@EqualsAndHashCode(of = "id", callSuper = false)
+public class ChargingStationBrand extends BaseAuditEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -40,7 +40,6 @@ public class ChargingStationBrand {
     @Column(name = "name", nullable = false, length = 100)
     private String name;
 
-    // Cross-service reference field using externalId
     @NotNull(message = "Company external ID is required")
     @Column(name = "company_external_id", nullable = false, length = 100)
     private String companyExternalId;
