@@ -52,15 +52,19 @@ public class JwtAuthenticationFilter implements GatewayFilter {
             Long userId = jwtUtil.extractUserId(token);
             String email = jwtUtil.extractEmail(token);
             List<String> roles = jwtUtil.extractRoles(token);
+            String userExternalId = jwtUtil.extractUserExternalId(token);
+            List<String> companyExternalIds = jwtUtil.extractCompanyExternalIds(token);
 
             // Add user information to request headers for downstream services
             ServerHttpRequest modifiedRequest = request.mutate()
                     .header("X-User-Id", String.valueOf(userId))
                     .header("X-User-Email", email)
                     .header("X-User-Roles", roles != null ? String.join(",", roles) : "")
+                    .header("X-User-External-Id", userExternalId != null ? userExternalId : "")
+                    .header("X-Company-External-Ids", companyExternalIds != null ? String.join(",", companyExternalIds) : "")
                     .build();
 
-            log.debug("JWT authenticated for user: {} ({})", email, userId);
+            log.debug("JWT authenticated for user: {} ({}), companies: {}", email, userId, companyExternalIds);
 
             return chain.filter(exchange.mutate().request(modifiedRequest).build());
 

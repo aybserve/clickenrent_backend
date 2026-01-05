@@ -190,6 +190,92 @@ SELECT setval('payout_fin_transactions_id_seq', (SELECT COALESCE(MAX(id), 1) FRO
 -- - B2B Subscription External IDs: Referenced from rental-service (b2b-subscription-ext-XXXXX)
 -- =====================================================================================================================
 
+-- =====================================================================================================================
+-- SECTION 3: ROW LEVEL SECURITY (RLS) FOR MULTI-TENANT ISOLATION
+-- =====================================================================================================================
+-- Description: Adds PostgreSQL Row Level Security policies to enforce tenant (company) isolation at database level.
+--              This is the 3rd layer of defense (after JWT claims and Hibernate filters).
+--              RLS ensures that even direct SQL queries cannot access cross-tenant data.
+-- 
+-- Note: RLS policies use PostgreSQL session variables set by the application:
+--       - app.is_superadmin: boolean flag for admin bypass
+--       - app.company_external_ids: comma-separated list of company UUIDs user can access
+-- =====================================================================================================================
+
+-- Add company_external_id column to financial_transactions for tenant isolation
+ALTER TABLE financial_transactions ADD COLUMN IF NOT EXISTS company_external_id VARCHAR(100);
+CREATE INDEX IF NOT EXISTS idx_financial_transaction_company ON financial_transactions(company_external_id);
+
+-- Enable RLS on tenant-scoped tables
+ALTER TABLE b2b_revenue_share_payouts ENABLE ROW LEVEL SECURITY;
+ALTER TABLE financial_transactions ENABLE ROW LEVEL SECURITY;
+
+-- Force RLS even for table owner (important for security)
+ALTER TABLE b2b_revenue_share_payouts FORCE ROW LEVEL SECURITY;
+ALTER TABLE financial_transactions FORCE ROW LEVEL SECURITY;
+
+-- ---------------------------------------------------------------------------------------------------------------------
+-- 3.1 RLS POLICY: b2b_revenue_share_payouts table
+-- ---------------------------------------------------------------------------------------------------------------------
+-- Allows access if:
+-- 1. User is superadmin (bypasses all filters), OR
+-- 2. Payout belongs to one of user's companies
+-- ---------------------------------------------------------------------------------------------------------------------
+DROP POLICY IF EXISTS b2b_revenue_share_payouts_tenant_isolation ON b2b_revenue_share_payouts;
+CREATE POLICY b2b_revenue_share_payouts_tenant_isolation ON b2b_revenue_share_payouts
+    FOR ALL
+    USING (
+        -- Allow if user is superadmin
+        COALESCE(current_setting('app.is_superadmin', true)::boolean, false) = true
+        OR
+        -- Allow if payout belongs to one of user's companies
+        company_external_id = ANY(
+            string_to_array(
+                COALESCE(current_setting('app.company_external_ids', true), ''),
+                ','
+            )
+        )
+    );
+
+-- ---------------------------------------------------------------------------------------------------------------------
+-- 3.2 RLS POLICY: financial_transactions table
+-- ---------------------------------------------------------------------------------------------------------------------
+-- Allows access if:
+-- 1. User is superadmin (bypasses all filters), OR
+-- 2. Transaction belongs to one of user's companies (via company_external_id)
+-- Note: company_external_id typically represents the recipient company (service provider)
+-- ---------------------------------------------------------------------------------------------------------------------
+DROP POLICY IF EXISTS financial_transactions_tenant_isolation ON financial_transactions;
+CREATE POLICY financial_transactions_tenant_isolation ON financial_transactions
+    FOR ALL
+    USING (
+        -- Allow if user is superadmin
+        COALESCE(current_setting('app.is_superadmin', true)::boolean, false) = true
+        OR
+        -- Allow if transaction belongs to one of user's companies
+        company_external_id = ANY(
+            string_to_array(
+                COALESCE(current_setting('app.company_external_ids', true), ''),
+                ','
+            )
+        )
+        OR
+        -- Allow if company_external_id is NULL (for backward compatibility or customer transactions)
+        company_external_id IS NULL
+    );
+
+-- ---------------------------------------------------------------------------------------------------------------------
+-- 3.3 PERFORMANCE INDEXES for RLS
+-- ---------------------------------------------------------------------------------------------------------------------
+-- These indexes ensure RLS policies don't slow down queries
+-- ---------------------------------------------------------------------------------------------------------------------
+CREATE INDEX IF NOT EXISTS idx_b2b_revenue_share_payouts_company_rls ON b2b_revenue_share_payouts(company_external_id) WHERE is_deleted = false;
+CREATE INDEX IF NOT EXISTS idx_financial_transactions_company_rls ON financial_transactions(company_external_id) WHERE is_deleted = false;
+
+-- =====================================================================================================================
+-- END OF INITIALIZATION
+-- =====================================================================================================================
+
 
 
 

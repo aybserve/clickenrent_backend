@@ -556,7 +556,49 @@ INSERT INTO invitation (id, email, token, invited_by_user_id, company_id, status
 ON CONFLICT (id) DO NOTHING;
 
 -- =====================================================================================================================
--- SECTION 6: SEQUENCE RESET
+-- SECTION 6: ROW LEVEL SECURITY
+-- =====================================================================================================================
+-- PostgreSQL RLS policies for database-level tenant isolation
+-- This is the final layer of defense-in-depth security
+
+-- Enable RLS on user_company table
+ALTER TABLE user_company ENABLE ROW LEVEL SECURITY;
+ALTER TABLE user_company FORCE ROW LEVEL SECURITY;
+
+-- Policy: Allow superadmins to see all user-company associations,
+-- B2B users see only their company's associations
+CREATE POLICY user_company_tenant_isolation ON user_company
+USING (
+    current_setting('app.is_superadmin', true)::boolean = true
+    OR EXISTS (
+        SELECT 1 FROM company c 
+        WHERE c.id = user_company.company_id 
+        AND c.external_id IN (
+            SELECT unnest(string_to_array(current_setting('app.company_external_ids', true), ','))
+        )
+    )
+);
+
+-- Enable RLS on company table
+ALTER TABLE company ENABLE ROW LEVEL SECURITY;
+ALTER TABLE company FORCE ROW LEVEL SECURITY;
+
+-- Policy: Allow superadmins to see all companies,
+-- B2B users see only their companies
+CREATE POLICY company_tenant_isolation ON company
+USING (
+    current_setting('app.is_superadmin', true)::boolean = true
+    OR external_id IN (
+        SELECT unnest(string_to_array(current_setting('app.company_external_ids', true), ','))
+    )
+);
+
+-- Create indexes for RLS performance
+CREATE INDEX IF NOT EXISTS idx_user_company_company_external_id ON user_company(company_id);
+CREATE INDEX IF NOT EXISTS idx_company_external_id_rls ON company(external_id);
+
+-- =====================================================================================================================
+-- SECTION 7: SEQUENCE RESET
 -- =====================================================================================================================
 -- Reset sequences to the correct values after inserting test data
 -- This ensures that new records will have IDs starting after the test data IDs

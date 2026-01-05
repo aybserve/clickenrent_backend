@@ -2,13 +2,16 @@ package org.clickenrent.notificationservice.entity;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
+import org.clickenrent.contracts.security.TenantScoped;
+import org.hibernate.annotations.Filter;
+import org.hibernate.annotations.FilterDef;
 import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.annotations.ParamDef;
 import org.hibernate.annotations.SQLDelete;
-import org.hibernate.annotations.Where;
+import org.hibernate.annotations.SQLRestriction;
 import org.hibernate.type.SqlTypes;
 
 import java.time.LocalDateTime;
@@ -16,6 +19,7 @@ import java.util.Map;
 
 /**
  * Entity representing a log of a notification that was sent (or attempted to be sent).
+ * Supports hybrid tenant isolation: user-scoped (personal) and company-scoped (B2B) notifications.
  */
 @Entity
 @Table(
@@ -23,18 +27,21 @@ import java.util.Map;
     indexes = {
         @Index(name = "idx_notification_logs_user_external_id", columnList = "user_external_id"),
         @Index(name = "idx_notification_logs_type", columnList = "notification_type"),
-        @Index(name = "idx_notification_logs_status", columnList = "status")
+        @Index(name = "idx_notification_logs_status", columnList = "status"),
+        @Index(name = "idx_notification_logs_company", columnList = "company_external_id")
     }
 )
 @SQLDelete(sql = "UPDATE notification_logs SET is_deleted = true WHERE id = ?")
-@Where(clause = "is_deleted = false")
+@SQLRestriction("is_deleted = false")
+@FilterDef(name = "companyFilter", parameters = @ParamDef(name = "companyExternalIds", type = String.class))
+@Filter(name = "companyFilter", condition = "company_external_id IS NULL OR company_external_id IN (:companyExternalIds)")
 @Getter
 @Setter
 @NoArgsConstructor
 @SuperBuilder
 @ToString(callSuper = true)
 @EqualsAndHashCode(of = "id", callSuper = false)
-public class NotificationLog extends BaseAuditEntity {
+public class NotificationLog extends BaseAuditEntity implements TenantScoped {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -44,6 +51,15 @@ public class NotificationLog extends BaseAuditEntity {
     @Size(max = 100, message = "User external ID must not exceed 100 characters")
     @Column(name = "user_external_id", nullable = false, length = 100)
     private String userExternalId;
+
+    @Size(max = 100, message = "Company external ID must not exceed 100 characters")
+    @Column(name = "company_external_id", length = 100)
+    private String companyExternalId;
+
+    @Size(max = 20, message = "Notification category must not exceed 20 characters")
+    @Column(name = "notification_category", length = 20)
+    @Builder.Default
+    private String notificationCategory = "USER"; // USER or COMPANY
 
     @Size(max = 50, message = "Notification type must not exceed 50 characters")
     @Column(name = "notification_type", length = 50)
@@ -91,6 +107,11 @@ public class NotificationLog extends BaseAuditEntity {
         if (createdAt == null) {
             createdAt = LocalDateTime.now();
         }
+    }
+
+    @Override
+    public String getCompanyExternalId() {
+        return companyExternalId;
     }
 }
 

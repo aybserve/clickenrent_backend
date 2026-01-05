@@ -6,6 +6,7 @@ import org.clickenrent.authservice.dto.*;
 import org.clickenrent.authservice.entity.GlobalRole;
 import org.clickenrent.authservice.entity.Language;
 import org.clickenrent.authservice.entity.User;
+import org.clickenrent.authservice.entity.UserCompany;
 import org.clickenrent.authservice.entity.UserGlobalRole;
 import org.clickenrent.authservice.exception.DuplicateResourceException;
 import org.clickenrent.authservice.exception.InvalidTokenException;
@@ -14,6 +15,7 @@ import org.clickenrent.authservice.exception.UnauthorizedException;
 import org.clickenrent.authservice.mapper.UserMapper;
 import org.clickenrent.authservice.repository.GlobalRoleRepository;
 import org.clickenrent.authservice.repository.LanguageRepository;
+import org.clickenrent.authservice.repository.UserCompanyRepository;
 import org.clickenrent.authservice.repository.UserGlobalRoleRepository;
 import org.clickenrent.authservice.repository.UserRepository;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -27,6 +29,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -44,6 +47,7 @@ public class AuthService {
     private final LanguageRepository languageRepository;
     private final GlobalRoleRepository globalRoleRepository;
     private final UserGlobalRoleRepository userGlobalRoleRepository;
+    private final UserCompanyRepository userCompanyRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final CustomUserDetailsService userDetailsService;
@@ -51,6 +55,35 @@ public class AuthService {
     private final UserMapper userMapper;
     private final TokenBlacklistService tokenBlacklistService;
     private final EmailVerificationService emailVerificationService;
+    
+    /**
+     * Build JWT claims with user information including company associations.
+     * This method centralizes claim building to ensure consistency across all token generation points.
+     * 
+     * @param user The user entity
+     * @param userDetails The Spring Security UserDetails
+     * @return Map of JWT claims
+     */
+    private Map<String, Object> buildJwtClaims(User user, UserDetails userDetails) {
+        Map<String, Object> claims = new HashMap<>();
+        claims.put("userId", user.getId());
+        claims.put("email", user.getEmail());
+        claims.put("userExternalId", user.getExternalId());
+        claims.put("roles", userDetails.getAuthorities().stream()
+                .map(GrantedAuthority::getAuthority)
+                .collect(Collectors.toList()));
+        
+        // Get user's companies
+        List<UserCompany> userCompanies = userCompanyRepository.findByUserId(user.getId());
+        claims.put("companyIds", userCompanies.stream()
+                .map(uc -> uc.getCompany().getId())
+                .collect(Collectors.toList()));
+        claims.put("companyExternalIds", userCompanies.stream()
+                .map(uc -> uc.getCompany().getExternalId())
+                .collect(Collectors.toList()));
+        
+        return claims;
+    }
     
     /**
      * Register a new user in the system.
@@ -208,13 +241,8 @@ public class AuthService {
         User user = userDetailsService.loadUserEntityByUsername(request.getUsernameOrEmail());
         UserDetails userDetails = userDetailsService.loadUserByUsername(request.getUsernameOrEmail());
         
-        // Generate tokens with custom claims
-        Map<String, Object> claims = new HashMap<>();
-        claims.put("userId", user.getId());
-        claims.put("email", user.getEmail());
-        claims.put("roles", userDetails.getAuthorities().stream()
-                .map(GrantedAuthority::getAuthority)
-                .collect(Collectors.toList()));
+        // Generate tokens with custom claims (including company data)
+        Map<String, Object> claims = buildJwtClaims(user, userDetails);
         
         String accessToken = jwtService.generateToken(claims, userDetails);
         String refreshToken = jwtService.generateRefreshToken(userDetails);
@@ -242,13 +270,8 @@ public class AuthService {
             
             User user = userDetailsService.loadUserEntityByUsername(username);
             
-            // Generate new access token with custom claims
-            Map<String, Object> claims = new HashMap<>();
-            claims.put("userId", user.getId());
-            claims.put("email", user.getEmail());
-            claims.put("roles", userDetails.getAuthorities().stream()
-                    .map(GrantedAuthority::getAuthority)
-                    .collect(Collectors.toList()));
+            // Generate new access token with custom claims (including company data)
+            Map<String, Object> claims = buildJwtClaims(user, userDetails);
             
             String accessToken = jwtService.generateToken(claims, userDetails);
             
@@ -314,15 +337,10 @@ public class AuthService {
             log.debug("User details loaded successfully, authorities count: {}", 
                     userDetails.getAuthorities() != null ? userDetails.getAuthorities().size() : 0);
             
-            log.debug("Building JWT claims");
-            Map<String, Object> claims = new HashMap<>();
-            claims.put("userId", user.getId());
-            claims.put("email", user.getEmail());
-            claims.put("roles", userDetails.getAuthorities().stream()
-                    .map(GrantedAuthority::getAuthority)
-                    .collect(Collectors.toList()));
-            log.debug("JWT claims built: userId={}, email={}, roles={}", 
-                    user.getId(), user.getEmail(), claims.get("roles"));
+            log.debug("Building JWT claims (including company data)");
+            Map<String, Object> claims = buildJwtClaims(user, userDetails);
+            log.debug("JWT claims built: userId={}, email={}, roles={}, companies={}", 
+                    user.getId(), user.getEmail(), claims.get("roles"), claims.get("companyExternalIds"));
             
             log.debug("Generating access token");
             String accessToken = jwtService.generateToken(claims, userDetails);

@@ -112,7 +112,32 @@ docker-compose down
 
 ## 🔐 Security
 
+### Multi-Tenant Isolation
+
+ClickEnRent implements **company-based multi-tenancy** with defense-in-depth security:
+
+- **5 Security Layers:** JWT claims → Tenant context → Hibernate filters → PostgreSQL RLS → Runtime validation
+- **Company Isolation:** B2B users can only access their company's data
+- **Database-Level Protection:** PostgreSQL Row Level Security (RLS) enforces isolation
+- **Automatic Filtering:** Hibernate filters add WHERE clauses to all queries
+- **Audit Trail:** All security violations are logged
+
+**Security Coverage:**
+- ✅ gateway: JWT validation and header forwarding
+- ✅ auth-service: User authentication with company claims
+- ✅ rental-service: Full 5-layer security stack
+- ✅ payment-service: Full 5-layer security stack
+- ✅ support-service: Full 5-layer security stack
+- ✅ notification-service: Hybrid isolation (user + company scoped)
+
+**Documentation:**
+- 📖 [SECURITY_ARCHITECTURE.md](SECURITY_ARCHITECTURE.md) - Complete security guide
+- 📊 [IMPLEMENTATION_STATUS.md](IMPLEMENTATION_STATUS.md) - Implementation status
+
+### Authentication & Authorization
+
 - JWT authentication on all endpoints
+- Role-based access control (SUPERADMIN, ADMIN, B2B, CUSTOMER)
 - Environment variables for secrets
 - HTTPS recommended (use Nginx reverse proxy)
 - Firewall: Only expose port 8080

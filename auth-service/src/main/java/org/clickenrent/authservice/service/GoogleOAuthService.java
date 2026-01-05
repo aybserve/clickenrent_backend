@@ -9,11 +9,13 @@ import org.clickenrent.authservice.dto.AuthResponse;
 import org.clickenrent.authservice.dto.GoogleTokenResponse;
 import org.clickenrent.authservice.dto.GoogleUserInfo;
 import org.clickenrent.authservice.entity.User;
+import org.clickenrent.authservice.entity.UserCompany;
 import org.clickenrent.authservice.entity.UserGlobalRole;
 import org.clickenrent.authservice.exception.UnauthorizedException;
 import org.clickenrent.authservice.mapper.UserMapper;
 import org.clickenrent.authservice.metrics.OAuthMetrics;
 import org.clickenrent.authservice.repository.GlobalRoleRepository;
+import org.clickenrent.authservice.repository.UserCompanyRepository;
 import org.clickenrent.authservice.repository.UserGlobalRoleRepository;
 import org.clickenrent.authservice.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Value;
@@ -30,6 +32,7 @@ import org.springframework.web.client.RestTemplate;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
@@ -47,6 +50,7 @@ public class GoogleOAuthService {
     private final UserRepository userRepository;
     private final GlobalRoleRepository globalRoleRepository;
     private final UserGlobalRoleRepository userGlobalRoleRepository;
+    private final UserCompanyRepository userCompanyRepository;
     private final JwtService jwtService;
     private final CustomUserDetailsService userDetailsService;
     private final UserMapper userMapper;
@@ -70,6 +74,34 @@ public class GoogleOAuthService {
     
     @Value("${oauth2.google.verify-id-token:true}")
     private boolean verifyIdToken;
+    
+    /**
+     * Build JWT claims with user information including company associations.
+     * 
+     * @param user The user entity
+     * @param userDetails The Spring Security UserDetails
+     * @return Map of JWT claims
+     */
+    private Map<String, Object> buildJwtClaims(User user, UserDetails userDetails) {
+        Map<String, Object> claims = new HashMap<>();
+        claims.put("userId", user.getId());
+        claims.put("email", user.getEmail());
+        claims.put("userExternalId", user.getExternalId());
+        claims.put("roles", userDetails.getAuthorities().stream()
+                .map(GrantedAuthority::getAuthority)
+                .collect(Collectors.toList()));
+        
+        // Get user's companies
+        List<UserCompany> userCompanies = userCompanyRepository.findByUserId(user.getId());
+        claims.put("companyIds", userCompanies.stream()
+                .map(uc -> uc.getCompany().getId())
+                .collect(Collectors.toList()));
+        claims.put("companyExternalIds", userCompanies.stream()
+                .map(uc -> uc.getCompany().getExternalId())
+                .collect(Collectors.toList()));
+        
+        return claims;
+    }
     
     /**
      * Authenticate user with Google OAuth authorization code.
@@ -105,15 +137,10 @@ public class GoogleOAuthService {
             User user = findOrCreateUser(googleUserInfo);
             log.info("User processed: ID={}, email={}", user.getId(), user.getEmail());
             
-            // Step 5: Generate JWT tokens
+            // Step 5: Generate JWT tokens (including company data)
             UserDetails userDetails = userDetailsService.loadUserByUsername(user.getUserName());
             
-            Map<String, Object> claims = new HashMap<>();
-            claims.put("userId", user.getId());
-            claims.put("email", user.getEmail());
-            claims.put("roles", userDetails.getAuthorities().stream()
-                    .map(GrantedAuthority::getAuthority)
-                    .collect(Collectors.toList()));
+            Map<String, Object> claims = buildJwtClaims(user, userDetails);
             
             String accessToken = jwtService.generateToken(claims, userDetails);
             String refreshToken = jwtService.generateRefreshToken(userDetails);

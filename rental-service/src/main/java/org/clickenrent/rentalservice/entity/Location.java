@@ -6,6 +6,8 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
+import org.clickenrent.contracts.security.TenantScoped;
+import org.hibernate.annotations.Filter;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
 
@@ -14,6 +16,7 @@ import java.util.UUID;
 /**
  * Entity representing a rental location.
  * Auto-creates "Default" location when a company is created.
+ * Implements TenantScoped for multi-tenant isolation.
  */
 @Entity
 @Table(
@@ -24,6 +27,7 @@ import java.util.UUID;
         @Index(name = "idx_location_erp_partner_id", columnList = "erp_partner_id")
     }
 )
+@Filter(name = "companyFilter", condition = "company_external_id IN (:companyExternalIds)")
 @SQLDelete(sql = "UPDATE location SET is_deleted = true WHERE id = ?")
 @Where(clause = "is_deleted = false")
 @Getter
@@ -33,7 +37,7 @@ import java.util.UUID;
 @SuperBuilder
 @ToString(callSuper = true)
 @EqualsAndHashCode(of = "id", callSuper = false)
-public class Location extends BaseAuditEntity {
+public class Location extends BaseAuditEntity implements TenantScoped {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -80,5 +84,10 @@ public class Location extends BaseAuditEntity {
         if (externalId == null || externalId.isEmpty()) {
             externalId = UUID.randomUUID().toString();
         }
+    }
+    
+    @Override
+    public String getCompanyExternalId() {
+        return this.companyExternalId;
     }
 }

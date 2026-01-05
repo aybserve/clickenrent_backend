@@ -4,14 +4,18 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
+import org.clickenrent.contracts.security.TenantScoped;
+import org.hibernate.annotations.Filter;
 import org.hibernate.annotations.SQLDelete;
-import org.hibernate.annotations.Where;
+import org.hibernate.annotations.SQLRestriction;
 
 import java.time.LocalDateTime;
 
 /**
  * Entity representing B2B sale orders between companies.
  * Orders that eventually create a B2BSale when completed/processed.
+ * Implements TenantScoped for multi-tenant isolation.
+ * Note: B2BSaleOrder has TWO company filters (seller and buyer).
  */
 @Entity
 @Table(
@@ -22,15 +26,17 @@ import java.time.LocalDateTime;
         @Index(name = "idx_b2b_sale_order_buyer_company_external_id", columnList = "buyer_company_external_id")
     }
 )
+@Filter(name = "sellerCompanyFilter", condition = "seller_company_external_id IN (:companyExternalIds)")
+@Filter(name = "buyerCompanyFilter", condition = "buyer_company_external_id IN (:companyExternalIds)")
 @SQLDelete(sql = "UPDATE b2b_sale_order SET is_deleted = true WHERE id = ?")
-@Where(clause = "is_deleted = false")
+@SQLRestriction("is_deleted = false")
 @Getter
 @Setter
 @NoArgsConstructor
 @SuperBuilder
 @ToString(callSuper = true)
 @EqualsAndHashCode(of = "id", callSuper = false)
-public class B2BSaleOrder extends BaseAuditEntity {
+public class B2BSaleOrder extends BaseAuditEntity implements TenantScoped {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -64,6 +70,12 @@ public class B2BSaleOrder extends BaseAuditEntity {
     @NotNull(message = "Date time is required")
     @Column(name = "date_time", nullable = false)
     private LocalDateTime dateTime;
+    
+    @Override
+    public String getCompanyExternalId() {
+        // For B2BSaleOrder, return seller company ID as primary tenant
+        return this.sellerCompanyExternalId;
+    }
 }
 
 

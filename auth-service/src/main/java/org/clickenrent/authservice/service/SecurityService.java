@@ -10,9 +10,11 @@ import org.clickenrent.authservice.repository.UserRepository;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -300,6 +302,33 @@ public class SecurityService {
     public Long getCurrentUserId() {
         User user = getCurrentUser();
         return user != null ? user.getId() : null;
+    }
+    
+    /**
+     * Get the current user's company external IDs from JWT token.
+     * Used for multi-tenant isolation.
+     *
+     * @return List of company external IDs
+     */
+    @SuppressWarnings("unchecked")
+    public List<String> getCurrentUserCompanyExternalIds() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return Collections.emptyList();
+        }
+
+        Object principal = authentication.getPrincipal();
+
+        if (principal instanceof Jwt jwt) {
+            // Extract company external IDs from JWT claims
+            Object companyExternalIdsClaim = jwt.getClaim("companyExternalIds");
+            if (companyExternalIdsClaim instanceof List) {
+                return (List<String>) companyExternalIdsClaim;
+            }
+        }
+
+        return Collections.emptyList();
     }
     
     /**

@@ -3,26 +3,36 @@ package org.clickenrent.paymentservice.entity;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
+import org.clickenrent.contracts.security.TenantScoped;
+import org.hibernate.annotations.Filter;
 import org.hibernate.annotations.SQLDelete;
-import org.hibernate.annotations.Where;
+import org.hibernate.annotations.SQLRestriction;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
 /**
- * Core financial transaction entity
+ * Core financial transaction entity.
+ * Implements TenantScoped for multi-tenant isolation.
+ * Transactions are scoped to the recipient company (typically the service provider).
  */
 @Entity
-@Table(name = "financial_transactions")
+@Table(
+    name = "financial_transactions",
+    indexes = {
+        @Index(name = "idx_financial_transaction_company", columnList = "company_external_id")
+    }
+)
+@Filter(name = "companyFilter", condition = "company_external_id IN (:companyExternalIds)")
 @SQLDelete(sql = "UPDATE financial_transactions SET is_deleted = true WHERE id = ?")
-@Where(clause = "is_deleted = false")
+@SQLRestriction("is_deleted = false")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @SuperBuilder
-public class FinancialTransaction extends BaseAuditEntity {
+public class FinancialTransaction extends BaseAuditEntity implements TenantScoped {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -36,6 +46,9 @@ public class FinancialTransaction extends BaseAuditEntity {
 
     @Column(name = "recipient_external_id", length = 100)
     private String recipientExternalId;
+    
+    @Column(name = "company_external_id", length = 100)
+    private String companyExternalId;
 
     @Column(nullable = false, precision = 19, scale = 2)
     private BigDecimal amount;
@@ -92,6 +105,11 @@ public class FinancialTransaction extends BaseAuditEntity {
     @Override
     public int hashCode() {
         return getClass().hashCode();
+    }
+    
+    @Override
+    public String getCompanyExternalId() {
+        return this.companyExternalId;
     }
 }
 

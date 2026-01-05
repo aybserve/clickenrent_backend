@@ -4,17 +4,19 @@ import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 import org.hibernate.annotations.SQLDelete;
-import org.hibernate.annotations.Where;
+import org.hibernate.annotations.SQLRestriction;
 
 import java.util.UUID;
 
 /**
- * User payment profile entity linking users to Stripe customers
+ * User payment profile entity linking users to Stripe customers.
+ * Note: This entity is user-scoped, not company-scoped.
+ * Access control is based on user_external_id matching the authenticated user.
  */
 @Entity
 @Table(name = "user_payment_profiles")
 @SQLDelete(sql = "UPDATE user_payment_profiles SET is_deleted = true WHERE id = ?")
-@Where(clause = "is_deleted = false")
+@SQLRestriction("is_deleted = false")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -35,6 +37,7 @@ public class UserPaymentProfile extends BaseAuditEntity {
     @Column(unique = true, length = 255)
     private String stripeCustomerId;
 
+    @Builder.Default
     @Column(nullable = false)
     private Boolean isActive = true;
 

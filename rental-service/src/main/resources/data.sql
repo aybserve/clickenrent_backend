@@ -650,5 +650,217 @@ SELECT setval('stock_movement_id_seq', (SELECT COALESCE(MAX(id), 1) FROM stock_m
 SELECT setval('bike_model_part_id_seq', (SELECT COALESCE(MAX(id), 1) FROM bike_model_part));
 
 -- =====================================================================================================================
+-- SECTION 7: ROW LEVEL SECURITY (RLS) FOR MULTI-TENANT ISOLATION
+-- =====================================================================================================================
+-- Description: Adds PostgreSQL Row Level Security policies to enforce tenant (company) isolation at database level.
+--              This is the 3rd layer of defense (after JWT claims and Hibernate filters).
+--              RLS ensures that even direct SQL queries cannot access cross-tenant data.
+-- 
+-- Note: RLS policies use PostgreSQL session variables set by the application:
+--       - app.is_superadmin: boolean flag for admin bypass
+--       - app.company_external_ids: comma-separated list of company UUIDs user can access
+-- =====================================================================================================================
+
+-- Enable RLS on tenant-scoped tables
+ALTER TABLE rental ENABLE ROW LEVEL SECURITY;
+ALTER TABLE location ENABLE ROW LEVEL SECURITY;
+ALTER TABLE b2b_sale ENABLE ROW LEVEL SECURITY;
+ALTER TABLE b2b_subscription ENABLE ROW LEVEL SECURITY;
+ALTER TABLE b2b_sale_order ENABLE ROW LEVEL SECURITY;
+ALTER TABLE bike_brand ENABLE ROW LEVEL SECURITY;
+ALTER TABLE charging_station_brand ENABLE ROW LEVEL SECURITY;
+ALTER TABLE part_brand ENABLE ROW LEVEL SECURITY;
+
+-- Force RLS even for table owner (important for security)
+ALTER TABLE rental FORCE ROW LEVEL SECURITY;
+ALTER TABLE location FORCE ROW LEVEL SECURITY;
+ALTER TABLE b2b_sale FORCE ROW LEVEL SECURITY;
+ALTER TABLE b2b_subscription FORCE ROW LEVEL SECURITY;
+ALTER TABLE b2b_sale_order FORCE ROW LEVEL SECURITY;
+ALTER TABLE bike_brand FORCE ROW LEVEL SECURITY;
+ALTER TABLE charging_station_brand FORCE ROW LEVEL SECURITY;
+ALTER TABLE part_brand FORCE ROW LEVEL SECURITY;
+
+-- ---------------------------------------------------------------------------------------------------------------------
+-- 7.1 RLS POLICY: rental table
+-- ---------------------------------------------------------------------------------------------------------------------
+-- Allows access if:
+-- 1. User is superadmin (bypasses all filters), OR
+-- 2. Rental belongs to one of user's companies
+-- ---------------------------------------------------------------------------------------------------------------------
+DROP POLICY IF EXISTS rental_tenant_isolation ON rental;
+CREATE POLICY rental_tenant_isolation ON rental
+    FOR ALL
+    USING (
+        -- Allow if user is superadmin
+        COALESCE(current_setting('app.is_superadmin', true)::boolean, false) = true
+        OR
+        -- Allow if rental belongs to one of user's companies
+        company_external_id = ANY(
+            string_to_array(
+                COALESCE(current_setting('app.company_external_ids', true), ''),
+                ','
+            )
+        )
+    );
+
+-- ---------------------------------------------------------------------------------------------------------------------
+-- 7.2 RLS POLICY: location table
+-- ---------------------------------------------------------------------------------------------------------------------
+DROP POLICY IF EXISTS location_tenant_isolation ON location;
+CREATE POLICY location_tenant_isolation ON location
+    FOR ALL
+    USING (
+        COALESCE(current_setting('app.is_superadmin', true)::boolean, false) = true
+        OR
+        company_external_id = ANY(
+            string_to_array(
+                COALESCE(current_setting('app.company_external_ids', true), ''),
+                ','
+            )
+        )
+    );
+
+-- ---------------------------------------------------------------------------------------------------------------------
+-- 7.3 RLS POLICY: b2b_sale table
+-- ---------------------------------------------------------------------------------------------------------------------
+-- Special case: User can see sale if they are seller OR buyer
+-- ---------------------------------------------------------------------------------------------------------------------
+DROP POLICY IF EXISTS b2b_sale_tenant_isolation ON b2b_sale;
+CREATE POLICY b2b_sale_tenant_isolation ON b2b_sale
+    FOR ALL
+    USING (
+        COALESCE(current_setting('app.is_superadmin', true)::boolean, false) = true
+        OR
+        seller_company_external_id = ANY(
+            string_to_array(
+                COALESCE(current_setting('app.company_external_ids', true), ''),
+                ','
+            )
+        )
+        OR
+        buyer_company_external_id = ANY(
+            string_to_array(
+                COALESCE(current_setting('app.company_external_ids', true), ''),
+                ','
+            )
+        )
+    );
+
+-- ---------------------------------------------------------------------------------------------------------------------
+-- 7.4 RLS POLICY: b2b_subscription table
+-- ---------------------------------------------------------------------------------------------------------------------
+-- Access via location relationship
+-- ---------------------------------------------------------------------------------------------------------------------
+DROP POLICY IF EXISTS b2b_subscription_tenant_isolation ON b2b_subscription;
+CREATE POLICY b2b_subscription_tenant_isolation ON b2b_subscription
+    FOR ALL
+    USING (
+        COALESCE(current_setting('app.is_superadmin', true)::boolean, false) = true
+        OR
+        location_id IN (
+            SELECT id FROM location 
+            WHERE company_external_id = ANY(
+                string_to_array(
+                    COALESCE(current_setting('app.company_external_ids', true), ''),
+                    ','
+                )
+            )
+        )
+    );
+
+-- ---------------------------------------------------------------------------------------------------------------------
+-- 7.5 RLS POLICY: b2b_sale_order table
+-- ---------------------------------------------------------------------------------------------------------------------
+-- Special case: User can see order if they are seller OR buyer
+-- ---------------------------------------------------------------------------------------------------------------------
+DROP POLICY IF EXISTS b2b_sale_order_tenant_isolation ON b2b_sale_order;
+CREATE POLICY b2b_sale_order_tenant_isolation ON b2b_sale_order
+    FOR ALL
+    USING (
+        COALESCE(current_setting('app.is_superadmin', true)::boolean, false) = true
+        OR
+        seller_company_external_id = ANY(
+            string_to_array(
+                COALESCE(current_setting('app.company_external_ids', true), ''),
+                ','
+            )
+        )
+        OR
+        buyer_company_external_id = ANY(
+            string_to_array(
+                COALESCE(current_setting('app.company_external_ids', true), ''),
+                ','
+            )
+        )
+    );
+
+-- ---------------------------------------------------------------------------------------------------------------------
+-- 7.6 RLS POLICY: bike_brand table
+-- ---------------------------------------------------------------------------------------------------------------------
+DROP POLICY IF EXISTS bike_brand_tenant_isolation ON bike_brand;
+CREATE POLICY bike_brand_tenant_isolation ON bike_brand
+    FOR ALL
+    USING (
+        COALESCE(current_setting('app.is_superadmin', true)::boolean, false) = true
+        OR
+        company_external_id = ANY(
+            string_to_array(
+                COALESCE(current_setting('app.company_external_ids', true), ''),
+                ','
+            )
+        )
+    );
+
+-- ---------------------------------------------------------------------------------------------------------------------
+-- 7.7 RLS POLICY: charging_station_brand table
+-- ---------------------------------------------------------------------------------------------------------------------
+DROP POLICY IF EXISTS charging_station_brand_tenant_isolation ON charging_station_brand;
+CREATE POLICY charging_station_brand_tenant_isolation ON charging_station_brand
+    FOR ALL
+    USING (
+        COALESCE(current_setting('app.is_superadmin', true)::boolean, false) = true
+        OR
+        company_external_id = ANY(
+            string_to_array(
+                COALESCE(current_setting('app.company_external_ids', true), ''),
+                ','
+            )
+        )
+    );
+
+-- ---------------------------------------------------------------------------------------------------------------------
+-- 7.8 RLS POLICY: part_brand table
+-- ---------------------------------------------------------------------------------------------------------------------
+DROP POLICY IF EXISTS part_brand_tenant_isolation ON part_brand;
+CREATE POLICY part_brand_tenant_isolation ON part_brand
+    FOR ALL
+    USING (
+        COALESCE(current_setting('app.is_superadmin', true)::boolean, false) = true
+        OR
+        company_external_id = ANY(
+            string_to_array(
+                COALESCE(current_setting('app.company_external_ids', true), ''),
+                ','
+            )
+        )
+    );
+
+-- ---------------------------------------------------------------------------------------------------------------------
+-- 7.9 PERFORMANCE INDEXES for RLS
+-- ---------------------------------------------------------------------------------------------------------------------
+-- These indexes ensure RLS policies don't slow down queries
+-- ---------------------------------------------------------------------------------------------------------------------
+CREATE INDEX IF NOT EXISTS idx_rental_company_rls ON rental(company_external_id) WHERE is_deleted = false;
+CREATE INDEX IF NOT EXISTS idx_location_company_rls ON location(company_external_id) WHERE is_deleted = false;
+CREATE INDEX IF NOT EXISTS idx_b2b_sale_seller_rls ON b2b_sale(seller_company_external_id) WHERE is_deleted = false;
+CREATE INDEX IF NOT EXISTS idx_b2b_sale_buyer_rls ON b2b_sale(buyer_company_external_id) WHERE is_deleted = false;
+CREATE INDEX IF NOT EXISTS idx_b2b_sale_order_seller_rls ON b2b_sale_order(seller_company_external_id) WHERE is_deleted = false;
+CREATE INDEX IF NOT EXISTS idx_b2b_sale_order_buyer_rls ON b2b_sale_order(buyer_company_external_id) WHERE is_deleted = false;
+CREATE INDEX IF NOT EXISTS idx_bike_brand_company_rls ON bike_brand(company_external_id) WHERE is_deleted = false;
+CREATE INDEX IF NOT EXISTS idx_charging_station_brand_company_rls ON charging_station_brand(company_external_id) WHERE is_deleted = false;
+CREATE INDEX IF NOT EXISTS idx_part_brand_company_rls ON part_brand(company_external_id) WHERE is_deleted = false;
+
+-- =====================================================================================================================
 -- END OF INITIALIZATION
 -- =====================================================================================================================

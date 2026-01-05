@@ -5,13 +5,18 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
+import org.clickenrent.contracts.security.TenantScoped;
+import org.hibernate.annotations.Filter;
+import org.hibernate.annotations.FilterDef;
+import org.hibernate.annotations.ParamDef;
 import org.hibernate.annotations.SQLDelete;
-import org.hibernate.annotations.Where;
+import org.hibernate.annotations.SQLRestriction;
 
 import java.util.UUID;
 
 /**
  * Entity representing customer support requests.
+ * Supports multi-tenant isolation - support requests are company-scoped.
  */
 @Entity
 @Table(
@@ -19,18 +24,21 @@ import java.util.UUID;
     indexes = {
         @Index(name = "idx_support_request_external_id", columnList = "external_id"),
         @Index(name = "idx_support_request_user_external_id", columnList = "user_external_id"),
-        @Index(name = "idx_support_request_bike_external_id", columnList = "bike_external_id")
+        @Index(name = "idx_support_request_bike_external_id", columnList = "bike_external_id"),
+        @Index(name = "idx_support_request_company", columnList = "company_external_id")
     }
 )
 @SQLDelete(sql = "UPDATE support_request SET is_deleted = true WHERE id = ?")
-@Where(clause = "is_deleted = false")
+@SQLRestriction("is_deleted = false")
+@FilterDef(name = "companyFilter", parameters = @ParamDef(name = "companyExternalIds", type = String.class))
+@Filter(name = "companyFilter", condition = "company_external_id IN (:companyExternalIds)")
 @Getter
 @Setter
 @NoArgsConstructor
 @SuperBuilder
 @ToString(callSuper = true)
 @EqualsAndHashCode(of = "id", callSuper = false)
-public class SupportRequest extends BaseAuditEntity {
+public class SupportRequest extends BaseAuditEntity implements TenantScoped {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -44,6 +52,11 @@ public class SupportRequest extends BaseAuditEntity {
 
     @Column(name = "bike_external_id", length = 100)
     private String bikeExternalId;
+
+    @NotNull(message = "Company external ID is required")
+    @Size(max = 100, message = "Company external ID must not exceed 100 characters")
+    @Column(name = "company_external_id", nullable = false, length = 100)
+    private String companyExternalId;
 
     @Builder.Default
     @Column(name = "is_near_location", nullable = false)
@@ -67,6 +80,11 @@ public class SupportRequest extends BaseAuditEntity {
         if (externalId == null || externalId.isEmpty()) {
             externalId = UUID.randomUUID().toString();
         }
+    }
+
+    @Override
+    public String getCompanyExternalId() {
+        return companyExternalId;
     }
 }
 

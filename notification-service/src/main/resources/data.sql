@@ -214,7 +214,38 @@ ON CONFLICT (id) DO NOTHING;
 -- These types are mapped to user preferences in NotificationService.shouldSendNotification()
 
 -- =====================================================================================================================
--- SECTION 5: SEQUENCE RESET
+-- SECTION 5: MULTI-TENANT SCHEMA UPDATES
+-- =====================================================================================================================
+-- Add company_external_id and notification_category columns for hybrid tenant isolation
+-- - notification_category: 'USER' (personal notifications) or 'COMPANY' (B2B business notifications)
+-- - company_external_id: NULL for user-scoped, set for company-scoped notifications
+
+ALTER TABLE notification_logs ADD COLUMN IF NOT EXISTS company_external_id VARCHAR(100);
+ALTER TABLE notification_logs ADD COLUMN IF NOT EXISTS notification_category VARCHAR(20) DEFAULT 'USER';
+CREATE INDEX IF NOT EXISTS idx_notification_logs_company ON notification_logs(company_external_id);
+
+-- =====================================================================================================================
+-- SECTION 6: ROW LEVEL SECURITY
+-- =====================================================================================================================
+-- PostgreSQL RLS policies for database-level tenant isolation
+-- This is the final layer of defense-in-depth security
+
+ALTER TABLE notification_logs ENABLE ROW LEVEL SECURITY;
+ALTER TABLE notification_logs FORCE ROW LEVEL SECURITY;
+
+-- Policy: Allow superadmins to see all notifications, B2B users see their company's notifications,
+-- and all users see user-scoped notifications (company_external_id IS NULL)
+CREATE POLICY notification_logs_tenant_isolation ON notification_logs
+USING (
+    current_setting('app.is_superadmin', true)::boolean = true
+    OR company_external_id IS NULL
+    OR company_external_id IN (
+        SELECT unnest(string_to_array(current_setting('app.company_external_ids', true), ','))
+    )
+);
+
+-- =====================================================================================================================
+-- SECTION 7: SEQUENCE RESET
 -- =====================================================================================================================
 -- Reset sequences to the correct values after inserting data.
 -- This ensures that new records will have IDs starting after the existing data IDs.

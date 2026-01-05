@@ -82,6 +82,13 @@
         <dependency>
             <groupId>org.clickenrent</groupId>
             <artifactId>shared-contracts</artifactId>
+            <version>2.2.0</version>
+        </dependency>
+
+        <!-- AOP for tenant security aspects -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-aop</artifactId>
         </dependency>
 
         <!-- Utils -->

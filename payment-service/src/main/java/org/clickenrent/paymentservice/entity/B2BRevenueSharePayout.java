@@ -3,6 +3,8 @@ package org.clickenrent.paymentservice.entity;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
+import org.clickenrent.contracts.security.TenantScoped;
+import org.hibernate.annotations.Filter;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
 
@@ -14,9 +16,11 @@ import java.util.UUID;
 
 /**
  * B2B revenue share payout entity
+ * Implements TenantScoped for multi-tenant isolation.
  */
 @Entity
 @Table(name = "b2b_revenue_share_payouts")
+@Filter(name = "companyFilter", condition = "company_external_id IN (:companyExternalIds)")
 @SQLDelete(sql = "UPDATE b2b_revenue_share_payouts SET is_deleted = true WHERE id = ?")
 @Where(clause = "is_deleted = false")
 @Getter
@@ -24,7 +28,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @SuperBuilder
-public class B2BRevenueSharePayout extends BaseAuditEntity {
+public class B2BRevenueSharePayout extends BaseAuditEntity implements TenantScoped {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -74,6 +78,11 @@ public class B2BRevenueSharePayout extends BaseAuditEntity {
     @Override
     public int hashCode() {
         return getClass().hashCode();
+    }
+    
+    @Override
+    public String getCompanyExternalId() {
+        return this.companyExternalId;
     }
 }
 
