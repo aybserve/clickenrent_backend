@@ -2,11 +2,11 @@ package org.clickenrent.gateway.config;
 
 import lombok.extern.slf4j.Slf4j;
 import org.clickenrent.gateway.filter.JwtAuthenticationFilter;
+import org.clickenrent.gateway.ratelimit.CustomRedisRateLimiter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.gateway.filter.ratelimit.KeyResolver;
-import org.springframework.cloud.gateway.filter.ratelimit.RedisRateLimiter;
 import org.springframework.cloud.gateway.route.RouteLocator;
 import org.springframework.cloud.gateway.route.builder.RouteLocatorBuilder;
 import org.springframework.context.annotation.Bean;
@@ -22,11 +22,11 @@ public class GatewayConfig {
     
     @Autowired
     @Qualifier("ipRateLimiter")
-    private RedisRateLimiter ipRateLimiter;
+    private CustomRedisRateLimiter ipRateLimiter;
     
     @Autowired
     @Qualifier("userRateLimiter")
-    private RedisRateLimiter userRateLimiter;
+    private CustomRedisRateLimiter userRateLimiter;
     
     @Autowired
     @Qualifier("ipKeyResolver")
