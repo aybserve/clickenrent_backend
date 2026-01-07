@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/service-providers")
+@RequestMapping("/api/v1/service-providers")
 @RequiredArgsConstructor
 @Tag(name = "Service Provider", description = "Service provider management API")
 public class ServiceProviderController {

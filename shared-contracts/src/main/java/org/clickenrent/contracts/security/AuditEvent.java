@@ -105,6 +105,16 @@ public class AuditEvent {
     private boolean allowed;
     
     /**
+     * Whether the action was successful
+     */
+    private boolean success;
+    
+    /**
+     * Error message if action failed
+     */
+    private String errorMessage;
+    
+    /**
      * Types of security events that can be audited
      */
     public enum EventType {

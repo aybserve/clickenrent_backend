@@ -18,7 +18,7 @@ import java.util.List;
  * REST controller for Country management operations.
  */
 @RestController
-@RequestMapping("/api/countries")
+@RequestMapping("/api/v1/countries")
 @RequiredArgsConstructor
 @Tag(name = "Country", description = "Country management endpoints")
 @SecurityRequirement(name = "bearerAuth")

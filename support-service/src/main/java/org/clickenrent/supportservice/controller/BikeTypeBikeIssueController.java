@@ -18,7 +18,7 @@ import java.util.List;
  * REST controller for managing BikeTypeBikeIssue junction entities.
  */
 @RestController
-@RequestMapping("/api/bike-type-bike-issues")
+@RequestMapping("/api/v1/bike-type-bike-issues")
 @RequiredArgsConstructor
 @Tag(name = "Bike Type Bike Issue", description = "Bike type bike issue link management")
 @SecurityRequirement(name = "bearerAuth")

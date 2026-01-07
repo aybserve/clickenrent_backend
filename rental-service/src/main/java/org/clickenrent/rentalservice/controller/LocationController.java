@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.*;
  * REST controller for location-based operations including geocoding and directions.
  */
 @RestController
-@RequestMapping("/api/location")
+@RequestMapping("/api/v1/location")
 @RequiredArgsConstructor
 @Tag(name = "Location", description = "Location services including geocoding and directions")
 @SecurityRequirement(name = "bearerAuth")

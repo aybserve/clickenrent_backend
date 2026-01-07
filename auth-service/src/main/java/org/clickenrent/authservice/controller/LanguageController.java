@@ -17,7 +17,7 @@ import java.util.List;
  * REST controller for Language management operations.
  */
 @RestController
-@RequestMapping("/api/languages")
+@RequestMapping("/api/v1/languages")
 @RequiredArgsConstructor
 @Tag(name = "Language", description = "Language management endpoints")
 @SecurityRequirement(name = "bearerAuth")

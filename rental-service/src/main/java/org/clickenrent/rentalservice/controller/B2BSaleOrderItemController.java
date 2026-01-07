@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/b2b-sale-order-items")
+@RequestMapping("/api/v1/b2b-sale-order-items")
 @RequiredArgsConstructor
 @Tag(name = "B2B Sale Order Items", description = "B2B sale order item management")
 @SecurityRequirement(name = "bearerAuth")

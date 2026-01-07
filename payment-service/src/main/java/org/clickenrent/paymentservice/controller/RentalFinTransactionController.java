@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/rental-fin-transactions")
+@RequestMapping("/api/v1/rental-fin-transactions")
 @RequiredArgsConstructor
 @Tag(name = "Rental Financial Transaction", description = "Rental financial transaction management API")
 public class RentalFinTransactionController {

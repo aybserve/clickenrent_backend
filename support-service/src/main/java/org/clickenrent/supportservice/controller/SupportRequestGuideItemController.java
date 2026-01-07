@@ -18,7 +18,7 @@ import java.util.List;
  * REST controller for managing SupportRequestGuideItem entities.
  */
 @RestController
-@RequestMapping("/api/support-request-guide-items")
+@RequestMapping("/api/v1/support-request-guide-items")
 @RequiredArgsConstructor
 @Tag(name = "Support Request Guide Item", description = "Support request guide item management")
 @SecurityRequirement(name = "bearerAuth")

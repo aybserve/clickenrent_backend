@@ -18,7 +18,7 @@ import java.util.List;
  * REST controller for managing ResponsiblePerson entities.
  */
 @RestController
-@RequestMapping("/api/responsible-persons")
+@RequestMapping("/api/v1/responsible-persons")
 @RequiredArgsConstructor
 @Tag(name = "Responsible Person", description = "Responsible person management")
 @SecurityRequirement(name = "bearerAuth")

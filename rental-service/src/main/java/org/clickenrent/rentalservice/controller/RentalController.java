@@ -27,7 +27,7 @@ import java.util.List;
  * REST controller for Rental management operations.
  */
 @RestController
-@RequestMapping("/api/rentals")
+@RequestMapping("/api/v1/rentals")
 @RequiredArgsConstructor
 @Tag(name = "Rental", description = "Rental management endpoints")
 @SecurityRequirement(name = "bearerAuth")

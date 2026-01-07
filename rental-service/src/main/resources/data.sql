@@ -862,5 +862,36 @@ CREATE INDEX IF NOT EXISTS idx_charging_station_brand_company_rls ON charging_st
 CREATE INDEX IF NOT EXISTS idx_part_brand_company_rls ON part_brand(company_external_id) WHERE is_deleted = false;
 
 -- =====================================================================================================================
+-- SECTION 8: AUDIT LOGGING
+-- =====================================================================================================================
+
+-- ---------------------------------------------------------------------------------------------------------------------
+-- 8.1 AUDIT LOGS TABLE
+-- ---------------------------------------------------------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS audit_logs (
+    id BIGSERIAL PRIMARY KEY,
+    event_type VARCHAR(50) NOT NULL,
+    user_external_id VARCHAR(100),
+    company_external_ids TEXT,
+    resource_type VARCHAR(100),
+    resource_id VARCHAR(100),
+    endpoint VARCHAR(500),
+    http_method VARCHAR(10),
+    client_ip VARCHAR(45),
+    success BOOLEAN NOT NULL,
+    error_message TEXT,
+    metadata TEXT,
+    timestamp TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+-- ---------------------------------------------------------------------------------------------------------------------
+-- 8.2 AUDIT LOGS INDEXES
+-- ---------------------------------------------------------------------------------------------------------------------
+CREATE INDEX IF NOT EXISTS idx_audit_logs_timestamp ON audit_logs(timestamp);
+CREATE INDEX IF NOT EXISTS idx_audit_logs_user ON audit_logs(user_external_id);
+CREATE INDEX IF NOT EXISTS idx_audit_logs_event_type ON audit_logs(event_type);
+CREATE INDEX IF NOT EXISTS idx_audit_logs_success ON audit_logs(success);
+
+-- =====================================================================================================================
 -- END OF INITIALIZATION
 -- =====================================================================================================================

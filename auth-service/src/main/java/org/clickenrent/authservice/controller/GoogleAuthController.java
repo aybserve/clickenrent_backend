@@ -24,7 +24,7 @@ import org.springframework.web.bind.annotation.RestController;
  * Handles Google social login via authorization code exchange.
  */
 @RestController
-@RequestMapping("/api/auth/google")
+@RequestMapping("/api/v1/auth/google")
 @RequiredArgsConstructor
 @Slf4j
 @Tag(name = "Google Authentication", description = "Google OAuth social login endpoints")

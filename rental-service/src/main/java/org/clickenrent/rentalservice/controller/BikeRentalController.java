@@ -20,7 +20,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/bike-rentals")
+@RequestMapping("/api/v1/bike-rentals")
 @RequiredArgsConstructor
 @Tag(name = "Bike Rental", description = "Bike rental management with revenue sharing")
 @SecurityRequirement(name = "bearerAuth")

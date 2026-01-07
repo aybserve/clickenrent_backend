@@ -17,7 +17,7 @@ import java.util.List;
  * REST controller for GlobalRole management operations.
  */
 @RestController
-@RequestMapping("/api/global-roles")
+@RequestMapping("/api/v1/global-roles")
 @RequiredArgsConstructor
 @Tag(name = "Global Role", description = "Global role management endpoints")
 @SecurityRequirement(name = "bearerAuth")

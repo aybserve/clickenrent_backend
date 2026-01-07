@@ -17,7 +17,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/service-products")
+@RequestMapping("/api/v1/service-products")
 @RequiredArgsConstructor
 @Tag(name = "Service Products", description = "Service product management")
 @SecurityRequirement(name = "bearerAuth")

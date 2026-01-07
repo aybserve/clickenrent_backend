@@ -33,7 +33,7 @@ import org.springframework.web.bind.annotation.*;
  * - CUSTOMER: Can only view and update themselves
  */
 @RestController
-@RequestMapping("/api/users")
+@RequestMapping("/api/v1/users")
 @RequiredArgsConstructor
 @Tag(name = "User", description = "User management endpoints")
 @SecurityRequirement(name = "bearerAuth")

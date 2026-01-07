@@ -17,7 +17,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/lock-providers")
+@RequestMapping("/api/v1/lock-providers")
 @RequiredArgsConstructor
 @Tag(name = "Lock Provider", description = "Lock provider/manufacturer management (Admin only)")
 @SecurityRequirement(name = "bearerAuth")

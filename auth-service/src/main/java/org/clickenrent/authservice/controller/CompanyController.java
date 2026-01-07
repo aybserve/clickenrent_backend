@@ -30,7 +30,7 @@ import org.springframework.web.bind.annotation.*;
  * - CUSTOMER: No access to companies
  */
 @RestController
-@RequestMapping("/api/companies")
+@RequestMapping("/api/v1/companies")
 @RequiredArgsConstructor
 @Tag(name = "Company", description = "Company management endpoints")
 @SecurityRequirement(name = "bearerAuth")

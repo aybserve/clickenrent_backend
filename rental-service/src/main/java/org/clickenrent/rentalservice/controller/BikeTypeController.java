@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/bike-types")
+@RequestMapping("/api/v1/bike-types")
 @RequiredArgsConstructor
 @Tag(name = "Bike Type", description = "Bike type management (Electric bike, Non-electric bike)")
 @SecurityRequirement(name = "bearerAuth")

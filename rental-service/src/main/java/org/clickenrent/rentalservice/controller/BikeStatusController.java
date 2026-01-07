@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/bike-statuses")
+@RequestMapping("/api/v1/bike-statuses")
 @RequiredArgsConstructor
 @Tag(name = "Bike Status", description = "Bike status management (Available, Broken, Disabled, In use, Paused, Reserved)")
 @SecurityRequirement(name = "bearerAuth")

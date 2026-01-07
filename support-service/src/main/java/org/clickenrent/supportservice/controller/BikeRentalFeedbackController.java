@@ -18,7 +18,7 @@ import java.util.List;
  * REST controller for managing BikeRentalFeedback entities.
  */
 @RestController
-@RequestMapping("/api/bike-rental-feedbacks")
+@RequestMapping("/api/v1/bike-rental-feedbacks")
 @RequiredArgsConstructor
 @Tag(name = "Bike Rental Feedback", description = "Bike rental feedback management")
 @SecurityRequirement(name = "bearerAuth")

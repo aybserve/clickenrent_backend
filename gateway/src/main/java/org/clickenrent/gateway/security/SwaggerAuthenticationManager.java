@@ -72,7 +72,7 @@ public class SwaggerAuthenticationManager implements ReactiveAuthenticationManag
                 .build();
         
         return webClient.post()
-                .uri("/api/auth/validate-swagger-access")
+                .uri("/api/v1/auth/validate-swagger-access")
                 .bodyValue(request)
                 .retrieve()
                 .bodyToMono(SwaggerAccessResponse.class)

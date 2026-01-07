@@ -1,7 +1,6 @@
 package org.clickenrent.authservice.config;
 
 import lombok.RequiredArgsConstructor;
-import org.clickenrent.authservice.filter.RateLimitFilter;
 import org.clickenrent.authservice.service.CustomUserDetailsService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -21,6 +20,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 /**
  * Security configuration for JWT-based authentication.
+ * Rate limiting is now handled at the Gateway level.
  */
 @Configuration
 @EnableWebSecurity
@@ -29,7 +29,6 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class SecurityConfig {
     
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
-    private final RateLimitFilter rateLimitFilter;
     private final CustomUserDetailsService userDetailsService;
     
     /**
@@ -40,12 +39,21 @@ public class SecurityConfig {
         http
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
-                        // Public endpoints
+                        // Public endpoints (legacy /api/auth paths)
                         .requestMatchers("/api/auth/**").permitAll()
-                        // Google OAuth endpoints (public)
+                        // Public endpoints (v1 API - /api/v1/auth paths)
+                        .requestMatchers("/api/v1/auth/login").permitAll()
+                        .requestMatchers("/api/v1/auth/register").permitAll()
+                        .requestMatchers("/api/v1/auth/refresh").permitAll()
+                        .requestMatchers("/api/v1/auth/verify-email").permitAll()
+                        .requestMatchers("/api/v1/auth/send-verification-code").permitAll()
+                        .requestMatchers("/api/v1/auth/validate-swagger-access").permitAll()
+                        // Google OAuth endpoints (public, both legacy and v1)
                         .requestMatchers("/api/auth/google/**").permitAll()
+                        .requestMatchers("/api/v1/auth/google/**").permitAll()
                         // Public invitation endpoints (validate token and complete registration)
                         .requestMatchers("/api/invitations/validate/**", "/api/invitations/complete").permitAll()
+                        .requestMatchers("/api/v1/invitations/validate/**", "/api/v1/invitations/complete").permitAll()
                         // Actuator endpoints (health checks)
                         .requestMatchers("/actuator/**").permitAll()
                         // OpenAPI/Swagger endpoints
@@ -57,7 +65,6 @@ public class SecurityConfig {
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
                 .authenticationProvider(authenticationProvider())
-                .addFilterBefore(rateLimitFilter, UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
         
         return http.build();

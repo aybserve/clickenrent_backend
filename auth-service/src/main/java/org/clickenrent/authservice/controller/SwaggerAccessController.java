@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
  * Used by Gateway to validate user credentials for Swagger UI access.
  */
 @RestController
-@RequestMapping("/api/auth")
+@RequestMapping("/api/v1/auth")
 @RequiredArgsConstructor
 @Tag(name = "Swagger Access", description = "Endpoints for validating Swagger documentation access")
 public class SwaggerAccessController {

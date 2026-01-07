@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/hub-images")
+@RequestMapping("/api/v1/hub-images")
 @RequiredArgsConstructor
 @Tag(name = "Hub Image", description = "Hub image management endpoints")
 @SecurityRequirement(name = "bearerAuth")

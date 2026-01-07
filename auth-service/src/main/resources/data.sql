@@ -617,6 +617,37 @@ SELECT setval('user_address_id_seq', (SELECT COALESCE(MAX(id), 1) FROM user_addr
 SELECT setval('invitation_id_seq', (SELECT COALESCE(MAX(id), 1) FROM invitation));
 
 -- =====================================================================================================================
+-- SECTION 9: AUDIT LOGGING
+-- =====================================================================================================================
+
+-- ---------------------------------------------------------------------------------------------------------------------
+-- 9.1 AUDIT LOGS TABLE
+-- ---------------------------------------------------------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS audit_logs (
+    id BIGSERIAL PRIMARY KEY,
+    event_type VARCHAR(50) NOT NULL,
+    user_external_id VARCHAR(100),
+    company_external_ids TEXT,
+    resource_type VARCHAR(100),
+    resource_id VARCHAR(100),
+    endpoint VARCHAR(500),
+    http_method VARCHAR(10),
+    client_ip VARCHAR(45),
+    success BOOLEAN NOT NULL,
+    error_message TEXT,
+    metadata TEXT,
+    timestamp TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+-- ---------------------------------------------------------------------------------------------------------------------
+-- 9.2 AUDIT LOGS INDEXES
+-- ---------------------------------------------------------------------------------------------------------------------
+CREATE INDEX IF NOT EXISTS idx_audit_logs_timestamp ON audit_logs(timestamp);
+CREATE INDEX IF NOT EXISTS idx_audit_logs_user ON audit_logs(user_external_id);
+CREATE INDEX IF NOT EXISTS idx_audit_logs_event_type ON audit_logs(event_type);
+CREATE INDEX IF NOT EXISTS idx_audit_logs_success ON audit_logs(success);
+
+-- =====================================================================================================================
 -- END OF SCHEMA
 -- =====================================================================================================================
 -- Schema created successfully!

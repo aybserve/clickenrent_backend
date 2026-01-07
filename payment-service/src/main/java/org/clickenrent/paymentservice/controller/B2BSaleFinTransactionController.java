@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/b2b-sale-fin-transactions")
+@RequestMapping("/api/v1/b2b-sale-fin-transactions")
 @RequiredArgsConstructor
 @Tag(name = "B2B Sale Financial Transaction", description = "B2B sale financial transaction management API")
 public class B2BSaleFinTransactionController {

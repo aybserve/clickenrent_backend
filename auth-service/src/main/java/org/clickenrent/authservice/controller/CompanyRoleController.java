@@ -17,7 +17,7 @@ import java.util.List;
  * REST controller for CompanyRole management operations.
  */
 @RestController
-@RequestMapping("/api/company-roles")
+@RequestMapping("/api/v1/company-roles")
 @RequiredArgsConstructor
 @Tag(name = "Company Role", description = "Company role management endpoints")
 @SecurityRequirement(name = "bearerAuth")

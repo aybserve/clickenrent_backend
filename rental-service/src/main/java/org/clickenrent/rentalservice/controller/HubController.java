@@ -27,7 +27,7 @@ import java.util.List;
  * REST controller for Hub management operations.
  */
 @RestController
-@RequestMapping("/api/hubs")
+@RequestMapping("/api/v1/hubs")
 @RequiredArgsConstructor
 @Tag(name = "Hub", description = "Hub management endpoints")
 @SecurityRequirement(name = "bearerAuth")

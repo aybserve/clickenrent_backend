@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.*;
  * REST controller for notification preference operations.
  */
 @RestController
-@RequestMapping("/api/notifications/preferences")
+@RequestMapping("/api/v1/notifications/preferences")
 @RequiredArgsConstructor
 @Slf4j
 @Tag(name = "Notification Preferences", description = "Manage notification preferences")

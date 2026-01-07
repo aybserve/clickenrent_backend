@@ -26,7 +26,7 @@ import java.util.List;
  * Handles invitation creation, validation, and completion.
  */
 @RestController
-@RequestMapping("/api/invitations")
+@RequestMapping("/api/v1/invitations")
 @RequiredArgsConstructor
 @Tag(name = "Invitations", description = "B2B user invitation management endpoints")
 public class InvitationController {

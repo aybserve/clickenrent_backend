@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/payout-fin-transactions")
+@RequestMapping("/api/v1/payout-fin-transactions")
 @RequiredArgsConstructor
 @Tag(name = "Payout Financial Transaction", description = "Payout financial transaction management API")
 public class PayoutFinTransactionController {

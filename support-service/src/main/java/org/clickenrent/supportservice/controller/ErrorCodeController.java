@@ -18,7 +18,7 @@ import java.util.List;
  * REST controller for managing ErrorCode entities.
  */
 @RestController
-@RequestMapping("/api/error-codes")
+@RequestMapping("/api/v1/error-codes")
 @RequiredArgsConstructor
 @Tag(name = "Error Code", description = "Error code management")
 @SecurityRequirement(name = "bearerAuth")

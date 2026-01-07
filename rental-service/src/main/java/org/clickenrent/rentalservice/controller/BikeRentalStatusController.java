@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/bike-rental-statuses")
+@RequestMapping("/api/v1/bike-rental-statuses")
 @RequiredArgsConstructor
 @Tag(name = "Bike Rental Status", description = "Bike rental status management")
 @SecurityRequirement(name = "bearerAuth")

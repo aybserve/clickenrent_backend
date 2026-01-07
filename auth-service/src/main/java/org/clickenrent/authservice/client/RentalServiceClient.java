@@ -15,7 +15,7 @@ import java.util.List;
  * Feign client for communicating with Rental Service.
  * Used to fetch rental, bike rental, and ride data for statistics.
  */
-@FeignClient(name = "rental-service", path = "/api", configuration = FeignConfig.class)
+@FeignClient(name = "rental-service", path = "/api/v1", configuration = FeignConfig.class)
 public interface RentalServiceClient {
 
     /**

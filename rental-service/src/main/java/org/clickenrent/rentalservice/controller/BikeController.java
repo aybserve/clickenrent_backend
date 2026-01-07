@@ -26,7 +26,7 @@ import org.springframework.web.bind.annotation.*;
  * REST controller for Bike management operations.
  */
 @RestController
-@RequestMapping("/api/bikes")
+@RequestMapping("/api/v1/bikes")
 @RequiredArgsConstructor
 @Tag(name = "Bike", description = "Bike management endpoints")
 @SecurityRequirement(name = "bearerAuth")

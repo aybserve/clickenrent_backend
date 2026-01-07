@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/user-payment-profiles")
+@RequestMapping("/api/v1/user-payment-profiles")
 @RequiredArgsConstructor
 @Tag(name = "User Payment Profile", description = "User payment profile management API")
 public class UserPaymentProfileController {
@@ -22,21 +22,21 @@ public class UserPaymentProfileController {
     private final UserPaymentProfileService userPaymentProfileService;
 
     @GetMapping
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('SUPERADMIN', 'ADMIN')")
     @Operation(summary = "Get all user payment profiles")
     public ResponseEntity<List<UserPaymentProfileDTO>> getAll() {
         return ResponseEntity.ok(userPaymentProfileService.findAll());
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('SUPERADMIN', 'ADMIN')")
     @Operation(summary = "Get payment profile by ID")
     public ResponseEntity<UserPaymentProfileDTO> getById(@PathVariable Long id) {
         return ResponseEntity.ok(userPaymentProfileService.findById(id));
     }
 
     @GetMapping("/external/{externalId}")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('SUPERADMIN', 'ADMIN')")
     @Operation(summary = "Get payment profile by external ID")
     public ResponseEntity<UserPaymentProfileDTO> getByExternalId(@PathVariable String externalId) {
         return ResponseEntity.ok(userPaymentProfileService.findByExternalId(externalId));

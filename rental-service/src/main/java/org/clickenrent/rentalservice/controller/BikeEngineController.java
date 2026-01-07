@@ -17,7 +17,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/bike-engines")
+@RequestMapping("/api/v1/bike-engines")
 @RequiredArgsConstructor
 @Tag(name = "Bike Engine", description = "Bike engine management")
 @SecurityRequirement(name = "bearerAuth")

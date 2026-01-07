@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/b2b-sale-statuses")
+@RequestMapping("/api/v1/b2b-sale-statuses")
 @RequiredArgsConstructor
 @Tag(name = "B2B Sale Status", description = "B2B sale status management")
 @SecurityRequirement(name = "bearerAuth")

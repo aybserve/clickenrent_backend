@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/user-locations")
+@RequestMapping("/api/v1/user-locations")
 @RequiredArgsConstructor
 @Tag(name = "User Location", description = "User location assignment endpoints")
 @SecurityRequirement(name = "bearerAuth")

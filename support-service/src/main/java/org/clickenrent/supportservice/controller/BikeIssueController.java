@@ -18,7 +18,7 @@ import java.util.List;
  * REST controller for managing BikeIssue entities.
  */
 @RestController
-@RequestMapping("/api/bike-issues")
+@RequestMapping("/api/v1/bike-issues")
 @RequiredArgsConstructor
 @Tag(name = "Bike Issue", description = "Bike issue management")
 @SecurityRequirement(name = "bearerAuth")

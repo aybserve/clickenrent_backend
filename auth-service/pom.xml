@@ -66,11 +66,11 @@
 	</dependency>
 
 	<!-- Shared contracts for cross-service communication -->
-	<dependency>
-		<groupId>org.clickenrent</groupId>
-		<artifactId>shared-contracts</artifactId>
-		<version>2.2.0</version>
-	</dependency>
+        <dependency>
+            <groupId>org.clickenrent</groupId>
+            <artifactId>shared-contracts</artifactId>
+            <version>2.3.0</version>
+        </dependency>
 
 	<!-- Utils -->
 	<dependency>
@@ -130,13 +130,6 @@
 		<groupId>com.google.api-client</groupId>
 		<artifactId>google-api-client</artifactId>
 		<version>2.2.0</version>
-	</dependency>
-
-	<!-- Bucket4j for rate limiting -->
-	<dependency>
-		<groupId>com.bucket4j</groupId>
-		<artifactId>bucket4j-core</artifactId>
-		<version>8.7.0</version>
 	</dependency>
 
 	<!-- MockWebServer for testing HTTP calls -->

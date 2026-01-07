@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/location-images")
+@RequestMapping("/api/v1/location-images")
 @RequiredArgsConstructor
 @Tag(name = "Location Image", description = "Location image management endpoints")
 @SecurityRequirement(name = "bearerAuth")

@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/rental-units")
+@RequestMapping("/api/v1/rental-units")
 @RequiredArgsConstructor
 @Tag(name = "Rental Unit", description = "Rental unit management (Day, Hour, Week)")
 @SecurityRequirement(name = "bearerAuth")

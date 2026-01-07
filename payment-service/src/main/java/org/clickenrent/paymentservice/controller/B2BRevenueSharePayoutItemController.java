@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/b2b-revenue-share-payout-items")
+@RequestMapping("/api/v1/b2b-revenue-share-payout-items")
 @RequiredArgsConstructor
 @Tag(name = "B2B Revenue Share Payout Item", description = "B2B revenue share payout item management API")
 public class B2BRevenueSharePayoutItemController {

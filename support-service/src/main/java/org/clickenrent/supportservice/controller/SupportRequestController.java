@@ -18,7 +18,7 @@ import java.util.List;
  * REST controller for managing SupportRequest entities.
  */
 @RestController
-@RequestMapping("/api/support-requests")
+@RequestMapping("/api/v1/support-requests")
 @RequiredArgsConstructor
 @Tag(name = "Support Request", description = "Support request management")
 @SecurityRequirement(name = "bearerAuth")

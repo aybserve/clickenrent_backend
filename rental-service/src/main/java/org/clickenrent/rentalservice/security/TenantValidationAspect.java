@@ -1,17 +1,25 @@
 package org.clickenrent.rentalservice.security;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
+import org.clickenrent.contracts.security.AuditEvent;
+import org.clickenrent.contracts.security.AuditService;
 import org.clickenrent.contracts.security.TenantContext;
 import org.clickenrent.contracts.security.TenantScoped;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Component;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
+import jakarta.servlet.http.HttpServletRequest;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Runtime validation aspect that verifies service layer doesn't leak cross-tenant data.
@@ -29,8 +37,11 @@ import java.util.List;
 @Aspect
 @Component
 @Slf4j
+@RequiredArgsConstructor
 @ConditionalOnProperty(name = "tenant.validation.enabled", havingValue = "true", matchIfMissing = true)
 public class TenantValidationAspect {
+    
+    private final AuditService auditService;
     
     @Around("execution(* org.clickenrent.rentalservice.service.*.*(..))")
     public Object validateTenantIsolation(ProceedingJoinPoint joinPoint) throws Throwable {
@@ -82,10 +93,47 @@ public class TenantValidationAspect {
                     "Method: {}, User companies: {}, Entity company: {}",
                     methodName, allowedCompanies, entityCompany);
             
+            // Log audit event
+            logSecurityViolation(entity, entityCompany, allowedCompanies, methodName);
+            
             // In production, you might want to just log and alert instead of throwing
             throw new SecurityException(
                 "Cross-tenant data access blocked: User does not have access to company " + entityCompany
             );
+        }
+    }
+    
+    private void logSecurityViolation(TenantScoped entity, String entityCompany, 
+                                      List<String> allowedCompanies, String methodName) {
+        try {
+            HttpServletRequest request = null;
+            if (RequestContextHolder.getRequestAttributes() instanceof ServletRequestAttributes) {
+                request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
+            }
+            
+            Map<String, Object> metadata = new HashMap<>();
+            metadata.put("method", methodName);
+            metadata.put("allowedCompanies", allowedCompanies);
+            metadata.put("entityCompany", entityCompany);
+            metadata.put("entityType", entity.getClass().getSimpleName());
+            
+            AuditEvent event = AuditEvent.builder()
+                .eventType(AuditEvent.EventType.RUNTIME_VALIDATION_FAILURE)
+                .userExternalId(TenantContext.getCurrentCompanies().isEmpty() ? null : "B2B_USER")
+                .userCompanyIds(String.join(",", allowedCompanies))
+                .attemptedCompanyId(entityCompany)
+                .resourceType(entity.getClass().getSimpleName())
+                .endpoint(request != null ? request.getRequestURI() : methodName)
+                .httpMethod(request != null ? request.getMethod() : "UNKNOWN")
+                .clientIp(request != null ? request.getRemoteAddr() : null)
+                .success(false)
+                .errorMessage("Cross-tenant data leak detected")
+                .metadata(metadata)
+                .build();
+            
+            auditService.logEvent(event);
+        } catch (Exception e) {
+            log.error("Failed to log audit event for security violation", e);
         }
     }
 }

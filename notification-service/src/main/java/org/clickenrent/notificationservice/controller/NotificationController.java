@@ -23,7 +23,7 @@ import java.util.stream.Collectors;
  * REST controller for notification operations.
  */
 @RestController
-@RequestMapping("/api/notifications")
+@RequestMapping("/api/v1/notifications")
 @RequiredArgsConstructor
 @Slf4j
 @Tag(name = "Notifications", description = "Push notification management")

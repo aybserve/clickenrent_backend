@@ -17,7 +17,7 @@ import java.util.List;
  * REST controller for CompanyType management operations.
  */
 @RestController
-@RequestMapping("/api/company-types")
+@RequestMapping("/api/v1/company-types")
 @RequiredArgsConstructor
 @Tag(name = "Company Type", description = "Company type management endpoints")
 @SecurityRequirement(name = "bearerAuth")

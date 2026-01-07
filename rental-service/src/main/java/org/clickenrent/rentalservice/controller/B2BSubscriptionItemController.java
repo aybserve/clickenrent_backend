@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/b2b-subscription-items")
+@RequestMapping("/api/v1/b2b-subscription-items")
 @RequiredArgsConstructor
 @Tag(name = "B2B Subscription Item", description = "B2B subscription items management")
 @SecurityRequirement(name = "bearerAuth")

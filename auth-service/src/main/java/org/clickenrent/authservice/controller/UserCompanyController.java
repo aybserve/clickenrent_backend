@@ -25,7 +25,7 @@ import java.util.List;
  * - CUSTOMER: Can only view their own company associations
  */
 @RestController
-@RequestMapping("/api/user-companies")
+@RequestMapping("/api/v1/user-companies")
 @RequiredArgsConstructor
 @Tag(name = "User Company", description = "User Company management endpoints")
 @SecurityRequirement(name = "bearerAuth")

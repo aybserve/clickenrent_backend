@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.PathVariable;
  * Feign client for communicating with Rental Service.
  * Used to validate rental, bike rental, B2B sale, and B2B subscription references.
  */
-@FeignClient(name = "rental-service", path = "/api")
+@FeignClient(name = "rental-service", path = "/api/v1")
 public interface RentalServiceClient {
 
     /**

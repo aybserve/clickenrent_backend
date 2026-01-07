@@ -16,7 +16,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/b2b-revenue-share-payouts")
+@RequestMapping("/api/v1/b2b-revenue-share-payouts")
 @RequiredArgsConstructor
 @Tag(name = "B2B Revenue Share Payout", description = "B2B revenue share payout management API")
 public class B2BRevenueSharePayoutController {

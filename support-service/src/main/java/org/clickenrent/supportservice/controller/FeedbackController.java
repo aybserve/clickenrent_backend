@@ -18,7 +18,7 @@ import java.util.List;
  * REST controller for managing Feedback entities.
  */
 @RestController
-@RequestMapping("/api/feedbacks")
+@RequestMapping("/api/v1/feedbacks")
 @RequiredArgsConstructor
 @Tag(name = "Feedback", description = "Feedback management")
 @SecurityRequirement(name = "bearerAuth")

@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/rental-plans")
+@RequestMapping("/api/v1/rental-plans")
 @RequiredArgsConstructor
 @Tag(name = "Rental Plan", description = "Rental plan management")
 @SecurityRequirement(name = "bearerAuth")

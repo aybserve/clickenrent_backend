@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/part-brands")
+@RequestMapping("/api/v1/part-brands")
 @RequiredArgsConstructor
 @Tag(name = "Part Brands", description = "Part brand management")
 @SecurityRequirement(name = "bearerAuth")

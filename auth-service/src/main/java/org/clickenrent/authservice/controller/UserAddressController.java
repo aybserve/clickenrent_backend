@@ -18,7 +18,7 @@ import java.util.List;
  * REST controller for UserAddress management operations.
  */
 @RestController
-@RequestMapping("/api/user-addresses")
+@RequestMapping("/api/v1/user-addresses")
 @RequiredArgsConstructor
 @Tag(name = "User Address", description = "User address link management endpoints")
 @SecurityRequirement(name = "bearerAuth")

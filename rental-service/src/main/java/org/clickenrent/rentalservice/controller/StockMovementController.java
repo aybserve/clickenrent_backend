@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/stock-movements")
+@RequestMapping("/api/v1/stock-movements")
 @RequiredArgsConstructor
 @Tag(name = "Stock Movement", description = "Stock movement tracking between hubs")
 @SecurityRequirement(name = "bearerAuth")

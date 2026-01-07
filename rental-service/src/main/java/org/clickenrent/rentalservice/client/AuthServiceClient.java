@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.PathVariable;
  * Feign client for communicating with Auth Service.
  * Used to fetch user and company details.
  */
-@FeignClient(name = "auth-service", path = "/api")
+@FeignClient(name = "auth-service", path = "/api/v1")
 public interface AuthServiceClient {
 
     /**

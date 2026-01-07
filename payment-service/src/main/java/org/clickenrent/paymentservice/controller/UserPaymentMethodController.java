@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/user-payment-methods")
+@RequestMapping("/api/v1/user-payment-methods")
 @RequiredArgsConstructor
 @Tag(name = "User Payment Method", description = "User payment method management API")
 public class UserPaymentMethodController {
@@ -22,21 +22,21 @@ public class UserPaymentMethodController {
     private final UserPaymentMethodService userPaymentMethodService;
 
     @GetMapping
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('SUPERADMIN', 'ADMIN')")
     @Operation(summary = "Get all user payment methods")
     public ResponseEntity<List<UserPaymentMethodDTO>> getAll() {
         return ResponseEntity.ok(userPaymentMethodService.findAll());
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('SUPERADMIN', 'ADMIN')")
     @Operation(summary = "Get payment method by ID")
     public ResponseEntity<UserPaymentMethodDTO> getById(@PathVariable Long id) {
         return ResponseEntity.ok(userPaymentMethodService.findById(id));
     }
 
     @GetMapping("/external/{externalId}")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('SUPERADMIN', 'ADMIN')")
     @Operation(summary = "Get payment method by external ID")
     public ResponseEntity<UserPaymentMethodDTO> getByExternalId(@PathVariable String externalId) {
         return ResponseEntity.ok(userPaymentMethodService.findByExternalId(externalId));

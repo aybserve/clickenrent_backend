@@ -18,7 +18,7 @@ import java.util.List;
  * REST controller for Address management operations.
  */
 @RestController
-@RequestMapping("/api/addresses")
+@RequestMapping("/api/v1/addresses")
 @RequiredArgsConstructor
 @Tag(name = "Address", description = "Address management endpoints")
 @SecurityRequirement(name = "bearerAuth")

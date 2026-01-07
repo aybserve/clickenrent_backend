@@ -88,10 +88,79 @@ All configuration is done via environment variables in `.env` file:
 - `STRIPE_API_KEY` - Stripe payments (optional)
 - `AZURE_STORAGE_CONNECTION_STRING` - Azure storage (optional)
 
+## 🛡️ Rate Limiting
+
+ClickEnRent implements **production-ready rate limiting** at the API Gateway level using Redis:
+
+### Architecture
+- **Single Layer:** All rate limiting enforced at Gateway (no duplicate service-level limiting)
+- **Dual Strategy:** IP-based (anonymous) + User-based (authenticated)
+- **Storage:** Redis for distributed rate limiting across instances
+- **Security:** Attack detection with automatic IP blocking
+
+### Rate Limit Policies
+
+| Endpoint Type | Strategy | Limit | Burst | Use Case |
+|---------------|----------|-------|-------|----------|
+| Public Auth (login, register) | IP-based | 20 req/sec | 30 | Prevent brute force attacks |
+| Protected APIs | User-based | 50 req/sec | 100 | Normal user operations |
+
+### Configuration
+
+```bash
+# Redis (required for rate limiting)
+REDIS_HOST=localhost
+REDIS_PORT=6379
+REDIS_PASSWORD=your-redis-password
+
+# Rate Limiting
+RATE_LIMIT_ENABLED=true
+RATE_LIMIT_IP_REPLENISH=20
+RATE_LIMIT_IP_BURST=30
+RATE_LIMIT_USER_REPLENISH=50
+RATE_LIMIT_USER_BURST=100
+
+# Attack Detection
+RATE_LIMIT_ATTACK_THRESHOLD=10
+RATE_LIMIT_BLOCK_DURATION=15
+```
+
+### Testing Rate Limits
+
+```bash
+# Run load test script
+./load-test-rate-limiting.sh
+
+# Monitor Redis keys
+redis-cli KEYS '*'
+
+# Check rate limit violations in logs
+docker-compose logs -f gateway | grep "Rate limit"
+```
+
+### Response Headers
+
+When rate limited, clients receive:
+- **Status:** 429 Too Many Requests
+- **X-RateLimit-Limit:** Total requests allowed
+- **X-RateLimit-Remaining:** Remaining requests
+- **X-RateLimit-Retry-After-Seconds:** Seconds to wait
+- **Retry-After:** Standard retry header
+
+### Attack Detection
+
+The system automatically:
+- Tracks rate limit violations per IP
+- Blocks IPs exceeding threshold (default: 10 violations)
+- Applies progressive penalties (exponential backoff)
+- Logs security alerts for monitoring
+
 ## 📊 Monitoring
 
 - **Eureka Dashboard**: http://46.224.148.235:8761
 - **Health Checks**: http://46.224.148.235:8080/actuator/health
+- **Prometheus Metrics**: http://46.224.148.235:8080/actuator/prometheus
+- **Redis Health**: http://46.224.148.235:8080/actuator/health (includes Redis status)
 - **Logs**: `docker-compose logs -f`
 
 ## 🐛 Troubleshooting

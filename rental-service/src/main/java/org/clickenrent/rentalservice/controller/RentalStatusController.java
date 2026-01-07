@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/rental-statuses")
+@RequestMapping("/api/v1/rental-statuses")
 @RequiredArgsConstructor
 @Tag(name = "Rental Status", description = "Rental status management")
 @SecurityRequirement(name = "bearerAuth")

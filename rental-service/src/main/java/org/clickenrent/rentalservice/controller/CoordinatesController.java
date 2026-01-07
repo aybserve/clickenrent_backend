@@ -13,7 +13,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/coordinates")
+@RequestMapping("/api/v1/coordinates")
 @RequiredArgsConstructor
 @Tag(name = "Coordinates", description = "Geographic coordinates management")
 @SecurityRequirement(name = "bearerAuth")

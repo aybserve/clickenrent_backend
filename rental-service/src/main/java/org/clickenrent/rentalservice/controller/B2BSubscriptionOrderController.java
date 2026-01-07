@@ -17,7 +17,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/b2b-subscription-orders")
+@RequestMapping("/api/v1/b2b-subscription-orders")
 @RequiredArgsConstructor
 @Tag(name = "B2B Subscription Order", description = "B2B subscription order management")
 @SecurityRequirement(name = "bearerAuth")

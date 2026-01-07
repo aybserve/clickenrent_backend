@@ -22,7 +22,7 @@ import java.util.List;
  * - Other roles: No access
  */
 @RestController
-@RequestMapping("/api/user-global-roles")
+@RequestMapping("/api/v1/user-global-roles")
 @RequiredArgsConstructor
 @Tag(name = "User Global Role", description = "User Global Role management endpoints")
 @SecurityRequirement(name = "bearerAuth")

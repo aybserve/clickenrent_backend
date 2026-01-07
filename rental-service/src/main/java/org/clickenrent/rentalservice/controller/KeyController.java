@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/keys")
+@RequestMapping("/api/v1/keys")
 @RequiredArgsConstructor
 @Tag(name = "Key", description = "Lock key management (Admin only)")
 @SecurityRequirement(name = "bearerAuth")

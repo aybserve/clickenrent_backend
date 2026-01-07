@@ -245,6 +245,7 @@ ALTER TABLE support_request FORCE ROW LEVEL SECURITY;
 
 -- Policy: Allow superadmins to see all support requests,
 -- B2B users see only their company's support requests
+DROP POLICY IF EXISTS support_request_tenant_isolation ON support_request;
 CREATE POLICY support_request_tenant_isolation ON support_request
 USING (
     current_setting('app.is_superadmin', true)::boolean = true
@@ -255,6 +256,37 @@ USING (
 
 -- Create index for RLS performance
 CREATE INDEX IF NOT EXISTS idx_support_request_company_rls ON support_request(company_external_id) WHERE is_deleted = false;
+
+-- =====================================================================================================================
+-- SECTION 6: AUDIT LOGGING
+-- =====================================================================================================================
+
+-- ---------------------------------------------------------------------------------------------------------------------
+-- 6.1 AUDIT LOGS TABLE
+-- ---------------------------------------------------------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS audit_logs (
+    id BIGSERIAL PRIMARY KEY,
+    event_type VARCHAR(50) NOT NULL,
+    user_external_id VARCHAR(100),
+    company_external_ids TEXT,
+    resource_type VARCHAR(100),
+    resource_id VARCHAR(100),
+    endpoint VARCHAR(500),
+    http_method VARCHAR(10),
+    client_ip VARCHAR(45),
+    success BOOLEAN NOT NULL,
+    error_message TEXT,
+    metadata TEXT,
+    timestamp TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+-- ---------------------------------------------------------------------------------------------------------------------
+-- 6.2 AUDIT LOGS INDEXES
+-- ---------------------------------------------------------------------------------------------------------------------
+CREATE INDEX IF NOT EXISTS idx_audit_logs_timestamp ON audit_logs(timestamp);
+CREATE INDEX IF NOT EXISTS idx_audit_logs_user ON audit_logs(user_external_id);
+CREATE INDEX IF NOT EXISTS idx_audit_logs_event_type ON audit_logs(event_type);
+CREATE INDEX IF NOT EXISTS idx_audit_logs_success ON audit_logs(success);
 
 -- =====================================================================================================================
 -- END OF INITIALIZATION

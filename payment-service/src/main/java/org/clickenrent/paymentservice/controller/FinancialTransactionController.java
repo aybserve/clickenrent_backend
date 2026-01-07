@@ -15,7 +15,7 @@ import java.math.BigDecimal;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/financial-transactions")
+@RequestMapping("/api/v1/financial-transactions")
 @RequiredArgsConstructor
 @Tag(name = "Financial Transaction", description = "Financial transaction management and payment processing API")
 public class FinancialTransactionController {

@@ -12,7 +12,7 @@ import java.util.List;
  * Feign client for communicating with Support Service.
  * Used to fetch bike rental feedback data for statistics.
  */
-@FeignClient(name = "support-service", path = "/api", configuration = FeignConfig.class)
+@FeignClient(name = "support-service", path = "/api/v1", configuration = FeignConfig.class)
 public interface SupportServiceClient {
 
     /**
