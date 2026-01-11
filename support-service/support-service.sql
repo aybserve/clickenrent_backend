@@ -14,6 +14,12 @@
 -- =====================================================================================================================
 
 -- Drop existing tables if they exist (in correct order to handle foreign key dependencies)
+DROP TABLE IF EXISTS bike_inspection_item_photo CASCADE;
+DROP TABLE IF EXISTS bike_inspection_item_bike_issue CASCADE;
+DROP TABLE IF EXISTS bike_inspection_item CASCADE;
+DROP TABLE IF EXISTS bike_inspection CASCADE;
+DROP TABLE IF EXISTS bike_inspection_item_status CASCADE;
+DROP TABLE IF EXISTS bike_inspection_status CASCADE;
 DROP TABLE IF EXISTS support_request_guide_item CASCADE;
 DROP TABLE IF EXISTS support_request_bike_issue CASCADE;
 DROP TABLE IF EXISTS bike_type_bike_issue CASCADE;
@@ -63,6 +69,42 @@ CREATE TABLE responsible_person (
     is_deleted              BOOLEAN NOT NULL DEFAULT false,
     
     CONSTRAINT chk_responsible_person_name_not_empty CHECK (name <> '')
+);
+
+-- ---------------------------------------------------------------------------------------------------------------------
+-- Table: bike_inspection_status
+-- Description: Status values for bike inspections (PENDING, IN_PROGRESS, COMPLETED, APPROVED)
+-- ---------------------------------------------------------------------------------------------------------------------
+CREATE TABLE bike_inspection_status (
+    id                      BIGSERIAL PRIMARY KEY,
+    name                    VARCHAR(100) NOT NULL UNIQUE,
+    
+    -- Audit fields
+    date_created            TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    last_date_modified      TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    created_by              VARCHAR(255),
+    last_modified_by        VARCHAR(255),
+    is_deleted              BOOLEAN NOT NULL DEFAULT false,
+    
+    CONSTRAINT chk_bike_inspection_status_name_not_empty CHECK (name <> '')
+);
+
+-- ---------------------------------------------------------------------------------------------------------------------
+-- Table: bike_inspection_item_status
+-- Description: Status values for bike inspection items (OK, DAMAGED, NEEDS_REPAIR)
+-- ---------------------------------------------------------------------------------------------------------------------
+CREATE TABLE bike_inspection_item_status (
+    id                      BIGSERIAL PRIMARY KEY,
+    name                    VARCHAR(100) NOT NULL UNIQUE,
+    
+    -- Audit fields
+    date_created            TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    last_date_modified      TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    created_by              VARCHAR(255),
+    last_modified_by        VARCHAR(255),
+    is_deleted              BOOLEAN NOT NULL DEFAULT false,
+    
+    CONSTRAINT chk_bike_inspection_item_status_name_not_empty CHECK (name <> '')
 );
 
 -- =====================================================================================================================
@@ -262,7 +304,109 @@ CREATE TABLE bike_type_bike_issue (
 );
 
 -- =====================================================================================================================
--- SECTION 6: INDEXES
+-- SECTION 6: BIKE INSPECTION TABLES
+-- =====================================================================================================================
+
+-- ---------------------------------------------------------------------------------------------------------------------
+-- Table: bike_inspection
+-- Description: Main bike inspections performed by users
+-- ---------------------------------------------------------------------------------------------------------------------
+CREATE TABLE bike_inspection (
+    id                          BIGSERIAL PRIMARY KEY,
+    external_id                 VARCHAR(100) UNIQUE,
+    user_external_id            VARCHAR(100),
+    company_external_id         VARCHAR(100) NOT NULL,
+    comment                     VARCHAR(2000),
+    bike_inspection_status_id   BIGINT NOT NULL,
+    
+    -- Audit fields
+    date_created                TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    last_date_modified          TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    created_by                  VARCHAR(255),
+    last_modified_by            VARCHAR(255),
+    is_deleted                  BOOLEAN NOT NULL DEFAULT false,
+    
+    CONSTRAINT fk_bike_inspection_status FOREIGN KEY (bike_inspection_status_id) 
+        REFERENCES bike_inspection_status(id) ON DELETE RESTRICT
+);
+
+-- ---------------------------------------------------------------------------------------------------------------------
+-- Table: bike_inspection_item
+-- Description: Individual items within a bike inspection
+-- ---------------------------------------------------------------------------------------------------------------------
+CREATE TABLE bike_inspection_item (
+    id                                  BIGSERIAL PRIMARY KEY,
+    external_id                         VARCHAR(100) UNIQUE,
+    bike_inspection_id                  BIGINT NOT NULL,
+    bike_external_id                    VARCHAR(100),
+    company_external_id                 VARCHAR(100) NOT NULL,
+    comment                             VARCHAR(2000),
+    bike_inspection_item_status_id      BIGINT NOT NULL,
+    error_code_id                       BIGINT,
+    
+    -- Audit fields
+    date_created                        TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    last_date_modified                  TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    created_by                          VARCHAR(255),
+    last_modified_by                    VARCHAR(255),
+    is_deleted                          BOOLEAN NOT NULL DEFAULT false,
+    
+    CONSTRAINT fk_bike_inspection_item_inspection FOREIGN KEY (bike_inspection_id) 
+        REFERENCES bike_inspection(id) ON DELETE CASCADE,
+    CONSTRAINT fk_bike_inspection_item_status FOREIGN KEY (bike_inspection_item_status_id) 
+        REFERENCES bike_inspection_item_status(id) ON DELETE RESTRICT,
+    CONSTRAINT fk_bike_inspection_item_error_code FOREIGN KEY (error_code_id) 
+        REFERENCES error_code(id) ON DELETE SET NULL
+);
+
+-- ---------------------------------------------------------------------------------------------------------------------
+-- Table: bike_inspection_item_photo
+-- Description: Photos attached to bike inspection items
+-- ---------------------------------------------------------------------------------------------------------------------
+CREATE TABLE bike_inspection_item_photo (
+    id                          BIGSERIAL PRIMARY KEY,
+    bike_inspection_item_id     BIGINT NOT NULL,
+    photo_url                   VARCHAR(500),
+    company_external_id         VARCHAR(100) NOT NULL,
+    
+    -- Audit fields
+    date_created                TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    last_date_modified          TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    created_by                  VARCHAR(255),
+    last_modified_by            VARCHAR(255),
+    is_deleted                  BOOLEAN NOT NULL DEFAULT false,
+    
+    CONSTRAINT fk_bike_inspection_item_photo_item FOREIGN KEY (bike_inspection_item_id) 
+        REFERENCES bike_inspection_item(id) ON DELETE CASCADE
+);
+
+-- ---------------------------------------------------------------------------------------------------------------------
+-- Table: bike_inspection_item_bike_issue
+-- Description: Junction table linking bike inspection items to bike issues
+-- ---------------------------------------------------------------------------------------------------------------------
+CREATE TABLE bike_inspection_item_bike_issue (
+    id                          BIGSERIAL PRIMARY KEY,
+    external_id                 VARCHAR(100) UNIQUE,
+    bike_inspection_item_id     BIGINT NOT NULL,
+    bike_issue_id               BIGINT NOT NULL,
+    company_external_id         VARCHAR(100) NOT NULL,
+    
+    -- Audit fields
+    date_created                TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    last_date_modified          TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    created_by                  VARCHAR(255),
+    last_modified_by            VARCHAR(255),
+    is_deleted                  BOOLEAN NOT NULL DEFAULT false,
+    
+    CONSTRAINT fk_bike_inspection_item_bike_issue_item FOREIGN KEY (bike_inspection_item_id) 
+        REFERENCES bike_inspection_item(id) ON DELETE CASCADE,
+    CONSTRAINT fk_bike_inspection_item_bike_issue_issue FOREIGN KEY (bike_issue_id) 
+        REFERENCES bike_issue(id) ON DELETE CASCADE,
+    CONSTRAINT uk_bike_inspection_item_bike_issue UNIQUE (bike_inspection_item_id, bike_issue_id)
+);
+
+-- =====================================================================================================================
+-- SECTION 7: INDEXES
 -- =====================================================================================================================
 -- Indexes for improved query performance
 
@@ -301,14 +445,38 @@ CREATE INDEX idx_support_request_bike_issue_issue ON support_request_bike_issue(
 CREATE INDEX idx_bike_type_bike_issue_bike_type_ext_id ON bike_type_bike_issue(bike_type_external_id);
 CREATE INDEX idx_bike_type_bike_issue_bike_issue ON bike_type_bike_issue(bike_issue_id);
 
+-- Bike Inspection indexes
+CREATE INDEX idx_bike_inspection_external_id ON bike_inspection(external_id);
+CREATE INDEX idx_bike_inspection_user_external_id ON bike_inspection(user_external_id);
+CREATE INDEX idx_bike_inspection_company ON bike_inspection(company_external_id);
+CREATE INDEX idx_bike_inspection_status ON bike_inspection(bike_inspection_status_id);
+
+-- Bike Inspection Item indexes
+CREATE INDEX idx_bike_inspection_item_external_id ON bike_inspection_item(external_id);
+CREATE INDEX idx_bike_inspection_item_inspection ON bike_inspection_item(bike_inspection_id);
+CREATE INDEX idx_bike_inspection_item_bike_external_id ON bike_inspection_item(bike_external_id);
+CREATE INDEX idx_bike_inspection_item_company ON bike_inspection_item(company_external_id);
+CREATE INDEX idx_bike_inspection_item_status ON bike_inspection_item(bike_inspection_item_status_id);
+CREATE INDEX idx_bike_inspection_item_error_code ON bike_inspection_item(error_code_id);
+
+-- Bike Inspection Item Photo indexes
+CREATE INDEX idx_bike_inspection_item_photo_item ON bike_inspection_item_photo(bike_inspection_item_id);
+CREATE INDEX idx_bike_inspection_item_photo_company ON bike_inspection_item_photo(company_external_id);
+
+-- Bike Inspection Item Bike Issue indexes
+CREATE INDEX idx_bike_inspection_item_bike_issue_external_id ON bike_inspection_item_bike_issue(external_id);
+CREATE INDEX idx_bike_inspection_item_bike_issue_item ON bike_inspection_item_bike_issue(bike_inspection_item_id);
+CREATE INDEX idx_bike_inspection_item_bike_issue_issue ON bike_inspection_item_bike_issue(bike_issue_id);
+CREATE INDEX idx_bike_inspection_item_bike_issue_company ON bike_inspection_item_bike_issue(company_external_id);
+
 -- =====================================================================================================================
--- SECTION 7: TEST/MOCKUP DATA (OPTIONAL)
+-- SECTION 8: TEST/MOCKUP DATA (OPTIONAL)
 -- =====================================================================================================================
 -- This section contains sample data for testing and development purposes.
 -- Comment out or remove this section before deploying to production if you don't want test data.
 
 -- ---------------------------------------------------------------------------------------------------------------------
--- 7.1 RESPONSIBLE PERSON
+-- 8.1 RESPONSIBLE PERSON
 -- ---------------------------------------------------------------------------------------------------------------------
 INSERT INTO responsible_person (id, name, date_created, last_date_modified, created_by, last_modified_by, is_deleted) VALUES
 (1, 'John Mechanic', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
@@ -317,7 +485,7 @@ INSERT INTO responsible_person (id, name, date_created, last_date_modified, crea
 ON CONFLICT (id) DO NOTHING;
 
 -- ---------------------------------------------------------------------------------------------------------------------
--- 7.2 SUPPORT REQUEST STATUS
+-- 8.2 SUPPORT REQUEST STATUS
 -- ---------------------------------------------------------------------------------------------------------------------
 INSERT INTO support_request_status (id, name, date_created, last_date_modified, created_by, last_modified_by, is_deleted) VALUES
 (1, 'OPEN', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
@@ -327,7 +495,27 @@ INSERT INTO support_request_status (id, name, date_created, last_date_modified, 
 ON CONFLICT (id) DO NOTHING;
 
 -- ---------------------------------------------------------------------------------------------------------------------
--- 7.3 BIKE ISSUE (Hierarchical Structure)
+-- 8.3 BIKE INSPECTION STATUS
+-- ---------------------------------------------------------------------------------------------------------------------
+INSERT INTO bike_inspection_status (id, name, date_created, last_date_modified, created_by, last_modified_by, is_deleted) VALUES
+(1, 'PENDING', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(2, 'IN_PROGRESS', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(3, 'COMPLETED', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(4, 'APPROVED', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false)
+ON CONFLICT (id) DO NOTHING;
+
+-- ---------------------------------------------------------------------------------------------------------------------
+-- 8.4 BIKE INSPECTION ITEM STATUS
+-- ---------------------------------------------------------------------------------------------------------------------
+INSERT INTO bike_inspection_item_status (id, name, date_created, last_date_modified, created_by, last_modified_by, is_deleted) VALUES
+(1, 'OK', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(2, 'DAMAGED', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(3, 'NEEDS_REPAIR', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(4, 'MISSING', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false)
+ON CONFLICT (id) DO NOTHING;
+
+-- ---------------------------------------------------------------------------------------------------------------------
+-- 8.5 BIKE ISSUE (Hierarchical Structure)
 -- ---------------------------------------------------------------------------------------------------------------------
 -- Root Issues
 INSERT INTO bike_issue (id, external_id, name, description, parent_bike_issue_id, is_fixable_by_client, responsible_person_id, date_created, last_date_modified, created_by, last_modified_by, is_deleted) VALUES
@@ -354,7 +542,7 @@ INSERT INTO bike_issue (id, external_id, name, description, parent_bike_issue_id
 ON CONFLICT (id) DO NOTHING;
 
 -- ---------------------------------------------------------------------------------------------------------------------
--- 7.4 ERROR CODE
+-- 8.6 ERROR CODE
 -- ---------------------------------------------------------------------------------------------------------------------
 INSERT INTO error_code (id, external_id, name, bike_engine_external_id, description, common_cause, diagnostic_steps, recommended_fix, notes, is_fixable_by_client, date_created, last_date_modified, created_by, last_modified_by, is_deleted) VALUES
 (1, '550e8400-e29b-41d4-a716-446655440201', 'E001', 'bike-engine-ext-001', 'Battery Low Voltage', 'Battery discharged or faulty cell', 'Check battery voltage with multimeter', 'Charge or replace battery', 'Common error in cold weather', false, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
@@ -365,7 +553,7 @@ INSERT INTO error_code (id, external_id, name, bike_engine_external_id, descript
 ON CONFLICT (id) DO NOTHING;
 
 -- ---------------------------------------------------------------------------------------------------------------------
--- 7.5 FEEDBACK
+-- 8.7 FEEDBACK
 -- ---------------------------------------------------------------------------------------------------------------------
 INSERT INTO feedback (id, external_id, user_external_id, rate, comment, date_time, date_created, last_date_modified, created_by, last_modified_by, is_deleted) VALUES
 (1, '550e8400-e29b-41d4-a716-446655440301', 'usr-ext-00007', 5, 'Excellent service, very responsive support team!', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
@@ -375,7 +563,7 @@ INSERT INTO feedback (id, external_id, user_external_id, rate, comment, date_tim
 ON CONFLICT (id) DO NOTHING;
 
 -- ---------------------------------------------------------------------------------------------------------------------
--- 7.6 BIKE RENTAL FEEDBACK
+-- 8.8 BIKE RENTAL FEEDBACK
 -- ---------------------------------------------------------------------------------------------------------------------
 INSERT INTO bike_rental_feedback (id, external_id, user_external_id, bike_rental_external_id, rate, comment, date_time, date_created, last_date_modified, created_by, last_modified_by, is_deleted) VALUES
 (1, '550e8400-e29b-41d4-a716-446655440501', 'usr-ext-00007', 'bike-rental-ext-00101', 5, 'Great bike, smooth ride!', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
@@ -385,7 +573,7 @@ INSERT INTO bike_rental_feedback (id, external_id, user_external_id, bike_rental
 ON CONFLICT (id) DO NOTHING;
 
 -- ---------------------------------------------------------------------------------------------------------------------
--- 7.7 SUPPORT REQUEST
+-- 8.9 SUPPORT REQUEST
 -- ---------------------------------------------------------------------------------------------------------------------
 INSERT INTO support_request (id, external_id, user_external_id, bike_external_id, is_near_location, photo_url, error_code_id, support_request_status_id, date_created, last_date_modified, created_by, last_modified_by, is_deleted) VALUES
 (1, '550e8400-e29b-41d4-a716-446655440401', 'usr-ext-00007', 'bike-ext-00201', true, 'https://example.com/photos/issue1.jpg', 1, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
@@ -396,7 +584,7 @@ INSERT INTO support_request (id, external_id, user_external_id, bike_external_id
 ON CONFLICT (id) DO NOTHING;
 
 -- ---------------------------------------------------------------------------------------------------------------------
--- 7.8 BIKE TYPE BIKE ISSUE (Junction Table)
+-- 8.10 BIKE TYPE BIKE ISSUE (Junction Table)
 -- ---------------------------------------------------------------------------------------------------------------------
 INSERT INTO bike_type_bike_issue (id, bike_type_external_id, bike_issue_id) VALUES
 (1, 'bike-type-ext-001', 1),
@@ -408,7 +596,7 @@ INSERT INTO bike_type_bike_issue (id, bike_type_external_id, bike_issue_id) VALU
 ON CONFLICT (id) DO NOTHING;
 
 -- ---------------------------------------------------------------------------------------------------------------------
--- 7.9 SUPPORT REQUEST BIKE ISSUE (Junction Table)
+-- 8.11 SUPPORT REQUEST BIKE ISSUE (Junction Table)
 -- ---------------------------------------------------------------------------------------------------------------------
 INSERT INTO support_request_bike_issue (id, support_request_id, bike_issue_id) VALUES
 (1, 1, 1),
@@ -421,7 +609,7 @@ INSERT INTO support_request_bike_issue (id, support_request_id, bike_issue_id) V
 ON CONFLICT (id) DO NOTHING;
 
 -- ---------------------------------------------------------------------------------------------------------------------
--- 7.10 SUPPORT REQUEST GUIDE ITEM
+-- 8.12 SUPPORT REQUEST GUIDE ITEM
 -- ---------------------------------------------------------------------------------------------------------------------
 INSERT INTO support_request_guide_item (id, item_index, description, bike_issue_id, support_request_status_id, date_created, last_date_modified, created_by, last_modified_by, is_deleted) VALUES
 (1, 1, 'Check if battery is properly connected', 1, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
@@ -434,13 +622,53 @@ INSERT INTO support_request_guide_item (id, item_index, description, bike_issue_
 (8, 2, 'Check for error codes on display', 3, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false)
 ON CONFLICT (id) DO NOTHING;
 
+-- ---------------------------------------------------------------------------------------------------------------------
+-- 8.13 BIKE INSPECTION
+-- ---------------------------------------------------------------------------------------------------------------------
+INSERT INTO bike_inspection (id, external_id, user_external_id, company_external_id, comment, bike_inspection_status_id, date_created, last_date_modified, created_by, last_modified_by, is_deleted) VALUES
+(1, '550e8400-e29b-41d4-a716-446655440601', 'usr-ext-00007', 'company-ext-001', 'Pre-rental inspection completed', 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(2, '550e8400-e29b-41d4-a716-446655440602', 'usr-ext-00008', 'company-ext-001', 'Post-rental inspection - minor issues found', 3, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(3, '550e8400-e29b-41d4-a716-446655440603', 'usr-ext-00009', 'company-ext-002', 'Routine maintenance inspection', 2, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false)
+ON CONFLICT (id) DO NOTHING;
+
+-- ---------------------------------------------------------------------------------------------------------------------
+-- 8.14 BIKE INSPECTION ITEM
+-- ---------------------------------------------------------------------------------------------------------------------
+INSERT INTO bike_inspection_item (id, external_id, bike_inspection_id, bike_external_id, company_external_id, comment, bike_inspection_item_status_id, error_code_id, date_created, last_date_modified, created_by, last_modified_by, is_deleted) VALUES
+(1, '550e8400-e29b-41d4-a716-446655440701', 1, 'bike-ext-00201', 'company-ext-001', 'Battery level good', 1, NULL, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(2, '550e8400-e29b-41d4-a716-446655440702', 1, 'bike-ext-00201', 'company-ext-001', 'Brakes working properly', 1, NULL, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(3, '550e8400-e29b-41d4-a716-446655440703', 2, 'bike-ext-00202', 'company-ext-001', 'Minor scratch on frame', 2, NULL, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(4, '550e8400-e29b-41d4-a716-446655440704', 2, 'bike-ext-00202', 'company-ext-001', 'Brake pads worn', 3, NULL, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(5, '550e8400-e29b-41d4-a716-446655440705', 3, 'bike-ext-00203', 'company-ext-002', 'Tire pressure low - Display showing E001', 3, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false)
+ON CONFLICT (id) DO NOTHING;
+
+-- ---------------------------------------------------------------------------------------------------------------------
+-- 8.15 BIKE INSPECTION ITEM PHOTO
+-- ---------------------------------------------------------------------------------------------------------------------
+INSERT INTO bike_inspection_item_photo (id, bike_inspection_item_id, photo_url, company_external_id, date_created, last_date_modified, created_by, last_modified_by, is_deleted) VALUES
+(1, 3, 'https://example.com/photos/inspection/scratch-001.jpg', 'company-ext-001', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(2, 3, 'https://example.com/photos/inspection/scratch-002.jpg', 'company-ext-001', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(3, 4, 'https://example.com/photos/inspection/brake-pads-001.jpg', 'company-ext-001', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(4, 5, 'https://example.com/photos/inspection/tire-001.jpg', 'company-ext-002', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false)
+ON CONFLICT (id) DO NOTHING;
+
+-- ---------------------------------------------------------------------------------------------------------------------
+-- 8.16 BIKE INSPECTION ITEM BIKE ISSUE
+-- ---------------------------------------------------------------------------------------------------------------------
+INSERT INTO bike_inspection_item_bike_issue (id, external_id, bike_inspection_item_id, bike_issue_id, company_external_id, date_created, last_date_modified, created_by, last_modified_by, is_deleted) VALUES
+(1, '550e8400-e29b-41d4-a716-446655440801', 4, 6, 'company-ext-001', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(2, '550e8400-e29b-41d4-a716-446655440802', 4, 2, 'company-ext-001', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false)
+ON CONFLICT (id) DO NOTHING;
+
 -- =====================================================================================================================
--- SECTION 8: SEQUENCE RESET
+-- SECTION 9: SEQUENCE RESET
 -- =====================================================================================================================
 -- Reset sequences to the correct values after inserting test data
 
 SELECT setval('responsible_person_id_seq', (SELECT COALESCE(MAX(id), 1) FROM responsible_person));
 SELECT setval('support_request_status_id_seq', (SELECT COALESCE(MAX(id), 1) FROM support_request_status));
+SELECT setval('bike_inspection_status_id_seq', (SELECT COALESCE(MAX(id), 1) FROM bike_inspection_status));
+SELECT setval('bike_inspection_item_status_id_seq', (SELECT COALESCE(MAX(id), 1) FROM bike_inspection_item_status));
 SELECT setval('error_code_id_seq', (SELECT COALESCE(MAX(id), 1) FROM error_code));
 SELECT setval('bike_issue_id_seq', (SELECT COALESCE(MAX(id), 1) FROM bike_issue));
 SELECT setval('feedback_id_seq', (SELECT COALESCE(MAX(id), 1) FROM feedback));
@@ -449,14 +677,19 @@ SELECT setval('support_request_id_seq', (SELECT COALESCE(MAX(id), 1) FROM suppor
 SELECT setval('support_request_guide_item_id_seq', (SELECT COALESCE(MAX(id), 1) FROM support_request_guide_item));
 SELECT setval('support_request_bike_issue_id_seq', (SELECT COALESCE(MAX(id), 1) FROM support_request_bike_issue));
 SELECT setval('bike_type_bike_issue_id_seq', (SELECT COALESCE(MAX(id), 1) FROM bike_type_bike_issue));
+SELECT setval('bike_inspection_id_seq', (SELECT COALESCE(MAX(id), 1) FROM bike_inspection));
+SELECT setval('bike_inspection_item_id_seq', (SELECT COALESCE(MAX(id), 1) FROM bike_inspection_item));
+SELECT setval('bike_inspection_item_photo_id_seq', (SELECT COALESCE(MAX(id), 1) FROM bike_inspection_item_photo));
+SELECT setval('bike_inspection_item_bike_issue_id_seq', (SELECT COALESCE(MAX(id), 1) FROM bike_inspection_item_bike_issue));
 
 -- =====================================================================================================================
 -- END OF SCHEMA
 -- =====================================================================================================================
 -- Schema created successfully!
--- Total tables: 10
+-- Total tables: 16
 -- Hierarchical structure: BikeIssue with parent-child relationships
--- Test data: Comprehensive support requests, issues, feedback, and troubleshooting guides
+-- Tenant isolation: BikeInspection and related entities are company-scoped
+-- Test data: Comprehensive support requests, issues, feedback, troubleshooting guides, and bike inspections
 -- =====================================================================================================================
 
 

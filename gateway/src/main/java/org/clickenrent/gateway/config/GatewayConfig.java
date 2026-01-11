@@ -875,6 +875,72 @@ public class GatewayConfig {
                                         .setStatusCode(HttpStatus.TOO_MANY_REQUESTS)))
                         .uri("lb://support-service"))
 
+                // Bike Inspection Status Routes
+                .route("bike-inspection-statuses", r -> r
+                        .path("/api/v1/bike-inspection-statuses/**")
+                        .filters(f -> f
+                                .filter(jwtAuthenticationFilter)
+                                .requestRateLimiter(c -> c
+                                        .setRateLimiter(userRateLimiter)
+                                        .setKeyResolver(userKeyResolver)
+                                        .setStatusCode(HttpStatus.TOO_MANY_REQUESTS)))
+                        .uri("lb://support-service"))
+
+                // Bike Inspection Item Status Routes
+                .route("bike-inspection-item-statuses", r -> r
+                        .path("/api/v1/bike-inspection-item-statuses/**")
+                        .filters(f -> f
+                                .filter(jwtAuthenticationFilter)
+                                .requestRateLimiter(c -> c
+                                        .setRateLimiter(userRateLimiter)
+                                        .setKeyResolver(userKeyResolver)
+                                        .setStatusCode(HttpStatus.TOO_MANY_REQUESTS)))
+                        .uri("lb://support-service"))
+
+                // Bike Inspection Routes
+                .route("bike-inspections", r -> r
+                        .path("/api/v1/bike-inspections/**")
+                        .filters(f -> f
+                                .filter(jwtAuthenticationFilter)
+                                .requestRateLimiter(c -> c
+                                        .setRateLimiter(userRateLimiter)
+                                        .setKeyResolver(userKeyResolver)
+                                        .setStatusCode(HttpStatus.TOO_MANY_REQUESTS)))
+                        .uri("lb://support-service"))
+
+                // Bike Inspection Item Routes
+                .route("bike-inspection-items", r -> r
+                        .path("/api/v1/bike-inspection-items/**")
+                        .filters(f -> f
+                                .filter(jwtAuthenticationFilter)
+                                .requestRateLimiter(c -> c
+                                        .setRateLimiter(userRateLimiter)
+                                        .setKeyResolver(userKeyResolver)
+                                        .setStatusCode(HttpStatus.TOO_MANY_REQUESTS)))
+                        .uri("lb://support-service"))
+
+                // Bike Inspection Item Photo Routes
+                .route("bike-inspection-item-photos", r -> r
+                        .path("/api/v1/bike-inspection-item-photos/**")
+                        .filters(f -> f
+                                .filter(jwtAuthenticationFilter)
+                                .requestRateLimiter(c -> c
+                                        .setRateLimiter(userRateLimiter)
+                                        .setKeyResolver(userKeyResolver)
+                                        .setStatusCode(HttpStatus.TOO_MANY_REQUESTS)))
+                        .uri("lb://support-service"))
+
+                // Bike Inspection Item Bike Issue Routes
+                .route("bike-inspection-item-bike-issues", r -> r
+                        .path("/api/v1/bike-inspection-item-bike-issues/**")
+                        .filters(f -> f
+                                .filter(jwtAuthenticationFilter)
+                                .requestRateLimiter(c -> c
+                                        .setRateLimiter(userRateLimiter)
+                                        .setKeyResolver(userKeyResolver)
+                                        .setStatusCode(HttpStatus.TOO_MANY_REQUESTS)))
+                        .uri("lb://support-service"))
+
 
                 // NOTIFICATION SERVICE ROUTES
 
