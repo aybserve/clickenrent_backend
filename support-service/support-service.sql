@@ -15,6 +15,7 @@
 
 -- Drop existing tables if they exist (in correct order to handle foreign key dependencies)
 DROP TABLE IF EXISTS bike_inspection_item_photo CASCADE;
+DROP TABLE IF EXISTS bike_inspection_item_bike_unit CASCADE;
 DROP TABLE IF EXISTS bike_inspection_item_bike_issue CASCADE;
 DROP TABLE IF EXISTS bike_inspection_item CASCADE;
 DROP TABLE IF EXISTS bike_inspection CASCADE;
@@ -27,6 +28,7 @@ DROP TABLE IF EXISTS support_request CASCADE;
 DROP TABLE IF EXISTS bike_rental_feedback CASCADE;
 DROP TABLE IF EXISTS feedback CASCADE;
 DROP TABLE IF EXISTS bike_issue CASCADE;
+DROP TABLE IF EXISTS bike_unit CASCADE;
 DROP TABLE IF EXISTS error_code CASCADE;
 DROP TABLE IF EXISTS support_request_status CASCADE;
 DROP TABLE IF EXISTS responsible_person CASCADE;
@@ -141,14 +143,40 @@ CREATE TABLE error_code (
 -- Table: bike_issue
 -- Description: Hierarchical bike issues with parent-child relationships
 -- ---------------------------------------------------------------------------------------------------------------------
+-- ---------------------------------------------------------------------------------------------------------------------
+-- Table: bike_unit
+-- Description: Bike unit/component reference data for tracking specific bike parts
+-- ---------------------------------------------------------------------------------------------------------------------
+CREATE TABLE bike_unit (
+    id                      BIGSERIAL PRIMARY KEY,
+    external_id             VARCHAR(100) UNIQUE,
+    name                    VARCHAR(255) NOT NULL,
+    company_external_id     VARCHAR(100) NOT NULL,
+    
+    -- Audit fields
+    date_created            TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    last_date_modified      TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    created_by              VARCHAR(255),
+    last_modified_by        VARCHAR(255),
+    is_deleted              BOOLEAN NOT NULL DEFAULT false,
+    
+    CONSTRAINT chk_bike_unit_name_not_empty CHECK (name <> '')
+);
+
+-- ---------------------------------------------------------------------------------------------------------------------
+-- Table: bike_issue
+-- Description: Hierarchical bike issues with parent-child relationships
+-- ---------------------------------------------------------------------------------------------------------------------
 CREATE TABLE bike_issue (
     id                      BIGSERIAL PRIMARY KEY,
     external_id             VARCHAR(100) UNIQUE,
+    erp_external_id         VARCHAR(100) UNIQUE,
     name                    VARCHAR(255) NOT NULL,
     description             VARCHAR(1000),
     parent_bike_issue_id    BIGINT,
     is_fixable_by_client    BOOLEAN NOT NULL DEFAULT false,
     responsible_person_id   BIGINT,
+    bike_unit_id            BIGINT,
     
     -- Audit fields
     date_created            TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -161,6 +189,8 @@ CREATE TABLE bike_issue (
         REFERENCES bike_issue(id) ON DELETE SET NULL,
     CONSTRAINT fk_bike_issue_responsible_person FOREIGN KEY (responsible_person_id) 
         REFERENCES responsible_person(id) ON DELETE SET NULL,
+    CONSTRAINT fk_bike_issue_bike_unit FOREIGN KEY (bike_unit_id)
+        REFERENCES bike_unit(id) ON DELETE SET NULL,
     CONSTRAINT chk_bike_issue_name_not_empty CHECK (name <> '')
 );
 
@@ -405,6 +435,32 @@ CREATE TABLE bike_inspection_item_bike_issue (
     CONSTRAINT uk_bike_inspection_item_bike_issue UNIQUE (bike_inspection_item_id, bike_issue_id)
 );
 
+-- ---------------------------------------------------------------------------------------------------------------------
+-- Table: bike_inspection_item_bike_unit
+-- Description: Junction table linking bike inspection items to bike units with problem tracking
+-- ---------------------------------------------------------------------------------------------------------------------
+CREATE TABLE bike_inspection_item_bike_unit (
+    id                          BIGSERIAL PRIMARY KEY,
+    external_id                 VARCHAR(100) UNIQUE,
+    bike_inspection_item_id     BIGINT NOT NULL,
+    bike_unit_id                BIGINT NOT NULL,
+    has_problem                 BOOLEAN NOT NULL DEFAULT false,
+    company_external_id         VARCHAR(100) NOT NULL,
+    
+    -- Audit fields
+    date_created                TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    last_date_modified          TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    created_by                  VARCHAR(255),
+    last_modified_by            VARCHAR(255),
+    is_deleted                  BOOLEAN NOT NULL DEFAULT false,
+    
+    CONSTRAINT fk_bike_inspection_item_bike_unit_item FOREIGN KEY (bike_inspection_item_id) 
+        REFERENCES bike_inspection_item(id) ON DELETE CASCADE,
+    CONSTRAINT fk_bike_inspection_item_bike_unit_unit FOREIGN KEY (bike_unit_id) 
+        REFERENCES bike_unit(id) ON DELETE CASCADE,
+    CONSTRAINT uk_bike_inspection_item_bike_unit UNIQUE (bike_inspection_item_id, bike_unit_id)
+);
+
 -- =====================================================================================================================
 -- SECTION 7: INDEXES
 -- =====================================================================================================================
@@ -414,10 +470,16 @@ CREATE TABLE bike_inspection_item_bike_issue (
 CREATE INDEX idx_error_code_external_id ON error_code(external_id);
 CREATE INDEX idx_error_code_bike_engine_ext_id ON error_code(bike_engine_external_id);
 
+-- Bike Unit indexes
+CREATE INDEX idx_bike_unit_external_id ON bike_unit(external_id);
+CREATE INDEX idx_bike_unit_company ON bike_unit(company_external_id);
+
 -- Bike Issue indexes
 CREATE INDEX idx_bike_issue_external_id ON bike_issue(external_id);
+CREATE INDEX idx_bike_issue_erp_external_id ON bike_issue(erp_external_id);
 CREATE INDEX idx_bike_issue_parent ON bike_issue(parent_bike_issue_id);
 CREATE INDEX idx_bike_issue_responsible_person ON bike_issue(responsible_person_id);
+CREATE INDEX idx_bike_issue_bike_unit ON bike_issue(bike_unit_id);
 
 -- Feedback indexes
 CREATE INDEX idx_feedback_external_id ON feedback(external_id);
@@ -468,6 +530,12 @@ CREATE INDEX idx_bike_inspection_item_bike_issue_external_id ON bike_inspection_
 CREATE INDEX idx_bike_inspection_item_bike_issue_item ON bike_inspection_item_bike_issue(bike_inspection_item_id);
 CREATE INDEX idx_bike_inspection_item_bike_issue_issue ON bike_inspection_item_bike_issue(bike_issue_id);
 CREATE INDEX idx_bike_inspection_item_bike_issue_company ON bike_inspection_item_bike_issue(company_external_id);
+
+-- Bike Inspection Item Bike Unit indexes
+CREATE INDEX idx_bike_inspection_item_bike_unit_external_id ON bike_inspection_item_bike_unit(external_id);
+CREATE INDEX idx_bike_inspection_item_bike_unit_item ON bike_inspection_item_bike_unit(bike_inspection_item_id);
+CREATE INDEX idx_bike_inspection_item_bike_unit_unit ON bike_inspection_item_bike_unit(bike_unit_id);
+CREATE INDEX idx_bike_inspection_item_bike_unit_company ON bike_inspection_item_bike_unit(company_external_id);
 
 -- =====================================================================================================================
 -- SECTION 8: TEST/MOCKUP DATA (OPTIONAL)

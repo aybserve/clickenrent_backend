@@ -61,6 +61,20 @@ public class BikeIssueController {
         return ResponseEntity.ok(bikeIssueService.getSubIssues(parentId));
     }
 
+    @GetMapping("/erp-external/{erpExternalId}")
+    @PreAuthorize("isAuthenticated()")
+    @Operation(summary = "Get bike issue by ERP external ID")
+    public ResponseEntity<BikeIssueDTO> getByErpExternalId(@PathVariable String erpExternalId) {
+        return ResponseEntity.ok(bikeIssueService.getByErpExternalId(erpExternalId));
+    }
+
+    @GetMapping("/bike-unit/{bikeUnitId}")
+    @PreAuthorize("isAuthenticated()")
+    @Operation(summary = "Get bike issues by bike unit ID")
+    public ResponseEntity<List<BikeIssueDTO>> getByBikeUnitId(@PathVariable Long bikeUnitId) {
+        return ResponseEntity.ok(bikeIssueService.getByBikeUnitId(bikeUnitId));
+    }
+
     @PostMapping
     @PreAuthorize("hasAnyRole('SUPERADMIN', 'ADMIN')")
     @Operation(summary = "Create bike issue")

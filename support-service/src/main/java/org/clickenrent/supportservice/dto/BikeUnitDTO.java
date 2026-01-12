@@ -8,25 +8,18 @@ import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
 
 /**
- * Data Transfer Object for BikeIssue entity.
+ * Data Transfer Object for BikeUnit entity.
  */
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class BikeIssueDTO {
+public class BikeUnitDTO {
 
     private Long id;
     private String externalId;
-    private String erpExternalId;
     private String name;
-    private String description;
-    private Long parentBikeIssueId;
-    private Boolean isFixableByClient;
-    private Long responsiblePersonId;
-    private String responsiblePersonName;
-    private Long bikeUnitId;
-    private String bikeUnitName;
+    private String companyExternalId;
 
     // Audit fields
     private LocalDateTime dateCreated;
@@ -34,11 +27,3 @@ public class BikeIssueDTO {
     private String createdBy;
     private String lastModifiedBy;
 }
-
-
-
-
-
-
-
-

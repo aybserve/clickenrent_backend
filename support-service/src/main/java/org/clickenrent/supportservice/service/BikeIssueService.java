@@ -59,6 +59,20 @@ public class BikeIssueService {
                 .collect(Collectors.toList());
     }
 
+    @Transactional(readOnly = true)
+    public BikeIssueDTO getByErpExternalId(String erpExternalId) {
+        BikeIssue entity = bikeIssueRepository.findByErpExternalId(erpExternalId)
+                .orElseThrow(() -> new ResourceNotFoundException("BikeIssue", "erpExternalId", erpExternalId));
+        return bikeIssueMapper.toDto(entity);
+    }
+
+    @Transactional(readOnly = true)
+    public List<BikeIssueDTO> getByBikeUnitId(Long bikeUnitId) {
+        return bikeIssueRepository.findByBikeUnitId(bikeUnitId).stream()
+                .map(bikeIssueMapper::toDto)
+                .collect(Collectors.toList());
+    }
+
     @Transactional
     public BikeIssueDTO create(BikeIssueDTO dto) {
         if (!securityService.isAdmin()) {

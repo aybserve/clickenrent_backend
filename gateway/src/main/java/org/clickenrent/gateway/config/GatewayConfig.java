@@ -941,6 +941,28 @@ public class GatewayConfig {
                                         .setStatusCode(HttpStatus.TOO_MANY_REQUESTS)))
                         .uri("lb://support-service"))
 
+                // Bike Unit Routes
+                .route("bike-units", r -> r
+                        .path("/api/v1/bike-units/**")
+                        .filters(f -> f
+                                .filter(jwtAuthenticationFilter)
+                                .requestRateLimiter(c -> c
+                                        .setRateLimiter(userRateLimiter)
+                                        .setKeyResolver(userKeyResolver)
+                                        .setStatusCode(HttpStatus.TOO_MANY_REQUESTS)))
+                        .uri("lb://support-service"))
+
+                // Bike Inspection Item Bike Unit Routes
+                .route("bike-inspection-item-bike-units", r -> r
+                        .path("/api/v1/bike-inspection-item-bike-units/**")
+                        .filters(f -> f
+                                .filter(jwtAuthenticationFilter)
+                                .requestRateLimiter(c -> c
+                                        .setRateLimiter(userRateLimiter)
+                                        .setKeyResolver(userKeyResolver)
+                                        .setStatusCode(HttpStatus.TOO_MANY_REQUESTS)))
+                        .uri("lb://support-service"))
+
 
                 // NOTIFICATION SERVICE ROUTES
 
