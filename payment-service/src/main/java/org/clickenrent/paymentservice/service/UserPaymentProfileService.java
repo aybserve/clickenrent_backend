@@ -24,7 +24,7 @@ public class UserPaymentProfileService {
     private final UserPaymentProfileRepository userPaymentProfileRepository;
     private final UserPaymentProfileMapper userPaymentProfileMapper;
     private final SecurityService securityService;
-    private final StripeService stripeService;
+    private final PaymentProviderService paymentProviderService;
 
     @Transactional(readOnly = true)
     public List<UserPaymentProfileDTO> findAll() {
@@ -80,19 +80,26 @@ public class UserPaymentProfileService {
                 .orElseGet(() -> {
                     log.info("Creating payment profile for user with externalId: {}", userExternalId);
                     
-                    // Create Stripe customer
-                    String stripeCustomerId = stripeService.createCustomer(null, userEmail);
+                    // Create customer in active payment provider
+                    String customerId = paymentProviderService.createCustomer(userExternalId, userEmail);
                     
-                    // Create profile
-                    UserPaymentProfile profile = UserPaymentProfile.builder()
+                    // Create profile with provider-specific customer ID
+                    UserPaymentProfile.UserPaymentProfileBuilder profileBuilder = UserPaymentProfile.builder()
                             .userExternalId(userExternalId)
-                            .stripeCustomerId(stripeCustomerId)
-                            .isActive(true)
-                            .build();
+                            .isActive(true);
                     
+                    // Set the appropriate customer ID based on active provider
+                    if (paymentProviderService.isStripeActive()) {
+                        profileBuilder.stripeCustomerId(customerId);
+                    } else if (paymentProviderService.isMultiSafepayActive()) {
+                        profileBuilder.multiSafepayCustomerId(customerId);
+                    }
+                    
+                    UserPaymentProfile profile = profileBuilder.build();
                     UserPaymentProfile savedProfile = userPaymentProfileRepository.save(profile);
-                    log.info("Created payment profile: {} with Stripe customer: {}", 
-                            savedProfile.getId(), stripeCustomerId);
+                    
+                    log.info("Created payment profile: {} with {} customer: {}", 
+                            savedProfile.getId(), paymentProviderService.getActiveProvider(), customerId);
                     
                     return userPaymentProfileMapper.toDTO(savedProfile);
                 });

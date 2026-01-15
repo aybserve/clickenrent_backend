@@ -29,6 +29,8 @@ public class UserPaymentMethodDTO {
     
     private String stripePaymentMethodId;
     
+    private String multiSafepayTokenId;
+    
     @NotNull(message = "Default status is required")
     private Boolean isDefault;
     

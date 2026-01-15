@@ -81,6 +81,12 @@ public class FinancialTransaction extends BaseAuditEntity implements TenantScope
     @Column(length = 255)
     private String stripeRefundId;
 
+    @Column(length = 255)
+    private String multiSafepayOrderId;
+
+    @Column(length = 255)
+    private String multiSafepayTransactionId;
+
     @Column
     private Long originalTransactionId; // Self-reference for refunds
 

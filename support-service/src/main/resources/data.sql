@@ -69,7 +69,18 @@ ON CONFLICT (id) DO NOTHING;
 -- Recommended for production but can be customized based on your bike fleet.
 
 -- ---------------------------------------------------------------------------------------------------------------------
--- 2.1 BIKE ISSUE (Hierarchical Structure)
+-- 2.1 BIKE UNIT
+-- ---------------------------------------------------------------------------------------------------------------------
+INSERT INTO bike_unit (id, external_id, name, company_external_id, date_created, last_date_modified, created_by, last_modified_by, is_deleted) VALUES
+(1, '550e8400-e29b-41d4-a716-446655440001', 'Front Wheel', 'company-ext-001', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(2, '550e8400-e29b-41d4-a716-446655440002', 'Rear Wheel', 'company-ext-001', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(3, '550e8400-e29b-41d4-a716-446655440003', 'Battery Pack', 'company-ext-001', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(4, '550e8400-e29b-41d4-a716-446655440004', 'Motor Assembly', 'company-ext-002', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(5, '550e8400-e29b-41d4-a716-446655440005', 'Brake System', 'company-ext-002', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false)
+ON CONFLICT (id) DO NOTHING;
+
+-- ---------------------------------------------------------------------------------------------------------------------
+-- 2.2 BIKE ISSUE (Hierarchical Structure)
 -- ---------------------------------------------------------------------------------------------------------------------
 -- Root Issues
 INSERT INTO bike_issue (id, external_id, erp_external_id, name, description, parent_bike_issue_id, is_fixable_by_client, responsible_person_id, bike_unit_id, date_created, last_date_modified, created_by, last_modified_by, is_deleted) VALUES
@@ -114,7 +125,7 @@ INSERT INTO bike_issue (id, external_id, erp_external_id, name, description, par
 ON CONFLICT (id) DO NOTHING;
 
 -- ---------------------------------------------------------------------------------------------------------------------
--- 2.2 ERROR CODE
+-- 2.3 ERROR CODE
 -- ---------------------------------------------------------------------------------------------------------------------
 INSERT INTO error_code (id, external_id, name, bike_engine_external_id, description, common_cause, diagnostic_steps, recommended_fix, notes, is_fixable_by_client, date_created, last_date_modified, created_by, last_modified_by, is_deleted) VALUES
 (1, '550e8400-e29b-41d4-a716-446655440201', 'E001', 'bike-engine-ext-001', 'Battery Low Voltage', 'Battery discharged or faulty cell', 'Check battery voltage with multimeter', 'Charge or replace battery', 'Common error in cold weather', false, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
@@ -157,12 +168,12 @@ ON CONFLICT (id) DO NOTHING;
 -- ---------------------------------------------------------------------------------------------------------------------
 -- 3.3 SUPPORT REQUEST (Sample data - references users and bikes from other services)
 -- ---------------------------------------------------------------------------------------------------------------------
-INSERT INTO support_request (id, external_id, user_external_id, bike_external_id, is_near_location, photo_url, error_code_id, support_request_status_id, date_created, last_date_modified, created_by, last_modified_by, is_deleted) VALUES
-(1, '550e8400-e29b-41d4-a716-446655440401', 'usr-ext-00007', 'bike-ext-00201', true, 'https://example.com/photos/issue1.jpg', 1, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
-(2, '550e8400-e29b-41d4-a716-446655440402', 'usr-ext-00008', 'bike-ext-00202', false, NULL, 2, 2, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
-(3, '550e8400-e29b-41d4-a716-446655440403', 'usr-ext-00009', 'bike-ext-00203', true, 'https://example.com/photos/issue3.jpg', NULL, 3, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
-(4, '550e8400-e29b-41d4-a716-446655440404', 'usr-ext-00007', NULL, false, NULL, 3, 4, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
-(5, '550e8400-e29b-41d4-a716-446655440405', 'usr-ext-00008', 'bike-ext-00204', true, 'https://example.com/photos/issue5.jpg', 4, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false)
+INSERT INTO support_request (id, external_id, user_external_id, bike_external_id, company_external_id, is_near_location, photo_url, error_code_id, support_request_status_id, date_created, last_date_modified, created_by, last_modified_by, is_deleted) VALUES
+(1, '550e8400-e29b-41d4-a716-446655440401', 'usr-ext-00007', 'bike-ext-00201', 'company-ext-001', true, 'https://example.com/photos/issue1.jpg', 1, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(2, '550e8400-e29b-41d4-a716-446655440402', 'usr-ext-00008', 'bike-ext-00202', 'company-ext-001', false, NULL, 2, 2, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(3, '550e8400-e29b-41d4-a716-446655440403', 'usr-ext-00009', 'bike-ext-00203', 'company-ext-002', true, 'https://example.com/photos/issue3.jpg', NULL, 3, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(4, '550e8400-e29b-41d4-a716-446655440404', 'usr-ext-00007', NULL, 'company-ext-001', false, NULL, 3, 4, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(5, '550e8400-e29b-41d4-a716-446655440405', 'usr-ext-00008', 'bike-ext-00204', 'company-ext-001', true, 'https://example.com/photos/issue5.jpg', 4, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false)
 ON CONFLICT (id) DO NOTHING;
 
 -- ---------------------------------------------------------------------------------------------------------------------
@@ -248,18 +259,7 @@ INSERT INTO bike_inspection_item_photo (id, bike_inspection_item_id, photo_url, 
 ON CONFLICT (id) DO NOTHING;
 
 -- ---------------------------------------------------------------------------------------------------------------------
--- 3.10 BIKE UNIT (Sample data)
--- ---------------------------------------------------------------------------------------------------------------------
-INSERT INTO bike_unit (id, external_id, name, company_external_id, date_created, last_date_modified, created_by, last_modified_by, is_deleted) VALUES
-(1, '550e8400-e29b-41d4-a716-446655441201', 'Front Wheel', 'company-ext-001', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
-(2, '550e8400-e29b-41d4-a716-446655441202', 'Rear Wheel', 'company-ext-001', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
-(3, '550e8400-e29b-41d4-a716-446655441203', 'Battery Pack', 'company-ext-001', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
-(4, '550e8400-e29b-41d4-a716-446655441204', 'Motor Assembly', 'company-ext-002', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
-(5, '550e8400-e29b-41d4-a716-446655441205', 'Brake System', 'company-ext-002', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false)
-ON CONFLICT (id) DO NOTHING;
-
--- ---------------------------------------------------------------------------------------------------------------------
--- 3.11 BIKE INSPECTION ITEM BIKE ISSUE (Junction Table)
+-- 3.10 BIKE INSPECTION ITEM BIKE ISSUE (Junction Table)
 -- ---------------------------------------------------------------------------------------------------------------------
 INSERT INTO bike_inspection_item_bike_issue (id, external_id, bike_inspection_item_id, bike_issue_id, company_external_id, date_created, last_date_modified, created_by, last_modified_by, is_deleted) VALUES
 (1, '550e8400-e29b-41d4-a716-446655441101', 5, 9, 'company-ext-001', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
@@ -269,7 +269,7 @@ INSERT INTO bike_inspection_item_bike_issue (id, external_id, bike_inspection_it
 ON CONFLICT (id) DO NOTHING;
 
 -- ---------------------------------------------------------------------------------------------------------------------
--- 3.12 BIKE INSPECTION ITEM BIKE UNIT (Junction Table)
+-- 3.11 BIKE INSPECTION ITEM BIKE UNIT (Junction Table)
 -- ---------------------------------------------------------------------------------------------------------------------
 INSERT INTO bike_inspection_item_bike_unit (id, external_id, bike_inspection_item_id, bike_unit_id, has_problem, company_external_id, date_created, last_date_modified, created_by, last_modified_by, is_deleted) VALUES
 (1, '550e8400-e29b-41d4-a716-446655441301', 5, 5, true, 'company-ext-001', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),

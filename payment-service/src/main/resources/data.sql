@@ -63,7 +63,8 @@ ON CONFLICT (id) DO NOTHING;
 INSERT INTO service_providers (id, external_id, code, name, date_created, last_date_modified, created_by, last_modified_by, is_deleted) VALUES
 (1, '550e8400-e29b-41d4-a716-446655440031', 'STRIPE', 'Stripe', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
 (2, '550e8400-e29b-41d4-a716-446655440032', 'PAYPAL', 'PayPal', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
-(3, '550e8400-e29b-41d4-a716-446655440033', 'INTERNAL', 'Internal Processing', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false)
+(3, '550e8400-e29b-41d4-a716-446655440033', 'INTERNAL', 'Internal Processing', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(4, '550e8400-e29b-41d4-a716-446655440034', 'MULTISAFEPAY', 'MultiSafePay', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false)
 ON CONFLICT (id) DO NOTHING;
 
 -- =====================================================================================================================
@@ -76,24 +77,41 @@ ON CONFLICT (id) DO NOTHING;
 -- ---------------------------------------------------------------------------------------------------------------------
 -- 2.1 USER PAYMENT PROFILES (Sample data - references users from auth-service)
 -- ---------------------------------------------------------------------------------------------------------------------
+-- Stripe customer examples
 INSERT INTO user_payment_profiles (id, external_id, user_external_id, stripe_customer_id, is_active, date_created, last_date_modified, created_by, last_modified_by, is_deleted) VALUES
 (1, '550e8400-e29b-41d4-a716-446655440101', 'usr-ext-00007', 'cus_test_customer001', true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
 (2, '550e8400-e29b-41d4-a716-446655440102', 'usr-ext-00008', 'cus_test_customer002', true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
 (3, '550e8400-e29b-41d4-a716-446655440103', 'usr-ext-00009', 'cus_test_customer003', true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false)
 ON CONFLICT (id) DO NOTHING;
 
+-- MultiSafePay customer examples (customer ID is typically the email address)
+INSERT INTO user_payment_profiles (id, external_id, user_external_id, multi_safepay_customer_id, is_active, date_created, last_date_modified, created_by, last_modified_by, is_deleted) VALUES
+(4, '550e8400-e29b-41d4-a716-446655440104', 'usr-ext-00010', 'john.doe@example.com', true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(5, '550e8400-e29b-41d4-a716-446655440105', 'usr-ext-00011', 'jane.smith@example.com', true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(6, '550e8400-e29b-41d4-a716-446655440106', 'usr-ext-00012', 'bob.johnson@example.com', true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false)
+ON CONFLICT (id) DO NOTHING;
+
 -- ---------------------------------------------------------------------------------------------------------------------
 -- 2.2 USER PAYMENT METHODS (Sample data)
 -- ---------------------------------------------------------------------------------------------------------------------
+-- Stripe payment methods
 INSERT INTO user_payment_methods (id, external_id, user_payment_profile_id, payment_method_id, stripe_payment_method_id, is_default, is_active, date_created, last_date_modified, created_by, last_modified_by, is_deleted) VALUES
 (1, '550e8400-e29b-41d4-a716-446655440051', 1, 1, 'pm_test_card1', true, true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
 (2, '550e8400-e29b-41d4-a716-446655440052', 1, 1, 'pm_test_card2', false, true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
 (3, '550e8400-e29b-41d4-a716-446655440053', 2, 1, 'pm_test_card3', true, true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false)
 ON CONFLICT (id) DO NOTHING;
 
+-- MultiSafePay payment methods (tokens for recurring payments)
+INSERT INTO user_payment_methods (id, external_id, user_payment_profile_id, payment_method_id, multi_safepay_token_id, is_default, is_active, date_created, last_date_modified, created_by, last_modified_by, is_deleted) VALUES
+(4, '550e8400-e29b-41d4-a716-446655440054', 4, 1, 'msp_token_visa_001', true, true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(5, '550e8400-e29b-41d4-a716-446655440055', 4, 2, 'msp_token_maestro_001', false, true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(6, '550e8400-e29b-41d4-a716-446655440056', 5, 1, 'msp_token_mastercard_001', true, true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false)
+ON CONFLICT (id) DO NOTHING;
+
 -- ---------------------------------------------------------------------------------------------------------------------
 -- 2.3 FINANCIAL TRANSACTIONS (Sample data)
 -- ---------------------------------------------------------------------------------------------------------------------
+-- Stripe transactions
 INSERT INTO financial_transactions (id, external_id, payer_external_id, recipient_external_id, amount, currency_id, date_time, payment_method_id, payment_status_id, service_provider_id, stripe_payment_intent_id, stripe_charge_id, date_created, last_date_modified, created_by, last_modified_by, is_deleted) VALUES
 (1, '550e8400-e29b-41d4-a716-446655440201', 'usr-ext-00007', 'company-ext-001', 25.00, 2, CURRENT_TIMESTAMP, 1, 2, 1, 'pi_test_001', 'ch_test_001', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
 (2, '550e8400-e29b-41d4-a716-446655440202', 'usr-ext-00008', 'company-ext-001', 35.50, 2, CURRENT_TIMESTAMP, 1, 2, 1, 'pi_test_002', 'ch_test_002', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
@@ -101,27 +119,55 @@ INSERT INTO financial_transactions (id, external_id, payer_external_id, recipien
 (4, '550e8400-e29b-41d4-a716-446655440204', 'usr-ext-00007', 'company-ext-001', 50.00, 2, CURRENT_TIMESTAMP, 1, 1, 1, 'pi_test_004', NULL, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false)
 ON CONFLICT (id) DO NOTHING;
 
+-- MultiSafePay transactions
+INSERT INTO financial_transactions (id, external_id, payer_external_id, recipient_external_id, amount, currency_id, date_time, payment_method_id, payment_status_id, service_provider_id, multi_safepay_order_id, multi_safepay_transaction_id, date_created, last_date_modified, created_by, last_modified_by, is_deleted) VALUES
+(5, '550e8400-e29b-41d4-a716-446655440205', 'usr-ext-00010', 'company-ext-001', 45.00, 2, CURRENT_TIMESTAMP, 1, 2, 4, 'order_msp_test_001', '123456789', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(6, '550e8400-e29b-41d4-a716-446655440206', 'usr-ext-00011', 'company-ext-001', 60.25, 2, CURRENT_TIMESTAMP, 1, 2, 4, 'order_msp_test_002', '123456790', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(7, '550e8400-e29b-41d4-a716-446655440207', 'usr-ext-00012', 'company-ext-002', 28.50, 2, CURRENT_TIMESTAMP, 4, 2, 4, 'order_msp_test_003', '123456791', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(8, '550e8400-e29b-41d4-a716-446655440208', 'usr-ext-00010', 'company-ext-001', 75.00, 2, CURRENT_TIMESTAMP, 1, 1, 4, 'order_msp_test_004', NULL, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false)
+ON CONFLICT (id) DO NOTHING;
+
 -- ---------------------------------------------------------------------------------------------------------------------
 -- 2.4 RENTAL FIN TRANSACTIONS (Sample data - references rentals from rental-service)
 -- ---------------------------------------------------------------------------------------------------------------------
+-- Stripe rental transactions
 INSERT INTO rental_fin_transactions (id, external_id, rental_external_id, financial_transaction_id, date_created, last_date_modified, created_by, last_modified_by, is_deleted) VALUES
 (1, '550e8400-e29b-41d4-a716-446655440301', 'rental-ext-00101', 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
 (2, '550e8400-e29b-41d4-a716-446655440302', 'rental-ext-00102', 2, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
 (3, '550e8400-e29b-41d4-a716-446655440303', 'rental-ext-00103', 3, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false)
 ON CONFLICT (id) DO NOTHING;
 
+-- MultiSafePay rental transactions
+INSERT INTO rental_fin_transactions (id, external_id, rental_external_id, financial_transaction_id, date_created, last_date_modified, created_by, last_modified_by, is_deleted) VALUES
+(4, '550e8400-e29b-41d4-a716-446655440304', 'rental-ext-00104', 5, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(5, '550e8400-e29b-41d4-a716-446655440305', 'rental-ext-00105', 6, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(6, '550e8400-e29b-41d4-a716-446655440306', 'rental-ext-00106', 7, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false)
+ON CONFLICT (id) DO NOTHING;
+
 -- ---------------------------------------------------------------------------------------------------------------------
 -- 2.5 B2B SALE FIN TRANSACTIONS (Sample data - references B2B sales from rental-service)
 -- ---------------------------------------------------------------------------------------------------------------------
+-- Stripe B2B transaction
 INSERT INTO b2b_sale_fin_transactions (id, external_id, b2b_sale_external_id, financial_transaction_id, date_created, last_date_modified, created_by, last_modified_by, is_deleted) VALUES
 (1, '550e8400-e29b-41d4-a716-446655440401', 'b2b-sale-ext-001', 4, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false)
+ON CONFLICT (id) DO NOTHING;
+
+-- MultiSafePay B2B transaction
+INSERT INTO b2b_sale_fin_transactions (id, external_id, b2b_sale_external_id, financial_transaction_id, date_created, last_date_modified, created_by, last_modified_by, is_deleted) VALUES
+(2, '550e8400-e29b-41d4-a716-446655440402', 'b2b-sale-ext-002', 8, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false)
 ON CONFLICT (id) DO NOTHING;
 
 -- ---------------------------------------------------------------------------------------------------------------------
 -- 2.6 B2B SUBSCRIPTION FIN TRANSACTIONS (Sample data)
 -- ---------------------------------------------------------------------------------------------------------------------
+-- Stripe subscription transaction
 INSERT INTO b2b_subscription_fin_transactions (id, external_id, b2b_subscription_external_id, financial_transaction_id, date_created, last_date_modified, created_by, last_modified_by, is_deleted) VALUES
 (1, '550e8400-e29b-41d4-a716-446655440501', 'b2b-subscription-ext-001', 4, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false)
+ON CONFLICT (id) DO NOTHING;
+
+-- MultiSafePay subscription transaction
+INSERT INTO b2b_subscription_fin_transactions (id, external_id, b2b_subscription_external_id, financial_transaction_id, date_created, last_date_modified, created_by, last_modified_by, is_deleted) VALUES
+(2, '550e8400-e29b-41d4-a716-446655440502', 'b2b-subscription-ext-002', 8, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false)
 ON CONFLICT (id) DO NOTHING;
 
 -- ---------------------------------------------------------------------------------------------------------------------
@@ -176,9 +222,13 @@ SELECT setval('payout_fin_transactions_id_seq', (SELECT COALESCE(MAX(id), 1) FRO
 -- Database initialization completed successfully!
 -- 
 -- Summary:
--- - Required lookup tables: payment_statuses (6), payment_methods (5), currencies (5), service_providers (3)
--- - Sample data: user_payment_profiles (3), user_payment_methods (3), financial_transactions (4)
--- - Sample data: rental_fin_transactions (3), b2b_sale_fin_transactions (1), b2b_subscription_fin_transactions (1)
+-- - Required lookup tables: payment_statuses (6), payment_methods (5), currencies (5), service_providers (4)
+-- - Sample data: user_payment_profiles (6: 3 Stripe + 3 MultiSafePay)
+-- - Sample data: user_payment_methods (6: 3 Stripe + 3 MultiSafePay)
+-- - Sample data: financial_transactions (8: 4 Stripe + 4 MultiSafePay)
+-- - Sample data: rental_fin_transactions (6: 3 Stripe + 3 MultiSafePay)
+-- - Sample data: b2b_sale_fin_transactions (2: 1 Stripe + 1 MultiSafePay)
+-- - Sample data: b2b_subscription_fin_transactions (2: 1 Stripe + 1 MultiSafePay)
 -- - Sample data: b2b_revenue_share_payouts (2), b2b_revenue_share_payout_items (5), payout_fin_transactions (1)
 -- 
 -- Cross-Service References:

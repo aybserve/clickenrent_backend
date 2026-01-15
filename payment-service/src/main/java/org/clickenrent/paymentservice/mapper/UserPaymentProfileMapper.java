@@ -23,6 +23,7 @@ public class UserPaymentProfileMapper {
                 .externalId(entity.getExternalId())
                 .userExternalId(entity.getUserExternalId())
                 .stripeCustomerId(entity.getStripeCustomerId())
+                .multiSafepayCustomerId(entity.getMultiSafepayCustomerId())
                 .isActive(entity.getIsActive())
                 .dateCreated(entity.getDateCreated())
                 .lastDateModified(entity.getLastDateModified())
@@ -41,6 +42,7 @@ public class UserPaymentProfileMapper {
                 .externalId(dto.getExternalId())
                 .userExternalId(dto.getUserExternalId())
                 .stripeCustomerId(dto.getStripeCustomerId())
+                .multiSafepayCustomerId(dto.getMultiSafepayCustomerId())
                 .isActive(dto.getIsActive())
                 .build();
     }

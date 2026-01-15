@@ -37,6 +37,9 @@ public class UserPaymentProfile extends BaseAuditEntity {
     @Column(unique = true, length = 255)
     private String stripeCustomerId;
 
+    @Column(length = 255)
+    private String multiSafepayCustomerId;
+
     @Builder.Default
     @Column(nullable = false)
     private Boolean isActive = true;

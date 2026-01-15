@@ -27,6 +27,8 @@ public class UserPaymentProfileDTO {
     
     private String stripeCustomerId;
     
+    private String multiSafepayCustomerId;
+    
     @NotNull(message = "Active status is required")
     private Boolean isActive;
     

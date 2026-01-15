@@ -27,7 +27,7 @@ public class UserPaymentMethodService {
     private final UserPaymentProfileRepository userPaymentProfileRepository;
     private final UserPaymentMethodMapper userPaymentMethodMapper;
     private final SecurityService securityService;
-    private final StripeService stripeService;
+    private final PaymentProviderService paymentProviderService;
 
     @Transactional(readOnly = true)
     public List<UserPaymentMethodDTO> findAll() {
@@ -83,16 +83,28 @@ public class UserPaymentMethodService {
         
         log.info("Attaching payment method: {} to profile: {}", stripePaymentMethodId, profileId);
         
-        // Attach payment method to Stripe customer
-        stripeService.attachPaymentMethod(stripePaymentMethodId, profile.getStripeCustomerId());
+        // Get customer ID based on active provider
+        String customerId = paymentProviderService.isStripeActive() 
+                ? profile.getStripeCustomerId() 
+                : profile.getMultiSafepayCustomerId();
         
-        // Create payment method record (simplified - you'd typically get more details from Stripe)
-        UserPaymentMethod method = UserPaymentMethod.builder()
+        // Attach payment method to customer
+        paymentProviderService.attachPaymentMethod(stripePaymentMethodId, customerId);
+        
+        // Create payment method record
+        UserPaymentMethod.UserPaymentMethodBuilder methodBuilder = UserPaymentMethod.builder()
                 .userPaymentProfile(profile)
-                .stripePaymentMethodId(stripePaymentMethodId)
                 .isDefault(false)
-                .isActive(true)
-                .build();
+                .isActive(true);
+        
+        // Set provider-specific payment method ID
+        if (paymentProviderService.isStripeActive()) {
+            methodBuilder.stripePaymentMethodId(stripePaymentMethodId);
+        } else if (paymentProviderService.isMultiSafepayActive()) {
+            methodBuilder.multiSafepayTokenId(stripePaymentMethodId);
+        }
+        
+        UserPaymentMethod method = methodBuilder.build();
         
         UserPaymentMethod savedMethod = userPaymentMethodRepository.save(method);
         log.info("Payment method attached successfully: {}", savedMethod.getId());

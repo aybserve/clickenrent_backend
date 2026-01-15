@@ -53,6 +53,10 @@ public class FinancialTransactionDTO {
     
     private String stripeRefundId;
     
+    private String multiSafepayOrderId;
+    
+    private String multiSafepayTransactionId;
+    
     private Long originalTransactionId;
     
     // Audit fields

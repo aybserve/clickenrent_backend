@@ -1008,6 +1008,16 @@ public class GatewayConfig {
                         .path("/api/v1/webhooks/stripe/**")
                         .uri("lb://payment-service"))
 
+                // Public MultiSafePay Webhook Route - No JWT validation required
+                .route("multisafepay-webhooks", r -> r
+                        .path("/api/v1/webhooks/multisafepay/**")
+                        .uri("lb://payment-service"))
+
+                // Public MultiSafePay Test Routes - For development/testing (should be disabled in production)
+                .route("multisafepay-test", r -> r
+                        .path("/api/v1/multisafepay/test/**")
+                        .uri("lb://payment-service"))
+
                 // Reference Data Routes
                 .route("currencies", r -> r
                         .path("/api/v1/currencies/**")

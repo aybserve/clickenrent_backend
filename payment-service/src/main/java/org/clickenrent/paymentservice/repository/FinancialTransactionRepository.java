@@ -19,6 +19,8 @@ public interface FinancialTransactionRepository extends JpaRepository<FinancialT
     
     Optional<FinancialTransaction> findByStripePaymentIntentId(String stripePaymentIntentId);
     
+    Optional<FinancialTransaction> findByMultiSafepayOrderId(String multiSafepayOrderId);
+    
     Optional<FinancialTransaction> findByExternalId(String externalId);
     
     List<FinancialTransaction> findByPaymentStatus(PaymentStatus status);

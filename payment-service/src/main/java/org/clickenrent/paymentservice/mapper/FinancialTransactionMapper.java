@@ -39,6 +39,8 @@ public class FinancialTransactionMapper {
                 .stripePaymentIntentId(entity.getStripePaymentIntentId())
                 .stripeChargeId(entity.getStripeChargeId())
                 .stripeRefundId(entity.getStripeRefundId())
+                .multiSafepayOrderId(entity.getMultiSafepayOrderId())
+                .multiSafepayTransactionId(entity.getMultiSafepayTransactionId())
                 .originalTransactionId(entity.getOriginalTransactionId())
                 .dateCreated(entity.getDateCreated())
                 .lastDateModified(entity.getLastDateModified())
@@ -66,6 +68,8 @@ public class FinancialTransactionMapper {
                 .stripePaymentIntentId(dto.getStripePaymentIntentId())
                 .stripeChargeId(dto.getStripeChargeId())
                 .stripeRefundId(dto.getStripeRefundId())
+                .multiSafepayOrderId(dto.getMultiSafepayOrderId())
+                .multiSafepayTransactionId(dto.getMultiSafepayTransactionId())
                 .originalTransactionId(dto.getOriginalTransactionId())
                 .build();
     }

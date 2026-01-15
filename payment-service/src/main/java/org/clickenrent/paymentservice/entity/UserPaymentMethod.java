@@ -36,6 +36,9 @@ public class UserPaymentMethod extends BaseAuditEntity {
     @Column(length = 255)
     private String stripePaymentMethodId;
 
+    @Column(length = 255)
+    private String multiSafepayTokenId;
+
     @Builder.Default
     @Column(nullable = false)
     private Boolean isDefault = false;
