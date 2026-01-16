@@ -1018,6 +1018,17 @@ public class GatewayConfig {
                         .path("/api/v1/multisafepay/test/**")
                         .uri("lb://payment-service"))
 
+                // Protected MultiSafePay Production Routes - Requires JWT authentication
+                .route("multisafepay-production", r -> r
+                        .path("/api/v1/multisafepay/**")
+                        .filters(f -> f
+                                .filter(jwtAuthenticationFilter)
+                                .requestRateLimiter(c -> c
+                                        .setRateLimiter(userRateLimiter)
+                                        .setKeyResolver(userKeyResolver)
+                                        .setStatusCode(HttpStatus.TOO_MANY_REQUESTS)))
+                        .uri("lb://payment-service"))
+
                 // Reference Data Routes
                 .route("currencies", r -> r
                         .path("/api/v1/currencies/**")

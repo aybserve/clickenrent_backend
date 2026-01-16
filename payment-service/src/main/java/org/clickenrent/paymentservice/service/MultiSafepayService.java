@@ -414,4 +414,436 @@ public class MultiSafepayService {
     public String getQrUrl(JsonObject orderResponse) {
         return MultiSafepayClient.getQrUrl(orderResponse);
     }
+
+    // === New API Methods ===
+
+    /**
+     * Capture authorized payment
+     * 
+     * @param orderId Order ID
+     * @return Response as JsonObject
+     */
+    public JsonObject captureOrder(String orderId) {
+        try {
+            JsonObject response = MultiSafepayClient.captureOrder(orderId);
+            log.info("Captured payment for MultiSafePay order: {}", orderId);
+            return response;
+        } catch (Exception e) {
+            log.error("Failed to capture payment for MultiSafePay order: {}", orderId, e);
+            throw new MultiSafepayIntegrationException("Failed to capture payment: " + e.getMessage(), e);
+        }
+    }
+
+    /**
+     * Cancel authorized payment
+     * 
+     * @param orderId Order ID
+     * @return Response as JsonObject
+     */
+    public JsonObject cancelAuthorization(String orderId) {
+        try {
+            JsonObject response = MultiSafepayClient.cancelAuthorization(orderId);
+            log.info("Cancelled authorization for MultiSafePay order: {}", orderId);
+            return response;
+        } catch (Exception e) {
+            log.error("Failed to cancel authorization for MultiSafePay order: {}", orderId, e);
+            throw new MultiSafepayIntegrationException("Failed to cancel authorization: " + e.getMessage(), e);
+        }
+    }
+
+    /**
+     * Extend order expiration
+     * 
+     * @param orderId Order ID
+     * @param days Number of days to extend
+     * @return Response as JsonObject
+     */
+    public JsonObject extendOrderExpiration(String orderId, int days) {
+        try {
+            JsonObject response = MultiSafepayClient.extendExpiration(orderId, days);
+            log.info("Extended expiration for MultiSafePay order: {} by {} days", orderId, days);
+            return response;
+        } catch (Exception e) {
+            log.error("Failed to extend expiration for MultiSafePay order: {}", orderId, e);
+            throw new MultiSafepayIntegrationException("Failed to extend expiration: " + e.getMessage(), e);
+        }
+    }
+
+    /**
+     * Cancel Bancontact QR payment
+     * 
+     * @param orderId Order ID
+     * @return Response as JsonObject
+     */
+    public JsonObject cancelBancontactQRPayment(String orderId) {
+        try {
+            JsonObject response = MultiSafepayClient.cancelBancontactQR(orderId);
+            log.info("Cancelled Bancontact QR payment for order: {}", orderId);
+            return response;
+        } catch (Exception e) {
+            log.error("Failed to cancel Bancontact QR payment for order: {}", orderId, e);
+            throw new MultiSafepayIntegrationException("Failed to cancel Bancontact QR payment: " + e.getMessage(), e);
+        }
+    }
+
+    /**
+     * Put PAD (Pay After Delivery) order on hold
+     * 
+     * @param orderId Order ID
+     * @return Response as JsonObject
+     */
+    public JsonObject putPADOrderOnHold(String orderId) {
+        try {
+            JsonObject response = MultiSafepayClient.putPADOrderOnHold(orderId);
+            log.info("Put PAD order on hold: {}", orderId);
+            return response;
+        } catch (Exception e) {
+            log.error("Failed to put PAD order on hold: {}", orderId, e);
+            throw new MultiSafepayIntegrationException("Failed to put PAD order on hold: " + e.getMessage(), e);
+        }
+    }
+
+    /**
+     * Cancel a refund
+     * 
+     * @param orderId Order ID
+     * @param refundId Refund ID
+     * @return Response as JsonObject
+     */
+    public JsonObject cancelRefund(String orderId, String refundId) {
+        try {
+            JsonObject response = MultiSafepayClient.cancelRefund(orderId, refundId);
+            log.info("Cancelled refund {} for MultiSafePay order: {}", refundId, orderId);
+            return response;
+        } catch (Exception e) {
+            log.error("Failed to cancel refund for MultiSafePay order: {}", orderId, e);
+            throw new MultiSafepayIntegrationException("Failed to cancel refund: " + e.getMessage(), e);
+        }
+    }
+
+    /**
+     * Challenge a chargeback
+     * 
+     * @param orderId Order ID
+     * @param reason Challenge reason
+     * @return Response as JsonObject
+     */
+    public JsonObject challengeChargeback(String orderId, String reason) {
+        try {
+            JsonObject response = MultiSafepayClient.challengeChargeback(orderId, reason);
+            log.info("Challenged chargeback for MultiSafePay order: {}", orderId);
+            return response;
+        } catch (Exception e) {
+            log.error("Failed to challenge chargeback for MultiSafePay order: {}", orderId, e);
+            throw new MultiSafepayIntegrationException("Failed to challenge chargeback: " + e.getMessage(), e);
+        }
+    }
+
+    /**
+     * List payment tokens
+     * 
+     * @param page Page number
+     * @param pageSize Page size
+     * @return Tokens list as JsonObject
+     */
+    public JsonObject listTokens(int page, int pageSize) {
+        try {
+            JsonObject response = MultiSafepayClient.listTokens(page, pageSize);
+            log.info("Retrieved MultiSafePay tokens list, page: {}", page);
+            return response;
+        } catch (Exception e) {
+            log.error("Failed to retrieve MultiSafePay tokens", e);
+            throw new MultiSafepayIntegrationException("Failed to retrieve tokens: " + e.getMessage(), e);
+        }
+    }
+
+    /**
+     * Get token details
+     * 
+     * @param tokenId Token ID
+     * @return Token details as JsonObject
+     */
+    public JsonObject getToken(String tokenId) {
+        try {
+            JsonObject response = MultiSafepayClient.getToken(tokenId);
+            log.info("Retrieved MultiSafePay token: {}", tokenId);
+            return response;
+        } catch (Exception e) {
+            log.error("Failed to retrieve MultiSafePay token: {}", tokenId, e);
+            throw new MultiSafepayIntegrationException("Failed to retrieve token: " + e.getMessage(), e);
+        }
+    }
+
+    /**
+     * Update a token
+     * 
+     * @param tokenId Token ID
+     * @param token Token data to update
+     * @return Response as JsonObject
+     */
+    public JsonObject updateToken(String tokenId, org.clickenrent.paymentservice.client.multisafepay.model.Token token) {
+        try {
+            JsonObject response = MultiSafepayClient.updateToken(tokenId, token);
+            log.info("Updated MultiSafePay token: {}", tokenId);
+            return response;
+        } catch (Exception e) {
+            log.error("Failed to update MultiSafePay token: {}", tokenId, e);
+            throw new MultiSafepayIntegrationException("Failed to update token: " + e.getMessage(), e);
+        }
+    }
+
+    /**
+     * Delete a token
+     * 
+     * @param tokenId Token ID
+     * @return Response as JsonObject
+     */
+    public JsonObject deleteToken(String tokenId) {
+        try {
+            JsonObject response = MultiSafepayClient.deleteToken(tokenId);
+            log.info("Deleted MultiSafePay token: {}", tokenId);
+            return response;
+        } catch (Exception e) {
+            log.error("Failed to delete MultiSafePay token: {}", tokenId, e);
+            throw new MultiSafepayIntegrationException("Failed to delete token: " + e.getMessage(), e);
+        }
+    }
+
+    /**
+     * List transactions with pagination
+     * 
+     * @param page Page number
+     * @param pageSize Page size
+     * @return Transactions list as JsonObject
+     */
+    public JsonObject listTransactions(int page, int pageSize) {
+        try {
+            JsonObject response = MultiSafepayClient.listTransactions(page, pageSize);
+            log.info("Retrieved MultiSafePay transactions list, page: {}", page);
+            return response;
+        } catch (Exception e) {
+            log.error("Failed to retrieve MultiSafePay transactions", e);
+            throw new MultiSafepayIntegrationException("Failed to retrieve transactions: " + e.getMessage(), e);
+        }
+    }
+
+    /**
+     * List payment methods
+     * 
+     * @return Payment methods list as JsonObject
+     */
+    public JsonObject listPaymentMethods() {
+        try {
+            JsonObject response = MultiSafepayClient.listPaymentMethods();
+            log.info("Retrieved MultiSafePay payment methods");
+            return response;
+        } catch (Exception e) {
+            log.error("Failed to retrieve MultiSafePay payment methods", e);
+            throw new MultiSafepayIntegrationException("Failed to retrieve payment methods: " + e.getMessage(), e);
+        }
+    }
+
+    /**
+     * Get payment method details
+     * 
+     * @param methodCode Payment method code
+     * @return Payment method details as JsonObject
+     */
+    public JsonObject getPaymentMethod(String methodCode) {
+        try {
+            JsonObject response = MultiSafepayClient.getPaymentMethod(methodCode);
+            log.info("Retrieved MultiSafePay payment method: {}", methodCode);
+            return response;
+        } catch (Exception e) {
+            log.error("Failed to retrieve MultiSafePay payment method: {}", methodCode, e);
+            throw new MultiSafepayIntegrationException("Failed to retrieve payment method: " + e.getMessage(), e);
+        }
+    }
+
+    /**
+     * Get site configuration
+     * 
+     * @return Site config as JsonObject
+     */
+    public JsonObject getSiteConfiguration() {
+        try {
+            JsonObject response = MultiSafepayClient.getSiteConfig();
+            log.info("Retrieved MultiSafePay site configuration");
+            return response;
+        } catch (Exception e) {
+            log.error("Failed to retrieve MultiSafePay site configuration", e);
+            throw new MultiSafepayIntegrationException("Failed to retrieve site config: " + e.getMessage(), e);
+        }
+    }
+
+    /**
+     * Update site configuration
+     * 
+     * @param siteConfig Site configuration data
+     * @return Response as JsonObject
+     */
+    public JsonObject updateSiteConfiguration(org.clickenrent.paymentservice.client.multisafepay.model.SiteConfig siteConfig) {
+        try {
+            JsonObject response = MultiSafepayClient.updateSiteConfig(siteConfig);
+            log.info("Updated MultiSafePay site configuration");
+            return response;
+        } catch (Exception e) {
+            log.error("Failed to update MultiSafePay site configuration", e);
+            throw new MultiSafepayIntegrationException("Failed to update site config: " + e.getMessage(), e);
+        }
+    }
+
+    /**
+     * Get closing balances for reconciliation
+     * 
+     * @param fromDate From date (yyyy-MM-dd)
+     * @param toDate To date (yyyy-MM-dd)
+     * @return Closing balances as JsonObject
+     */
+    public JsonObject getClosingBalances(String fromDate, String toDate) {
+        try {
+            JsonObject response = MultiSafepayClient.listClosingBalances(fromDate, toDate);
+            log.info("Retrieved MultiSafePay closing balances from {} to {}", fromDate, toDate);
+            return response;
+        } catch (Exception e) {
+            log.error("Failed to retrieve MultiSafePay closing balances", e);
+            throw new MultiSafepayIntegrationException("Failed to retrieve closing balances: " + e.getMessage(), e);
+        }
+    }
+
+    /**
+     * List POS terminals
+     * 
+     * @return Terminals list as JsonObject
+     */
+    public JsonObject listTerminals() {
+        try {
+            JsonObject response = MultiSafepayClient.listTerminals();
+            log.info("Retrieved MultiSafePay terminals");
+            return response;
+        } catch (Exception e) {
+            log.error("Failed to retrieve MultiSafePay terminals", e);
+            throw new MultiSafepayIntegrationException("Failed to retrieve terminals: " + e.getMessage(), e);
+        }
+    }
+
+    /**
+     * List POS terminals by group
+     * 
+     * @param groupId Group ID
+     * @return Terminals list as JsonObject
+     */
+    public JsonObject listTerminalsByGroup(String groupId) {
+        try {
+            JsonObject response = MultiSafepayClient.listTerminalsByGroup(groupId);
+            log.info("Retrieved MultiSafePay terminals for group: {}", groupId);
+            return response;
+        } catch (Exception e) {
+            log.error("Failed to retrieve MultiSafePay terminals for group: {}", groupId, e);
+            throw new MultiSafepayIntegrationException("Failed to retrieve terminals by group: " + e.getMessage(), e);
+        }
+    }
+
+    /**
+     * Get POS transaction receipt
+     * 
+     * @param terminalId Terminal ID
+     * @param transactionId Transaction ID
+     * @return Receipt as JsonObject
+     */
+    public JsonObject getReceipt(String terminalId, String transactionId) {
+        try {
+            JsonObject response = MultiSafepayClient.getReceipt(terminalId, transactionId);
+            log.info("Retrieved receipt for terminal: {}, transaction: {}", terminalId, transactionId);
+            return response;
+        } catch (Exception e) {
+            log.error("Failed to retrieve receipt for terminal: {}, transaction: {}", terminalId, transactionId, e);
+            throw new MultiSafepayIntegrationException("Failed to retrieve receipt: " + e.getMessage(), e);
+        }
+    }
+
+    /**
+     * Cancel POS transaction
+     * 
+     * @param terminalId Terminal ID
+     * @param transactionId Transaction ID
+     * @return Response as JsonObject
+     */
+    public JsonObject cancelPOSTransaction(String terminalId, String transactionId) {
+        try {
+            JsonObject response = MultiSafepayClient.cancelTransaction(terminalId, transactionId);
+            log.info("Cancelled POS transaction for terminal: {}, transaction: {}", terminalId, transactionId);
+            return response;
+        } catch (Exception e) {
+            log.error("Failed to cancel POS transaction for terminal: {}, transaction: {}", terminalId, transactionId, e);
+            throw new MultiSafepayIntegrationException("Failed to cancel POS transaction: " + e.getMessage(), e);
+        }
+    }
+
+    /**
+     * Create POS terminal
+     * 
+     * @param terminal Terminal data
+     * @return Response as JsonObject
+     */
+    public JsonObject createPOSTerminal(org.clickenrent.paymentservice.client.multisafepay.model.Terminal terminal) {
+        try {
+            JsonObject response = MultiSafepayClient.createTerminal(terminal);
+            log.info("Created POS terminal");
+            return response;
+        } catch (Exception e) {
+            log.error("Failed to create POS terminal", e);
+            throw new MultiSafepayIntegrationException("Failed to create POS terminal: " + e.getMessage(), e);
+        }
+    }
+
+    /**
+     * Verify webhook signature
+     * 
+     * @param payload Webhook payload
+     * @param signature Webhook signature
+     * @return true if signature is valid
+     */
+    public boolean verifyWebhookSignature(String payload, String signature) {
+        try {
+            boolean valid = MultiSafepayClient.verifySignature(payload, signature, multiSafepayApiKey);
+            log.info("Webhook signature verification: {}", valid ? "VALID" : "INVALID");
+            return valid;
+        } catch (Exception e) {
+            log.error("Failed to verify webhook signature", e);
+            return false;
+        }
+    }
+
+    /**
+     * Verify MultiSafePay API connection
+     * 
+     * @return Connection status map
+     */
+    public java.util.Map<String, Object> verifyConnection() {
+        java.util.Map<String, Object> result = new java.util.HashMap<>();
+        try {
+            JsonObject response = getSiteConfiguration();
+            boolean connected = response != null && response.has("success") && response.get("success").getAsBoolean();
+            
+            result.put("connected", connected);
+            result.put("testMode", testMode);
+            result.put("apiKeyConfigured", multiSafepayApiKey != null && !multiSafepayApiKey.isEmpty());
+            
+            if (connected && response.has("data")) {
+                JsonObject data = response.getAsJsonObject("data");
+                if (data.has("account_id")) {
+                    result.put("accountId", data.get("account_id").getAsString());
+                }
+            }
+            
+            log.info("MultiSafePay connection verification: {}", connected ? "SUCCESS" : "FAILED");
+            return result;
+        } catch (Exception e) {
+            log.error("Failed to verify MultiSafePay connection", e);
+            result.put("connected", false);
+            result.put("error", e.getMessage());
+            return result;
+        }
+    }
 }

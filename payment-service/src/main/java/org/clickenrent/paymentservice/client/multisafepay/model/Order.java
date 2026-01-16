@@ -21,6 +21,7 @@ public class Order {
 	public String invoice_id = null;
 	public String items = null;
 	public String cart_expiration = null;
+	public String status = null;
 
 	public String var1 = null;
 	public String var2 = null;
@@ -39,6 +40,7 @@ public class Order {
 	public CustomFields custom_fields = null;
 	public CustomInfo custom_info = null;
 	public CheckoutOptions checkout_options = null;
+	public Affiliate affiliate = null;
 
 	public Order setRedirect(String order_id, String description,
 			Integer amount, String currency, PaymentOptions payment_options) {

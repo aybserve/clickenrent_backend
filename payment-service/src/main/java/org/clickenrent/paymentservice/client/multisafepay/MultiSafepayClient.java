@@ -102,6 +102,148 @@ public class MultiSafepayClient {
 		return MultiSafepayClient.sendRequest("orders", "POST", order);
 	}
 
+	// === Orders Management ===
+	
+	public static JsonObject updateOrder(String order_id, Order order) {
+		return MultiSafepayClient.sendRequest("orders/" + order_id, "PATCH", order);
+	}
+	
+	public static JsonObject captureOrder(String order_id) {
+		return MultiSafepayClient.sendRequest("orders/" + order_id + "/capture", "POST", null);
+	}
+	
+	public static JsonObject cancelAuthorization(String order_id) {
+		Order order = new Order();
+		order.status = "void";
+		return MultiSafepayClient.sendRequest("orders/" + order_id, "PATCH", order);
+	}
+	
+	public static JsonObject extendExpiration(String order_id, int days) {
+		Order order = new Order();
+		order.days_active = String.valueOf(days);
+		return MultiSafepayClient.sendRequest("orders/" + order_id, "PATCH", order);
+	}
+	
+	public static JsonObject cancelBancontactQR(String order_id) {
+		return MultiSafepayClient.sendRequest("orders/" + order_id + "/cancel-bancontact-qr", "POST", null);
+	}
+	
+	public static JsonObject putPADOrderOnHold(String order_id) {
+		return MultiSafepayClient.sendRequest("orders/" + order_id + "/hold", "POST", null);
+	}
+
+	// === Refunds ===
+	
+	public static JsonObject createRefund(String order_id, Refund refund) {
+		return MultiSafepayClient.sendRequest("orders/" + order_id + "/refunds", "POST", refund);
+	}
+	
+	public static JsonObject cancelRefund(String order_id, String refund_id) {
+		return MultiSafepayClient.sendRequest("orders/" + order_id + "/refunds/" + refund_id, "PATCH", null);
+	}
+
+	// === Chargebacks ===
+	
+	public static JsonObject challengeChargeback(String order_id, String reason) {
+		Chargeback chargeback = new Chargeback();
+		chargeback.reason = reason;
+		return MultiSafepayClient.sendRequest("orders/" + order_id + "/chargebacks/challenge", "POST", chargeback);
+	}
+
+	// === Tokens ===
+	
+	public static JsonObject listTokens(int page, int pageSize) {
+		return MultiSafepayClient.sendRequest("recurring/" + api_key + "/tokens?page=" + page + "&per_page=" + pageSize);
+	}
+	
+	public static JsonObject getToken(String token_id) {
+		return MultiSafepayClient.sendRequest("recurring/" + api_key + "/tokens/" + token_id);
+	}
+	
+	public static JsonObject updateToken(String token_id, Token token) {
+		return MultiSafepayClient.sendRequest("recurring/" + api_key + "/tokens/" + token_id, "PATCH", token);
+	}
+	
+	public static JsonObject deleteToken(String token_id) {
+		return MultiSafepayClient.sendRequest("recurring/" + api_key + "/tokens/" + token_id, "DELETE", null);
+	}
+
+	// === Transactions ===
+	
+	public static JsonObject listTransactions(int page, int pageSize) {
+		return MultiSafepayClient.sendRequest("transactions?page=" + page + "&per_page=" + pageSize);
+	}
+
+	// === Payment Methods ===
+	
+	public static JsonObject listPaymentMethods() {
+		return MultiSafepayClient.sendRequest("payment-methods");
+	}
+	
+	public static JsonObject getPaymentMethod(String method_code) {
+		return MultiSafepayClient.sendRequest("payment-methods/" + method_code);
+	}
+
+	// === Account Management ===
+	
+	public static JsonObject getSiteConfig() {
+		return MultiSafepayClient.sendRequest("sites/" + api_key);
+	}
+	
+	public static JsonObject updateSiteConfig(SiteConfig siteConfig) {
+		return MultiSafepayClient.sendRequest("sites/" + api_key, "PATCH", siteConfig);
+	}
+	
+	public static JsonObject listClosingBalances(String from_date, String to_date) {
+		return MultiSafepayClient.sendRequest("balances/closing?from=" + from_date + "&to=" + to_date);
+	}
+
+	// === POS Terminals ===
+	
+	public static JsonObject listTerminals() {
+		return MultiSafepayClient.sendRequest("terminals");
+	}
+	
+	public static JsonObject listTerminalsByGroup(String group_id) {
+		return MultiSafepayClient.sendRequest("terminals?group=" + group_id);
+	}
+	
+	public static JsonObject getReceipt(String terminal_id, String transaction_id) {
+		return MultiSafepayClient.sendRequest("terminals/" + terminal_id + "/receipt/" + transaction_id);
+	}
+	
+	public static JsonObject cancelTransaction(String terminal_id, String transaction_id) {
+		return MultiSafepayClient.sendRequest("terminals/" + terminal_id + "/transactions/" + transaction_id, "POST", null);
+	}
+	
+	public static JsonObject createTerminal(Terminal terminal) {
+		return MultiSafepayClient.sendRequest("terminals", "POST", terminal);
+	}
+
+	// === Webhook Signature Verification ===
+	
+	public static boolean verifySignature(String payload, String signature, String apiKey) {
+		try {
+			javax.crypto.Mac mac = javax.crypto.Mac.getInstance("HmacSHA512");
+			javax.crypto.spec.SecretKeySpec secret_key = new javax.crypto.spec.SecretKeySpec(
+				apiKey.getBytes("UTF-8"), "HmacSHA512");
+			mac.init(secret_key);
+			byte[] hash = mac.doFinal(payload.getBytes("UTF-8"));
+			
+			StringBuilder hexString = new StringBuilder();
+			for (byte b : hash) {
+				String hex = Integer.toHexString(0xff & b);
+				if (hex.length() == 1) hexString.append('0');
+				hexString.append(hex);
+			}
+			
+			return hexString.toString().equalsIgnoreCase(signature);
+		} catch (Exception e) {
+			System.out.println("Error verifying signature: " + e.toString());
+			return false;
+		}
+	}
+
 	// Private Methods
 
 	/**
@@ -152,20 +294,19 @@ public class MultiSafepayClient {
 			con.setRequestProperty("charset", "utf-8");
 			con.setUseCaches(false);
 
-			if ("POST".equals(method) || "PUT".equals(method) || "PATCH".equals(method)) {
-				con.setDoInput(true);
-				con.setRequestProperty("Content-Type",
-						"application/x-www-form-urlencoded");
-				con.setRequestProperty("Content-Length",
-						"" + Integer.toString(jsonString.getBytes().length));
-				DataOutputStream wr = new DataOutputStream(
-						con.getOutputStream());
-				wr.writeBytes(jsonString);
-				wr.flush();
-				wr.close();
-				System.out.println(method + " Data:");
-				System.out.println(jsonString);
-			}
+		if ("POST".equals(method) || "PUT".equals(method) || "PATCH".equals(method)) {
+			con.setDoInput(true);
+			con.setRequestProperty("Content-Type", "application/json");
+			con.setRequestProperty("Content-Length",
+					"" + Integer.toString(jsonString.getBytes().length));
+			DataOutputStream wr = new DataOutputStream(
+					con.getOutputStream());
+			wr.writeBytes(jsonString);
+			wr.flush();
+			wr.close();
+			System.out.println(method + " Data:");
+			System.out.println(jsonString);
+		}
 
 			int status = con.getResponseCode();
 			System.out.println("Http response code:");
