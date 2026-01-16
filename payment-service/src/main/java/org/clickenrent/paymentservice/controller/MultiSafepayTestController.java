@@ -724,10 +724,17 @@ public class MultiSafepayTestController {
             JsonObject result = multiSafepayService.cancelBancontactQRPayment(orderId);
             
             Map<String, Object> response = new HashMap<>();
-            response.put("success", true);
-            response.put("orderId", orderId);
-            response.put("message", "Bancontact QR payment cancelled successfully");
-            response.put("fullResponse", result.toString());
+            
+            if (result != null) {
+                response.put("success", true);
+                response.put("orderId", orderId);
+                response.put("message", "Bancontact QR payment cancelled successfully");
+                response.put("fullResponse", result.toString());
+            } else {
+                response.put("success", false);
+                response.put("orderId", orderId);
+                response.put("message", "No response from MultiSafePay API");
+            }
             
             return ResponseEntity.ok(response);
             
@@ -751,10 +758,17 @@ public class MultiSafepayTestController {
             JsonObject result = multiSafepayService.putPADOrderOnHold(orderId);
             
             Map<String, Object> response = new HashMap<>();
-            response.put("success", true);
-            response.put("orderId", orderId);
-            response.put("message", "PAD order put on hold successfully");
-            response.put("fullResponse", result.toString());
+            
+            if (result != null) {
+                response.put("success", true);
+                response.put("orderId", orderId);
+                response.put("message", "PAD order put on hold successfully");
+                response.put("fullResponse", result.toString());
+            } else {
+                response.put("success", false);
+                response.put("orderId", orderId);
+                response.put("message", "No response from MultiSafePay API");
+            }
             
             return ResponseEntity.ok(response);
             

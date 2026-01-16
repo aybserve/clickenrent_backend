@@ -817,24 +817,33 @@ public class MultiSafepayService {
 
     /**
      * Verify MultiSafePay API connection
+     * Uses the List Gateways endpoint which is more reliable than Site Configuration
      * 
      * @return Connection status map
      */
     public java.util.Map<String, Object> verifyConnection() {
         java.util.Map<String, Object> result = new java.util.HashMap<>();
         try {
-            JsonObject response = getSiteConfiguration();
+            // Use List Gateways endpoint - it's more reliable and available for all API keys
+            JsonObject response = listGateways();
             boolean connected = response != null && response.has("success") && response.get("success").getAsBoolean();
             
             result.put("connected", connected);
             result.put("testMode", testMode);
             result.put("apiKeyConfigured", multiSafepayApiKey != null && !multiSafepayApiKey.isEmpty());
+            result.put("apiEndpoint", testMode ? "https://testapi.multisafepay.com" : "https://api.multisafepay.com");
             
             if (connected && response.has("data")) {
-                JsonObject data = response.getAsJsonObject("data");
-                if (data.has("account_id")) {
-                    result.put("accountId", data.get("account_id").getAsString());
+                try {
+                    // Count available gateways
+                    com.google.gson.JsonArray gateways = response.getAsJsonArray("data");
+                    result.put("availableGateways", gateways.size());
+                    result.put("message", "✅ Connected to MultiSafePay API successfully! " + gateways.size() + " payment gateways available.");
+                } catch (Exception e) {
+                    result.put("message", "✅ Connected to MultiSafePay API successfully!");
                 }
+            } else {
+                result.put("message", "❌ Failed to connect to MultiSafePay API");
             }
             
             log.info("MultiSafePay connection verification: {}", connected ? "SUCCESS" : "FAILED");
@@ -842,7 +851,10 @@ public class MultiSafepayService {
         } catch (Exception e) {
             log.error("Failed to verify MultiSafePay connection", e);
             result.put("connected", false);
+            result.put("testMode", testMode);
+            result.put("apiKeyConfigured", multiSafepayApiKey != null && !multiSafepayApiKey.isEmpty());
             result.put("error", e.getMessage());
+            result.put("message", "❌ Failed to connect. Check your API key and network connection.");
             return result;
         }
     }

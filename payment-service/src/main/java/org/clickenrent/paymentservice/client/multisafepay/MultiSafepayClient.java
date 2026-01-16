@@ -294,19 +294,23 @@ public class MultiSafepayClient {
 			con.setRequestProperty("charset", "utf-8");
 			con.setUseCaches(false);
 
-		if ("POST".equals(method) || "PUT".equals(method) || "PATCH".equals(method)) {
-			con.setDoInput(true);
-			con.setRequestProperty("Content-Type", "application/json");
-			con.setRequestProperty("Content-Length",
-					"" + Integer.toString(jsonString.getBytes().length));
-			DataOutputStream wr = new DataOutputStream(
-					con.getOutputStream());
-			wr.writeBytes(jsonString);
-			wr.flush();
-			wr.close();
-			System.out.println(method + " Data:");
-			System.out.println(jsonString);
-		}
+	if ("POST".equals(method) || "PUT".equals(method) || "PATCH".equals(method)) {
+		con.setDoInput(true);
+		con.setRequestProperty("Content-Type", "application/json");
+		
+		// Handle null jsonString by sending empty JSON object
+		String requestBody = (jsonString != null) ? jsonString : "{}";
+		
+		con.setRequestProperty("Content-Length",
+				"" + Integer.toString(requestBody.getBytes().length));
+		DataOutputStream wr = new DataOutputStream(
+				con.getOutputStream());
+		wr.writeBytes(requestBody);
+		wr.flush();
+		wr.close();
+		System.out.println(method + " Data:");
+		System.out.println(requestBody);
+	}
 
 			int status = con.getResponseCode();
 			System.out.println("Http response code:");
