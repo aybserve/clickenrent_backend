@@ -43,7 +43,10 @@ INSERT INTO payment_methods (id, external_id, code, name, is_active, date_create
 (2, '550e8400-e29b-41d4-a716-446655440012', 'DEBIT_CARD', 'Debit Card', true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
 (3, '550e8400-e29b-41d4-a716-446655440013', 'BANK_TRANSFER', 'Bank Transfer', true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
 (4, '550e8400-e29b-41d4-a716-446655440014', 'DIGITAL_WALLET', 'Digital Wallet', true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
-(5, '550e8400-e29b-41d4-a716-446655440015', 'CASH', 'Cash', true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false)
+(5, '550e8400-e29b-41d4-a716-446655440015', 'CASH', 'Cash', true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(6, '550e8400-e29b-41d4-a716-446655440016', 'IDEAL', 'iDEAL', true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(7, '550e8400-e29b-41d4-a716-446655440017', 'BANCONTACT', 'Bancontact', true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(8, '550e8400-e29b-41d4-a716-446655440018', 'DIRECTBANK', 'Direct Bank Transfer', true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false)
 ON CONFLICT (id) DO NOTHING;
 
 -- ---------------------------------------------------------------------------------------------------------------------

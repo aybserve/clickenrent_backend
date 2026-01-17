@@ -162,4 +162,48 @@ public class Order {
 		this.gateway_info = gateway_info;
 		return this;
 	}
+
+	// Split payment methods
+
+	public Order setRedirectWithSplits(String order_id, String description,
+			Integer amount, String currency, PaymentOptions payment_options,
+			Affiliate affiliate) {
+		this.type = "redirect";
+		this.order_id = order_id;
+		this.description = description;
+		this.amount = amount;
+		this.currency = currency;
+		this.payment_options = payment_options;
+		this.affiliate = affiliate;
+		return this;
+	}
+
+	public Order setDirectIdealWithSplits(String order_id, String description,
+			Integer amount, String currency, PaymentOptions payment_options,
+			GatewayInfo gateway_info, Affiliate affiliate) {
+		this.type = "direct";
+		this.gateway = "IDEAL";
+		this.order_id = order_id;
+		this.description = description;
+		this.amount = amount;
+		this.currency = currency;
+		this.payment_options = payment_options;
+		this.gateway_info = gateway_info;
+		this.affiliate = affiliate;
+		return this;
+	}
+
+	public Order setDirectBankWithSplits(String order_id, String description,
+			Integer amount, String currency, GatewayInfo gateway_info,
+			Affiliate affiliate) {
+		this.type = "direct";
+		this.gateway = "DIRECTBANK";
+		this.order_id = order_id;
+		this.description = description;
+		this.amount = amount;
+		this.currency = currency;
+		this.gateway_info = gateway_info;
+		this.affiliate = affiliate;
+		return this;
+	}
 }

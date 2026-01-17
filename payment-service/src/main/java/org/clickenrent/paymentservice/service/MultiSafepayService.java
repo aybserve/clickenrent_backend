@@ -415,6 +415,307 @@ public class MultiSafepayService {
         return MultiSafepayClient.getQrUrl(orderResponse);
     }
 
+    // === Mobile Payment Methods ===
+
+    /**
+     * Create direct iDEAL payment order
+     * 
+     * @param amount Amount to charge
+     * @param currency Currency code (e.g., "EUR")
+     * @param customerEmail Customer email address
+     * @param description Order description
+     * @param issuerId Bank issuer ID (e.g., "0031" for ABN AMRO)
+     * @return Full JsonObject response from MultiSafePay
+     */
+    public JsonObject createDirectIdealOrder(BigDecimal amount, String currency, 
+            String customerEmail, String description, String issuerId) {
+        try {
+            // Convert amount to cents
+            int amountInCents = amount.multiply(new BigDecimal(100)).intValue();
+            
+            // Generate unique order ID
+            String orderId = "order_ideal_" + System.currentTimeMillis();
+            
+            // Create payment options with notification and redirect URLs
+            PaymentOptions paymentOptions = new PaymentOptions(
+                notificationUrl,
+                cancelUrl,
+                redirectUrl
+            );
+            
+            // Create gateway info with bank issuer
+            GatewayInfo gatewayInfo = GatewayInfo.Ideal(issuerId);
+            
+            // Create order
+            Order order = new Order();
+            order.setDirectIdeal(orderId, description, amountInCents, 
+                currency.toUpperCase(), paymentOptions, gatewayInfo);
+            
+            // Add customer information if available
+            if (customerEmail != null && !customerEmail.isEmpty()) {
+                Customer customer = new Customer();
+                customer.email = customerEmail;
+                order.customer = customer;
+            }
+            
+            // Send request to MultiSafePay
+            JsonObject response = MultiSafepayClient.createOrder(order);
+            
+            if (response != null && response.has("success") && response.get("success").getAsBoolean()) {
+                log.info("Created direct iDEAL order: {} for amount: {} {} with bank: {}", 
+                    orderId, amount, currency, issuerId);
+            } else {
+                log.warn("Failed to create direct iDEAL order: {}", orderId);
+            }
+            
+            return response;
+        } catch (Exception e) {
+            log.error("Failed to create direct iDEAL order", e);
+            throw new MultiSafepayIntegrationException("Failed to create direct iDEAL payment: " + e.getMessage(), e);
+        }
+    }
+
+    /**
+     * Create direct bank transfer order
+     * 
+     * @param amount Amount to charge
+     * @param currency Currency code (e.g., "EUR")
+     * @param description Order description
+     * @param accountHolderName Account holder name
+     * @param accountHolderCity Account holder city
+     * @param accountHolderCountry Account holder country code
+     * @param accountHolderIban Account holder IBAN
+     * @param accountHolderBic Account holder BIC
+     * @return Full JsonObject response from MultiSafePay
+     */
+    public JsonObject createDirectBankOrder(BigDecimal amount, String currency,
+            String description, String accountHolderName, String accountHolderCity,
+            String accountHolderCountry, String accountHolderIban, String accountHolderBic) {
+        try {
+            // Convert amount to cents
+            int amountInCents = amount.multiply(new BigDecimal(100)).intValue();
+            
+            // Generate unique order ID
+            String orderId = "order_bank_" + System.currentTimeMillis();
+            
+            // Create gateway info with bank account details
+            GatewayInfo gatewayInfo = GatewayInfo.DirectBank(
+                accountHolderName, 
+                accountHolderCity, 
+                accountHolderCountry,
+                accountHolderIban, 
+                accountHolderBic
+            );
+            
+            // Create order
+            Order order = new Order();
+            order.setDirectBank(orderId, description, amountInCents,
+                currency.toUpperCase(), gatewayInfo);
+            
+            // Send request to MultiSafePay
+            JsonObject response = MultiSafepayClient.createOrder(order);
+            
+            if (response != null && response.has("success") && response.get("success").getAsBoolean()) {
+                log.info("Created direct bank order: {} for amount: {} {}", orderId, amount, currency);
+            } else {
+                log.warn("Failed to create direct bank order: {}", orderId);
+            }
+            
+            return response;
+        } catch (Exception e) {
+            log.error("Failed to create direct bank order", e);
+            throw new MultiSafepayIntegrationException("Failed to create direct bank payment: " + e.getMessage(), e);
+        }
+    }
+
+    /**
+     * Get list of iDEAL issuers (banks) from MultiSafePay
+     * 
+     * @return JsonObject containing issuers list
+     */
+    public JsonObject getIdealIssuers() {
+        try {
+            JsonObject response = MultiSafepayClient.GetGateway("IDEAL");
+            log.info("Retrieved iDEAL issuers from MultiSafePay");
+            return response;
+        } catch (Exception e) {
+            log.error("Failed to get iDEAL issuers", e);
+            throw new MultiSafepayIntegrationException("Failed to retrieve bank list: " + e.getMessage(), e);
+        }
+    }
+
+    // === Mobile Payment Methods with Split Payments ===
+
+    /**
+     * Create direct iDEAL payment order with split payments
+     * 
+     * @param amount Amount to charge
+     * @param currency Currency code (e.g., "EUR")
+     * @param customerEmail Customer email address
+     * @param description Order description
+     * @param issuerId Bank issuer ID (e.g., "0031" for ABN AMRO)
+     * @param affiliate Affiliate object containing split payment configuration
+     * @return Full JsonObject response from MultiSafePay
+     */
+    public JsonObject createDirectIdealOrderWithSplits(BigDecimal amount, String currency, 
+            String customerEmail, String description, String issuerId, Affiliate affiliate) {
+        try {
+            // Convert amount to cents
+            int amountInCents = amount.multiply(new BigDecimal(100)).intValue();
+            
+            // Generate unique order ID
+            String orderId = "order_ideal_split_" + System.currentTimeMillis();
+            
+            // Create payment options with notification and redirect URLs
+            PaymentOptions paymentOptions = new PaymentOptions(
+                notificationUrl,
+                cancelUrl,
+                redirectUrl
+            );
+            
+            // Create gateway info with bank issuer
+            GatewayInfo gatewayInfo = GatewayInfo.Ideal(issuerId);
+            
+            // Create order with splits
+            Order order = new Order();
+            order.setDirectIdealWithSplits(orderId, description, amountInCents, 
+                currency.toUpperCase(), paymentOptions, gatewayInfo, affiliate);
+            
+            // Add customer information if available
+            if (customerEmail != null && !customerEmail.isEmpty()) {
+                Customer customer = new Customer();
+                customer.email = customerEmail;
+                order.customer = customer;
+            }
+            
+            // Send request to MultiSafePay
+            JsonObject response = MultiSafepayClient.createOrder(order);
+            
+            if (response != null && response.has("success") && response.get("success").getAsBoolean()) {
+                log.info("Created direct iDEAL order with splits: {} for amount: {} {} with bank: {} and {} splits", 
+                    orderId, amount, currency, issuerId, affiliate.split_payments != null ? affiliate.split_payments.size() : 0);
+            } else {
+                log.warn("Failed to create direct iDEAL order with splits: {}", orderId);
+            }
+            
+            return response;
+        } catch (Exception e) {
+            log.error("Failed to create direct iDEAL order with splits", e);
+            throw new MultiSafepayIntegrationException("Failed to create direct iDEAL payment with splits: " + e.getMessage(), e);
+        }
+    }
+
+    /**
+     * Create direct bank transfer order with split payments
+     * 
+     * @param amount Amount to charge
+     * @param currency Currency code (e.g., "EUR")
+     * @param description Order description
+     * @param accountHolderName Account holder name
+     * @param accountHolderCity Account holder city
+     * @param accountHolderCountry Account holder country code
+     * @param accountHolderIban Account holder IBAN
+     * @param accountHolderBic Account holder BIC
+     * @param affiliate Affiliate object containing split payment configuration
+     * @return Full JsonObject response from MultiSafePay
+     */
+    public JsonObject createDirectBankOrderWithSplits(BigDecimal amount, String currency,
+            String description, String accountHolderName, String accountHolderCity,
+            String accountHolderCountry, String accountHolderIban, String accountHolderBic, 
+            Affiliate affiliate) {
+        try {
+            // Convert amount to cents
+            int amountInCents = amount.multiply(new BigDecimal(100)).intValue();
+            
+            // Generate unique order ID
+            String orderId = "order_bank_split_" + System.currentTimeMillis();
+            
+            // Create gateway info with bank account details
+            GatewayInfo gatewayInfo = GatewayInfo.DirectBank(
+                accountHolderName, 
+                accountHolderCity, 
+                accountHolderCountry,
+                accountHolderIban, 
+                accountHolderBic
+            );
+            
+            // Create order with splits
+            Order order = new Order();
+            order.setDirectBankWithSplits(orderId, description, amountInCents,
+                currency.toUpperCase(), gatewayInfo, affiliate);
+            
+            // Send request to MultiSafePay
+            JsonObject response = MultiSafepayClient.createOrder(order);
+            
+            if (response != null && response.has("success") && response.get("success").getAsBoolean()) {
+                log.info("Created direct bank order with splits: {} for amount: {} {} with {} splits", 
+                    orderId, amount, currency, affiliate.split_payments != null ? affiliate.split_payments.size() : 0);
+            } else {
+                log.warn("Failed to create direct bank order with splits: {}", orderId);
+            }
+            
+            return response;
+        } catch (Exception e) {
+            log.error("Failed to create direct bank order with splits", e);
+            throw new MultiSafepayIntegrationException("Failed to create direct bank payment with splits: " + e.getMessage(), e);
+        }
+    }
+
+    /**
+     * Create redirect order with split payments
+     * 
+     * @param amount Amount to charge
+     * @param currency Currency code (e.g., "EUR")
+     * @param customerEmail Customer email address
+     * @param description Order description
+     * @param affiliate Affiliate object containing split payment configuration
+     * @return Full JsonObject response from MultiSafePay
+     */
+    public JsonObject createRedirectOrderWithSplits(BigDecimal amount, String currency, 
+            String customerEmail, String description, Affiliate affiliate) {
+        try {
+            // Convert amount to cents
+            int amountInCents = amount.multiply(new BigDecimal(100)).intValue();
+            
+            // Generate unique order ID
+            String orderId = "order_split_" + System.currentTimeMillis();
+            
+            // Create payment options with notification and redirect URLs
+            PaymentOptions paymentOptions = new PaymentOptions(
+                notificationUrl,
+                cancelUrl,
+                redirectUrl
+            );
+            
+            // Create order with splits
+            Order order = new Order();
+            order.setRedirectWithSplits(orderId, description, amountInCents, 
+                currency.toUpperCase(), paymentOptions, affiliate);
+            
+            // Add customer information if available
+            if (customerEmail != null && !customerEmail.isEmpty()) {
+                Customer customer = new Customer();
+                customer.email = customerEmail;
+                order.customer = customer;
+            }
+            
+            // Send request to MultiSafePay
+            JsonObject response = MultiSafepayClient.createOrder(order);
+            
+            if (response != null && response.has("success") && response.get("success").getAsBoolean()) {
+                log.info("Created redirect order with splits: {} for amount: {} {} with {} splits", 
+                    orderId, amount, currency, affiliate.split_payments != null ? affiliate.split_payments.size() : 0);
+            } else {
+                log.warn("Failed to create redirect order with splits: {}", orderId);
+            }
+            
+            return response;
+        } catch (Exception e) {
+            log.error("Failed to create redirect order with splits", e);
+            throw new MultiSafepayIntegrationException("Failed to create redirect payment with splits: " + e.getMessage(), e);
+        }
+    }
+
     // === New API Methods ===
 
     /**

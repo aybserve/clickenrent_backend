@@ -1018,9 +1018,25 @@ public class GatewayConfig {
                         .path("/api/v1/multisafepay/test/**")
                         .uri("lb://payment-service"))
 
+                // Public Mobile Payment Test Routes - For development/testing (should be disabled in production)
+                .route("mobile-payments-test", r -> r
+                        .path("/api/v1/payments/mobile/test/**")
+                        .uri("lb://payment-service"))
+
                 // Protected MultiSafePay Production Routes - Requires JWT authentication
                 .route("multisafepay-production", r -> r
                         .path("/api/v1/multisafepay/**")
+                        .filters(f -> f
+                                .filter(jwtAuthenticationFilter)
+                                .requestRateLimiter(c -> c
+                                        .setRateLimiter(userRateLimiter)
+                                        .setKeyResolver(userKeyResolver)
+                                        .setStatusCode(HttpStatus.TOO_MANY_REQUESTS)))
+                        .uri("lb://payment-service"))
+
+                // Mobile Payment Routes - Protected, requires JWT authentication
+                .route("mobile-payments", r -> r
+                        .path("/api/v1/payments/mobile/**")
                         .filters(f -> f
                                 .filter(jwtAuthenticationFilter)
                                 .requestRateLimiter(c -> c
