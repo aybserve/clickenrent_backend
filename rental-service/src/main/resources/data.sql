@@ -548,8 +548,12 @@ ON CONFLICT (id) DO NOTHING;
 --       These can be accessed through relationships: bike.getExternalId(), location.getExternalId(), rental.getExternalId()
 -- ---------------------------------------------------------------------------------------------------------------------
 INSERT INTO bike_rental (id, external_id, bike_id, location_id, rental_id, start_date_time, end_date_time, rental_unit_id, bike_rental_status_id, is_revenue_share_paid, photo_url, price, total_price, date_created, last_date_modified, created_by, last_modified_by, is_deleted) VALUES
-(1, 'bike-rental-ext-00101', 1, 1, 1, CURRENT_TIMESTAMP - INTERVAL '2 days', CURRENT_TIMESTAMP - INTERVAL '1 day', 2, 2, true, NULL, 25.00, 25.00, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
-(2, 'bike-rental-ext-00102', 2, 1, 2, CURRENT_TIMESTAMP - INTERVAL '5 days', CURRENT_TIMESTAMP - INTERVAL '1 day', 1, 2, true, NULL, 5.00, 20.00, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false)
+-- Unpaid bike rentals from December 2025 (for payout testing)
+(1, 'bike-rental-ext-00101', 1, 1, 1, '2025-12-05 10:00:00', '2025-12-05 18:00:00', 1, 2, false, NULL, 5.00, 40.00, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(2, 'bike-rental-ext-00102', 2, 1, 2, '2025-12-10 09:00:00', '2025-12-10 17:00:00', 1, 2, false, NULL, 5.00, 40.00, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(3, 'bike-rental-ext-00103', 3, 2, 2, '2025-12-15 14:00:00', '2025-12-15 20:00:00', 1, 2, false, NULL, 5.00, 30.00, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+-- Paid bike rental from November 2025 (should not appear in December payouts)
+(4, 'bike-rental-ext-00104', 1, 1, 1, '2025-11-20 10:00:00', '2025-11-20 15:00:00', 1, 2, true, NULL, 5.00, 25.00, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false)
 ON CONFLICT (id) DO NOTHING;
 
 -- ---------------------------------------------------------------------------------------------------------------------

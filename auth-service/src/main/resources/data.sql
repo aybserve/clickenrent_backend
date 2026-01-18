@@ -383,7 +383,8 @@ INSERT INTO global_role (id, name) VALUES
 (2, 'ADMIN'),
 (3, 'B2B'),
 (4, 'CUSTOMER'),
-(5, 'DEV')
+(5, 'DEV'),
+(6, 'SYSTEM')
 ON CONFLICT (id) DO NOTHING;
 
 -- Company Types
@@ -437,7 +438,10 @@ INSERT INTO users (id, external_id, user_name, email, password, first_name, last
 (10, 'usr-ext-00010', 'customer_marie', 'marie.blanc@email.fr', '$2a$10$59i5SxRWkbcxt2rfTyjJ2.dZrlXFchPqyw1p56D/Ltp6jvYGVh2YK', 'Marie', 'Blanc', '+33-1-555-0104', 3, true, true, true, true, NOW(), NOW(), 'system', 'system', false),
 (11, 'usr-ext-00011', 'customer_hans', 'hans.weber@email.de', '$2a$10$59i5SxRWkbcxt2rfTyjJ2.dZrlXFchPqyw1p56D/Ltp6jvYGVh2YK', 'Hans', 'Weber', '+49-89-555-0105', 2, true, true, true, true, NOW(), NOW(), 'system', 'system', false),
 (12, 'usr-ext-00012', 'customer_sophia', 'sophia.martin@email.com', '$2a$10$59i5SxRWkbcxt2rfTyjJ2.dZrlXFchPqyw1p56D/Ltp6jvYGVh2YK', 'Sophia', 'Martin', '+41-22-555-0106', 1, true, true, true, true, NOW(), NOW(), 'system', 'system', false),
-(13, 'usr-ext-00013', 'customer_oliver', 'oliver.brown@email.com', '$2a$10$59i5SxRWkbcxt2rfTyjJ2.dZrlXFchPqyw1p56D/Ltp6jvYGVh2YK', 'Oliver', 'Brown', '+1-310-555-0107', 1, true, false, true, true, NOW(), NOW(), 'system', 'system', false)
+(13, 'usr-ext-00013', 'customer_oliver', 'oliver.brown@email.com', '$2a$10$59i5SxRWkbcxt2rfTyjJ2.dZrlXFchPqyw1p56D/Ltp6jvYGVh2YK', 'Oliver', 'Brown', '+1-310-555-0107', 1, true, false, true, true, NOW(), NOW(), 'system', 'system', false),
+
+-- SYSTEM Service Account (for inter-service communication)
+(14, 'usr-ext-service-payment', 'service_payment', 'service.payment@clickenrent.internal', '$2a$10$59i5SxRWkbcxt2rfTyjJ2.dZrlXFchPqyw1p56D/Ltp6jvYGVh2YK', 'Payment', 'Service', '+00-00-00000000', 1, true, true, true, true, NOW(), NOW(), 'system', 'system', false)
 ON CONFLICT (id) DO NOTHING;
 
 -- ---------------------------------------------------------------------------------------------------------------------
@@ -464,7 +468,10 @@ INSERT INTO user_global_role (id, user_id, global_role_id, date_created, last_da
 (10, 10, 4, NOW(), NOW(), 'system', 'system', false),
 (11, 11, 4, NOW(), NOW(), 'system', 'system', false),
 (12, 12, 4, NOW(), NOW(), 'system', 'system', false),
-(13, 13, 4, NOW(), NOW(), 'system', 'system', false)
+(13, 13, 4, NOW(), NOW(), 'system', 'system', false),
+
+-- SYSTEM (Service Accounts)
+(14, 14, 6, NOW(), NOW(), 'system', 'system', false)
 ON CONFLICT (id) DO NOTHING;
 
 -- ---------------------------------------------------------------------------------------------------------------------

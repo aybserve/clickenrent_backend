@@ -176,20 +176,28 @@ ON CONFLICT (id) DO NOTHING;
 -- ---------------------------------------------------------------------------------------------------------------------
 -- 2.7 B2B REVENUE SHARE PAYOUTS (Sample data - references companies from auth-service)
 -- ---------------------------------------------------------------------------------------------------------------------
-INSERT INTO b2b_revenue_share_payouts (id, external_id, company_external_id, payment_status_id, due_date, total_amount, paid_amount, remaining_amount, date_created, last_date_modified, created_by, last_modified_by, is_deleted) VALUES
-(1, '550e8400-e29b-41d4-a716-446655440601', 'company-ext-001', 1, CURRENT_DATE + INTERVAL '30 days', 500.00, 0.00, 500.00, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
-(2, '550e8400-e29b-41d4-a716-446655440602', 'company-ext-002', 2, CURRENT_DATE - INTERVAL '5 days', 350.75, 350.75, 0.00, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false)
+INSERT INTO b2b_revenue_share_payouts (id, external_id, company_external_id, location_bank_account_id, multisafepay_payout_id, payment_status_id, due_date, payout_date, total_amount, paid_amount, remaining_amount, status, currency, failure_reason, date_created, last_date_modified, created_by, last_modified_by, is_deleted) VALUES
+-- Payout 1: Pending payout for Amsterdam location (company-ext-00001)
+(1, '550e8400-e29b-41d4-a716-446655440601', 'company-ext-00001', 1, NULL, 1, CURRENT_DATE + INTERVAL '30 days', NULL, 500.00, 0.00, 500.00, 'PENDING', 'EUR', NULL, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+-- Payout 2: Completed payout for Rotterdam location (company-ext-00001)
+(2, '550e8400-e29b-41d4-a716-446655440602', 'company-ext-00001', 2, 'payout_msp_test_123456', 2, CURRENT_DATE - INTERVAL '5 days', CURRENT_DATE - INTERVAL '2 days', 350.75, 350.75, 0.00, 'COMPLETED', 'EUR', NULL, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+-- Payout 3: Failed payout for Utrecht location (unverified bank account)
+(3, '550e8400-e29b-41d4-a716-446655440603', 'company-ext-00002', 3, NULL, 3, CURRENT_DATE - INTERVAL '10 days', NULL, 225.00, 0.00, 225.00, 'FAILED', 'EUR', 'Bank account not verified', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false)
 ON CONFLICT (id) DO NOTHING;
 
 -- ---------------------------------------------------------------------------------------------------------------------
 -- 2.8 B2B REVENUE SHARE PAYOUT ITEMS (Sample data)
 -- ---------------------------------------------------------------------------------------------------------------------
-INSERT INTO b2b_revenue_share_payout_items (id, external_id, b2b_revenue_share_payout_id, bike_rental_external_id, amount, date_created, last_date_modified, created_by, last_modified_by, is_deleted) VALUES
-(1, '550e8400-e29b-41d4-a716-446655440701', 1, 'bike-rental-ext-00101', 150.00, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
-(2, '550e8400-e29b-41d4-a716-446655440702', 1, 'bike-rental-ext-00102', 200.00, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
-(3, '550e8400-e29b-41d4-a716-446655440703', 1, 'bike-rental-ext-00103', 150.00, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
-(4, '550e8400-e29b-41d4-a716-446655440704', 2, 'bike-rental-ext-00104', 175.50, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
-(5, '550e8400-e29b-41d4-a716-446655440705', 2, 'bike-rental-ext-00105', 175.25, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false)
+INSERT INTO b2b_revenue_share_payout_items (id, external_id, b2b_revenue_share_payout_id, bike_rental_external_id, bike_rental_total_price, revenue_share_percent, amount, date_created, last_date_modified, created_by, last_modified_by, is_deleted) VALUES
+-- Items for Payout 1 (PENDING - Amsterdam)
+(1, '550e8400-e29b-41d4-a716-446655440701', 1, 'bike-rental-ext-00101', 200.00, 75.00, 150.00, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(2, '550e8400-e29b-41d4-a716-446655440702', 1, 'bike-rental-ext-00102', 250.00, 80.00, 200.00, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(3, '550e8400-e29b-41d4-a716-446655440703', 1, 'bike-rental-ext-00103', 214.29, 70.00, 150.00, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+-- Items for Payout 2 (COMPLETED - Rotterdam)
+(4, '550e8400-e29b-41d4-a716-446655440704', 2, 'bike-rental-ext-00104', 250.71, 70.00, 175.50, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(5, '550e8400-e29b-41d4-a716-446655440705', 2, 'bike-rental-ext-00105', 250.36, 70.00, 175.25, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+-- Items for Payout 3 (FAILED - Utrecht)
+(6, '550e8400-e29b-41d4-a716-446655440706', 3, 'bike-rental-ext-00106', 321.43, 70.00, 225.00, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false)
 ON CONFLICT (id) DO NOTHING;
 
 -- ---------------------------------------------------------------------------------------------------------------------
@@ -197,6 +205,20 @@ ON CONFLICT (id) DO NOTHING;
 -- ---------------------------------------------------------------------------------------------------------------------
 INSERT INTO payout_fin_transactions (id, external_id, b2b_revenue_share_payout_id, financial_transaction_id, date_created, last_date_modified, created_by, last_modified_by, is_deleted) VALUES
 (1, '550e8400-e29b-41d4-a716-446655440121', 2, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', FALSE)
+ON CONFLICT (id) DO NOTHING;
+
+-- ---------------------------------------------------------------------------------------------------------------------
+-- 2.7 LOCATION BANK ACCOUNTS (Sample data for payout testing)
+-- ---------------------------------------------------------------------------------------------------------------------
+-- Sample bank accounts for location payout testing
+-- These reference locations from rental-service
+-- IMPORTANT: Replace with real bank accounts before production use
+INSERT INTO location_bank_accounts (id, external_id, company_external_id, location_external_id, account_holder_name, iban, bic, currency, is_verified, is_active, verification_notes, date_created, last_date_modified, created_by, last_modified_by, is_deleted) VALUES
+-- Bank accounts for locations with unpaid rentals (Dec 2025)
+(1, '550e8400-e29b-41d4-a716-446655440201', 'company-ext-001', '550e8400-e29b-41d4-a716-446655440101', 'Downtown Bike Hub BV', 'NL91ABNA0417164300', 'ABNANL2A', 'EUR', true, true, 'Verified via bank statement - Test account', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(2, '550e8400-e29b-41d4-a716-446655440202', 'company-ext-001', '550e8400-e29b-41d4-a716-446655440102', 'Park Side Station Ltd', 'NL20INGB0001234567', 'INGBNL2A', 'EUR', true, true, 'Verified via bank statement - Test account', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+-- Additional test bank accounts
+(3, '550e8400-e29b-41d4-a716-446655440203', 'company-ext-002', '550e8400-e29b-41d4-a716-446655440103', 'City Center Rentals BV', 'NL86RABO0123456789', 'RABONL2U', 'EUR', true, true, 'Verified via bank statement - Test account', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false)
 ON CONFLICT (id) DO NOTHING;
 
 -- =====================================================================================================================
@@ -218,6 +240,7 @@ SELECT setval('b2b_subscription_fin_transactions_id_seq', (SELECT COALESCE(MAX(i
 SELECT setval('b2b_revenue_share_payouts_id_seq', (SELECT COALESCE(MAX(id), 1) FROM b2b_revenue_share_payouts));
 SELECT setval('b2b_revenue_share_payout_items_id_seq', (SELECT COALESCE(MAX(id), 1) FROM b2b_revenue_share_payout_items));
 SELECT setval('payout_fin_transactions_id_seq', (SELECT COALESCE(MAX(id), 1) FROM payout_fin_transactions));
+SELECT setval('location_bank_accounts_id_seq', (SELECT COALESCE(MAX(id), 1) FROM location_bank_accounts));
 
 -- =====================================================================================================================
 -- END OF INITIALIZATION
@@ -225,18 +248,22 @@ SELECT setval('payout_fin_transactions_id_seq', (SELECT COALESCE(MAX(id), 1) FRO
 -- Database initialization completed successfully!
 -- 
 -- Summary:
--- - Required lookup tables: payment_statuses (6), payment_methods (5), currencies (5), service_providers (4)
+-- - Required lookup tables: payment_statuses (6), payment_methods (8), currencies (5), service_providers (4)
 -- - Sample data: user_payment_profiles (6: 3 Stripe + 3 MultiSafePay)
 -- - Sample data: user_payment_methods (6: 3 Stripe + 3 MultiSafePay)
 -- - Sample data: financial_transactions (8: 4 Stripe + 4 MultiSafePay)
 -- - Sample data: rental_fin_transactions (6: 3 Stripe + 3 MultiSafePay)
 -- - Sample data: b2b_sale_fin_transactions (2: 1 Stripe + 1 MultiSafePay)
 -- - Sample data: b2b_subscription_fin_transactions (2: 1 Stripe + 1 MultiSafePay)
--- - Sample data: b2b_revenue_share_payouts (2), b2b_revenue_share_payout_items (5), payout_fin_transactions (1)
+-- - Sample data: b2b_revenue_share_payouts (3: 1 pending, 1 completed, 1 failed)
+-- - Sample data: b2b_revenue_share_payout_items (6: 3 for payout 1, 2 for payout 2, 1 for payout 3)
+-- - Sample data: payout_fin_transactions (1)
+-- - Sample data: location_bank_accounts (4: 2 verified+active, 1 unverified, 1 inactive)
 -- 
 -- Cross-Service References:
 -- - User External IDs: Referenced from auth-service (usr-ext-XXXXX)
 -- - Company External IDs: Referenced from auth-service (company-ext-XXXXX)
+-- - Location External IDs: Referenced from rental-service (location-ext-XXXXX)
 -- - Rental External IDs: Referenced from rental-service (rental-ext-XXXXX)
 -- - Bike Rental External IDs: Referenced from rental-service (bike-rental-ext-XXXXX)
 -- - B2B Sale External IDs: Referenced from rental-service (b2b-sale-ext-XXXXX)
@@ -262,10 +289,12 @@ CREATE INDEX IF NOT EXISTS idx_financial_transaction_company ON financial_transa
 -- Enable RLS on tenant-scoped tables
 ALTER TABLE b2b_revenue_share_payouts ENABLE ROW LEVEL SECURITY;
 ALTER TABLE financial_transactions ENABLE ROW LEVEL SECURITY;
+ALTER TABLE location_bank_accounts ENABLE ROW LEVEL SECURITY;
 
 -- Force RLS even for table owner (important for security)
 ALTER TABLE b2b_revenue_share_payouts FORCE ROW LEVEL SECURITY;
 ALTER TABLE financial_transactions FORCE ROW LEVEL SECURITY;
+ALTER TABLE location_bank_accounts FORCE ROW LEVEL SECURITY;
 
 -- ---------------------------------------------------------------------------------------------------------------------
 -- 3.1 RLS POLICY: b2b_revenue_share_payouts table
@@ -318,12 +347,36 @@ CREATE POLICY financial_transactions_tenant_isolation ON financial_transactions
     );
 
 -- ---------------------------------------------------------------------------------------------------------------------
--- 3.3 PERFORMANCE INDEXES for RLS
+-- 3.3 RLS POLICY: location_bank_accounts table
+-- ---------------------------------------------------------------------------------------------------------------------
+-- Allows access if:
+-- 1. User is superadmin (bypasses all filters), OR
+-- 2. Bank account belongs to one of user's companies
+-- ---------------------------------------------------------------------------------------------------------------------
+DROP POLICY IF EXISTS location_bank_accounts_tenant_isolation ON location_bank_accounts;
+CREATE POLICY location_bank_accounts_tenant_isolation ON location_bank_accounts
+    FOR ALL
+    USING (
+        -- Allow if user is superadmin
+        COALESCE(current_setting('app.is_superadmin', true)::boolean, false) = true
+        OR
+        -- Allow if bank account belongs to one of user's companies
+        company_external_id = ANY(
+            string_to_array(
+                COALESCE(current_setting('app.company_external_ids', true), ''),
+                ','
+            )
+        )
+    );
+
+-- ---------------------------------------------------------------------------------------------------------------------
+-- 3.4 PERFORMANCE INDEXES for RLS
 -- ---------------------------------------------------------------------------------------------------------------------
 -- These indexes ensure RLS policies don't slow down queries
 -- ---------------------------------------------------------------------------------------------------------------------
 CREATE INDEX IF NOT EXISTS idx_b2b_revenue_share_payouts_company_rls ON b2b_revenue_share_payouts(company_external_id) WHERE is_deleted = false;
 CREATE INDEX IF NOT EXISTS idx_financial_transactions_company_rls ON financial_transactions(company_external_id) WHERE is_deleted = false;
+CREATE INDEX IF NOT EXISTS idx_location_bank_accounts_company_rls ON location_bank_accounts(company_external_id) WHERE is_deleted = false;
 
 -- =====================================================================================================================
 -- SECTION 4: AUDIT LOGGING

@@ -37,6 +37,12 @@ public class B2BRevenueSharePayoutItem extends BaseAuditEntity {
     @Column(name = "bike_rental_external_id", length = 100)
     private String bikeRentalExternalId;
 
+    @Column(name = "bike_rental_total_price", precision = 19, scale = 2)
+    private BigDecimal bikeRentalTotalPrice;
+
+    @Column(name = "revenue_share_percent", precision = 5, scale = 2)
+    private BigDecimal revenueSharePercent;
+
     @Column(nullable = false, precision = 19, scale = 2)
     private BigDecimal amount;
 

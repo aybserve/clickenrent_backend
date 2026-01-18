@@ -419,4 +419,53 @@ public class MultiSafepayClient {
 		}
 		return qr_url;
 	}
+
+	// ===== PAYOUT API METHODS =====
+
+	/**
+	 * Create a payout to a bank account
+	 * Sends money from merchant MultiSafepay account to specified IBAN
+	 * 
+	 * @param payout Payout object with amount, currency, bank account details
+	 * @return JsonObject response from MultiSafepay
+	 */
+	public static JsonObject createPayout(Payout payout) {
+		return MultiSafepayClient.sendRequest("payouts", "POST", payout);
+	}
+
+	/**
+	 * Get payout status by payout ID
+	 * 
+	 * @param payoutId Payout ID from MultiSafepay
+	 * @return JsonObject with payout details and status
+	 */
+	public static JsonObject getPayoutStatus(String payoutId) {
+		return MultiSafepayClient.sendRequest("payouts/" + payoutId);
+	}
+
+	/**
+	 * List all payouts with pagination
+	 * 
+	 * @param page Page number (1-based)
+	 * @param limit Number of results per page
+	 * @return JsonObject with list of payouts
+	 */
+	public static JsonObject listPayouts(int page, int limit) {
+		return MultiSafepayClient.sendRequest("payouts?page=" + page + "&limit=" + limit);
+	}
+
+	/**
+	 * List payouts with date range filter
+	 * 
+	 * @param page Page number (1-based)
+	 * @param limit Number of results per page
+	 * @param fromDate Date from in format YYYY-MM-DD
+	 * @param toDate Date to in format YYYY-MM-DD
+	 * @return JsonObject with list of payouts
+	 */
+	public static JsonObject listPayoutsWithDateRange(int page, int limit, String fromDate, String toDate) {
+		return MultiSafepayClient.sendRequest(
+			"payouts?page=" + page + "&limit=" + limit + "&from=" + fromDate + "&to=" + toDate
+		);
+	}
 }

@@ -19,6 +19,8 @@ public interface B2BRevenueSharePayoutRepository extends JpaRepository<B2BRevenu
     List<B2BRevenueSharePayout> findByPaymentStatus(PaymentStatus status);
     
     Optional<B2BRevenueSharePayout> findByExternalId(String externalId);
+    
+    Optional<B2BRevenueSharePayout> findByMultiSafepayPayoutId(String multiSafepayPayoutId);
 }
 
 

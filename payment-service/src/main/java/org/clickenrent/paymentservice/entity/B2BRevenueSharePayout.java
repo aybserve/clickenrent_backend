@@ -40,12 +40,22 @@ public class B2BRevenueSharePayout extends BaseAuditEntity implements TenantScop
     @Column(name = "company_external_id", length = 100)
     private String companyExternalId;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "location_bank_account_id")
+    private LocationBankAccount locationBankAccount;
+
+    @Column(name = "multisafepay_payout_id", length = 100)
+    private String multiSafepayPayoutId;
+
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "payment_status_id", nullable = false)
     private PaymentStatus paymentStatus;
 
     @Column(nullable = false)
     private LocalDate dueDate;
+
+    @Column(name = "payout_date")
+    private LocalDate payoutDate;
 
     @Column(nullable = false, precision = 19, scale = 2)
     private BigDecimal totalAmount;
@@ -55,6 +65,15 @@ public class B2BRevenueSharePayout extends BaseAuditEntity implements TenantScop
 
     @Column(nullable = false, precision = 19, scale = 2)
     private BigDecimal remainingAmount;
+
+    @Column(name = "status", length = 50)
+    private String status;
+
+    @Column(name = "currency", length = 3)
+    private String currency;
+
+    @Column(name = "failure_reason", length = 1000)
+    private String failureReason;
 
     @OneToMany(mappedBy = "b2bRevenueSharePayout", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default

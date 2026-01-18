@@ -3,6 +3,7 @@ package org.clickenrent.paymentservice.entity;
 import jakarta.persistence.Column;
 import jakarta.persistence.EntityListeners;
 import jakarta.persistence.MappedSuperclass;
+import jakarta.persistence.PrePersist;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -45,6 +46,13 @@ public abstract class BaseAuditEntity {
 
     @Column(name = "is_deleted", nullable = false)
     private Boolean isDeleted = false;
+
+    @PrePersist
+    protected void ensureIsDeletedIsSet() {
+        if (isDeleted == null) {
+            isDeleted = false;
+        }
+    }
 }
 
 

@@ -143,4 +143,27 @@ public class BikeRentalController {
     public ResponseEntity<List<BikeRentalDTO>> getBikeRentalsByRentalExternalId(@PathVariable String rentalExternalId) {
         return ResponseEntity.ok(bikeRentalService.getBikeRentalsByRentalExternalId(rentalExternalId));
     }
+
+    @GetMapping("/unpaid")
+    @PreAuthorize("hasAnyRole('ADMIN', 'SUPERADMIN', 'SYSTEM')")
+    @Operation(
+        summary = "Get unpaid bike rentals for payout processing",
+        description = "Returns all bike rentals within date range where isRevenueSharePaid=false. Used by payment-service for monthly payouts."
+    )
+    public ResponseEntity<List<BikeRentalPayoutDTO>> getUnpaidBikeRentals(
+            @RequestParam @org.springframework.format.annotation.DateTimeFormat(iso = org.springframework.format.annotation.DateTimeFormat.ISO.DATE) java.time.LocalDate startDate,
+            @RequestParam @org.springframework.format.annotation.DateTimeFormat(iso = org.springframework.format.annotation.DateTimeFormat.ISO.DATE) java.time.LocalDate endDate) {
+        return ResponseEntity.ok(bikeRentalService.getUnpaidBikeRentalsForPayout(startDate, endDate));
+    }
+
+    @PostMapping("/mark-paid")
+    @PreAuthorize("hasAnyRole('ADMIN', 'SUPERADMIN', 'SYSTEM')")
+    @Operation(
+        summary = "Mark bike rentals as paid",
+        description = "Sets isRevenueSharePaid=true for specified bike rentals. Called by payment-service after successful payout."
+    )
+    public ResponseEntity<Void> markBikeRentalsAsPaid(@RequestBody List<String> bikeRentalExternalIds) {
+        bikeRentalService.markBikeRentalsAsPaid(bikeRentalExternalIds);
+        return ResponseEntity.ok().build();
+    }
 }

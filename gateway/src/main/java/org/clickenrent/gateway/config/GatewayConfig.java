@@ -1008,7 +1008,14 @@ public class GatewayConfig {
                         .path("/api/v1/webhooks/stripe/**")
                         .uri("lb://payment-service"))
 
+                // IMPORTANT: More specific routes must come BEFORE general routes!
+                // Payout Webhooks (Public - No authentication required) - MUST be before general multisafepay-webhooks
+                .route("payout-webhooks", r -> r
+                        .path("/api/v1/webhooks/multisafepay/payout/**")
+                        .uri("lb://payment-service"))
+
                 // Public MultiSafePay Webhook Route - No JWT validation required
+                // This catches all other multisafepay webhooks (payment orders, etc.)
                 .route("multisafepay-webhooks", r -> r
                         .path("/api/v1/webhooks/multisafepay/**")
                         .uri("lb://payment-service"))
@@ -1021,6 +1028,11 @@ public class GatewayConfig {
                 // Public Mobile Payment Test Routes - For development/testing (should be disabled in production)
                 .route("mobile-payments-test", r -> r
                         .path("/api/v1/payments/mobile/test/**")
+                        .uri("lb://payment-service"))
+
+                // Public Service Auth Test Routes - For debugging service authentication (should be disabled in production)
+                .route("service-auth-test", r -> r
+                        .path("/api/v1/test/service-auth/**")
                         .uri("lb://payment-service"))
 
                 // Protected MultiSafePay Production Routes - Requires JWT authentication
@@ -1177,6 +1189,28 @@ public class GatewayConfig {
                 // Junction Table Routes - Payout Financial Transactions
                 .route("payout-fin-transactions", r -> r
                         .path("/api/v1/payout-fin-transactions/**")
+                        .filters(f -> f
+                                .filter(jwtAuthenticationFilter)
+                                .requestRateLimiter(c -> c
+                                        .setRateLimiter(userRateLimiter)
+                                        .setKeyResolver(userKeyResolver)
+                                        .setStatusCode(HttpStatus.TOO_MANY_REQUESTS)))
+                        .uri("lb://payment-service"))
+
+                // Location Bank Accounts (Protected - ADMIN and B2B_CLIENT)
+                .route("location-bank-accounts", r -> r
+                        .path("/api/v1/location-bank-accounts/**")
+                        .filters(f -> f
+                                .filter(jwtAuthenticationFilter)
+                                .requestRateLimiter(c -> c
+                                        .setRateLimiter(userRateLimiter)
+                                        .setKeyResolver(userKeyResolver)
+                                        .setStatusCode(HttpStatus.TOO_MANY_REQUESTS)))
+                        .uri("lb://payment-service"))
+
+                // Payout Admin Endpoints (Protected - ADMIN only)
+                .route("payout-admin", r -> r
+                        .path("/api/v1/admin/payouts/**")
                         .filters(f -> f
                                 .filter(jwtAuthenticationFilter)
                                 .requestRateLimiter(c -> c

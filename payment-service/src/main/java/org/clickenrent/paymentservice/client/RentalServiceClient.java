@@ -3,9 +3,17 @@ package org.clickenrent.paymentservice.client;
 import org.clickenrent.contracts.rental.BikeDTO;
 import org.clickenrent.contracts.rental.BikeRentalDTO;
 import org.clickenrent.contracts.rental.RentalDTO;
+import org.clickenrent.paymentservice.dto.BikeRentalPayoutDTO;
 import org.springframework.cloud.openfeign.FeignClient;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
+
+import java.time.LocalDate;
+import java.util.List;
 
 /**
  * Feign client for communicating with Rental Service.
@@ -73,6 +81,29 @@ public interface RentalServiceClient {
      */
     @GetMapping("/bikes/external/{externalId}")
     BikeDTO getBikeByExternalId(@PathVariable("externalId") String externalId);
+
+    // ========== PAYOUT-RELATED METHODS ==========
+
+    /**
+     * Get all unpaid bike rentals within a date range for payout processing
+     * 
+     * @param startDate Start date of the range
+     * @param endDate End date of the range
+     * @return List of bike rentals that haven't been paid out yet
+     */
+    @GetMapping("/bike-rentals/unpaid")
+    List<BikeRentalPayoutDTO> getUnpaidBikeRentals(
+        @RequestParam("startDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+        @RequestParam("endDate") @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate
+    );
+    
+    /**
+     * Mark bike rentals as paid after successful payout
+     * 
+     * @param bikeRentalExternalIds List of bike rental external IDs to mark as paid
+     */
+    @PostMapping("/bike-rentals/mark-paid")
+    void markBikeRentalsAsPaid(@RequestBody List<String> bikeRentalExternalIds);
 }
 
 

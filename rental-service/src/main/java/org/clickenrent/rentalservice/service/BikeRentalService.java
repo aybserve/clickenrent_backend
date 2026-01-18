@@ -433,4 +433,73 @@ public class BikeRentalService {
             log.error("Failed to send notification for bike rental: {}", bikeRental.getId(), e);
         }
     }
+
+    /**
+     * Get unpaid bike rentals for payout processing
+     * Returns bike rentals where isRevenueSharePaid=false within the specified date range
+     *
+     * @param startDate Start date of the range
+     * @param endDate End date of the range
+     * @return List of bike rental payout DTOs
+     */
+    @Transactional(readOnly = true)
+    public List<BikeRentalPayoutDTO> getUnpaidBikeRentalsForPayout(java.time.LocalDate startDate, java.time.LocalDate endDate) {
+        log.info("Fetching unpaid bike rentals from {} to {}", startDate, endDate);
+
+        java.time.LocalDateTime startDateTime = startDate.atStartOfDay();
+        java.time.LocalDateTime endDateTime = endDate.atTime(23, 59, 59);
+
+        List<BikeRental> unpaidRentals = bikeRentalRepository.findAll().stream()
+                .filter(br -> !br.getIsRevenueSharePaid())
+                .filter(br -> br.getStartDateTime() != null)
+                .filter(br -> !br.getStartDateTime().isBefore(startDateTime) && !br.getStartDateTime().isAfter(endDateTime))
+                .collect(java.util.stream.Collectors.toList());
+
+        log.info("Found {} unpaid bike rentals", unpaidRentals.size());
+
+        return unpaidRentals.stream()
+                .map(this::convertToPayoutDTO)
+                .collect(java.util.stream.Collectors.toList());
+    }
+
+    /**
+     * Mark bike rentals as paid after successful payout
+     *
+     * @param bikeRentalExternalIds List of bike rental external IDs to mark as paid
+     */
+    @Transactional
+    public void markBikeRentalsAsPaid(List<String> bikeRentalExternalIds) {
+        log.info("Marking {} bike rentals as paid", bikeRentalExternalIds.size());
+
+        for (String externalId : bikeRentalExternalIds) {
+            BikeRental bikeRental = bikeRentalRepository.findByExternalId(externalId)
+                    .orElseThrow(() -> new IllegalArgumentException("BikeRental not found: " + externalId));
+
+            bikeRental.setIsRevenueSharePaid(true);
+            bikeRentalRepository.save(bikeRental);
+
+            log.debug("Marked bike rental as paid: {}", externalId);
+        }
+
+        log.info("Successfully marked {} bike rentals as paid", bikeRentalExternalIds.size());
+    }
+
+    /**
+     * Convert BikeRental entity to BikeRentalPayoutDTO
+     *
+     * @param bikeRental BikeRental entity
+     * @return BikeRentalPayoutDTO
+     */
+    private BikeRentalPayoutDTO convertToPayoutDTO(BikeRental bikeRental) {
+        return BikeRentalPayoutDTO.builder()
+                .bikeRentalExternalId(bikeRental.getExternalId())
+                .locationExternalId(bikeRental.getLocation() != null ? bikeRental.getLocation().getExternalId() : null)
+                .bikeExternalId(bikeRental.getBike() != null ? bikeRental.getBike().getExternalId() : null)
+                .totalPrice(bikeRental.getTotalPrice())
+                .revenueSharePercent(bikeRental.getBike() != null ? bikeRental.getBike().getRevenueSharePercent() : java.math.BigDecimal.ZERO)
+                .startDateTime(bikeRental.getStartDateTime())
+                .endDateTime(bikeRental.getEndDateTime())
+                .rentalExternalId(bikeRental.getRental() != null ? bikeRental.getRental().getExternalId() : null)
+                .build();
+    }
 }
