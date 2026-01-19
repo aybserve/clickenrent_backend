@@ -28,14 +28,14 @@ public class RentalFinTransactionController {
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'SUPERADMIN')")
     @Operation(summary = "Get rental transaction by ID")
     public ResponseEntity<RentalFinTransactionDTO> getById(@PathVariable Long id) {
         return ResponseEntity.ok(rentalFinTransactionService.findById(id));
     }
 
     @GetMapping("/external/{externalId}")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'SUPERADMIN')")
     @Operation(summary = "Get rental transaction by external ID")
     public ResponseEntity<RentalFinTransactionDTO> getByExternalId(@PathVariable String externalId) {
         return ResponseEntity.ok(rentalFinTransactionService.findByExternalId(externalId));

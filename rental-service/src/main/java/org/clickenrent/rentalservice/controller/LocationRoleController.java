@@ -37,21 +37,21 @@ public class LocationRoleController {
     }
 
     @PostMapping
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'SUPERADMIN')")
     @Operation(summary = "Create a new location role")
     public ResponseEntity<LocationRoleDTO> createLocationRole(@Valid @RequestBody LocationRoleDTO locationRoleDTO) {
         return ResponseEntity.status(201).body(locationRoleService.createLocationRole(locationRoleDTO));
     }
 
     @PutMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'SUPERADMIN')")
     @Operation(summary = "Update location role")
     public ResponseEntity<LocationRoleDTO> updateLocationRole(@PathVariable Long id, @Valid @RequestBody LocationRoleDTO locationRoleDTO) {
         return ResponseEntity.ok(locationRoleService.updateLocationRole(id, locationRoleDTO));
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'SUPERADMIN')")
     @Operation(summary = "Delete location role")
     public ResponseEntity<Void> deleteLocationRole(@PathVariable Long id) {
         locationRoleService.deleteLocationRole(id);

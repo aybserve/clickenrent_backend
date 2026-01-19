@@ -28,14 +28,14 @@ public class B2BSubscriptionFinTransactionController {
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'SUPERADMIN')")
     @Operation(summary = "Get B2B subscription transaction by ID")
     public ResponseEntity<B2BSubscriptionFinTransactionDTO> getById(@PathVariable Long id) {
         return ResponseEntity.ok(b2bSubscriptionFinTransactionService.findById(id));
     }
 
     @GetMapping("/external/{externalId}")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'SUPERADMIN')")
     @Operation(summary = "Get B2B subscription transaction by external ID")
     public ResponseEntity<B2BSubscriptionFinTransactionDTO> getByExternalId(@PathVariable String externalId) {
         return ResponseEntity.ok(b2bSubscriptionFinTransactionService.findByExternalId(externalId));

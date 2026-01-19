@@ -32,7 +32,7 @@ public class MultiSafepayPaymentController {
     // === Orders ===
 
     @GetMapping("/orders/{orderId}")
-    @PreAuthorize("hasAnyRole('ADMIN', 'COMPANY_ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'SUPERADMIN', 'B2B')")
     @Operation(summary = "Get order status")
     public ResponseEntity<Map<String, Object>> getOrder(@PathVariable String orderId) {
         log.info("Getting MultiSafePay order: {}", orderId);
@@ -58,7 +58,7 @@ public class MultiSafepayPaymentController {
     }
 
     @PostMapping("/orders/with-splits")
-    @PreAuthorize("hasAnyRole('ADMIN', 'COMPANY_ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'SUPERADMIN', 'B2B')")
     @Operation(summary = "Create order with split payments")
     public ResponseEntity<Map<String, Object>> createOrderWithSplits(
             @Valid @RequestBody Map<String, Object> request) {
@@ -85,7 +85,7 @@ public class MultiSafepayPaymentController {
     }
 
     @GetMapping("/orders/{orderId}/splits")
-    @PreAuthorize("hasAnyRole('ADMIN', 'COMPANY_ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'SUPERADMIN', 'B2B')")
     @Operation(summary = "Get split payment details")
     public ResponseEntity<List<SplitPaymentDTO>> getOrderSplits(@PathVariable String orderId) {
         log.info("Getting split payment details for order: {}", orderId);
@@ -101,7 +101,7 @@ public class MultiSafepayPaymentController {
     }
 
     @PostMapping("/orders/{orderId}/capture")
-    @PreAuthorize("hasAnyRole('ADMIN', 'COMPANY_ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'SUPERADMIN', 'B2B')")
     @Operation(summary = "Capture authorized payment")
     public ResponseEntity<Map<String, Object>> capturePayment(@PathVariable String orderId) {
         log.info("Capturing payment for order: {}", orderId);
@@ -128,7 +128,7 @@ public class MultiSafepayPaymentController {
     }
 
     @PostMapping("/orders/{orderId}/cancel-authorization")
-    @PreAuthorize("hasAnyRole('ADMIN', 'COMPANY_ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'SUPERADMIN', 'B2B')")
     @Operation(summary = "Cancel authorization")
     public ResponseEntity<Map<String, Object>> cancelAuthorization(@PathVariable String orderId) {
         log.info("Cancelling authorization for order: {}", orderId);
@@ -155,7 +155,7 @@ public class MultiSafepayPaymentController {
     }
 
     @PostMapping("/orders/{orderId}/extend")
-    @PreAuthorize("hasAnyRole('ADMIN', 'COMPANY_ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'SUPERADMIN', 'B2B')")
     @Operation(summary = "Extend order expiration")
     public ResponseEntity<Map<String, Object>> extendExpiration(
             @PathVariable String orderId,
@@ -188,7 +188,7 @@ public class MultiSafepayPaymentController {
     // === Refunds ===
 
     @PostMapping("/orders/{orderId}/refunds/{refundId}/cancel")
-    @PreAuthorize("hasAnyRole('ADMIN', 'COMPANY_ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'SUPERADMIN', 'B2B')")
     @Operation(summary = "Cancel refund")
     public ResponseEntity<Map<String, Object>> cancelRefund(
             @PathVariable String orderId,
@@ -221,7 +221,7 @@ public class MultiSafepayPaymentController {
     // === Chargebacks ===
 
     @PostMapping("/orders/{orderId}/chargebacks/challenge")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'SUPERADMIN')")
     @Operation(summary = "Challenge chargeback")
     public ResponseEntity<Map<String, Object>> challengeChargeback(
             @PathVariable String orderId,
@@ -253,7 +253,7 @@ public class MultiSafepayPaymentController {
     // === Tokens ===
 
     @GetMapping("/tokens")
-    @PreAuthorize("hasAnyRole('ADMIN', 'COMPANY_ADMIN', 'USER')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'SUPERADMIN', 'B2B', 'CUSTOMER')")
     @Operation(summary = "List payment tokens")
     public ResponseEntity<Map<String, Object>> listTokens(
             @RequestParam(defaultValue = "1") int page,
@@ -282,7 +282,7 @@ public class MultiSafepayPaymentController {
     }
 
     @GetMapping("/tokens/{tokenId}")
-    @PreAuthorize("hasAnyRole('ADMIN', 'COMPANY_ADMIN', 'USER')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'SUPERADMIN', 'B2B', 'CUSTOMER')")
     @Operation(summary = "Get token details")
     public ResponseEntity<Map<String, Object>> getToken(@PathVariable String tokenId) {
         log.info("Getting token details: {}", tokenId);
@@ -308,7 +308,7 @@ public class MultiSafepayPaymentController {
     }
 
     @PatchMapping("/tokens/{tokenId}")
-    @PreAuthorize("hasAnyRole('ADMIN', 'COMPANY_ADMIN', 'USER')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'SUPERADMIN', 'B2B', 'CUSTOMER')")
     @Operation(summary = "Update token")
     public ResponseEntity<Map<String, Object>> updateToken(
             @PathVariable String tokenId,
@@ -341,7 +341,7 @@ public class MultiSafepayPaymentController {
     }
 
     @DeleteMapping("/tokens/{tokenId}")
-    @PreAuthorize("hasAnyRole('ADMIN', 'COMPANY_ADMIN', 'USER')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'SUPERADMIN', 'B2B', 'CUSTOMER')")
     @Operation(summary = "Delete token")
     public ResponseEntity<Void> deleteToken(@PathVariable String tokenId) {
         log.info("Deleting token: {}", tokenId);
@@ -359,7 +359,7 @@ public class MultiSafepayPaymentController {
     // === Transactions ===
 
     @GetMapping("/transactions")
-    @PreAuthorize("hasAnyRole('ADMIN', 'COMPANY_ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'SUPERADMIN', 'B2B')")
     @Operation(summary = "List transactions")
     public ResponseEntity<Map<String, Object>> listTransactions(
             @RequestParam(defaultValue = "1") int page,
@@ -388,7 +388,7 @@ public class MultiSafepayPaymentController {
     }
 
     @GetMapping("/transactions/{transactionId}")
-    @PreAuthorize("hasAnyRole('ADMIN', 'COMPANY_ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'SUPERADMIN', 'B2B')")
     @Operation(summary = "Get transaction")
     public ResponseEntity<Map<String, Object>> getTransaction(@PathVariable String transactionId) {
         log.info("Getting transaction: {}", transactionId);
@@ -520,7 +520,7 @@ public class MultiSafepayPaymentController {
     // === Account Management ===
 
     @GetMapping("/site-config")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'SUPERADMIN')")
     @Operation(summary = "Get site configuration")
     public ResponseEntity<Map<String, Object>> getSiteConfig() {
         log.info("Getting site configuration");
@@ -546,7 +546,7 @@ public class MultiSafepayPaymentController {
     }
 
     @PatchMapping("/site-config")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'SUPERADMIN')")
     @Operation(summary = "Update site configuration")
     public ResponseEntity<Map<String, Object>> updateSiteConfig(
             @RequestBody Map<String, Object> siteConfigData) {
@@ -578,7 +578,7 @@ public class MultiSafepayPaymentController {
     }
 
     @GetMapping("/closing-balances")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'SUPERADMIN')")
     @Operation(summary = "List closing balances")
     public ResponseEntity<Map<String, Object>> getClosingBalances(
             @RequestParam String fromDate,
@@ -608,7 +608,7 @@ public class MultiSafepayPaymentController {
     // === Payment Method Specific ===
 
     @PostMapping("/orders/{orderId}/cancel-bancontact-qr")
-    @PreAuthorize("hasAnyRole('ADMIN', 'COMPANY_ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'SUPERADMIN', 'B2B')")
     @Operation(summary = "Cancel Bancontact QR payment")
     public ResponseEntity<Map<String, Object>> cancelBancontactQR(@PathVariable String orderId) {
         log.info("Cancelling Bancontact QR payment for order: {}", orderId);
@@ -634,7 +634,7 @@ public class MultiSafepayPaymentController {
     }
 
     @PostMapping("/orders/{orderId}/hold")
-    @PreAuthorize("hasAnyRole('ADMIN', 'COMPANY_ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'SUPERADMIN', 'B2B')")
     @Operation(summary = "Put PAD order on hold")
     public ResponseEntity<Map<String, Object>> putPADOrderOnHold(@PathVariable String orderId) {
         log.info("Putting PAD order on hold: {}", orderId);

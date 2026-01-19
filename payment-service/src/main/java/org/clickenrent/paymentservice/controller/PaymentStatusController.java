@@ -28,14 +28,14 @@ public class PaymentStatusController {
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'SUPERADMIN')")
     @Operation(summary = "Get payment status by ID")
     public ResponseEntity<PaymentStatusDTO> getById(@PathVariable Long id) {
         return ResponseEntity.ok(paymentStatusService.findById(id));
     }
 
     @GetMapping("/external/{externalId}")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'SUPERADMIN')")
     @Operation(summary = "Get payment status by external ID")
     public ResponseEntity<PaymentStatusDTO> getByExternalId(@PathVariable String externalId) {
         return ResponseEntity.ok(paymentStatusService.findByExternalId(externalId));

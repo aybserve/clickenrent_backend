@@ -76,7 +76,7 @@ public class MobilePaymentController {
                      "Payment completion is confirmed via webhook. " +
                      "To use split payments, include the 'splits' array in the request body with partner merchant IDs and percentages."
     )
-    @PreAuthorize("hasAnyAuthority('USER', 'ADMIN', 'B2B_CLIENT')")
+    @PreAuthorize("hasAnyAuthority('USER', 'ADMIN', 'SUPERADMIN', 'B2B_CLIENT')")
     public ResponseEntity<MobilePaymentResponseDTO> createDirectPayment(
             @Valid @RequestBody MobilePaymentRequestDTO request,
             @AuthenticationPrincipal Jwt jwt) {
@@ -112,7 +112,7 @@ public class MobilePaymentController {
                      "Payment completion is confirmed via webhook. " +
                      "To use split payments, include the 'splits' array in the request body with partner merchant IDs and percentages."
     )
-    @PreAuthorize("hasAnyAuthority('USER', 'ADMIN', 'B2B_CLIENT')")
+    @PreAuthorize("hasAnyAuthority('USER', 'ADMIN', 'SUPERADMIN', 'B2B_CLIENT')")
     public ResponseEntity<MobilePaymentResponseDTO> createRedirectPayment(
             @Valid @RequestBody MobilePaymentRequestDTO request,
             @AuthenticationPrincipal Jwt jwt) {
@@ -143,7 +143,7 @@ public class MobilePaymentController {
                      "Mobile apps should call this endpoint after the user returns from the payment WebView " +
                      "or in response to a push notification."
     )
-    @PreAuthorize("hasAnyAuthority('USER', 'ADMIN', 'B2B_CLIENT')")
+    @PreAuthorize("hasAnyAuthority('USER', 'ADMIN', 'SUPERADMIN', 'B2B_CLIENT')")
     public ResponseEntity<MobilePaymentResponseDTO> getPaymentStatus(
             @PathVariable String orderId,
             @AuthenticationPrincipal Jwt jwt) {
@@ -167,7 +167,7 @@ public class MobilePaymentController {
         description = "Simplified endpoint for iDEAL payment with default values. " +
                      "Provide only amount and issuer ID via query parameters."
     )
-    @PreAuthorize("hasAnyAuthority('USER', 'ADMIN', 'B2B_CLIENT')")
+    @PreAuthorize("hasAnyAuthority('USER', 'ADMIN', 'SUPERADMIN', 'B2B_CLIENT')")
     public ResponseEntity<MobilePaymentResponseDTO> createQuickIdealPayment(
             @RequestParam String amount,
             @RequestParam String issuerId,
@@ -204,7 +204,7 @@ public class MobilePaymentController {
         description = "Simplified endpoint for redirect payment with default values. " +
                      "Provide only amount via query parameter."
     )
-    @PreAuthorize("hasAnyAuthority('USER', 'ADMIN', 'B2B_CLIENT')")
+    @PreAuthorize("hasAnyAuthority('USER', 'ADMIN', 'SUPERADMIN', 'B2B_CLIENT')")
     public ResponseEntity<MobilePaymentResponseDTO> createQuickRedirectPayment(
             @RequestParam String amount,
             @RequestParam(defaultValue = "EUR") String currency,
@@ -240,7 +240,7 @@ public class MobilePaymentController {
                      "Split configuration must be provided in the request body. " +
                      "Returns a transaction URL for minimal WebView authentication."
     )
-    @PreAuthorize("hasAnyAuthority('USER', 'ADMIN', 'B2B_CLIENT')")
+    @PreAuthorize("hasAnyAuthority('USER', 'ADMIN', 'SUPERADMIN', 'B2B_CLIENT')")
     public ResponseEntity<MobilePaymentResponseDTO> createDirectPaymentWithSplits(
             @Valid @RequestBody MobilePaymentRequestDTO request,
             @AuthenticationPrincipal Jwt jwt) {
@@ -274,7 +274,7 @@ public class MobilePaymentController {
                      "Split configuration must be provided in the request body. " +
                      "Returns a payment URL for full WebView."
     )
-    @PreAuthorize("hasAnyAuthority('USER', 'ADMIN', 'B2B_CLIENT')")
+    @PreAuthorize("hasAnyAuthority('USER', 'ADMIN', 'SUPERADMIN', 'B2B_CLIENT')")
     public ResponseEntity<MobilePaymentResponseDTO> createRedirectPaymentWithSplits(
             @Valid @RequestBody MobilePaymentRequestDTO request,
             @AuthenticationPrincipal Jwt jwt) {
@@ -306,7 +306,7 @@ public class MobilePaymentController {
         description = "Quick endpoint for iDEAL payment with revenue sharing. " +
                      "Provide amount, issuer ID, partner merchant ID, and percentage via query parameters."
     )
-    @PreAuthorize("hasAnyAuthority('USER', 'ADMIN', 'B2B_CLIENT')")
+    @PreAuthorize("hasAnyAuthority('USER', 'ADMIN', 'SUPERADMIN', 'B2B_CLIENT')")
     public ResponseEntity<MobilePaymentResponseDTO> createQuickIdealWithSplits(
             @RequestParam String amount,
             @RequestParam String issuerId,
@@ -353,7 +353,7 @@ public class MobilePaymentController {
         description = "Quick endpoint for redirect payment with revenue sharing. " +
                      "Provide amount, partner merchant ID, and percentage via query parameters."
     )
-    @PreAuthorize("hasAnyAuthority('USER', 'ADMIN', 'B2B_CLIENT')")
+    @PreAuthorize("hasAnyAuthority('USER', 'ADMIN', 'SUPERADMIN', 'B2B_CLIENT')")
     public ResponseEntity<MobilePaymentResponseDTO> createQuickRedirectWithSplits(
             @RequestParam String amount,
             @RequestParam String partnerMerchantId,

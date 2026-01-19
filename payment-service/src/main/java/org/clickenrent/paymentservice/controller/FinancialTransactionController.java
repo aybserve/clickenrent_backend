@@ -29,14 +29,14 @@ public class FinancialTransactionController {
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'SUPERADMIN')")
     @Operation(summary = "Get financial transaction by ID")
     public ResponseEntity<FinancialTransactionDTO> getById(@PathVariable Long id) {
         return ResponseEntity.ok(financialTransactionService.findById(id));
     }
 
     @GetMapping("/external/{externalId}")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'SUPERADMIN')")
     @Operation(summary = "Get financial transaction by external ID")
     public ResponseEntity<FinancialTransactionDTO> getByExternalId(@PathVariable String externalId) {
         return ResponseEntity.ok(financialTransactionService.findByExternalId(externalId));
@@ -52,7 +52,7 @@ public class FinancialTransactionController {
     }
 
     @DeleteMapping("/external/{externalId}")
-    @PreAuthorize("hasRole('SUPERADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'SUPERADMIN')")
     @Operation(summary = "Delete financial transaction by external ID", description = "SUPERADMIN only - for data correction")
     public ResponseEntity<Void> deleteByExternalId(@PathVariable String externalId) {
         financialTransactionService.deleteByExternalId(externalId);
@@ -72,7 +72,7 @@ public class FinancialTransactionController {
     }
 
     @PostMapping
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'SUPERADMIN')")
     @Operation(summary = "Create new financial transaction")
     public ResponseEntity<FinancialTransactionDTO> create(@Valid @RequestBody FinancialTransactionDTO dto) {
         return ResponseEntity.status(HttpStatus.CREATED).body(financialTransactionService.create(dto));

@@ -28,14 +28,14 @@ public class B2BRevenueSharePayoutItemController {
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'SUPERADMIN')")
     @Operation(summary = "Get payout item by ID")
     public ResponseEntity<B2BRevenueSharePayoutItemDTO> getById(@PathVariable Long id) {
         return ResponseEntity.ok(payoutItemService.findById(id));
     }
 
     @GetMapping("/external/{externalId}")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'SUPERADMIN')")
     @Operation(summary = "Get payout item by external ID")
     public ResponseEntity<B2BRevenueSharePayoutItemDTO> getByExternalId(@PathVariable String externalId) {
         return ResponseEntity.ok(payoutItemService.findByExternalId(externalId));

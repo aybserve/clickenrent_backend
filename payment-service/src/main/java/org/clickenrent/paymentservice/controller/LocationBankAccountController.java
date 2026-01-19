@@ -32,7 +32,7 @@ public class LocationBankAccountController {
     private final LocationBankAccountService locationBankAccountService;
     
     @PostMapping
-    @PreAuthorize("hasAuthority('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'SUPERADMIN')")
     @Operation(
         summary = "Create location bank account",
         description = "Register bank account details for a location to enable automatic payouts"
@@ -45,7 +45,7 @@ public class LocationBankAccountController {
     }
     
     @GetMapping("/location/{locationExternalId}")
-    @PreAuthorize("hasAnyAuthority('ADMIN', 'B2B_CLIENT')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'SUPERADMIN', 'B2B_CLIENT')")
     @Operation(
         summary = "Get bank account by location external ID",
         description = "Retrieve bank account details for a specific location"
@@ -63,7 +63,7 @@ public class LocationBankAccountController {
     }
     
     @GetMapping("/{externalId}")
-    @PreAuthorize("hasAnyAuthority('ADMIN', 'B2B_CLIENT')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'SUPERADMIN', 'B2B_CLIENT')")
     @Operation(
         summary = "Get bank account by external ID",
         description = "Retrieve bank account details by its external ID"
@@ -81,7 +81,7 @@ public class LocationBankAccountController {
     }
     
     @GetMapping("/company/{companyExternalId}")
-    @PreAuthorize("hasAuthority('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'SUPERADMIN')")
     @Operation(
         summary = "Get all bank accounts for a company",
         description = "Retrieve all bank accounts for all locations of a specific company"
@@ -94,7 +94,7 @@ public class LocationBankAccountController {
     }
     
     @PutMapping("/{externalId}")
-    @PreAuthorize("hasAuthority('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'SUPERADMIN')")
     @Operation(
         summary = "Update location bank account",
         description = "Update bank account details for a location"
@@ -108,7 +108,7 @@ public class LocationBankAccountController {
     }
     
     @DeleteMapping("/{externalId}")
-    @PreAuthorize("hasAuthority('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'SUPERADMIN')")
     @Operation(
         summary = "Deactivate location bank account",
         description = "Deactivate a bank account (soft delete). Payouts will no longer be sent to this account."
@@ -127,7 +127,7 @@ public class LocationBankAccountController {
     }
     
     @PostMapping("/{externalId}/verify")
-    @PreAuthorize("hasAuthority('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'SUPERADMIN')")
     @Operation(
         summary = "Verify location bank account",
         description = "Mark a bank account as verified after manual verification process"

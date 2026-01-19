@@ -28,14 +28,14 @@ public class ServiceProviderController {
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'SUPERADMIN')")
     @Operation(summary = "Get service provider by ID")
     public ResponseEntity<ServiceProviderDTO> getById(@PathVariable Long id) {
         return ResponseEntity.ok(serviceProviderService.findById(id));
     }
 
     @GetMapping("/external/{externalId}")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'SUPERADMIN')")
     @Operation(summary = "Get service provider by external ID")
     public ResponseEntity<ServiceProviderDTO> getByExternalId(@PathVariable String externalId) {
         return ResponseEntity.ok(serviceProviderService.findByExternalId(externalId));

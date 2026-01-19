@@ -33,7 +33,7 @@ public class CurrencyController {
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'SUPERADMIN')")
     @Operation(summary = "Get currency by ID")
     @ApiResponse(responseCode = "200", description = "Successfully retrieved currency")
     @ApiResponse(responseCode = "404", description = "Currency not found")
@@ -42,7 +42,7 @@ public class CurrencyController {
     }
 
     @GetMapping("/external/{externalId}")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'SUPERADMIN')")
     @Operation(summary = "Get currency by external ID")
     @ApiResponse(responseCode = "200", description = "Successfully retrieved currency")
     @ApiResponse(responseCode = "404", description = "Currency not found")
@@ -51,7 +51,7 @@ public class CurrencyController {
     }
 
     @PostMapping
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'SUPERADMIN')")
     @Operation(summary = "Create new currency")
     @ApiResponse(responseCode = "201", description = "Currency created successfully")
     @ApiResponse(responseCode = "400", description = "Invalid input")

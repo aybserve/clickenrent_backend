@@ -174,7 +174,22 @@ INSERT INTO b2b_subscription_fin_transactions (id, external_id, b2b_subscription
 ON CONFLICT (id) DO NOTHING;
 
 -- ---------------------------------------------------------------------------------------------------------------------
--- 2.7 B2B REVENUE SHARE PAYOUTS (Sample data - references companies from auth-service)
+-- 2.7 LOCATION BANK ACCOUNTS (Sample data for payout testing)
+-- ---------------------------------------------------------------------------------------------------------------------
+-- Sample bank accounts for location payout testing
+-- These reference locations from rental-service
+-- IMPORTANT: Replace with real bank accounts before production use
+-- NOTE: This MUST come BEFORE b2b_revenue_share_payouts due to foreign key constraints
+INSERT INTO location_bank_accounts (id, external_id, company_external_id, location_external_id, account_holder_name, iban, bic, currency, is_verified, is_active, verification_notes, date_created, last_date_modified, created_by, last_modified_by, is_deleted) VALUES
+-- Bank accounts for locations with unpaid rentals (Dec 2025)
+(1, '550e8400-e29b-41d4-a716-446655440201', 'company-ext-001', '550e8400-e29b-41d4-a716-446655440101', 'Downtown Bike Hub BV', 'NL91ABNA0417164300', 'ABNANL2A', 'EUR', true, true, 'Verified via bank statement - Test account', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(2, '550e8400-e29b-41d4-a716-446655440202', 'company-ext-001', '550e8400-e29b-41d4-a716-446655440102', 'Park Side Station Ltd', 'NL20INGB0001234567', 'INGBNL2A', 'EUR', true, true, 'Verified via bank statement - Test account', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+-- Additional test bank accounts
+(3, '550e8400-e29b-41d4-a716-446655440203', 'company-ext-002', '550e8400-e29b-41d4-a716-446655440103', 'City Center Rentals BV', 'NL86RABO0123456789', 'RABONL2U', 'EUR', true, true, 'Verified via bank statement - Test account', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false)
+ON CONFLICT (id) DO NOTHING;
+
+-- ---------------------------------------------------------------------------------------------------------------------
+-- 2.8 B2B REVENUE SHARE PAYOUTS (Sample data - references companies from auth-service)
 -- ---------------------------------------------------------------------------------------------------------------------
 INSERT INTO b2b_revenue_share_payouts (id, external_id, company_external_id, location_bank_account_id, multisafepay_payout_id, payment_status_id, due_date, payout_date, total_amount, paid_amount, remaining_amount, status, currency, failure_reason, date_created, last_date_modified, created_by, last_modified_by, is_deleted) VALUES
 -- Payout 1: Pending payout for Amsterdam location (company-ext-00001)
@@ -186,7 +201,7 @@ INSERT INTO b2b_revenue_share_payouts (id, external_id, company_external_id, loc
 ON CONFLICT (id) DO NOTHING;
 
 -- ---------------------------------------------------------------------------------------------------------------------
--- 2.8 B2B REVENUE SHARE PAYOUT ITEMS (Sample data)
+-- 2.9 B2B REVENUE SHARE PAYOUT ITEMS (Sample data)
 -- ---------------------------------------------------------------------------------------------------------------------
 INSERT INTO b2b_revenue_share_payout_items (id, external_id, b2b_revenue_share_payout_id, bike_rental_external_id, bike_rental_total_price, revenue_share_percent, amount, date_created, last_date_modified, created_by, last_modified_by, is_deleted) VALUES
 -- Items for Payout 1 (PENDING - Amsterdam)
@@ -201,24 +216,10 @@ INSERT INTO b2b_revenue_share_payout_items (id, external_id, b2b_revenue_share_p
 ON CONFLICT (id) DO NOTHING;
 
 -- ---------------------------------------------------------------------------------------------------------------------
--- 2.9 PAYOUT FIN TRANSACTIONS (Sample data - links payouts to financial transactions)
+-- 2.10 PAYOUT FIN TRANSACTIONS (Sample data - links payouts to financial transactions)
 -- ---------------------------------------------------------------------------------------------------------------------
 INSERT INTO payout_fin_transactions (id, external_id, b2b_revenue_share_payout_id, financial_transaction_id, date_created, last_date_modified, created_by, last_modified_by, is_deleted) VALUES
 (1, '550e8400-e29b-41d4-a716-446655440121', 2, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', FALSE)
-ON CONFLICT (id) DO NOTHING;
-
--- ---------------------------------------------------------------------------------------------------------------------
--- 2.7 LOCATION BANK ACCOUNTS (Sample data for payout testing)
--- ---------------------------------------------------------------------------------------------------------------------
--- Sample bank accounts for location payout testing
--- These reference locations from rental-service
--- IMPORTANT: Replace with real bank accounts before production use
-INSERT INTO location_bank_accounts (id, external_id, company_external_id, location_external_id, account_holder_name, iban, bic, currency, is_verified, is_active, verification_notes, date_created, last_date_modified, created_by, last_modified_by, is_deleted) VALUES
--- Bank accounts for locations with unpaid rentals (Dec 2025)
-(1, '550e8400-e29b-41d4-a716-446655440201', 'company-ext-001', '550e8400-e29b-41d4-a716-446655440101', 'Downtown Bike Hub BV', 'NL91ABNA0417164300', 'ABNANL2A', 'EUR', true, true, 'Verified via bank statement - Test account', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
-(2, '550e8400-e29b-41d4-a716-446655440202', 'company-ext-001', '550e8400-e29b-41d4-a716-446655440102', 'Park Side Station Ltd', 'NL20INGB0001234567', 'INGBNL2A', 'EUR', true, true, 'Verified via bank statement - Test account', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
--- Additional test bank accounts
-(3, '550e8400-e29b-41d4-a716-446655440203', 'company-ext-002', '550e8400-e29b-41d4-a716-446655440103', 'City Center Rentals BV', 'NL86RABO0123456789', 'RABONL2U', 'EUR', true, true, 'Verified via bank statement - Test account', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false)
 ON CONFLICT (id) DO NOTHING;
 
 -- =====================================================================================================================

@@ -34,21 +34,21 @@ public class PaymentMethodController {
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'SUPERADMIN')")
     @Operation(summary = "Get payment method by ID")
     public ResponseEntity<PaymentMethodDTO> getById(@PathVariable Long id) {
         return ResponseEntity.ok(paymentMethodService.findById(id));
     }
 
     @GetMapping("/external/{externalId}")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'SUPERADMIN')")
     @Operation(summary = "Get payment method by external ID")
     public ResponseEntity<PaymentMethodDTO> getByExternalId(@PathVariable String externalId) {
         return ResponseEntity.ok(paymentMethodService.findByExternalId(externalId));
     }
 
     @PostMapping
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'SUPERADMIN')")
     @Operation(summary = "Create new payment method")
     public ResponseEntity<PaymentMethodDTO> create(@Valid @RequestBody PaymentMethodDTO dto) {
         return ResponseEntity.status(HttpStatus.CREATED).body(paymentMethodService.create(dto));

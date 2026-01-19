@@ -28,14 +28,14 @@ public class PayoutFinTransactionController {
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'SUPERADMIN')")
     @Operation(summary = "Get payout transaction by ID")
     public ResponseEntity<PayoutFinTransactionDTO> getById(@PathVariable Long id) {
         return ResponseEntity.ok(payoutFinTransactionService.findById(id));
     }
 
     @GetMapping("/external/{externalId}")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'SUPERADMIN')")
     @Operation(summary = "Get payout transaction by external ID")
     public ResponseEntity<PayoutFinTransactionDTO> getByExternalId(@PathVariable String externalId) {
         return ResponseEntity.ok(payoutFinTransactionService.findByExternalId(externalId));
