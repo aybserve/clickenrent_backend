@@ -21,7 +21,7 @@ import java.util.Map;
 @RequestMapping("/api/v1/multisafepay/test")
 @RequiredArgsConstructor
 @Slf4j
-@Tag(name = "MultiSafePay Testing", description = "Testing endpoints for MultiSafePay integration")
+@Tag(name = "Admin Payments - B2B (Test)", description = "Testing endpoints for B2B payment operations (NO AUTH)")
 public class MultiSafepayTestController {
 
     private final MultiSafepayService multiSafepayService;
@@ -821,131 +821,6 @@ public class MultiSafepayTestController {
         }
     }
 
-    @GetMapping("/terminals")
-    @Operation(summary = "Test: List POS terminals")
-    public ResponseEntity<Map<String, Object>> testListTerminals(
-            @RequestParam(required = false) String groupId) {
-        
-        log.info("Testing MultiSafePay list terminals");
-        
-        try {
-            JsonObject result;
-            if (groupId != null && !groupId.isEmpty()) {
-                result = multiSafepayService.listTerminalsByGroup(groupId);
-            } else {
-                result = multiSafepayService.listTerminals();
-            }
-            
-            Map<String, Object> response = new HashMap<>();
-            response.put("success", true);
-            response.put("message", "Terminals retrieved successfully");
-            response.put("fullResponse", result.toString());
-            
-            return ResponseEntity.ok(response);
-            
-        } catch (Exception e) {
-            log.error("❌ Failed to list terminals", e);
-            
-            Map<String, Object> errorResponse = new HashMap<>();
-            errorResponse.put("success", false);
-            errorResponse.put("error", e.getMessage());
-            
-            return ResponseEntity.status(500).body(errorResponse);
-        }
-    }
-
-    @PostMapping("/terminals")
-    @Operation(summary = "Test: Create POS terminal")
-    public ResponseEntity<Map<String, Object>> testCreateTerminal(
-            @RequestBody Map<String, Object> terminalData) {
-        
-        log.info("Testing MultiSafePay create terminal");
-        
-        try {
-            org.clickenrent.paymentservice.client.multisafepay.model.Terminal terminal = 
-                new org.clickenrent.paymentservice.client.multisafepay.model.Terminal();
-            // Map terminalData to terminal object
-            
-            JsonObject result = multiSafepayService.createPOSTerminal(terminal);
-            
-            Map<String, Object> response = new HashMap<>();
-            response.put("success", true);
-            response.put("message", "Terminal created successfully");
-            response.put("fullResponse", result.toString());
-            
-            return ResponseEntity.ok(response);
-            
-        } catch (Exception e) {
-            log.error("❌ Failed to create terminal", e);
-            
-            Map<String, Object> errorResponse = new HashMap<>();
-            errorResponse.put("success", false);
-            errorResponse.put("error", e.getMessage());
-            
-            return ResponseEntity.status(500).body(errorResponse);
-        }
-    }
-
-    @PostMapping("/terminals/{terminalId}/transactions/{transactionId}/cancel")
-    @Operation(summary = "Test: Cancel POS transaction")
-    public ResponseEntity<Map<String, Object>> testCancelPOSTransaction(
-            @PathVariable String terminalId,
-            @PathVariable String transactionId) {
-        
-        log.info("Testing MultiSafePay cancel POS transaction");
-        
-        try {
-            JsonObject result = multiSafepayService.cancelPOSTransaction(terminalId, transactionId);
-            
-            Map<String, Object> response = new HashMap<>();
-            response.put("success", true);
-            response.put("terminalId", terminalId);
-            response.put("transactionId", transactionId);
-            response.put("message", "POS transaction cancelled successfully");
-            response.put("fullResponse", result.toString());
-            
-            return ResponseEntity.ok(response);
-            
-        } catch (Exception e) {
-            log.error("❌ Failed to cancel POS transaction", e);
-            
-            Map<String, Object> errorResponse = new HashMap<>();
-            errorResponse.put("success", false);
-            errorResponse.put("error", e.getMessage());
-            
-            return ResponseEntity.status(500).body(errorResponse);
-        }
-    }
-
-    @GetMapping("/terminals/{terminalId}/receipt/{transactionId}")
-    @Operation(summary = "Test: Get POS transaction receipt")
-    public ResponseEntity<Map<String, Object>> testGetReceipt(
-            @PathVariable String terminalId,
-            @PathVariable String transactionId) {
-        
-        log.info("Testing MultiSafePay get receipt for terminal: {}, transaction: {}", terminalId, transactionId);
-        
-        try {
-            JsonObject result = multiSafepayService.getReceipt(terminalId, transactionId);
-            
-            Map<String, Object> response = new HashMap<>();
-            response.put("success", true);
-            response.put("terminalId", terminalId);
-            response.put("transactionId", transactionId);
-            response.put("fullResponse", result.toString());
-            
-            return ResponseEntity.ok(response);
-            
-        } catch (Exception e) {
-            log.error("❌ Failed to get receipt", e);
-            
-            Map<String, Object> errorResponse = new HashMap<>();
-            errorResponse.put("success", false);
-            errorResponse.put("error", e.getMessage());
-            
-            return ResponseEntity.status(500).body(errorResponse);
-        }
-    }
 
     @PostMapping("/verify-webhook-signature")
     @Operation(summary = "Test: Verify webhook signature")

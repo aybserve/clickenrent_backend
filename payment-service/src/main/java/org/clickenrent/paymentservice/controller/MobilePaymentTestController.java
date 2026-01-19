@@ -23,7 +23,7 @@ import java.util.Map;
 @RequestMapping("/api/v1/payments/mobile/test")
 @RequiredArgsConstructor
 @Slf4j
-@Tag(name = "Mobile Payments Test", description = "Testing endpoints for mobile payment integration (NO AUTH)")
+@Tag(name = "Mobile Payments - Customer (Test)", description = "Testing endpoints for mobile payment integration (NO AUTH)")
 public class MobilePaymentTestController {
 
     private final MobilePaymentService mobilePaymentService;

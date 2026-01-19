@@ -23,7 +23,7 @@ import java.util.List;
 @RequestMapping("/api/v1/payments/mobile")
 @RequiredArgsConstructor
 @Slf4j
-@Tag(name = "Mobile Payments", description = "Mobile-optimized payment APIs")
+@Tag(name = "Mobile Payments - Customer", description = "Payment flows for mobile app customers")
 public class MobilePaymentController {
 
     private final MobilePaymentService mobilePaymentService;

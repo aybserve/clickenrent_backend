@@ -24,7 +24,7 @@ import java.util.Map;
 @RequestMapping("/api/v1/multisafepay")
 @RequiredArgsConstructor
 @Slf4j
-@Tag(name = "MultiSafepay Payment", description = "Production MultiSafepay payment operations API")
+@Tag(name = "Admin Payments - B2B", description = "Administrative operations for B2B partners")
 public class MultiSafepayPaymentController {
 
     private final MultiSafepayService multiSafepayService;
@@ -605,131 +605,6 @@ public class MultiSafepayPaymentController {
             return ResponseEntity.status(500).body(errorResponse);
         }
     }
-
-    // === POS Terminals ===
-
-    @GetMapping("/terminals")
-    @PreAuthorize("hasAnyRole('ADMIN', 'COMPANY_ADMIN')")
-    @Operation(summary = "List POS terminals")
-    public ResponseEntity<Map<String, Object>> listTerminals(
-            @RequestParam(required = false) String groupId) {
-        
-        log.info("Listing POS terminals");
-        
-        try {
-            JsonObject result;
-            if (groupId != null && !groupId.isEmpty()) {
-                result = multiSafepayService.listTerminalsByGroup(groupId);
-            } else {
-                result = multiSafepayService.listTerminals();
-            }
-            
-            Map<String, Object> response = new HashMap<>();
-            response.put("success", true);
-            response.put("data", result.toString());
-            
-            return ResponseEntity.ok(response);
-            
-        } catch (Exception e) {
-            log.error("Failed to list terminals", e);
-            
-            Map<String, Object> errorResponse = new HashMap<>();
-            errorResponse.put("success", false);
-            errorResponse.put("error", e.getMessage());
-            
-            return ResponseEntity.status(500).body(errorResponse);
-        }
-    }
-
-    @PostMapping("/terminals")
-    @PreAuthorize("hasRole('ADMIN')")
-    @Operation(summary = "Create POS terminal")
-    public ResponseEntity<Map<String, Object>> createTerminal(
-            @RequestBody Map<String, Object> terminalData) {
-        
-        log.info("Creating POS terminal");
-        
-        try {
-            org.clickenrent.paymentservice.client.multisafepay.model.Terminal terminal = 
-                new org.clickenrent.paymentservice.client.multisafepay.model.Terminal();
-            
-            JsonObject result = multiSafepayService.createPOSTerminal(terminal);
-            
-            Map<String, Object> response = new HashMap<>();
-            response.put("success", true);
-            response.put("data", result.toString());
-            
-            return ResponseEntity.ok(response);
-            
-        } catch (Exception e) {
-            log.error("Failed to create terminal", e);
-            
-            Map<String, Object> errorResponse = new HashMap<>();
-            errorResponse.put("success", false);
-            errorResponse.put("error", e.getMessage());
-            
-            return ResponseEntity.status(500).body(errorResponse);
-        }
-    }
-
-    @PostMapping("/terminals/{terminalId}/transactions/{transactionId}/cancel")
-    @PreAuthorize("hasAnyRole('ADMIN', 'COMPANY_ADMIN')")
-    @Operation(summary = "Cancel POS transaction")
-    public ResponseEntity<Map<String, Object>> cancelPOSTransaction(
-            @PathVariable String terminalId,
-            @PathVariable String transactionId) {
-        
-        log.info("Cancelling POS transaction for terminal: {}, transaction: {}", terminalId, transactionId);
-        
-        try {
-            JsonObject result = multiSafepayService.cancelPOSTransaction(terminalId, transactionId);
-            
-            Map<String, Object> response = new HashMap<>();
-            response.put("success", true);
-            response.put("data", result.toString());
-            
-            return ResponseEntity.ok(response);
-            
-        } catch (Exception e) {
-            log.error("Failed to cancel POS transaction", e);
-            
-            Map<String, Object> errorResponse = new HashMap<>();
-            errorResponse.put("success", false);
-            errorResponse.put("error", e.getMessage());
-            
-            return ResponseEntity.status(500).body(errorResponse);
-        }
-    }
-
-    @GetMapping("/terminals/{terminalId}/receipt/{transactionId}")
-    @PreAuthorize("hasAnyRole('ADMIN', 'COMPANY_ADMIN')")
-    @Operation(summary = "Get POS receipt")
-    public ResponseEntity<Map<String, Object>> getReceipt(
-            @PathVariable String terminalId,
-            @PathVariable String transactionId) {
-        
-        log.info("Getting receipt for terminal: {}, transaction: {}", terminalId, transactionId);
-        
-        try {
-            JsonObject result = multiSafepayService.getReceipt(terminalId, transactionId);
-            
-            Map<String, Object> response = new HashMap<>();
-            response.put("success", true);
-            response.put("data", result.toString());
-            
-            return ResponseEntity.ok(response);
-            
-        } catch (Exception e) {
-            log.error("Failed to get receipt", e);
-            
-            Map<String, Object> errorResponse = new HashMap<>();
-            errorResponse.put("success", false);
-            errorResponse.put("error", e.getMessage());
-            
-            return ResponseEntity.status(500).body(errorResponse);
-        }
-    }
-
     // === Payment Method Specific ===
 
     @PostMapping("/orders/{orderId}/cancel-bancontact-qr")

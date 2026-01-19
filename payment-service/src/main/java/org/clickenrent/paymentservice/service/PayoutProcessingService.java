@@ -10,6 +10,7 @@ import org.clickenrent.paymentservice.entity.B2BRevenueSharePayoutItem;
 import org.clickenrent.paymentservice.entity.LocationBankAccount;
 import org.clickenrent.paymentservice.entity.PaymentStatus;
 import org.clickenrent.paymentservice.exception.MultiSafepayIntegrationException;
+import org.clickenrent.paymentservice.exception.ResourceNotFoundException;
 import org.clickenrent.paymentservice.repository.B2BRevenueSharePayoutItemRepository;
 import org.clickenrent.paymentservice.repository.B2BRevenueSharePayoutRepository;
 import org.clickenrent.paymentservice.repository.LocationBankAccountRepository;
@@ -245,6 +246,109 @@ public class PayoutProcessingService {
             payout.setFailureReason("Unexpected error: " + e.getMessage());
             payoutRepository.save(payout);
             throw new RuntimeException("Payout processing failed: " + e.getMessage(), e);
+        }
+    }
+    
+    /**
+     * Retry a failed payout
+     * Re-attempts the MultiSafepay payout API call for a payout that previously failed
+     *
+     * @param payoutExternalId External ID of the payout to retry
+     * @return Updated payout entity
+     * @throws ResourceNotFoundException if payout not found
+     * @throws IllegalStateException if payout status is not FAILED
+     * @throws MultiSafepayIntegrationException if MultiSafepay API call fails
+     */
+    @Transactional
+    public B2BRevenueSharePayout retryPayout(String payoutExternalId) {
+        log.info("Retrying payout: {}", payoutExternalId);
+        
+        // 1. Fetch payout by external ID
+        B2BRevenueSharePayout payout = payoutRepository.findByExternalId(payoutExternalId)
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "B2BRevenueSharePayout", "externalId", payoutExternalId));
+        
+        log.debug("Found payout with status: {}", payout.getStatus());
+        
+        // 2. Validate payout status is FAILED
+        if (!"FAILED".equals(payout.getStatus())) {
+            throw new IllegalStateException(
+                    "Cannot retry payout with status: " + payout.getStatus() + 
+                    ". Only FAILED payouts can be retried.");
+        }
+        
+        // 3. Get associated bank account
+        LocationBankAccount bankAccount = payout.getLocationBankAccount();
+        if (bankAccount == null) {
+            throw new IllegalStateException(
+                    "Payout has no associated bank account. Cannot retry.");
+        }
+        
+        log.debug("Bank account found for location: {}", bankAccount.getLocationExternalId());
+        
+        // 4. Recreate description from payout items
+        int itemCount = payout.getPayoutItems() != null ? payout.getPayoutItems().size() : 0;
+        String description = String.format("Revenue share for %d bike rentals - Location %s", 
+                itemCount, bankAccount.getLocationExternalId());
+        
+        // 5. Call MultiSafepay Payout API
+        try {
+            log.info("Calling MultiSafepay Payout API for retry - Location: {}", 
+                    bankAccount.getLocationExternalId());
+            
+            JsonObject mspResponse = multiSafepayPayoutService.createPayout(
+                    bankAccount, 
+                    payout.getTotalAmount(), 
+                    description
+            );
+            
+            // 6. Extract payout ID and update payout
+            String payoutId = multiSafepayPayoutService.extractPayoutId(mspResponse);
+            if (payoutId != null) {
+                payout.setMultiSafepayPayoutId(payoutId);
+                payout.setStatus("PROCESSING");
+                payout.setPayoutDate(LocalDate.now());
+                payout.setFailureReason(null); // Clear previous failure reason
+                log.info("MultiSafepay payout created with ID: {}", payoutId);
+            } else {
+                payout.setStatus("FAILED");
+                payout.setFailureReason("Failed to extract payout ID from MultiSafepay response");
+                log.error("Failed to extract payout ID from MultiSafepay response");
+            }
+            
+            B2BRevenueSharePayout savedPayout = payoutRepository.save(payout);
+            
+            // 7. Mark bike rentals as paid (only if payout was successful)
+            if (payoutId != null && payout.getPayoutItems() != null && !payout.getPayoutItems().isEmpty()) {
+                List<String> rentalIds = payout.getPayoutItems().stream()
+                        .map(B2BRevenueSharePayoutItem::getBikeRentalExternalId)
+                        .collect(Collectors.toList());
+                
+                try {
+                    rentalServiceClient.markBikeRentalsAsPaid(rentalIds);
+                    log.info("Marked {} bike rentals as paid", rentalIds.size());
+                } catch (Exception e) {
+                    log.error("Failed to mark bike rentals as paid. " +
+                            "Payout was created but rentals not marked. Manual intervention required.", e);
+                    // Don't fail the whole retry process if rental marking fails
+                }
+            }
+            
+            log.info("Successfully retried payout: {}", payoutExternalId);
+            return savedPayout;
+            
+        } catch (MultiSafepayIntegrationException e) {
+            log.error("MultiSafepay payout API call failed during retry for: {}", payoutExternalId, e);
+            payout.setStatus("FAILED");
+            payout.setFailureReason("Retry failed: " + e.getMessage());
+            payoutRepository.save(payout);
+            throw e;
+        } catch (Exception e) {
+            log.error("Unexpected error during payout retry for: {}", payoutExternalId, e);
+            payout.setStatus("FAILED");
+            payout.setFailureReason("Retry failed: " + e.getMessage());
+            payoutRepository.save(payout);
+            throw new RuntimeException("Payout retry failed: " + e.getMessage(), e);
         }
     }
     

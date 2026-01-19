@@ -1020,13 +1020,13 @@ public class GatewayConfig {
                         .path("/api/v1/webhooks/multisafepay/**")
                         .uri("lb://payment-service"))
 
-                // Public MultiSafePay Test Routes - For development/testing (should be disabled in production)
-                .route("multisafepay-test", r -> r
+                // Admin Payments - B2B (Test) - For development/testing (should be disabled in production)
+                .route("admin-b2b-payments-test", r -> r
                         .path("/api/v1/multisafepay/test/**")
                         .uri("lb://payment-service"))
 
-                // Public Mobile Payment Test Routes - For development/testing (should be disabled in production)
-                .route("mobile-payments-test", r -> r
+                // Mobile Payments - Customer (Test) - For development/testing (should be disabled in production)
+                .route("customer-mobile-payments-test", r -> r
                         .path("/api/v1/payments/mobile/test/**")
                         .uri("lb://payment-service"))
 
@@ -1035,8 +1035,9 @@ public class GatewayConfig {
                         .path("/api/v1/test/service-auth/**")
                         .uri("lb://payment-service"))
 
-                // Protected MultiSafePay Production Routes - Requires JWT authentication
-                .route("multisafepay-production", r -> r
+                // Admin Payments - B2B (Production) - Requires JWT authentication
+                // Administrative operations for B2B partners
+                .route("admin-b2b-payments-production", r -> r
                         .path("/api/v1/multisafepay/**")
                         .filters(f -> f
                                 .filter(jwtAuthenticationFilter)
@@ -1046,8 +1047,9 @@ public class GatewayConfig {
                                         .setStatusCode(HttpStatus.TOO_MANY_REQUESTS)))
                         .uri("lb://payment-service"))
 
-                // Mobile Payment Routes - Protected, requires JWT authentication
-                .route("mobile-payments", r -> r
+                // Mobile Payments - Customer (Production) - Requires JWT authentication
+                // Payment flows for mobile app customers
+                .route("customer-mobile-payments-production", r -> r
                         .path("/api/v1/payments/mobile/**")
                         .filters(f -> f
                                 .filter(jwtAuthenticationFilter)

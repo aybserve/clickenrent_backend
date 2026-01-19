@@ -28,6 +28,9 @@ public class MultiSafepayPayoutService {
     @Value("${multisafepay.payout.enabled:true}")
     private boolean payoutEnabled;
     
+    @Value("${multisafepay.test.mode:true}")
+    private boolean testMode;
+    
     /**
      * Create a payout to a location's bank account
      * 
@@ -86,7 +89,35 @@ public class MultiSafepayPayoutService {
         );
         
         try {
-            // Send request to MultiSafepay
+            // In test mode, simulate successful payout since MultiSafePay test API doesn't support payouts
+            if (testMode) {
+                log.warn("TEST MODE: Simulating payout creation (MultiSafePay test API doesn't support payouts)");
+                JsonObject simulatedResponse = new JsonObject();
+                simulatedResponse.addProperty("success", true);
+                
+                JsonObject data = new JsonObject();
+                data.addProperty("id", "test_payout_" + System.currentTimeMillis());
+                data.addProperty("status", "pending");
+                data.addProperty("currency", locationBankAccount.getCurrency());
+                data.addProperty("amount", amountInCents);
+                data.addProperty("description", description);
+                data.addProperty("reference", reference);
+                data.addProperty("created", java.time.Instant.now().toString());
+                
+                JsonObject bankAccountData = new JsonObject();
+                bankAccountData.addProperty("account_holder_name", locationBankAccount.getAccountHolderName());
+                bankAccountData.addProperty("iban", locationBankAccount.getIban());
+                bankAccountData.addProperty("bic", locationBankAccount.getBic());
+                data.add("bank_account", bankAccountData);
+                
+                simulatedResponse.add("data", data);
+                
+                log.info("TEST MODE: Successfully simulated payout for location: {} - Reference: {}", 
+                    locationBankAccount.getLocationExternalId(), reference);
+                return simulatedResponse;
+            }
+            
+            // Send request to MultiSafepay (production mode only)
             JsonObject response = MultiSafepayClient.createPayout(payout);
             
             if (response != null && response.has("success") && response.get("success").getAsBoolean()) {
@@ -120,6 +151,24 @@ public class MultiSafepayPayoutService {
         log.debug("Fetching payout status for: {}", payoutId);
         
         try {
+            // In test mode, simulate successful payout status
+            if (testMode) {
+                log.warn("TEST MODE: Simulating payout status (MultiSafePay test API doesn't support payouts)");
+                JsonObject simulatedResponse = new JsonObject();
+                simulatedResponse.addProperty("success", true);
+                
+                JsonObject data = new JsonObject();
+                data.addProperty("id", payoutId);
+                data.addProperty("status", "completed");
+                data.addProperty("created", java.time.Instant.now().toString());
+                
+                simulatedResponse.add("data", data);
+                
+                log.debug("TEST MODE: Successfully simulated payout status for: {}", payoutId);
+                return simulatedResponse;
+            }
+            
+            // Get status from MultiSafepay (production mode only)
             JsonObject response = MultiSafepayClient.getPayoutStatus(payoutId);
             
             if (response != null && response.has("success") && response.get("success").getAsBoolean()) {
@@ -151,6 +200,25 @@ public class MultiSafepayPayoutService {
         log.debug("Listing payouts - Page: {}, Limit: {}", page, limit);
         
         try {
+            // In test mode, return empty list
+            if (testMode) {
+                log.warn("TEST MODE: Simulating empty payouts list (MultiSafePay test API doesn't support payouts)");
+                JsonObject simulatedResponse = new JsonObject();
+                simulatedResponse.addProperty("success", true);
+                
+                JsonObject data = new JsonObject();
+                data.addProperty("total", 0);
+                data.addProperty("page", page);
+                data.addProperty("limit", limit);
+                data.add("payouts", new com.google.gson.JsonArray());
+                
+                simulatedResponse.add("data", data);
+                
+                log.debug("TEST MODE: Successfully simulated payouts list");
+                return simulatedResponse;
+            }
+            
+            // Get list from MultiSafepay (production mode only)
             JsonObject response = MultiSafepayClient.listPayouts(page, limit);
             
             if (response != null && response.has("success") && response.get("success").getAsBoolean()) {
@@ -181,8 +249,13 @@ public class MultiSafepayPayoutService {
         try {
             if (response.has("data")) {
                 JsonObject data = response.getAsJsonObject("data");
+                // Try payout_id first (production format)
                 if (data.has("payout_id")) {
                     return data.get("payout_id").getAsString();
+                }
+                // Try id (test mode format)
+                if (data.has("id")) {
+                    return data.get("id").getAsString();
                 }
             }
         } catch (Exception e) {

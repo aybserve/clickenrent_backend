@@ -5,6 +5,9 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.clickenrent.paymentservice.entity.B2BRevenueSharePayout;
+import org.clickenrent.paymentservice.exception.MultiSafepayIntegrationException;
+import org.clickenrent.paymentservice.exception.ResourceNotFoundException;
 import org.clickenrent.paymentservice.scheduler.MonthlyPayoutScheduler;
 import org.clickenrent.paymentservice.service.PayoutProcessingService;
 import org.springframework.http.ResponseEntity;
@@ -115,18 +118,51 @@ public class PayoutAdminController {
         log.info("Retry payout requested for: {}", payoutExternalId);
         
         Map<String, Object> response = new HashMap<>();
-        response.put("success", false);
-        response.put("message", "Payout retry not yet implemented");
-        response.put("payoutExternalId", payoutExternalId);
         
-        // TODO: Implement payout retry functionality
-        // This would:
-        // 1. Fetch the failed payout from database
-        // 2. Verify it's in FAILED status
-        // 3. Retry the MultiSafepay API call
-        // 4. Update the payout status
-        
-        return ResponseEntity.ok(response);
+        try {
+            // Call service to retry the payout
+            B2BRevenueSharePayout payout = payoutProcessingService.retryPayout(payoutExternalId);
+            
+            // Build success response
+            response.put("success", true);
+            response.put("message", "Payout retry successful");
+            response.put("payoutExternalId", payout.getExternalId());
+            response.put("newStatus", payout.getStatus());
+            response.put("multiSafepayPayoutId", payout.getMultiSafepayPayoutId());
+            response.put("totalAmount", payout.getTotalAmount());
+            response.put("currency", payout.getCurrency());
+            
+            log.info("Payout retry successful for: {}", payoutExternalId);
+            return ResponseEntity.ok(response);
+            
+        } catch (ResourceNotFoundException e) {
+            log.warn("Payout not found: {}", payoutExternalId);
+            response.put("success", false);
+            response.put("error", "NotFound");
+            response.put("message", "Payout not found: " + e.getMessage());
+            return ResponseEntity.status(404).body(response);
+            
+        } catch (IllegalStateException e) {
+            log.warn("Invalid payout state for retry: {}", e.getMessage());
+            response.put("success", false);
+            response.put("error", "InvalidState");
+            response.put("message", e.getMessage());
+            return ResponseEntity.status(400).body(response);
+            
+        } catch (MultiSafepayIntegrationException e) {
+            log.error("MultiSafepay API error during payout retry for: {}", payoutExternalId, e);
+            response.put("success", false);
+            response.put("error", "MultiSafepayError");
+            response.put("message", "MultiSafepay API error: " + e.getMessage());
+            return ResponseEntity.status(500).body(response);
+            
+        } catch (Exception e) {
+            log.error("Payout retry failed for: {}", payoutExternalId, e);
+            response.put("success", false);
+            response.put("error", e.getClass().getSimpleName());
+            response.put("message", "Payout retry failed: " + e.getMessage());
+            return ResponseEntity.status(500).body(response);
+        }
     }
     
     @GetMapping("/history")

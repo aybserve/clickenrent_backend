@@ -91,7 +91,7 @@ public class UserController {
      * GET /api/users/external/{externalId}
      */
     @GetMapping("/external/{externalId}")
-    @PreAuthorize("isAuthenticated()")
+    @PreAuthorize("hasAnyRole('SUPERADMIN', 'ADMIN') or @resourceSecurity.canAccessUser(#externalId)")
     @Operation(summary = "Get user by external ID", description = "Retrieve user details by external ID for cross-service communication")
     public ResponseEntity<UserDTO> getUserByExternalId(@PathVariable String externalId) {
         UserDTO user = userService.findByExternalId(externalId);

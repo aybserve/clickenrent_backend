@@ -55,7 +55,7 @@ public class UserAddressController {
      * GET /api/user-addresses/external/{externalId}
      */
     @GetMapping("/external/{externalId}")
-    @PreAuthorize("hasAnyRole('SUPERADMIN', 'ADMIN', 'B2B', 'CUSTOMER')")
+    @PreAuthorize("hasAnyRole('SUPERADMIN', 'ADMIN') or @resourceSecurity.canAccessUserAddress(#externalId)")
     @Operation(summary = "Get user-address link by external ID", description = "Retrieve a user-address link by its external ID")
     public ResponseEntity<UserAddressDTO> getUserAddressByExternalId(@PathVariable String externalId) {
         UserAddressDTO userAddress = userAddressService.getUserAddressByExternalId(externalId);
