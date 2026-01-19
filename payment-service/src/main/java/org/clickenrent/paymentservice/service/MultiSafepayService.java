@@ -535,7 +535,7 @@ public class MultiSafepayService {
      */
     public JsonObject getIdealIssuers() {
         try {
-            JsonObject response = MultiSafepayClient.GetGateway("IDEAL");
+            JsonObject response = MultiSafepayClient.GetIdealIssuers();
             log.info("Retrieved iDEAL issuers from MultiSafePay");
             return response;
         } catch (Exception e) {

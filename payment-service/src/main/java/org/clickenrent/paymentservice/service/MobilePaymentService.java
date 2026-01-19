@@ -83,17 +83,39 @@ public class MobilePaymentService {
 
             if (response != null && response.has("success") && response.get("success").getAsBoolean()) {
                 if (response.has("data")) {
-                    JsonObject data = response.getAsJsonObject("data");
+                    JsonElement dataElement = response.get("data");
+                    JsonArray issuers = null;
                     
-                    // Parse issuers from gateway data
-                    if (data.has("issuers") && data.get("issuers").isJsonArray()) {
-                        JsonArray issuers = data.getAsJsonArray("issuers");
-                        
+                    // Handle two possible response structures:
+                    // 1. data is an array directly: {"success": true, "data": [...]}
+                    // 2. data is an object with issuers: {"success": true, "data": {"issuers": [...]}}
+                    if (dataElement.isJsonArray()) {
+                        issuers = dataElement.getAsJsonArray();
+                    } else if (dataElement.isJsonObject()) {
+                        JsonObject data = dataElement.getAsJsonObject();
+                        if (data.has("issuers") && data.get("issuers").isJsonArray()) {
+                            issuers = data.getAsJsonArray("issuers");
+                        }
+                    }
+                    
+                    if (issuers != null) {
                         for (JsonElement element : issuers) {
                             JsonObject issuer = element.getAsJsonObject();
+                            
+                            // Handle both field name formats from MultiSafePay API
+                            String issuerId = getJsonString(issuer, "code");
+                            if (issuerId == null) {
+                                issuerId = getJsonString(issuer, "id");
+                            }
+                            
+                            String name = getJsonString(issuer, "description");
+                            if (name == null) {
+                                name = getJsonString(issuer, "name");
+                            }
+                            
                             MobileBankDTO bank = MobileBankDTO.builder()
-                                .issuerId(getJsonString(issuer, "code"))
-                                .name(getJsonString(issuer, "description"))
+                                .issuerId(issuerId)
+                                .name(name)
                                 .iconUrl(getJsonString(issuer, "icon_url"))
                                 .build();
                             banks.add(bank);

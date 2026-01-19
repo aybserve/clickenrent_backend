@@ -51,6 +51,10 @@ public class MultiSafepayClient {
 		return MultiSafepayClient.sendRequest("gateways/" + name);
 	}
 
+	public static JsonObject GetIdealIssuers() {
+		return MultiSafepayClient.sendRequest("issuers/ideal");
+	}
+
 	public static JsonObject GetIssuer(String name) {
 		return MultiSafepayClient.sendRequest("issuers/" + name);
 	}
