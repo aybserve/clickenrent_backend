@@ -49,6 +49,13 @@ public class MobilePaymentService {
             JsonObject response = multiSafepayService.listPaymentMethods();
             List<MobilePaymentMethodDTO> methods = new ArrayList<>();
 
+            log.info("DEBUG: Response is null? {}", response == null);
+            if (response != null) {
+                log.info("DEBUG: Response has 'success'? {}", response.has("success"));
+                log.info("DEBUG: Response has 'data'? {}", response.has("data"));
+                log.info("DEBUG: Full response keys: {}", response.keySet());
+            }
+
             if (response != null && response.has("success") && response.get("success").getAsBoolean()) {
                 if (response.has("data")) {
                     JsonArray paymentMethods = response.getAsJsonArray("data");
@@ -410,10 +417,34 @@ public class MobilePaymentService {
     private MobilePaymentMethodDTO transformGatewayToMobileMethod(JsonObject gateway, int order) {
         try {
             String code = getJsonString(gateway, "id");
-            String name = getJsonString(gateway, "description");
+            
+            // Try "name" first (payment-methods API), fallback to "description" (gateways API)
+            String name = getJsonString(gateway, "name");
+            if (name == null) {
+                name = getJsonString(gateway, "description");
+            }
             
             if (code == null || name == null) {
+                log.warn("Skipping payment method - code: {}, name: {}", code, name);
                 return null;
+            }
+
+            // Get icon URL - handle both formats
+            String iconUrl = null;
+            if (gateway.has("icon_urls") && gateway.get("icon_urls").isJsonObject()) {
+                // New format: {"icon_urls": {"large": "...", "medium": "...", "vector": "..."}}
+                JsonObject iconUrls = gateway.getAsJsonObject("icon_urls");
+                // Prefer vector, then medium, then large
+                iconUrl = getJsonString(iconUrls, "vector");
+                if (iconUrl == null) {
+                    iconUrl = getJsonString(iconUrls, "medium");
+                }
+                if (iconUrl == null) {
+                    iconUrl = getJsonString(iconUrls, "large");
+                }
+            } else {
+                // Old format: {"icon_url": "..."}
+                iconUrl = getJsonString(gateway, "icon_url");
             }
 
             // Determine flow type and requirements
@@ -435,13 +466,15 @@ public class MobilePaymentService {
                 popular = true;
             } else if ("PAYPAL".equalsIgnoreCase(code)) {
                 popular = true;
+            } else if ("GOOGLEPAY".equalsIgnoreCase(code) || "APPLEPAY".equalsIgnoreCase(code)) {
+                popular = true;
             }
 
             return MobilePaymentMethodDTO.builder()
                 .code(code)
                 .name(name)
                 .displayName(name)
-                .iconUrl(getJsonString(gateway, "icon_url"))
+                .iconUrl(iconUrl)
                 .flowType(flowType)
                 .requiresBankSelection(requiresBankSelection)
                 .requiresCardDetails(requiresCardDetails)

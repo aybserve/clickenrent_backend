@@ -937,6 +937,7 @@ public class MultiSafepayService {
         try {
             JsonObject response = MultiSafepayClient.listPaymentMethods();
             log.info("Retrieved MultiSafePay payment methods");
+            log.info("DEBUG: Full payment methods API response: {}", response != null ? response.toString() : "NULL");
             return response;
         } catch (Exception e) {
             log.error("Failed to retrieve MultiSafePay payment methods", e);
