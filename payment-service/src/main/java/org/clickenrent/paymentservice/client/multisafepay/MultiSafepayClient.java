@@ -59,6 +59,56 @@ public class MultiSafepayClient {
 		return MultiSafepayClient.sendRequest("issuers/" + name);
 	}
 
+	/**
+	 * Get issuers for a specific payment method
+	 * @param paymentMethod Payment method code (e.g., "ideal", "bancontact", "dotpay", "mybank")
+	 * @return JsonObject with issuers list
+	 */
+	public static JsonObject GetIssuers(String paymentMethod) {
+		return MultiSafepayClient.sendRequest("issuers/" + paymentMethod);
+	}
+
+	/**
+	 * Get Bancontact issuers/banks
+	 * @return JsonObject with Bancontact issuers
+	 */
+	public static JsonObject GetBancontactIssuers() {
+		return GetIssuers("bancontact");
+	}
+
+	/**
+	 * Get Dotpay banks
+	 * @return JsonObject with Dotpay banks
+	 */
+	public static JsonObject GetDotpayBanks() {
+		return GetIssuers("dotpay");
+	}
+
+	/**
+	 * Get MyBank issuers
+	 * @return JsonObject with MyBank issuers
+	 */
+	public static JsonObject GetMyBankIssuers() {
+		return GetIssuers("mybank");
+	}
+
+	/**
+	 * Get list of available payment methods
+	 * Note: This returns individual payment methods, not just gateways
+	 * @return JsonObject with payment methods list
+	 */
+	public static JsonObject ListPaymentMethods() {
+		return MultiSafepayClient.sendRequest("gateways");
+	}
+
+	/**
+	 * Get available gift card types
+	 * @return JsonObject with gift card types
+	 */
+	public static JsonObject GetGiftCards() {
+		return MultiSafepayClient.sendRequest("gateways/giftcards");
+	}
+
 	public static JsonObject GetOrder(String order_id) {
 		return MultiSafepayClient.sendRequest("orders/" + order_id);
 	}

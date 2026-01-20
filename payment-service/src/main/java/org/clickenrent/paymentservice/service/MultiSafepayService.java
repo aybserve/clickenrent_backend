@@ -1242,4 +1242,550 @@ public class MultiSafepayService {
             return result;
         }
     }
+
+    // ========================================
+    // BANKING PAYMENT METHODS
+    // ========================================
+
+    /**
+     * Create Bancontact payment order
+     */
+    public JsonObject createBancontactOrder(BigDecimal amount, String currency, 
+            String customerEmail, String description) {
+        try {
+            int amountInCents = amount.multiply(new BigDecimal(100)).intValue();
+            String orderId = "order_bancontact_" + System.currentTimeMillis();
+            
+            PaymentOptions paymentOptions = new PaymentOptions(notificationUrl, cancelUrl, redirectUrl);
+            GatewayInfo gatewayInfo = GatewayInfo.Bancontact();
+            
+            Order order = new Order();
+            order.setDirectBancontact(orderId, description, amountInCents, 
+                currency.toUpperCase(), paymentOptions, gatewayInfo);
+            
+            if (customerEmail != null && !customerEmail.isEmpty()) {
+                Customer customer = new Customer();
+                customer.email = customerEmail;
+                order.customer = customer;
+            }
+            
+            JsonObject response = MultiSafepayClient.createOrder(order);
+            log.info("Created Bancontact order: {} for amount: {} {}", orderId, amount, currency);
+            return response;
+        } catch (Exception e) {
+            log.error("Failed to create Bancontact order", e);
+            throw new MultiSafepayIntegrationException("Failed to create Bancontact payment: " + e.getMessage(), e);
+        }
+    }
+
+    /**
+     * Create Bizum payment order (Spanish mobile payment)
+     */
+    public JsonObject createBizumOrder(BigDecimal amount, String currency, 
+            String customerEmail, String description, String phone) {
+        try {
+            int amountInCents = amount.multiply(new BigDecimal(100)).intValue();
+            String orderId = "order_bizum_" + System.currentTimeMillis();
+            
+            PaymentOptions paymentOptions = new PaymentOptions(notificationUrl, cancelUrl, redirectUrl);
+            GatewayInfo gatewayInfo = GatewayInfo.Bizum(phone);
+            
+            Order order = new Order();
+            order.setDirectBizum(orderId, description, amountInCents, 
+                currency.toUpperCase(), paymentOptions, gatewayInfo);
+            
+            if (customerEmail != null && !customerEmail.isEmpty()) {
+                Customer customer = new Customer();
+                customer.email = customerEmail;
+                order.customer = customer;
+            }
+            
+            JsonObject response = MultiSafepayClient.createOrder(order);
+            log.info("Created Bizum order: {} for amount: {} {}", orderId, amount, currency);
+            return response;
+        } catch (Exception e) {
+            log.error("Failed to create Bizum order", e);
+            throw new MultiSafepayIntegrationException("Failed to create Bizum payment: " + e.getMessage(), e);
+        }
+    }
+
+    /**
+     * Create Giropay payment order
+     */
+    public JsonObject createGiropayOrder(BigDecimal amount, String currency, 
+            String customerEmail, String description, String bic) {
+        try {
+            int amountInCents = amount.multiply(new BigDecimal(100)).intValue();
+            String orderId = "order_giropay_" + System.currentTimeMillis();
+            
+            PaymentOptions paymentOptions = new PaymentOptions(notificationUrl, cancelUrl, redirectUrl);
+            GatewayInfo gatewayInfo = GatewayInfo.Giropay(bic);
+            
+            Order order = new Order();
+            order.setDirectGiropay(orderId, description, amountInCents, 
+                currency.toUpperCase(), paymentOptions, gatewayInfo);
+            
+            if (customerEmail != null && !customerEmail.isEmpty()) {
+                Customer customer = new Customer();
+                customer.email = customerEmail;
+                order.customer = customer;
+            }
+            
+            JsonObject response = MultiSafepayClient.createOrder(order);
+            log.info("Created Giropay order: {} for amount: {} {}", orderId, amount, currency);
+            return response;
+        } catch (Exception e) {
+            log.error("Failed to create Giropay order", e);
+            throw new MultiSafepayIntegrationException("Failed to create Giropay payment: " + e.getMessage(), e);
+        }
+    }
+
+    /**
+     * Create EPS payment order (Austrian banks)
+     */
+    public JsonObject createEPSOrder(BigDecimal amount, String currency, 
+            String customerEmail, String description, String bic) {
+        try {
+            int amountInCents = amount.multiply(new BigDecimal(100)).intValue();
+            String orderId = "order_eps_" + System.currentTimeMillis();
+            
+            PaymentOptions paymentOptions = new PaymentOptions(notificationUrl, cancelUrl, redirectUrl);
+            GatewayInfo gatewayInfo = GatewayInfo.EPS(bic);
+            
+            Order order = new Order();
+            order.setDirectEPS(orderId, description, amountInCents, 
+                currency.toUpperCase(), paymentOptions, gatewayInfo);
+            
+            if (customerEmail != null && !customerEmail.isEmpty()) {
+                Customer customer = new Customer();
+                customer.email = customerEmail;
+                order.customer = customer;
+            }
+            
+            JsonObject response = MultiSafepayClient.createOrder(order);
+            log.info("Created EPS order: {} for amount: {} {}", orderId, amount, currency);
+            return response;
+        } catch (Exception e) {
+            log.error("Failed to create EPS order", e);
+            throw new MultiSafepayIntegrationException("Failed to create EPS payment: " + e.getMessage(), e);
+        }
+    }
+
+    /**
+     * Create MB WAY payment order (Portuguese mobile payment)
+     */
+    public JsonObject createMBWayOrder(BigDecimal amount, String currency, 
+            String customerEmail, String description, String phone) {
+        try {
+            int amountInCents = amount.multiply(new BigDecimal(100)).intValue();
+            String orderId = "order_mbway_" + System.currentTimeMillis();
+            
+            PaymentOptions paymentOptions = new PaymentOptions(notificationUrl, cancelUrl, redirectUrl);
+            GatewayInfo gatewayInfo = GatewayInfo.MBWay(phone);
+            
+            Order order = new Order();
+            order.setDirectMBWay(orderId, description, amountInCents, 
+                currency.toUpperCase(), paymentOptions, gatewayInfo);
+            
+            if (customerEmail != null && !customerEmail.isEmpty()) {
+                Customer customer = new Customer();
+                customer.email = customerEmail;
+                order.customer = customer;
+            }
+            
+            JsonObject response = MultiSafepayClient.createOrder(order);
+            log.info("Created MB WAY order: {} for amount: {} {}", orderId, amount, currency);
+            return response;
+        } catch (Exception e) {
+            log.error("Failed to create MB WAY order", e);
+            throw new MultiSafepayIntegrationException("Failed to create MB WAY payment: " + e.getMessage(), e);
+        }
+    }
+
+    /**
+     * Create Direct Debit (SEPA) payment order
+     */
+    public JsonObject createDirectDebitOrder(BigDecimal amount, String currency,
+            String description, String accountHolderName, String iban) {
+        try {
+            int amountInCents = amount.multiply(new BigDecimal(100)).intValue();
+            String orderId = "order_sepa_" + System.currentTimeMillis();
+            
+            PaymentOptions paymentOptions = new PaymentOptions(notificationUrl, cancelUrl, redirectUrl);
+            GatewayInfo gatewayInfo = GatewayInfo.DirectDebit(accountHolderName, iban, null);
+            
+            Order order = new Order();
+            order.setDirectDebit(orderId, description, amountInCents, 
+                currency.toUpperCase(), paymentOptions, gatewayInfo);
+            
+            JsonObject response = MultiSafepayClient.createOrder(order);
+            log.info("Created Direct Debit order: {} for amount: {} {}", orderId, amount, currency);
+            return response;
+        } catch (Exception e) {
+            log.error("Failed to create Direct Debit order", e);
+            throw new MultiSafepayIntegrationException("Failed to create Direct Debit payment: " + e.getMessage(), e);
+        }
+    }
+
+    // ========================================
+    // CARD PAYMENT METHODS
+    // ========================================
+
+    /**
+     * Create credit card payment order
+     */
+    public JsonObject createCreditCardOrder(BigDecimal amount, String currency,
+            String customerEmail, String description, String cardNumber, String cvv,
+            String expiryDate, String cardHolderName) {
+        try {
+            int amountInCents = amount.multiply(new BigDecimal(100)).intValue();
+            String orderId = "order_card_" + System.currentTimeMillis();
+            
+            PaymentOptions paymentOptions = new PaymentOptions(notificationUrl, cancelUrl, redirectUrl);
+            GatewayInfo gatewayInfo = GatewayInfo.CreditCard(cardNumber, cvv, expiryDate, cardHolderName);
+            
+            Order order = new Order();
+            order.setDirectCreditCard(orderId, description, amountInCents, 
+                currency.toUpperCase(), paymentOptions, gatewayInfo);
+            
+            if (customerEmail != null && !customerEmail.isEmpty()) {
+                Customer customer = new Customer();
+                customer.email = customerEmail;
+                order.customer = customer;
+            }
+            
+            JsonObject response = MultiSafepayClient.createOrder(order);
+            log.info("Created credit card order: {} for amount: {} {}", orderId, amount, currency);
+            return response;
+        } catch (Exception e) {
+            log.error("Failed to create credit card order", e);
+            throw new MultiSafepayIntegrationException("Failed to create credit card payment: " + e.getMessage(), e);
+        }
+    }
+
+    // ========================================
+    // BNPL (BUY NOW PAY LATER) METHODS
+    // ========================================
+
+    /**
+     * Create Klarna payment order
+     */
+    public JsonObject createKlarnaOrder(BigDecimal amount, String currency,
+            String customerEmail, String description, String birthday, String gender,
+            String phone, Customer customer, ShoppingCart shoppingCart) {
+        try {
+            int amountInCents = amount.multiply(new BigDecimal(100)).intValue();
+            String orderId = "order_klarna_" + System.currentTimeMillis();
+            
+            PaymentOptions paymentOptions = new PaymentOptions(notificationUrl, cancelUrl, redirectUrl);
+            GatewayInfo gatewayInfo = GatewayInfo.Klarna(birthday, gender, phone, customerEmail);
+            CheckoutOptions checkoutOptions = new CheckoutOptions();
+            Delivery delivery = new Delivery();
+            
+            Order order = new Order();
+            order.setDirectKlarna(orderId, description, amountInCents, 
+                currency.toUpperCase(), paymentOptions, gatewayInfo, shoppingCart, 
+                checkoutOptions, customer, delivery);
+            
+            JsonObject response = MultiSafepayClient.createOrder(order);
+            log.info("Created Klarna order: {} for amount: {} {}", orderId, amount, currency);
+            return response;
+        } catch (Exception e) {
+            log.error("Failed to create Klarna order", e);
+            throw new MultiSafepayIntegrationException("Failed to create Klarna payment: " + e.getMessage(), e);
+        }
+    }
+
+    /**
+     * Create Billink payment order
+     */
+    public JsonObject createBillinkOrder(BigDecimal amount, String currency,
+            String description, String birthday, String gender, String companyType,
+            Customer customer, ShoppingCart shoppingCart, CheckoutOptions checkoutOptions) {
+        try {
+            int amountInCents = amount.multiply(new BigDecimal(100)).intValue();
+            String orderId = "order_billink_" + System.currentTimeMillis();
+            
+            PaymentOptions paymentOptions = new PaymentOptions(notificationUrl, cancelUrl, redirectUrl);
+            GatewayInfo gatewayInfo = GatewayInfo.Billink(birthday, gender, companyType);
+            
+            Order order = new Order();
+            order.setDirectBillink(orderId, description, amountInCents, 
+                currency.toUpperCase(), paymentOptions, gatewayInfo, 
+                shoppingCart, checkoutOptions, customer);
+            
+            JsonObject response = MultiSafepayClient.createOrder(order);
+            log.info("Created Billink order: {} for amount: {} {}", orderId, amount, currency);
+            return response;
+        } catch (Exception e) {
+            log.error("Failed to create Billink order", e);
+            throw new MultiSafepayIntegrationException("Failed to create Billink payment: " + e.getMessage(), e);
+        }
+    }
+
+    /**
+     * Create in3 payment order
+     */
+    public JsonObject createIn3Order(BigDecimal amount, String currency,
+            String description, String birthday, String phone,
+            Customer customer, ShoppingCart shoppingCart, CheckoutOptions checkoutOptions) {
+        try {
+            int amountInCents = amount.multiply(new BigDecimal(100)).intValue();
+            String orderId = "order_in3_" + System.currentTimeMillis();
+            
+            PaymentOptions paymentOptions = new PaymentOptions(notificationUrl, cancelUrl, redirectUrl);
+            GatewayInfo gatewayInfo = GatewayInfo.In3(birthday, phone);
+            
+            Order order = new Order();
+            order.setDirectIn3(orderId, description, amountInCents, 
+                currency.toUpperCase(), paymentOptions, gatewayInfo, 
+                shoppingCart, checkoutOptions, customer);
+            
+            JsonObject response = MultiSafepayClient.createOrder(order);
+            log.info("Created in3 order: {} for amount: {} {}", orderId, amount, currency);
+            return response;
+        } catch (Exception e) {
+            log.error("Failed to create in3 order", e);
+            throw new MultiSafepayIntegrationException("Failed to create in3 payment: " + e.getMessage(), e);
+        }
+    }
+
+    /**
+     * Create Riverty (AfterPay) payment order
+     */
+    public JsonObject createRivertyOrder(BigDecimal amount, String currency,
+            String description, String birthday, String gender, String phone, String email,
+            Customer customer, ShoppingCart shoppingCart, CheckoutOptions checkoutOptions, Delivery delivery) {
+        try {
+            int amountInCents = amount.multiply(new BigDecimal(100)).intValue();
+            String orderId = "order_riverty_" + System.currentTimeMillis();
+            
+            PaymentOptions paymentOptions = new PaymentOptions(notificationUrl, cancelUrl, redirectUrl);
+            GatewayInfo gatewayInfo = GatewayInfo.Riverty(birthday, gender, phone, email);
+            
+            Order order = new Order();
+            order.setDirectRiverty(orderId, description, amountInCents, 
+                currency.toUpperCase(), paymentOptions, gatewayInfo, 
+                shoppingCart, checkoutOptions, customer, delivery);
+            
+            JsonObject response = MultiSafepayClient.createOrder(order);
+            log.info("Created Riverty order: {} for amount: {} {}", orderId, amount, currency);
+            return response;
+        } catch (Exception e) {
+            log.error("Failed to create Riverty order", e);
+            throw new MultiSafepayIntegrationException("Failed to create Riverty payment: " + e.getMessage(), e);
+        }
+    }
+
+    // ========================================
+    // PREPAID CARDS / GIFT CARDS
+    // ========================================
+
+    /**
+     * Create gift card payment order
+     */
+    public JsonObject createGiftCardOrder(BigDecimal amount, String currency,
+            String description, String giftCardType, String cardNumber, String pin) {
+        try {
+            int amountInCents = amount.multiply(new BigDecimal(100)).intValue();
+            String orderId = "order_giftcard_" + System.currentTimeMillis();
+            
+            PaymentOptions paymentOptions = new PaymentOptions(notificationUrl, cancelUrl, redirectUrl);
+            GatewayInfo gatewayInfo = GatewayInfo.GiftCard(cardNumber);
+            
+            Order order = new Order();
+            order.setDirectGiftCard(orderId, description, amountInCents, 
+                currency.toUpperCase(), paymentOptions, gatewayInfo, giftCardType);
+            
+            JsonObject response = MultiSafepayClient.createOrder(order);
+            log.info("Created gift card order: {} for amount: {} {} with card type: {}", 
+                orderId, amount, currency, giftCardType);
+            return response;
+        } catch (Exception e) {
+            log.error("Failed to create gift card order", e);
+            throw new MultiSafepayIntegrationException("Failed to create gift card payment: " + e.getMessage(), e);
+        }
+    }
+
+    // ========================================
+    // WALLET PAYMENT METHODS
+    // ========================================
+
+    /**
+     * Create PayPal payment order
+     */
+    public JsonObject createPayPalOrder(BigDecimal amount, String currency,
+            String customerEmail, String description) {
+        try {
+            int amountInCents = amount.multiply(new BigDecimal(100)).intValue();
+            String orderId = "order_paypal_" + System.currentTimeMillis();
+            
+            PaymentOptions paymentOptions = new PaymentOptions(notificationUrl, cancelUrl, redirectUrl);
+            GatewayInfo gatewayInfo = GatewayInfo.PayPal();
+            
+            Order order = new Order();
+            order.setDirectPayPal(orderId, description, amountInCents, 
+                currency.toUpperCase(), paymentOptions, gatewayInfo);
+            
+            if (customerEmail != null && !customerEmail.isEmpty()) {
+                Customer customer = new Customer();
+                customer.email = customerEmail;
+                order.customer = customer;
+            }
+            
+            JsonObject response = MultiSafepayClient.createOrder(order);
+            log.info("Created PayPal order: {} for amount: {} {}", orderId, amount, currency);
+            return response;
+        } catch (Exception e) {
+            log.error("Failed to create PayPal order", e);
+            throw new MultiSafepayIntegrationException("Failed to create PayPal payment: " + e.getMessage(), e);
+        }
+    }
+
+    /**
+     * Create Apple Pay payment order
+     */
+    public JsonObject createApplePayOrder(BigDecimal amount, String currency,
+            String customerEmail, String description, String applePayToken) {
+        try {
+            int amountInCents = amount.multiply(new BigDecimal(100)).intValue();
+            String orderId = "order_applepay_" + System.currentTimeMillis();
+            
+            PaymentOptions paymentOptions = new PaymentOptions(notificationUrl, cancelUrl, redirectUrl);
+            GatewayInfo gatewayInfo = GatewayInfo.ApplePay(applePayToken);
+            
+            Order order = new Order();
+            order.setDirectApplePay(orderId, description, amountInCents, 
+                currency.toUpperCase(), paymentOptions, gatewayInfo);
+            
+            if (customerEmail != null && !customerEmail.isEmpty()) {
+                Customer customer = new Customer();
+                customer.email = customerEmail;
+                order.customer = customer;
+            }
+            
+            JsonObject response = MultiSafepayClient.createOrder(order);
+            log.info("Created Apple Pay order: {} for amount: {} {}", orderId, amount, currency);
+            return response;
+        } catch (Exception e) {
+            log.error("Failed to create Apple Pay order", e);
+            throw new MultiSafepayIntegrationException("Failed to create Apple Pay payment: " + e.getMessage(), e);
+        }
+    }
+
+    /**
+     * Create Google Pay payment order
+     */
+    public JsonObject createGooglePayOrder(BigDecimal amount, String currency,
+            String customerEmail, String description, String googlePayToken) {
+        try {
+            int amountInCents = amount.multiply(new BigDecimal(100)).intValue();
+            String orderId = "order_googlepay_" + System.currentTimeMillis();
+            
+            PaymentOptions paymentOptions = new PaymentOptions(notificationUrl, cancelUrl, redirectUrl);
+            GatewayInfo gatewayInfo = GatewayInfo.GooglePay(googlePayToken);
+            
+            Order order = new Order();
+            order.setDirectGooglePay(orderId, description, amountInCents, 
+                currency.toUpperCase(), paymentOptions, gatewayInfo);
+            
+            if (customerEmail != null && !customerEmail.isEmpty()) {
+                Customer customer = new Customer();
+                customer.email = customerEmail;
+                order.customer = customer;
+            }
+            
+            JsonObject response = MultiSafepayClient.createOrder(order);
+            log.info("Created Google Pay order: {} for amount: {} {}", orderId, amount, currency);
+            return response;
+        } catch (Exception e) {
+            log.error("Failed to create Google Pay order", e);
+            throw new MultiSafepayIntegrationException("Failed to create Google Pay payment: " + e.getMessage(), e);
+        }
+    }
+
+    // ========================================
+    // ISSUER/BANK LIST METHODS
+    // ========================================
+
+    /**
+     * Get Bancontact issuers
+     */
+    public JsonObject getBancontactIssuers() {
+        try {
+            JsonObject response = MultiSafepayClient.GetBancontactIssuers();
+            log.info("Retrieved Bancontact issuers");
+            return response;
+        } catch (Exception e) {
+            log.error("Failed to get Bancontact issuers", e);
+            throw new MultiSafepayIntegrationException("Failed to retrieve Bancontact issuers: " + e.getMessage(), e);
+        }
+    }
+
+    /**
+     * Get Dotpay banks
+     */
+    public JsonObject getDotpayBanks() {
+        try {
+            JsonObject response = MultiSafepayClient.GetDotpayBanks();
+            log.info("Retrieved Dotpay banks");
+            return response;
+        } catch (Exception e) {
+            log.error("Failed to get Dotpay banks", e);
+            throw new MultiSafepayIntegrationException("Failed to retrieve Dotpay banks: " + e.getMessage(), e);
+        }
+    }
+
+    /**
+     * Get MyBank issuers
+     */
+    public JsonObject getMyBankIssuers() {
+        try {
+            JsonObject response = MultiSafepayClient.GetMyBankIssuers();
+            log.info("Retrieved MyBank issuers");
+            return response;
+        } catch (Exception e) {
+            log.error("Failed to get MyBank issuers", e);
+            throw new MultiSafepayIntegrationException("Failed to retrieve MyBank issuers: " + e.getMessage(), e);
+        }
+    }
+
+    /**
+     * Get available gift card types
+     */
+    public JsonObject getGiftCardTypes() {
+        try {
+            JsonObject response = MultiSafepayClient.GetGiftCards();
+            log.info("Retrieved gift card types");
+            return response;
+        } catch (Exception e) {
+            log.error("Failed to get gift card types", e);
+            throw new MultiSafepayIntegrationException("Failed to retrieve gift card types: " + e.getMessage(), e);
+        }
+    }
+
+    // ========================================
+    // HELPER METHODS
+    // ========================================
+
+    /**
+     * Convert BigDecimal amount to cents
+     */
+    private int toAmountInCents(BigDecimal amount) {
+        return amount.multiply(new BigDecimal(100)).intValue();
+    }
+
+    /**
+     * Build standard payment options
+     */
+    private PaymentOptions buildPaymentOptions() {
+        return new PaymentOptions(notificationUrl, cancelUrl, redirectUrl);
+    }
+
+    /**
+     * Generate unique order ID with prefix
+     */
+    private String generateOrderId(String prefix) {
+        return "order_" + prefix + "_" + System.currentTimeMillis();
+    }
 }

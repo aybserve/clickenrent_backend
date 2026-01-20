@@ -445,6 +445,83 @@ public class MobilePaymentController {
         }
     }
 
+    // ========================================
+    // ISSUER/BANK LIST ENDPOINTS
+    // ========================================
+
+    @GetMapping("/bancontact/issuers")
+    @Operation(
+        summary = "Get list of Bancontact issuers",
+        description = "Returns a list of banks (issuers) available for Bancontact payments in Belgium. " +
+                     "Each bank includes an issuer ID for direct Bancontact payments."
+    )
+    public ResponseEntity<List<IssuerDTO>> getBancontactIssuers() {
+        log.info("Fetching Bancontact issuer list for mobile");
+        try {
+            List<IssuerDTO> issuers = mobilePaymentService.getBancontactIssuers();
+            log.info("Successfully retrieved {} Bancontact issuers", issuers.size());
+            return ResponseEntity.ok(issuers);
+        } catch (Exception e) {
+            log.error("Failed to get Bancontact issuers", e);
+            throw e;
+        }
+    }
+
+    @GetMapping("/dotpay/banks")
+    @Operation(
+        summary = "Get list of Dotpay banks",
+        description = "Returns a list of banks available for Dotpay payments in Poland. " +
+                     "Each bank includes an issuer ID for direct Dotpay payments."
+    )
+    public ResponseEntity<List<IssuerDTO>> getDotpayBanks() {
+        log.info("Fetching Dotpay bank list for mobile");
+        try {
+            List<IssuerDTO> banks = mobilePaymentService.getDotpayBanks();
+            log.info("Successfully retrieved {} Dotpay banks", banks.size());
+            return ResponseEntity.ok(banks);
+        } catch (Exception e) {
+            log.error("Failed to get Dotpay banks", e);
+            throw e;
+        }
+    }
+
+    @GetMapping("/mybank/issuers")
+    @Operation(
+        summary = "Get list of MyBank issuers",
+        description = "Returns a list of banks (issuers) available for MyBank payments in Italy. " +
+                     "Each bank includes an issuer ID for direct MyBank payments."
+    )
+    public ResponseEntity<List<IssuerDTO>> getMyBankIssuers() {
+        log.info("Fetching MyBank issuer list for mobile");
+        try {
+            List<IssuerDTO> issuers = mobilePaymentService.getMyBankIssuers();
+            log.info("Successfully retrieved {} MyBank issuers", issuers.size());
+            return ResponseEntity.ok(issuers);
+        } catch (Exception e) {
+            log.error("Failed to get MyBank issuers", e);
+            throw e;
+        }
+    }
+
+    @GetMapping("/giftcards/types")
+    @Operation(
+        summary = "Get available gift card types",
+        description = "Returns a list of gift card types accepted for payment. " +
+                     "Includes VVV Cadeaukaart, Beauty & Wellness, Fashioncheque, etc. " +
+                     "Each type includes min/max amounts and whether PIN is required."
+    )
+    public ResponseEntity<List<GiftCardTypeDTO>> getGiftCardTypes() {
+        log.info("Fetching gift card types for mobile");
+        try {
+            List<GiftCardTypeDTO> types = mobilePaymentService.getGiftCardTypes();
+            log.info("Successfully retrieved {} gift card types", types.size());
+            return ResponseEntity.ok(types);
+        } catch (Exception e) {
+            log.error("Failed to get gift card types", e);
+            throw e;
+        }
+    }
+
     @GetMapping("/health")
     @Operation(
         summary = "Health check for mobile payment service",

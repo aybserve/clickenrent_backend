@@ -449,18 +449,77 @@ INSERT INTO currencies (id, external_id, code, name, created_at, updated_at, cre
 (2, '550e8400-e29b-41d4-a716-446655440002'::uuid, 'EUR', 'Euro', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system'),
 (3, '550e8400-e29b-41d4-a716-446655440003'::uuid, 'GBP', 'British Pound', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system'),
 (4, '550e8400-e29b-41d4-a716-446655440004'::uuid, 'JPY', 'Japanese Yen', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system')
-ON CONFLICT (id) DO NOTHING;
+ON CONFLICT (code) DO NOTHING;
 
 -- ---------------------------------------------------------------------------------------------------------------------
 -- 7.2 PAYMENT METHODS
 -- ---------------------------------------------------------------------------------------------------------------------
 INSERT INTO payment_methods (id, external_id, code, name, is_active, created_at, updated_at, created_by, last_modified_by) VALUES
+-- Generic/Legacy Methods
 (1, '550e8400-e29b-41d4-a716-446655440011'::uuid, 'CREDIT_CARD', 'Credit Card', true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system'),
 (2, '550e8400-e29b-41d4-a716-446655440012'::uuid, 'DEBIT_CARD', 'Debit Card', true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system'),
 (3, '550e8400-e29b-41d4-a716-446655440013'::uuid, 'BANK_TRANSFER', 'Bank Transfer', true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system'),
-(4, '550e8400-e29b-41d4-a716-446655440014'::uuid, 'PAYPAL', 'PayPal', true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system'),
-(5, '550e8400-e29b-41d4-a716-446655440015'::uuid, 'APPLE_PAY', 'Apple Pay', false, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system')
-ON CONFLICT (id) DO NOTHING;
+(4, '550e8400-e29b-41d4-a716-446655440014'::uuid, 'DIGITAL_WALLET', 'Digital Wallet', true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system'),
+(5, '550e8400-e29b-41d4-a716-446655440015'::uuid, 'CASH', 'Cash', true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system'),
+
+-- Banking Methods
+(6, '550e8400-e29b-41d4-a716-446655440016'::uuid, 'IDEAL', 'iDEAL', true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system'),
+(7, '550e8400-e29b-41d4-a716-446655440017'::uuid, 'IDEALQR', 'iDEAL QR', true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system'),
+(8, '550e8400-e29b-41d4-a716-446655440018'::uuid, 'BANCONTACT', 'Bancontact', true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system'),
+(9, '550e8400-e29b-41d4-a716-446655440019'::uuid, 'BANCONTACTQR', 'Bancontact QR', true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system'),
+(10, '550e8400-e29b-41d4-a716-446655440020'::uuid, 'BELFIUS', 'Belfius', true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system'),
+(11, '550e8400-e29b-41d4-a716-446655440021'::uuid, 'BIZUM', 'Bizum', true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system'),
+(12, '550e8400-e29b-41d4-a716-446655440022'::uuid, 'CBC', 'CBC', true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system'),
+(13, '550e8400-e29b-41d4-a716-446655440023'::uuid, 'KBC', 'KBC', true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system'),
+(14, '550e8400-e29b-41d4-a716-446655440024'::uuid, 'DIRDEB', 'Direct Debit (SEPA)', true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system'),
+(15, '550e8400-e29b-41d4-a716-446655440025'::uuid, 'DIRECTBANK', 'Direct Bank Transfer', true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system'),
+(16, '550e8400-e29b-41d4-a716-446655440026'::uuid, 'DOTPAY', 'Dotpay', true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system'),
+(17, '550e8400-e29b-41d4-a716-446655440027'::uuid, 'EPS', 'EPS', true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system'),
+(18, '550e8400-e29b-41d4-a716-446655440028'::uuid, 'GIROPAY', 'Giropay', true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system'),
+(19, '550e8400-e29b-41d4-a716-446655440029'::uuid, 'MBWAY', 'MB WAY', true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system'),
+(20, '550e8400-e29b-41d4-a716-446655440030'::uuid, 'MULTIBANCO', 'Multibanco', true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system'),
+(21, '550e8400-e29b-41d4-a716-446655440031'::uuid, 'MYBANK', 'MyBank', true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system'),
+(22, '550e8400-e29b-41d4-a716-446655440032'::uuid, 'SOFORT', 'Sofort', true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system'),
+(23, '550e8400-e29b-41d4-a716-446655440033'::uuid, 'TRUSTLY', 'Trustly', true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system'),
+
+-- Card Schemes
+(24, '550e8400-e29b-41d4-a716-446655440034'::uuid, 'VISA', 'Visa', true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system'),
+(25, '550e8400-e29b-41d4-a716-446655440035'::uuid, 'MASTERCARD', 'Mastercard', true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system'),
+(26, '550e8400-e29b-41d4-a716-446655440036'::uuid, 'MAESTRO', 'Maestro', true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system'),
+(27, '550e8400-e29b-41d4-a716-446655440037'::uuid, 'AMEX', 'American Express', true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system'),
+(28, '550e8400-e29b-41d4-a716-446655440038'::uuid, 'DANKORT', 'Dankort', true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system'),
+(29, '550e8400-e29b-41d4-a716-446655440039'::uuid, 'CARTEBANCAIRE', 'Cartes Bancaires', true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system'),
+(30, '550e8400-e29b-41d4-a716-446655440040'::uuid, 'POSTEPAY', 'Postepay', true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system'),
+
+-- BNPL (Buy Now Pay Later) Methods
+(31, '550e8400-e29b-41d4-a716-446655440041'::uuid, 'BILLINK', 'Billink', true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system'),
+(32, '550e8400-e29b-41d4-a716-446655440042'::uuid, 'EINVOICE', 'E-Invoicing', true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system'),
+(33, '550e8400-e29b-41d4-a716-446655440043'::uuid, 'IN3', 'iDEAL in3', true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system'),
+(34, '550e8400-e29b-41d4-a716-446655440044'::uuid, 'KLARNA', 'Klarna', true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system'),
+(35, '550e8400-e29b-41d4-a716-446655440045'::uuid, 'PAYAFTER', 'Pay After Delivery', true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system'),
+(36, '550e8400-e29b-41d4-a716-446655440046'::uuid, 'AFTERPAY', 'Riverty (AfterPay)', true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system'),
+
+-- Prepaid Cards
+(37, '550e8400-e29b-41d4-a716-446655440047'::uuid, 'EDENRED', 'Edenred', true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system'),
+(38, '550e8400-e29b-41d4-a716-446655440048'::uuid, 'BEAUTYANDWELLNESS', 'Beauty & Wellness Gift Card', true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system'),
+(39, '550e8400-e29b-41d4-a716-446655440049'::uuid, 'BOEKENBON', 'Boekenbon', true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system'),
+(40, '550e8400-e29b-41d4-a716-446655440050'::uuid, 'FASHIONCHEQUE', 'Fashioncheque', true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system'),
+(41, '550e8400-e29b-41d4-a716-446655440051'::uuid, 'FASHIONGIFTCARD', 'Fashion Gift Card', true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system'),
+(42, '550e8400-e29b-41d4-a716-446655440052'::uuid, 'VVVGIFTCARD', 'VVV Cadeaukaart', true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system'),
+(43, '550e8400-e29b-41d4-a716-446655440053'::uuid, 'WEBSHOPGIFTCARD', 'Webshop Giftcard', true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system'),
+(44, '550e8400-e29b-41d4-a716-446655440054'::uuid, 'MONIZZE', 'Monizze', true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system'),
+(45, '550e8400-e29b-41d4-a716-446655440055'::uuid, 'PAYSAFECARD', 'Paysafecard', true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system'),
+(46, '550e8400-e29b-41d4-a716-446655440056'::uuid, 'SODEXO', 'Sodexo', true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system'),
+
+-- Wallets
+(47, '550e8400-e29b-41d4-a716-446655440057'::uuid, 'ALIPAY', 'Alipay', true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system'),
+(48, '550e8400-e29b-41d4-a716-446655440058'::uuid, 'ALIPAYPLUS', 'Alipay+', true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system'),
+(49, '550e8400-e29b-41d4-a716-446655440059'::uuid, 'AMAZONPAY', 'Amazon Pay', true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system'),
+(50, '550e8400-e29b-41d4-a716-446655440060'::uuid, 'APPLEPAY', 'Apple Pay', true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system'),
+(51, '550e8400-e29b-41d4-a716-446655440061'::uuid, 'GOOGLEPAY', 'Google Pay', true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system'),
+(52, '550e8400-e29b-41d4-a716-446655440062'::uuid, 'PAYPAL', 'PayPal', true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system'),
+(53, '550e8400-e29b-41d4-a716-446655440063'::uuid, 'WECHAT', 'WeChat Pay', true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system')
+ON CONFLICT (code) DO NOTHING;
 
 -- ---------------------------------------------------------------------------------------------------------------------
 -- 7.3 PAYMENT STATUSES
@@ -472,7 +531,7 @@ INSERT INTO payment_statuses (id, external_id, code, name, created_at, updated_a
 (4, '550e8400-e29b-41d4-a716-446655440024'::uuid, 'CANCELED', 'Payment Canceled', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system'),
 (5, '550e8400-e29b-41d4-a716-446655440025'::uuid, 'REFUNDED', 'Payment Refunded', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system'),
 (6, '550e8400-e29b-41d4-a716-446655440026'::uuid, 'PARTIALLY_REFUNDED', 'Payment Partially Refunded', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system')
-ON CONFLICT (id) DO NOTHING;
+ON CONFLICT (code) DO NOTHING;
 
 -- ---------------------------------------------------------------------------------------------------------------------
 -- 7.4 SERVICE PROVIDERS
@@ -481,7 +540,7 @@ INSERT INTO service_providers (id, external_id, code, name, created_at, updated_
 (1, '550e8400-e29b-41d4-a716-446655440031'::uuid, 'STRIPE', 'Stripe', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system'),
 (2, '550e8400-e29b-41d4-a716-446655440032'::uuid, 'PAYPAL', 'PayPal', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system'),
 (3, '550e8400-e29b-41d4-a716-446655440033'::uuid, 'SQUARE', 'Square', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system')
-ON CONFLICT (id) DO NOTHING;
+ON CONFLICT (code) DO NOTHING;
 
 -- ---------------------------------------------------------------------------------------------------------------------
 -- 7.5 USER PAYMENT PROFILES
@@ -490,7 +549,7 @@ INSERT INTO user_payment_profiles (id, external_id, user_id, stripe_customer_id,
 (1, '550e8400-e29b-41d4-a716-446655440041'::uuid, 1, 'cus_test_user1', true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system'),
 (2, '550e8400-e29b-41d4-a716-446655440042'::uuid, 2, 'cus_test_user2', true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system'),
 (3, '550e8400-e29b-41d4-a716-446655440043'::uuid, 3, 'cus_test_user3', true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system')
-ON CONFLICT (id) DO NOTHING;
+ON CONFLICT (code) DO NOTHING;
 
 -- ---------------------------------------------------------------------------------------------------------------------
 -- 7.6 USER PAYMENT METHODS
@@ -499,7 +558,7 @@ INSERT INTO user_payment_methods (id, external_id, user_payment_profile_id, paym
 (1, '550e8400-e29b-41d4-a716-446655440051'::uuid, 1, 1, 'pm_test_card1', true, true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', FALSE),
 (2, '550e8400-e29b-41d4-a716-446655440052'::uuid, 1, 1, 'pm_test_card2', false, true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', FALSE),
 (3, '550e8400-e29b-41d4-a716-446655440053'::uuid, 2, 1, 'pm_test_card3', true, true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', FALSE)
-ON CONFLICT (id) DO NOTHING;
+ON CONFLICT (code) DO NOTHING;
 
 -- ---------------------------------------------------------------------------------------------------------------------
 -- 7.7 FINANCIAL TRANSACTIONS
@@ -508,7 +567,7 @@ INSERT INTO financial_transactions (id, external_id, payer_id, recipient_id, amo
 (1, '550e8400-e29b-41d4-a716-446655440061'::uuid, 1, 2, 100.00, 1, CURRENT_TIMESTAMP, 1, 2, 1, 'pi_test_intent1', 'ch_test_charge1', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system'),
 (2, '550e8400-e29b-41d4-a716-446655440062'::uuid, 2, 1, 50.00, 2, CURRENT_TIMESTAMP, 1, 2, 1, 'pi_test_intent2', 'ch_test_charge2', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system'),
 (3, '550e8400-e29b-41d4-a716-446655440063'::uuid, 3, 1, 25.00, 1, CURRENT_TIMESTAMP, 2, 1, 1, NULL, NULL, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system')
-ON CONFLICT (id) DO NOTHING;
+ON CONFLICT (code) DO NOTHING;
 
 -- ---------------------------------------------------------------------------------------------------------------------
 -- 7.8 RENTAL FIN TRANSACTIONS
@@ -516,21 +575,21 @@ ON CONFLICT (id) DO NOTHING;
 INSERT INTO rental_fin_transactions (id, external_id, rental_external_id, financial_transaction_id, date_created, last_date_modified, created_by, last_modified_by, is_deleted) VALUES
 (1, '550e8400-e29b-41d4-a716-446655440071'::uuid, 'rental-ext-00101', 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', FALSE),
 (2, '550e8400-e29b-41d4-a716-446655440072'::uuid, 'rental-ext-00102', 2, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', FALSE)
-ON CONFLICT (id) DO NOTHING;
+ON CONFLICT (code) DO NOTHING;
 
 -- ---------------------------------------------------------------------------------------------------------------------
 -- 7.9 B2B SALE FIN TRANSACTIONS
 -- ---------------------------------------------------------------------------------------------------------------------
 INSERT INTO b2b_sale_fin_transactions (id, external_id, b2b_sale_id, financial_transaction_id, created_at, updated_at, created_by, last_modified_by) VALUES
 (1, '550e8400-e29b-41d4-a716-446655440081'::uuid, 1, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system')
-ON CONFLICT (id) DO NOTHING;
+ON CONFLICT (code) DO NOTHING;
 
 -- ---------------------------------------------------------------------------------------------------------------------
 -- 7.10 B2B SUBSCRIPTION FIN TRANSACTIONS
 -- ---------------------------------------------------------------------------------------------------------------------
 INSERT INTO b2b_subscription_fin_transactions (id, external_id, b2b_subscription_id, financial_transaction_id, created_at, updated_at, created_by, last_modified_by) VALUES
 (1, '550e8400-e29b-41d4-a716-446655440091'::uuid, 1, 2, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system')
-ON CONFLICT (id) DO NOTHING;
+ON CONFLICT (code) DO NOTHING;
 
 -- ---------------------------------------------------------------------------------------------------------------------
 -- 7.11 B2B REVENUE SHARE PAYOUTS
@@ -539,7 +598,7 @@ INSERT INTO b2b_revenue_share_payouts (id, external_id, company_id, payment_stat
 (1, '550e8400-e29b-41d4-a716-446655440101'::uuid, 1, 1, CURRENT_DATE + INTERVAL '30 days', 1000.00, 0.00, 1000.00, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system'),
 (2, '550e8400-e29b-41d4-a716-446655440102'::uuid, 2, 2, CURRENT_DATE + INTERVAL '15 days', 2500.00, 2500.00, 0.00, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system'),
 (3, '550e8400-e29b-41d4-a716-446655440103'::uuid, 3, 6, CURRENT_DATE - INTERVAL '10 days', 750.00, 500.00, 250.00, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system')
-ON CONFLICT (id) DO NOTHING;
+ON CONFLICT (code) DO NOTHING;
 
 -- ---------------------------------------------------------------------------------------------------------------------
 -- 7.12 B2B REVENUE SHARE PAYOUT ITEMS
@@ -548,14 +607,14 @@ INSERT INTO b2b_revenue_share_payout_items (id, external_id, b2b_revenue_share_p
 (1, '550e8400-e29b-41d4-a716-446655440111'::uuid, 1, 1, 50.00, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system'),
 (2, '550e8400-e29b-41d4-a716-446655440112'::uuid, 1, 2, 75.00, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system'),
 (3, '550e8400-e29b-41d4-a716-446655440113'::uuid, 2, 1, 125.00, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system')
-ON CONFLICT (id) DO NOTHING;
+ON CONFLICT (code) DO NOTHING;
 
 -- ---------------------------------------------------------------------------------------------------------------------
 -- 7.13 PAYOUT FIN TRANSACTIONS
 -- ---------------------------------------------------------------------------------------------------------------------
 INSERT INTO payout_fin_transactions (id, external_id, b2b_revenue_share_payout_id, financial_transaction_id, date_created, last_date_modified, created_by, last_modified_by, is_deleted) VALUES
 (1, '550e8400-e29b-41d4-a716-446655440121'::uuid, 2, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', FALSE)
-ON CONFLICT (id) DO NOTHING;
+ON CONFLICT (code) DO NOTHING;
 
 -- =====================================================================================================================
 -- SECTION 8: SEQUENCE RESET

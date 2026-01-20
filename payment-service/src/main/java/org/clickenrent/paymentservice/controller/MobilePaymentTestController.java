@@ -465,6 +465,182 @@ public class MobilePaymentTestController {
         return ResponseEntity.ok(response);
     }
 
+    @GetMapping("/scenarios")
+    @Operation(
+        summary = "Test: Get MultiSafepay test scenarios",
+        description = "Returns comprehensive test scenarios for all payment methods including test card numbers, " +
+                     "IBANs, phone numbers, and expected outcomes based on MultiSafepay official testing documentation."
+    )
+    public ResponseEntity<Map<String, Object>> getTestScenarios() {
+        log.info("🧪 TEST: Fetching test scenarios");
+        
+        Map<String, Object> response = new HashMap<>();
+        response.put("success", true);
+        response.put("message", "✅ MultiSafepay test scenarios - See PAYMENT_METHODS_TESTING.md for complete guide");
+        
+        // Banking Methods
+        Map<String, Object> bankingScenarios = new HashMap<>();
+        bankingScenarios.put("IDEAL", Map.of(
+            "banks", "Use any bank from GET /test/ideal/banks",
+            "scenarios", "Select Success/Failure/Cancelled/Expired on test platform"
+        ));
+        bankingScenarios.put("BANCONTACT", Map.of(
+            "testCards", Map.of(
+                "67034500054620008", "Completed (3D enrolled)",
+                "67039902990000045", "Declined (3D failed)",
+                "67039902990000011", "Declined (insufficient funds)"
+            ),
+            "expiry", "Any future date",
+            "cvv", "Any 3 digits"
+        ));
+        bankingScenarios.put("BIZUM", Map.of(
+            "phone", "+34612345678 (Spanish format)",
+            "amountScenarios", Map.of(
+                "€10.00-€20.00", "Completed",
+                "< €9.99", "Declined",
+                "> €20.00", "Expired (after 84 hours)"
+            )
+        ));
+        bankingScenarios.put("GIROPAY", Map.of(
+            "bic", "NOLADE22XXX (any valid German BIC)",
+            "scenarios", "Select 'Completed' on test platform"
+        ));
+        bankingScenarios.put("EPS", Map.of(
+            "bic", "RZOOAT2L420 (any valid Austrian BIC)",
+            "scenarios", "Select 'Completed' on test platform"
+        ));
+        bankingScenarios.put("MBWAY", Map.of(
+            "phone", "+351912345678 (Portuguese format)",
+            "amountScenarios", Map.of(
+                "€10.00-€20.00", "Completed",
+                "< €9.99", "Declined",
+                "> €20.00", "Expired"
+            )
+        ));
+        bankingScenarios.put("MULTIBANCO", Map.of(
+            "amountScenarios", Map.of(
+                "€10.00-€20.00", "Completed",
+                "< €9.99", "Declined",
+                "> €20.00", "Expired"
+            )
+        ));
+        bankingScenarios.put("DIRECTDEBIT", Map.of(
+            "testIBANs", Map.of(
+                "NL87ABNA0000000001", "Initiated → Completed (2 min)",
+                "NL87ABNA0000000002", "Initiated → Declined (2 min)",
+                "NL87ABNA0000000003", "Initiated → Uncleared → Completed",
+                "NL87ABNA0000000004", "Initiated → Uncleared → Declined"
+            )
+        ));
+        response.put("bankingMethods", bankingScenarios);
+        
+        // Card Methods
+        Map<String, Object> cardScenarios = new HashMap<>();
+        cardScenarios.put("VISA", Map.of(
+            "cards", Map.of(
+                "4111111111111111", "Completed (3D enrolled)",
+                "4761340000000019", "Completed (3D enrolled)",
+                "4917300000000008", "Uncleared → Void (3 min)",
+                "4462000000000003", "Uncleared → Completed (3 min)",
+                "4012001037461114", "Declined (3D failed)",
+                "4012001038488884", "Declined (insufficient funds)"
+            ),
+            "cvv", "123",
+            "expiry", "Any future date"
+        ));
+        cardScenarios.put("MASTERCARD", Map.of(
+            "cards", Map.of("5500000000000004", "Completed (3D enrolled)"),
+            "cvv", "123",
+            "expiry", "Any future date"
+        ));
+        cardScenarios.put("MAESTRO", Map.of(
+            "cards", Map.of("6799990000000000011", "Completed (3D enrolled)"),
+            "cvv", "123",
+            "expiry", "Any future date"
+        ));
+        cardScenarios.put("AMEX", Map.of(
+            "cards", Map.of(
+                "374500000000015", "Completed (3D enrolled)",
+                "378734493671000", "Uncleared → Void (3 min)",
+                "374200000000004", "Declined (3D failed)"
+            ),
+            "cvv", "1234 (4 digits for Amex)",
+            "expiry", "Any future date"
+        ));
+        response.put("cardMethods", cardScenarios);
+        
+        // BNPL Methods
+        Map<String, Object> bnplScenarios = new HashMap<>();
+        bnplScenarios.put("KLARNA", Map.of(
+            "scenarios", "Click 'Kopen', enter any mobile, any 6-digit verification code",
+            "result", "Uncleared (change to Shipped to test invoice)"
+        ));
+        bnplScenarios.put("IN3", Map.of(
+            "successScenario", Map.of(
+                "birthday", "01-01-1999",
+                "postalCode", "1234AB",
+                "houseNumber", "1"
+            ),
+            "declineScenario", Map.of(
+                "birthday", "01-01-2000",
+                "postalCode", "1111AB",
+                "houseNumber", "1"
+            )
+        ));
+        bnplScenarios.put("BILLINK", Map.of(
+            "scenarios", Map.of(
+                "Success", "Order Completed, transaction Uncleared",
+                "Failure", "Order Declined, transaction Declined",
+                "Cancelled", "Order Void, transaction Void"
+            )
+        ));
+        bnplScenarios.put("AFTERPAY", Map.of(
+            "rejectTest", "Use email test-reject@afterpay.nl to test rejection"
+        ));
+        response.put("bnplMethods", bnplScenarios);
+        
+        // Gift Cards
+        Map<String, Object> giftCardScenarios = new HashMap<>();
+        giftCardScenarios.put("testCards", Map.of(
+            "111115", "€100 balance → Completed",
+            "111112", "€5 balance → Completed",
+            "111110", "€0 balance → Declined (no balance)"
+        ));
+        giftCardScenarios.put("pin", "Any 4-digit security code");
+        giftCardScenarios.put("types", "VVV, Beauty & Wellness, Fashioncheque, etc.");
+        response.put("giftCards", giftCardScenarios);
+        
+        // Wallets
+        Map<String, Object> walletScenarios = new HashMap<>();
+        walletScenarios.put("PAYPAL", Map.of(
+            "scenarios", "Select Approved/Cancelled/Closed on test platform",
+            "note", "Transaction remains 'Initialized' (MultiSafepay doesn't collect for PayPal)"
+        ));
+        walletScenarios.put("ALIPAY", Map.of(
+            "scenarios", "Select 'Completed' on test platform",
+            "note", "Cannot test declined transactions"
+        ));
+        walletScenarios.put("AMAZONPAY", Map.of(
+            "scenarios", "Wait 5 seconds or click 'Amazon Pay', select 'Completed'"
+        ));
+        walletScenarios.put("WECHAT", Map.of(
+            "scenarios", "Scan QR code with general QR reader (NOT WeChat app), select 'Completed'"
+        ));
+        walletScenarios.put("APPLEPAY", Map.of(
+            "requirement", "Apple device with Touch ID/Face ID or Appetize.io emulator",
+            "note", "Requires Apple Developer account with test cards"
+        ));
+        walletScenarios.put("GOOGLEPAY", Map.of(
+            "requirement", "Google account with at least one chargeable card",
+            "note", "May redirect to 3D Secure based on card type"
+        ));
+        response.put("walletMethods", walletScenarios);
+        
+        response.put("documentation", "For complete testing guide, see PAYMENT_METHODS_TESTING.md");
+        
+        return ResponseEntity.ok(response);
+    }
+
     // Helper method to explain payment statuses
     private String getStatusExplanation(String status) {
         if (status == null) return "Status unknown";

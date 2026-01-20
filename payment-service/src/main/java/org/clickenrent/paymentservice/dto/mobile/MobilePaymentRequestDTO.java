@@ -83,7 +83,89 @@ public class MobilePaymentRequestDTO {
      */
     private String accountHolderBic;
     
+    // ========================================
+    // Banking Methods Fields
+    // ========================================
+    
+    /**
+     * Phone number - required for Bizum, MB WAY
+     */
+    private String phone;
+    
+    /**
+     * BIC code - required for Giropay, EPS
+     */
+    private String bic;
+    
+    // ========================================
+    // Card Payment Fields
+    // ========================================
+    
+    /**
+     * Card number - required for card payments
+     */
+    private String cardNumber;
+    
+    /**
+     * Card holder name - required for card payments
+     */
+    private String cardHolderName;
+    
+    /**
+     * Card expiry date (MM/YY format) - required for card payments
+     */
+    private String expiryDate;
+    
+    /**
+     * Card CVV/CVC - required for card payments
+     */
+    private String cvv;
+    
+    // ========================================
+    // BNPL (Buy Now Pay Later) Fields
+    // ========================================
+    
+    /**
+     * Customer birthday (YYYY-MM-DD) - required for BNPL methods (Klarna, Billink, in3, Riverty)
+     */
+    private String birthday;
+    
+    /**
+     * Customer gender (male/female/other) - required for some BNPL methods
+     */
+    private String gender;
+    
+    /**
+     * Company type (private/business) - required for Billink
+     */
+    private String companyType;
+    
+    // ========================================
+    // Prepaid Cards / Gift Cards Fields
+    // ========================================
+    
+    /**
+     * Gift card PIN / security code
+     */
+    private String pin;
+    
+    // ========================================
+    // Wallet Payment Fields
+    // ========================================
+    
+    /**
+     * Apple Pay payment token - required for Apple Pay
+     */
+    private String applePayToken;
+    
+    /**
+     * Google Pay payment token - required for Google Pay
+     */
+    private String googlePayToken;
+    
+    // ========================================
     // Metadata
+    // ========================================
     
     /**
      * Optional: Rental external ID to link payment to rental
@@ -95,7 +177,9 @@ public class MobilePaymentRequestDTO {
      */
     private Map<String, String> metadata;
     
-    // Split payments
+    // ========================================
+    // Split Payments
+    // ========================================
     
     /**
      * Optional: Split payment configuration for revenue sharing

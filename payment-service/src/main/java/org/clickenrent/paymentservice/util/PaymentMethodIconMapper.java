@@ -15,47 +15,88 @@ public class PaymentMethodIconMapper {
     private static final Map<String, String> ICON_MAP = new HashMap<>();
 
     static {
-        // Popular payment methods
-        ICON_MAP.put("IDEAL", ICON_BASE_URL + "ideal.svg");
+        // ========================================
+        // Card Schemes
+        // ========================================
         ICON_MAP.put("CREDITCARD", ICON_BASE_URL + "creditcard.svg");
+        ICON_MAP.put("DEBIT_CARD", ICON_BASE_URL + "creditcard.svg");
         ICON_MAP.put("VISA", ICON_BASE_URL + "visa.svg");
         ICON_MAP.put("MASTERCARD", ICON_BASE_URL + "mastercard.svg");
         ICON_MAP.put("MAESTRO", ICON_BASE_URL + "maestro.svg");
         ICON_MAP.put("AMEX", ICON_BASE_URL + "amex.svg");
         
-        // European payment methods
+        // Co-branded cards
+        ICON_MAP.put("DANKORT", ICON_BASE_URL + "dankort.svg");
+        ICON_MAP.put("CARTEBANCAIRE", ICON_BASE_URL + "cartebleue.svg");
+        ICON_MAP.put("POSTEPAY", ICON_BASE_URL + "postepay.svg");
+        
+        // ========================================
+        // Banking Methods
+        // ========================================
+        ICON_MAP.put("IDEAL", ICON_BASE_URL + "ideal.svg");
+        ICON_MAP.put("IDEALQR", ICON_BASE_URL + "ideal.svg");
         ICON_MAP.put("BANCONTACT", ICON_BASE_URL + "bancontact.svg");
-        ICON_MAP.put("GIROPAY", ICON_BASE_URL + "giropay.svg");
-        ICON_MAP.put("SOFORT", ICON_BASE_URL + "sofort.svg");
-        ICON_MAP.put("EPS", ICON_BASE_URL + "eps.svg");
-        ICON_MAP.put("DOTPAY", ICON_BASE_URL + "dotpay.svg");
-        ICON_MAP.put("MULTIBANCO", ICON_BASE_URL + "multibanco.svg");
-        
-        // E-wallets
-        ICON_MAP.put("PAYPAL", ICON_BASE_URL + "paypal.svg");
-        ICON_MAP.put("APPLEPAY", ICON_BASE_URL + "applepay.svg");
-        ICON_MAP.put("GOOGLEPAY", ICON_BASE_URL + "googlepay.svg");
-        ICON_MAP.put("ALIPAY", ICON_BASE_URL + "alipay.svg");
-        ICON_MAP.put("WECHAT", ICON_BASE_URL + "wechat.svg");
-        
-        // Bank transfers
+        ICON_MAP.put("BANCONTACTQR", ICON_BASE_URL + "bancontact.svg");
+        ICON_MAP.put("BELFIUS", ICON_BASE_URL + "belfius.svg");
+        ICON_MAP.put("BIZUM", ICON_BASE_URL + "bizum.svg");
+        ICON_MAP.put("CBC", ICON_BASE_URL + "cbc.svg");
+        ICON_MAP.put("KBC", ICON_BASE_URL + "kbc.svg");
+        ICON_MAP.put("DIRDEB", ICON_BASE_URL + "dirdeb.svg");
         ICON_MAP.put("DIRECTBANK", ICON_BASE_URL + "directbank.svg");
+        ICON_MAP.put("DOTPAY", ICON_BASE_URL + "dotpay.svg");
+        ICON_MAP.put("EPS", ICON_BASE_URL + "eps.svg");
+        ICON_MAP.put("GIROPAY", ICON_BASE_URL + "giropay.svg");
+        ICON_MAP.put("MBWAY", ICON_BASE_URL + "mbway.svg");
+        ICON_MAP.put("MULTIBANCO", ICON_BASE_URL + "multibanco.svg");
+        ICON_MAP.put("MYBANK", ICON_BASE_URL + "mybank.svg");
+        ICON_MAP.put("SOFORT", ICON_BASE_URL + "sofort.svg");
+        ICON_MAP.put("TRUSTLY", ICON_BASE_URL + "trustly.svg");
         ICON_MAP.put("BANKTRANS", ICON_BASE_URL + "banktransfer.svg");
+        ICON_MAP.put("BANK_TRANSFER", ICON_BASE_URL + "banktransfer.svg");
         ICON_MAP.put("SEPA", ICON_BASE_URL + "sepa.svg");
         
-        // Buy Now Pay Later
+        // ========================================
+        // BNPL (Buy Now Pay Later)
+        // ========================================
         ICON_MAP.put("KLARNA", ICON_BASE_URL + "klarna.svg");
         ICON_MAP.put("AFTERPAY", ICON_BASE_URL + "afterpay.svg");
         ICON_MAP.put("PAYAFTER", ICON_BASE_URL + "payafter.svg");
         ICON_MAP.put("EINVOICE", ICON_BASE_URL + "einvoice.svg");
         ICON_MAP.put("IN3", ICON_BASE_URL + "in3.svg");
+        ICON_MAP.put("BILLINK", ICON_BASE_URL + "billink.svg");
         
-        // Other methods
-        ICON_MAP.put("TRUSTLY", ICON_BASE_URL + "trustly.svg");
+        // ========================================
+        // Prepaid Cards
+        // ========================================
+        ICON_MAP.put("EDENRED", ICON_BASE_URL + "edenred.svg");
+        ICON_MAP.put("MONIZZE", ICON_BASE_URL + "monizze.svg");
         ICON_MAP.put("PAYSAFECARD", ICON_BASE_URL + "paysafecard.svg");
-        ICON_MAP.put("BELFIUS", ICON_BASE_URL + "belfius.svg");
-        ICON_MAP.put("KBC", ICON_BASE_URL + "kbc.svg");
-        ICON_MAP.put("CBC", ICON_BASE_URL + "cbc.svg");
+        ICON_MAP.put("SODEXO", ICON_BASE_URL + "sodexo.svg");
+        
+        // Gift Cards
+        ICON_MAP.put("BEAUTYANDWELLNESS", ICON_BASE_URL + "beautywellness.svg");
+        ICON_MAP.put("BOEKENBON", ICON_BASE_URL + "boekenbon.svg");
+        ICON_MAP.put("FASHIONCHEQUE", ICON_BASE_URL + "fashioncheque.svg");
+        ICON_MAP.put("FASHIONGIFTCARD", ICON_BASE_URL + "fashiongiftcard.svg");
+        ICON_MAP.put("VVVGIFTCARD", ICON_BASE_URL + "vvvgiftcard.svg");
+        ICON_MAP.put("WEBSHOPGIFTCARD", ICON_BASE_URL + "webshopgiftcard.svg");
+        
+        // ========================================
+        // E-Wallets
+        // ========================================
+        ICON_MAP.put("PAYPAL", ICON_BASE_URL + "paypal.svg");
+        ICON_MAP.put("APPLEPAY", ICON_BASE_URL + "applepay.svg");
+        ICON_MAP.put("GOOGLEPAY", ICON_BASE_URL + "googlepay.svg");
+        ICON_MAP.put("ALIPAY", ICON_BASE_URL + "alipay.svg");
+        ICON_MAP.put("ALIPAYPLUS", ICON_BASE_URL + "alipayplus.svg");
+        ICON_MAP.put("AMAZONPAY", ICON_BASE_URL + "amazonpay.svg");
+        ICON_MAP.put("WECHAT", ICON_BASE_URL + "wechat.svg");
+        ICON_MAP.put("DIGITAL_WALLET", ICON_BASE_URL + "wallet.svg");
+        
+        // ========================================
+        // Other
+        // ========================================
+        ICON_MAP.put("CASH", ICON_BASE_URL + "cash.svg");
     }
 
     /**

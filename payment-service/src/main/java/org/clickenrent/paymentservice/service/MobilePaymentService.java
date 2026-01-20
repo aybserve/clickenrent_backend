@@ -155,6 +155,140 @@ public class MobilePaymentService {
     }
 
     /**
+     * Get list of Bancontact issuers for mobile
+     * 
+     * @return List of Bancontact issuers
+     */
+    public List<IssuerDTO> getBancontactIssuers() {
+        try {
+            JsonObject response = multiSafepayService.getBancontactIssuers();
+            return transformIssuersToDTO(response, "BANCONTACT");
+        } catch (Exception e) {
+            log.error("Failed to get Bancontact issuers for mobile", e);
+            throw new MultiSafepayIntegrationException("Failed to retrieve Bancontact issuers: " + e.getMessage(), e);
+        }
+    }
+
+    /**
+     * Get list of Dotpay banks for mobile
+     * 
+     * @return List of Dotpay banks
+     */
+    public List<IssuerDTO> getDotpayBanks() {
+        try {
+            JsonObject response = multiSafepayService.getDotpayBanks();
+            return transformIssuersToDTO(response, "DOTPAY");
+        } catch (Exception e) {
+            log.error("Failed to get Dotpay banks for mobile", e);
+            throw new MultiSafepayIntegrationException("Failed to retrieve Dotpay banks: " + e.getMessage(), e);
+        }
+    }
+
+    /**
+     * Get list of MyBank issuers for mobile
+     * 
+     * @return List of MyBank issuers
+     */
+    public List<IssuerDTO> getMyBankIssuers() {
+        try {
+            JsonObject response = multiSafepayService.getMyBankIssuers();
+            return transformIssuersToDTO(response, "MYBANK");
+        } catch (Exception e) {
+            log.error("Failed to get MyBank issuers for mobile", e);
+            throw new MultiSafepayIntegrationException("Failed to retrieve MyBank issuers: " + e.getMessage(), e);
+        }
+    }
+
+    /**
+     * Get list of available gift card types for mobile
+     * 
+     * @return List of gift card types
+     */
+    public List<GiftCardTypeDTO> getGiftCardTypes() {
+        try {
+            JsonObject response = multiSafepayService.getGiftCardTypes();
+            List<GiftCardTypeDTO> giftCards = new ArrayList<>();
+
+            if (response != null && response.has("success") && response.get("success").getAsBoolean()) {
+                if (response.has("data")) {
+                    JsonElement dataElement = response.get("data");
+                    JsonArray cards = dataElement.isJsonArray() ? dataElement.getAsJsonArray() 
+                        : (dataElement.isJsonObject() && dataElement.getAsJsonObject().has("giftcards") 
+                            ? dataElement.getAsJsonObject().getAsJsonArray("giftcards") : null);
+                    
+                    if (cards != null) {
+                        for (JsonElement element : cards) {
+                            JsonObject card = element.getAsJsonObject();
+                            
+                            GiftCardTypeDTO giftCard = GiftCardTypeDTO.builder()
+                                .code(getJsonString(card, "code"))
+                                .name(getJsonString(card, "name"))
+                                .logoUrl(getJsonString(card, "logo_url"))
+                                .currency(getJsonString(card, "currency"))
+                                .requiresPin(true) // Most gift cards require PIN
+                                .build();
+                            giftCards.add(giftCard);
+                        }
+                    }
+                }
+            }
+
+            log.info("Retrieved {} gift card types for mobile", giftCards.size());
+            return giftCards;
+        } catch (Exception e) {
+            log.error("Failed to get gift card types for mobile", e);
+            throw new MultiSafepayIntegrationException("Failed to retrieve gift card types: " + e.getMessage(), e);
+        }
+    }
+
+    /**
+     * Helper method to transform issuer JSON response to IssuerDTO list
+     */
+    private List<IssuerDTO> transformIssuersToDTO(JsonObject response, String paymentMethod) {
+        List<IssuerDTO> issuers = new ArrayList<>();
+
+        if (response != null && response.has("success") && response.get("success").getAsBoolean()) {
+            if (response.has("data")) {
+                JsonElement dataElement = response.get("data");
+                JsonArray issuerArray = null;
+                
+                if (dataElement.isJsonArray()) {
+                    issuerArray = dataElement.getAsJsonArray();
+                } else if (dataElement.isJsonObject()) {
+                    JsonObject data = dataElement.getAsJsonObject();
+                    if (data.has("issuers") && data.get("issuers").isJsonArray()) {
+                        issuerArray = data.getAsJsonArray("issuers");
+                    }
+                }
+                
+                if (issuerArray != null) {
+                    for (JsonElement element : issuerArray) {
+                        JsonObject issuer = element.getAsJsonObject();
+                        
+                        String code = getJsonString(issuer, "code");
+                        if (code == null) code = getJsonString(issuer, "id");
+                        
+                        String name = getJsonString(issuer, "description");
+                        if (name == null) name = getJsonString(issuer, "name");
+                        
+                        IssuerDTO issuerDTO = IssuerDTO.builder()
+                            .code(code)
+                            .name(name)
+                            .logoUrl(getJsonString(issuer, "icon_url"))
+                            .paymentMethod(paymentMethod)
+                            .available(true)
+                            .build();
+                        issuers.add(issuerDTO);
+                    }
+                }
+            }
+        }
+
+        log.info("Retrieved {} issuers for {} payment method", issuers.size(), paymentMethod);
+        return issuers;
+    }
+
+    /**
      * Create direct payment (iDEAL, DirectBank)
      * 
      * @param request Mobile payment request
@@ -178,61 +312,193 @@ public class MobilePaymentService {
             }
 
             // Create order based on payment method
-            if ("IDEAL".equalsIgnoreCase(request.getPaymentMethodCode())) {
-                if (request.getIssuerId() == null || request.getIssuerId().isEmpty()) {
-                    throw new IllegalArgumentException("Issuer ID is required for iDEAL payments");
+            String methodCode = request.getPaymentMethodCode().toUpperCase();
+            String description = request.getDescription() != null ? request.getDescription() : "Payment";
+            
+            orderResponse = switch (methodCode) {
+                // ========================================
+                // BANKING METHODS
+                // ========================================
+                case "IDEAL" -> {
+                    if (request.getIssuerId() == null || request.getIssuerId().isEmpty()) {
+                        throw new IllegalArgumentException("Issuer ID is required for iDEAL payments");
+                    }
+                    yield hasSplits 
+                        ? multiSafepayService.createDirectIdealOrderWithSplits(
+                            request.getAmount(), request.getCurrency(), request.getCustomerEmail(),
+                            description, request.getIssuerId(), affiliate)
+                        : multiSafepayService.createDirectIdealOrder(
+                            request.getAmount(), request.getCurrency(), request.getCustomerEmail(),
+                            description, request.getIssuerId());
                 }
                 
-                if (hasSplits) {
-                    orderResponse = multiSafepayService.createDirectIdealOrderWithSplits(
-                        request.getAmount(),
-                        request.getCurrency(),
-                        request.getCustomerEmail(),
-                        request.getDescription() != null ? request.getDescription() : "Payment",
-                        request.getIssuerId(),
-                        affiliate
-                    );
-                } else {
-                    orderResponse = multiSafepayService.createDirectIdealOrder(
-                        request.getAmount(),
-                        request.getCurrency(),
-                        request.getCustomerEmail(),
-                        request.getDescription() != null ? request.getDescription() : "Payment",
-                        request.getIssuerId()
-                    );
-                }
-            } else if ("DIRECTBANK".equalsIgnoreCase(request.getPaymentMethodCode())) {
-                if (request.getAccountHolderName() == null || request.getAccountHolderIban() == null) {
-                    throw new IllegalArgumentException("Account holder details are required for direct bank payments");
+                case "BANCONTACT" -> multiSafepayService.createBancontactOrder(
+                    request.getAmount(), request.getCurrency(), request.getCustomerEmail(), description);
+                
+                case "BIZUM" -> {
+                    if (request.getPhone() == null || request.getPhone().isEmpty()) {
+                        throw new IllegalArgumentException("Phone number is required for Bizum payments");
+                    }
+                    yield multiSafepayService.createBizumOrder(
+                        request.getAmount(), request.getCurrency(), request.getCustomerEmail(),
+                        description, request.getPhone());
                 }
                 
-                if (hasSplits) {
-                    orderResponse = multiSafepayService.createDirectBankOrderWithSplits(
-                        request.getAmount(),
-                        request.getCurrency(),
-                        request.getDescription() != null ? request.getDescription() : "Payment",
-                        request.getAccountHolderName(),
-                        request.getAccountHolderCity(),
-                        request.getAccountHolderCountry(),
-                        request.getAccountHolderIban(),
-                        request.getAccountHolderBic(),
-                        affiliate
-                    );
-                } else {
-                    orderResponse = multiSafepayService.createDirectBankOrder(
-                        request.getAmount(),
-                        request.getCurrency(),
-                        request.getDescription() != null ? request.getDescription() : "Payment",
-                        request.getAccountHolderName(),
-                        request.getAccountHolderCity(),
-                        request.getAccountHolderCountry(),
-                        request.getAccountHolderIban(),
-                        request.getAccountHolderBic()
-                    );
+                case "GIROPAY" -> {
+                    if (request.getBic() == null || request.getBic().isEmpty()) {
+                        throw new IllegalArgumentException("BIC is required for Giropay payments");
+                    }
+                    yield multiSafepayService.createGiropayOrder(
+                        request.getAmount(), request.getCurrency(), request.getCustomerEmail(),
+                        description, request.getBic());
                 }
-            } else {
-                throw new IllegalArgumentException("Unsupported payment method for direct payment: " + request.getPaymentMethodCode());
-            }
+                
+                case "EPS" -> {
+                    if (request.getBic() == null || request.getBic().isEmpty()) {
+                        throw new IllegalArgumentException("BIC is required for EPS payments");
+                    }
+                    yield multiSafepayService.createEPSOrder(
+                        request.getAmount(), request.getCurrency(), request.getCustomerEmail(),
+                        description, request.getBic());
+                }
+                
+                case "MBWAY" -> {
+                    if (request.getPhone() == null || request.getPhone().isEmpty()) {
+                        throw new IllegalArgumentException("Phone number is required for MB WAY payments");
+                    }
+                    yield multiSafepayService.createMBWayOrder(
+                        request.getAmount(), request.getCurrency(), request.getCustomerEmail(),
+                        description, request.getPhone());
+                }
+                
+                case "DIRDEB", "DIRECTDEBIT" -> {
+                    if (request.getAccountHolderName() == null || request.getAccountHolderIban() == null) {
+                        throw new IllegalArgumentException("Account holder name and IBAN are required for Direct Debit");
+                    }
+                    yield multiSafepayService.createDirectDebitOrder(
+                        request.getAmount(), request.getCurrency(), description,
+                        request.getAccountHolderName(), request.getAccountHolderIban());
+                }
+                
+                case "DIRECTBANK" -> {
+                    if (request.getAccountHolderName() == null || request.getAccountHolderIban() == null) {
+                        throw new IllegalArgumentException("Account holder details are required for direct bank payments");
+                    }
+                    yield hasSplits
+                        ? multiSafepayService.createDirectBankOrderWithSplits(
+                            request.getAmount(), request.getCurrency(), description,
+                            request.getAccountHolderName(), request.getAccountHolderCity(),
+                            request.getAccountHolderCountry(), request.getAccountHolderIban(),
+                            request.getAccountHolderBic(), affiliate)
+                        : multiSafepayService.createDirectBankOrder(
+                            request.getAmount(), request.getCurrency(), description,
+                            request.getAccountHolderName(), request.getAccountHolderCity(),
+                            request.getAccountHolderCountry(), request.getAccountHolderIban(),
+                            request.getAccountHolderBic());
+                }
+                
+                // ========================================
+                // CARD METHODS
+                // ========================================
+                case "CREDITCARD", "VISA", "MASTERCARD", "MAESTRO", "AMEX" -> {
+                    if (request.getCardNumber() == null || request.getCardHolderName() == null ||
+                        request.getExpiryDate() == null || request.getCvv() == null) {
+                        throw new IllegalArgumentException("Card details are required for card payments");
+                    }
+                    yield multiSafepayService.createCreditCardOrder(
+                        request.getAmount(), request.getCurrency(), request.getCustomerEmail(),
+                        description, request.getCardNumber(), request.getCvv(),
+                        request.getExpiryDate(), request.getCardHolderName());
+                }
+                
+                // ========================================
+                // BNPL (BUY NOW PAY LATER) METHODS
+                // ========================================
+                case "KLARNA" -> {
+                    if (request.getBirthday() == null || request.getPhone() == null) {
+                        throw new IllegalArgumentException("Birthday and phone are required for Klarna");
+                    }
+                    yield multiSafepayService.createKlarnaOrder(
+                        request.getAmount(), request.getCurrency(), request.getCustomerEmail(),
+                        description, request.getBirthday(), request.getGender(),
+                        request.getPhone(), null, null); // Customer and ShoppingCart need to be built
+                }
+                
+                case "BILLINK" -> {
+                    if (request.getBirthday() == null || request.getGender() == null) {
+                        throw new IllegalArgumentException("Birthday and gender are required for Billink");
+                    }
+                    yield multiSafepayService.createBillinkOrder(
+                        request.getAmount(), request.getCurrency(), description,
+                        request.getBirthday(), request.getGender(), request.getCompanyType(),
+                        null, null, null); // Customer, ShoppingCart, CheckoutOptions need to be built
+                }
+                
+                case "IN3" -> {
+                    if (request.getBirthday() == null || request.getPhone() == null) {
+                        throw new IllegalArgumentException("Birthday and phone are required for in3");
+                    }
+                    yield multiSafepayService.createIn3Order(
+                        request.getAmount(), request.getCurrency(), description,
+                        request.getBirthday(), request.getPhone(),
+                        null, null, null); // Customer, ShoppingCart, CheckoutOptions need to be built
+                }
+                
+                case "AFTERPAY", "RIVERTY" -> {
+                    if (request.getBirthday() == null || request.getGender() == null ||
+                        request.getPhone() == null || request.getCustomerEmail() == null) {
+                        throw new IllegalArgumentException("Birthday, gender, phone, and email are required for Riverty");
+                    }
+                    yield multiSafepayService.createRivertyOrder(
+                        request.getAmount(), request.getCurrency(), description,
+                        request.getBirthday(), request.getGender(), request.getPhone(),
+                        request.getCustomerEmail(), null, null, null, null);
+                }
+                
+                // ========================================
+                // PREPAID CARDS / GIFT CARDS
+                // ========================================
+                case "VVVGIFTCARD", "BEAUTYANDWELLNESS", "BOEKENBON", "FASHIONCHEQUE",
+                     "FASHIONGIFTCARD", "WEBSHOPGIFTCARD", "EDENRED", "MONIZZE", "SODEXO" -> {
+                    if (request.getCardNumber() == null) {
+                        throw new IllegalArgumentException("Card number is required for gift card payments");
+                    }
+                    yield multiSafepayService.createGiftCardOrder(
+                        request.getAmount(), request.getCurrency(), description,
+                        methodCode, request.getCardNumber(), request.getPin());
+                }
+                
+                // ========================================
+                // WALLET METHODS
+                // ========================================
+                case "PAYPAL" -> multiSafepayService.createPayPalOrder(
+                    request.getAmount(), request.getCurrency(), request.getCustomerEmail(), description);
+                
+                case "APPLEPAY" -> {
+                    if (request.getApplePayToken() == null) {
+                        throw new IllegalArgumentException("Apple Pay token is required");
+                    }
+                    yield multiSafepayService.createApplePayOrder(
+                        request.getAmount(), request.getCurrency(), request.getCustomerEmail(),
+                        description, request.getApplePayToken());
+                }
+                
+                case "GOOGLEPAY" -> {
+                    if (request.getGooglePayToken() == null) {
+                        throw new IllegalArgumentException("Google Pay token is required");
+                    }
+                    yield multiSafepayService.createGooglePayOrder(
+                        request.getAmount(), request.getCurrency(), request.getCustomerEmail(),
+                        description, request.getGooglePayToken());
+                }
+                
+                // ========================================
+                // UNSUPPORTED / REDIRECT-ONLY METHODS
+                // ========================================
+                default -> throw new IllegalArgumentException(
+                    "Unsupported or redirect-only payment method: " + methodCode + 
+                    ". Use createRedirectPayment() for methods that require browser redirect.");
+            };
 
             // Parse response
             if (orderResponse == null || !orderResponse.has("success") || !orderResponse.get("success").getAsBoolean()) {
