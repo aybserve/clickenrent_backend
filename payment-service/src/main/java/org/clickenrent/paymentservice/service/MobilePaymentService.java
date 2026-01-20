@@ -39,31 +39,42 @@ public class MobilePaymentService {
 
     /**
      * Get available payment methods for mobile
-     * Transforms MultiSafePay gateways to mobile-friendly format
+     * Transforms MultiSafePay payment methods to mobile-friendly format
      * 
      * @return List of mobile payment methods
      */
     public List<MobilePaymentMethodDTO> getAvailablePaymentMethods() {
         try {
-            JsonObject response = multiSafepayService.listGateways();
+            // Use listPaymentMethods() instead of listGateways() to get all individual payment methods
+            JsonObject response = multiSafepayService.listPaymentMethods();
             List<MobilePaymentMethodDTO> methods = new ArrayList<>();
 
             if (response != null && response.has("success") && response.get("success").getAsBoolean()) {
                 if (response.has("data")) {
-                    JsonArray gateways = response.getAsJsonArray("data");
+                    JsonArray paymentMethods = response.getAsJsonArray("data");
+                    
+                    log.info("DEBUG: MultiSafePay returned {} payment methods from API", paymentMethods.size());
+                    log.debug("DEBUG: Full payment methods response: {}", paymentMethods.toString());
                     
                     int order = 0;
-                    for (JsonElement element : gateways) {
-                        JsonObject gateway = element.getAsJsonObject();
-                        MobilePaymentMethodDTO method = transformGatewayToMobileMethod(gateway, order++);
+                    for (JsonElement element : paymentMethods) {
+                        JsonObject paymentMethod = element.getAsJsonObject();
+                        String methodId = getJsonString(paymentMethod, "id");
+                        log.debug("DEBUG: Processing payment method: {}", methodId);
+                        
+                        MobilePaymentMethodDTO method = transformGatewayToMobileMethod(paymentMethod, order++);
                         if (method != null) {
                             methods.add(method);
+                            log.debug("DEBUG: Added method: {} ({})", method.getName(), method.getCode());
+                        } else {
+                            log.warn("DEBUG: Skipped payment method (returned null): {}", methodId);
                         }
                     }
                 }
             }
 
-            log.info("Retrieved {} payment methods for mobile", methods.size());
+            log.info("Retrieved {} payment methods for mobile (from {} payment methods in API)", methods.size(), 
+                response != null && response.has("data") ? response.getAsJsonArray("data").size() : 0);
             return methods;
         } catch (Exception e) {
             log.error("Failed to get payment methods for mobile", e);
