@@ -57,6 +57,50 @@ public class MultiSafepayPaymentController {
         }
     }
 
+    @PostMapping("/orders")
+    @PreAuthorize("hasAnyRole('ADMIN', 'SUPERADMIN', 'B2B')")
+    @Operation(summary = "Create order for web checkout")
+    public ResponseEntity<Map<String, Object>> createOrder(
+            @Valid @RequestBody WebOrderCreateRequest request) {
+        
+        log.info("Creating web checkout order: {} {}", request.getAmount(), request.getCurrency());
+        
+        try {
+            // Delegate to service layer for complete order creation
+            JsonObject orderResponse = multiSafepayService.createWebOrder(request);
+            
+            Map<String, Object> response = new HashMap<>();
+            
+            if (orderResponse != null && orderResponse.has("success") 
+                    && orderResponse.get("success").getAsBoolean()) {
+                
+                JsonObject data = orderResponse.getAsJsonObject("data");
+                
+                response.put("success", true);
+                response.put("orderId", data.get("order_id").getAsString());
+                response.put("paymentUrl", data.has("payment_url") 
+                    ? data.get("payment_url").getAsString() : null);
+                response.put("status", data.has("status") 
+                    ? data.get("status").getAsString() : "initialized");
+                
+                return ResponseEntity.ok(response);
+            } else {
+                response.put("success", false);
+                response.put("error", "Failed to create order");
+                return ResponseEntity.status(500).body(response);
+            }
+            
+        } catch (Exception e) {
+            log.error("Failed to create web order", e);
+            
+            Map<String, Object> errorResponse = new HashMap<>();
+            errorResponse.put("success", false);
+            errorResponse.put("error", e.getMessage());
+            
+            return ResponseEntity.status(500).body(errorResponse);
+        }
+    }
+
     @PostMapping("/orders/with-splits")
     @PreAuthorize("hasAnyRole('ADMIN', 'SUPERADMIN', 'B2B')")
     @Operation(summary = "Create order with split payments")
@@ -209,6 +253,43 @@ public class MultiSafepayPaymentController {
             
         } catch (Exception e) {
             log.error("Failed to cancel refund for order: {}", orderId, e);
+            
+            Map<String, Object> errorResponse = new HashMap<>();
+            errorResponse.put("success", false);
+            errorResponse.put("error", e.getMessage());
+            
+            return ResponseEntity.status(500).body(errorResponse);
+        }
+    }
+
+    @PostMapping("/orders/{orderId}/refunds")
+    @PreAuthorize("hasAnyRole('ADMIN', 'SUPERADMIN', 'B2B')")
+    @Operation(summary = "Create refund for order")
+    public ResponseEntity<Map<String, Object>> createRefund(
+            @PathVariable String orderId,
+            @Valid @RequestBody RefundRequestDTO request) {
+        
+        log.info("Creating refund for order: {}", orderId);
+        
+        try {
+            String refundId = multiSafepayService.createRefund(
+                orderId, 
+                request.getAmount(), 
+                request.getCurrency(), 
+                request.getDescription()
+            );
+            
+            Map<String, Object> response = new HashMap<>();
+            response.put("success", true);
+            response.put("orderId", orderId);
+            response.put("refundId", refundId);
+            response.put("amount", request.getAmount());
+            response.put("currency", request.getCurrency());
+            
+            return ResponseEntity.ok(response);
+            
+        } catch (Exception e) {
+            log.error("Failed to create refund for order: {}", orderId, e);
             
             Map<String, Object> errorResponse = new HashMap<>();
             errorResponse.put("success", false);

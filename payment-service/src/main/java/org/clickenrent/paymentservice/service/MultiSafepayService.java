@@ -6,11 +6,14 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.clickenrent.paymentservice.client.multisafepay.MultiSafepayClient;
 import org.clickenrent.paymentservice.client.multisafepay.model.*;
+import org.clickenrent.paymentservice.dto.SplitPaymentDTO;
+import org.clickenrent.paymentservice.dto.WebOrderCreateRequest;
 import org.clickenrent.paymentservice.exception.MultiSafepayIntegrationException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 
 /**
  * Service for MultiSafePay API integration
@@ -132,6 +135,85 @@ public class MultiSafepayService {
         } catch (Exception e) {
             log.error("Failed to create MultiSafePay order for amount: {} {}", amount, currency, e);
             throw new MultiSafepayIntegrationException("Failed to create order: " + e.getMessage(), e);
+        }
+    }
+
+    /**
+     * Create web checkout order with full configuration
+     * 
+     * @param request Web order creation request
+     * @return Full JsonObject response from MultiSafePay
+     */
+    public JsonObject createWebOrder(WebOrderCreateRequest request) {
+        try {
+            int amountInCents = request.getAmount().multiply(new BigDecimal(100)).intValue();
+            String orderId = "order_web_" + System.currentTimeMillis();
+            
+            // Build order object using existing MultiSafepay client models
+            Order order = new Order();
+            order.type = "redirect";
+            order.order_id = orderId;
+            order.currency = request.getCurrency().toUpperCase();
+            order.amount = amountInCents;
+            order.description = request.getDescription() != null 
+                ? request.getDescription() : "Web Payment";
+            
+            // Set customer info
+            Customer customer = new Customer();
+            customer.email = request.getCustomerEmail();
+            customer.first_name = request.getCustomerFirstName();
+            customer.last_name = request.getCustomerLastName();
+            order.customer = customer;
+            
+            // Set gateway if specified
+            if (request.getPaymentMethodCode() != null) {
+                order.gateway = request.getPaymentMethodCode();
+                
+                // Set issuer for iDEAL
+                if ("IDEAL".equals(request.getPaymentMethodCode()) 
+                        && request.getIssuerId() != null) {
+                    GatewayInfo gatewayInfo = new GatewayInfo();
+                    gatewayInfo.issuer_id = request.getIssuerId();
+                    order.gateway_info = gatewayInfo;
+                }
+            }
+            
+            // Set redirect URLs using PaymentOptions
+            PaymentOptions paymentOptions = new PaymentOptions(
+                request.getNotificationUrl(),
+                request.getCancelUrl(),
+                request.getRedirectUrl()
+            );
+            order.payment_options = paymentOptions;
+            
+            // Handle splits if provided
+            if (request.getSplits() != null && !request.getSplits().isEmpty()) {
+                Affiliate affiliate = new Affiliate();
+                affiliate.split_payments = new ArrayList<>();
+                
+                for (SplitPaymentDTO split : request.getSplits()) {
+                    SplitPayments sp = new SplitPayments();
+                    sp.merchant = split.getMerchantId();
+                    sp.fixed = split.getPercentage().multiply(new BigDecimal(amountInCents))
+                        .divide(new BigDecimal(100)).intValue();
+                    sp.description = split.getDescription();
+                    affiliate.split_payments.add(sp);
+                }
+                
+                order.affiliate = affiliate;
+            }
+            
+            JsonObject response = MultiSafepayClient.createOrder(order);
+            
+            if (response != null && response.has("success") && response.get("success").getAsBoolean()) {
+                log.info("Created web order: {} for amount: {} {}", orderId, request.getAmount(), request.getCurrency());
+            }
+            
+            return response;
+            
+        } catch (Exception e) {
+            log.error("Failed to create web order", e);
+            throw new MultiSafepayIntegrationException("Failed to create web order: " + e.getMessage(), e);
         }
     }
 

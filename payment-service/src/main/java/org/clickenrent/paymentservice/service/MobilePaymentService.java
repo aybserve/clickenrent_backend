@@ -11,6 +11,10 @@ import org.clickenrent.paymentservice.dto.mobile.*;
 import org.clickenrent.paymentservice.entity.*;
 import org.clickenrent.paymentservice.exception.MultiSafepayIntegrationException;
 import org.clickenrent.paymentservice.repository.*;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -406,6 +410,102 @@ public class MobilePaymentService {
         } catch (Exception e) {
             log.error("Failed to get payment status for order: {}", orderId, e);
             throw new MultiSafepayIntegrationException("Failed to retrieve payment status: " + e.getMessage(), e);
+        }
+    }
+
+    /**
+     * Get refund status for order
+     * 
+     * @param orderId Order ID
+     * @return Refund status information
+     */
+    public MobileRefundStatusDTO getRefundStatus(String orderId) {
+        try {
+            // Get order from MultiSafePay
+            JsonObject orderResponse = multiSafepayService.getOrder(orderId);
+            
+            if (orderResponse == null || !orderResponse.has("data")) {
+                throw new RuntimeException("Order not found: " + orderId);
+            }
+            
+            JsonObject data = orderResponse.getAsJsonObject("data");
+            
+            // Check if order has been refunded
+            String status = data.has("status") ? data.get("status").getAsString() : "unknown";
+            boolean isRefunded = "refunded".equalsIgnoreCase(status) 
+                || "partial_refunded".equalsIgnoreCase(status);
+            
+            if (!isRefunded) {
+                throw new RuntimeException("No refund found for order: " + orderId);
+            }
+            
+            // Extract refund information
+            BigDecimal amount = BigDecimal.ZERO;
+            String currency = "EUR";
+            String refundId = null;
+            
+            if (data.has("amount")) {
+                amount = new BigDecimal(data.get("amount").getAsInt()).divide(new BigDecimal(100));
+            }
+            if (data.has("currency")) {
+                currency = data.get("currency").getAsString();
+            }
+            if (data.has("transaction_id")) {
+                refundId = data.get("transaction_id").getAsString();
+            }
+            
+            return MobileRefundStatusDTO.builder()
+                .orderId(orderId)
+                .refundId(refundId)
+                .amount(amount)
+                .currency(currency)
+                .status(status)
+                .description("Refund for order " + orderId)
+                .build();
+            
+        } catch (Exception e) {
+            log.error("Failed to get refund status for order: {}", orderId, e);
+            throw new RuntimeException("Failed to get refund status: " + e.getMessage(), e);
+        }
+    }
+
+    /**
+     * Get payment history for user
+     * 
+     * @param userExternalId User external ID
+     * @param page Page number
+     * @param size Page size
+     * @return List of payment history records
+     */
+    public List<MobilePaymentHistoryDTO> getPaymentHistory(String userExternalId, int page, int size) {
+        try {
+            Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "dateTime"));
+            Page<FinancialTransaction> transactions = financialTransactionRepository
+                .findByPayerExternalIdOrderByDateTimeDesc(userExternalId, pageable);
+            
+            List<MobilePaymentHistoryDTO> history = new ArrayList<>();
+            
+            for (FinancialTransaction transaction : transactions) {
+                MobilePaymentHistoryDTO dto = MobilePaymentHistoryDTO.builder()
+                    .transactionExternalId(transaction.getExternalId())
+                    .orderId(transaction.getMultiSafepayOrderId())
+                    .amount(transaction.getAmount())
+                    .currency(transaction.getCurrency().getCode())
+                    .paymentMethod(transaction.getPaymentMethod().getName())
+                    .status(transaction.getPaymentStatus().getCode())
+                    .createdAt(transaction.getDateTime())
+                    .isRefund(transaction.getOriginalTransactionId() != null)
+                    .build();
+                
+                history.add(dto);
+            }
+            
+            log.info("Retrieved {} payment records for user: {}", history.size(), userExternalId);
+            return history;
+            
+        } catch (Exception e) {
+            log.error("Failed to get payment history for user: {}", userExternalId, e);
+            throw new RuntimeException("Failed to get payment history: " + e.getMessage(), e);
         }
     }
 

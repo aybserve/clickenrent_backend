@@ -3,6 +3,8 @@
 **Version**: 2.0.0  
 **Purpose**: Single source of truth for cross-service DTOs
 
+📖 **[Read DTO Architecture Guide](DTO-ARCHITECTURE.md)** - Comprehensive guide on DTO synchronization, usage patterns, and recommendations.
+
 ---
 
 ## ⚠️ Version 2.0.0 Breaking Changes

@@ -2,8 +2,8 @@ package org.clickenrent.authservice.service;
 
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
+import io.github.resilience4j.retry.Retry;
 import io.micrometer.core.instrument.Timer;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.clickenrent.authservice.dto.AuthResponse;
 import org.clickenrent.authservice.dto.GoogleTokenResponse;
@@ -18,6 +18,7 @@ import org.clickenrent.authservice.repository.GlobalRoleRepository;
 import org.clickenrent.authservice.repository.UserCompanyRepository;
 import org.clickenrent.authservice.repository.UserGlobalRoleRepository;
 import org.clickenrent.authservice.repository.UserRepository;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.security.core.GrantedAuthority;
@@ -43,7 +44,6 @@ import java.util.stream.Collectors;
  * Manages the OAuth flow, token exchange, user creation/linking, and JWT generation.
  */
 @Service
-@RequiredArgsConstructor
 @Slf4j
 public class GoogleOAuthService {
     
@@ -56,7 +56,40 @@ public class GoogleOAuthService {
     private final UserMapper userMapper;
     private final GoogleIdTokenVerifier googleIdTokenVerifier;
     private final OAuthMetrics oAuthMetrics;
-    private final RestTemplate restTemplate = new RestTemplate();
+    private final RestTemplate restTemplate;
+    private final Retry tokenExchangeRetry;
+    private final Retry userInfoRetry;
+    
+    /**
+     * Constructor with dependency injection.
+     * Uses @Qualifier to distinguish between multiple Retry beans.
+     */
+    public GoogleOAuthService(
+            UserRepository userRepository,
+            GlobalRoleRepository globalRoleRepository,
+            UserGlobalRoleRepository userGlobalRoleRepository,
+            UserCompanyRepository userCompanyRepository,
+            JwtService jwtService,
+            CustomUserDetailsService userDetailsService,
+            UserMapper userMapper,
+            GoogleIdTokenVerifier googleIdTokenVerifier,
+            OAuthMetrics oAuthMetrics,
+            RestTemplate restTemplate,
+            @Qualifier("googleTokenExchangeRetry") Retry tokenExchangeRetry,
+            @Qualifier("googleUserInfoRetry") Retry userInfoRetry) {
+        this.userRepository = userRepository;
+        this.globalRoleRepository = globalRoleRepository;
+        this.userGlobalRoleRepository = userGlobalRoleRepository;
+        this.userCompanyRepository = userCompanyRepository;
+        this.jwtService = jwtService;
+        this.userDetailsService = userDetailsService;
+        this.userMapper = userMapper;
+        this.googleIdTokenVerifier = googleIdTokenVerifier;
+        this.oAuthMetrics = oAuthMetrics;
+        this.restTemplate = restTemplate;
+        this.tokenExchangeRetry = tokenExchangeRetry;
+        this.userInfoRetry = userInfoRetry;
+    }
     
     private static final String PROVIDER_GOOGLE = "google";
     
@@ -213,59 +246,67 @@ public class GoogleOAuthService {
     
     /**
      * Exchange authorization code for Google access token.
+     * Uses retry mechanism with exponential backoff for resilience.
      */
     private GoogleTokenResponse exchangeCodeForToken(String code, String redirectUri) {
         log.debug("Exchanging authorization code for token");
         
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
-        
-        MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
-        params.add("code", code);
-        params.add("client_id", clientId);
-        params.add("client_secret", clientSecret);
-        params.add("redirect_uri", redirectUri);
-        params.add("grant_type", "authorization_code");
-        
-        HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(params, headers);
-        
-        ResponseEntity<GoogleTokenResponse> response = restTemplate.exchange(
-                tokenUri,
-                HttpMethod.POST,
-                request,
-                GoogleTokenResponse.class
-        );
-        
-        if (response.getBody() == null) {
-            throw new UnauthorizedException("Failed to get token from Google");
-        }
-        
-        return response.getBody();
+        // Wrap the API call with retry logic
+        return tokenExchangeRetry.executeSupplier(() -> {
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+            
+            MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+            params.add("code", code);
+            params.add("client_id", clientId);
+            params.add("client_secret", clientSecret);
+            params.add("redirect_uri", redirectUri);
+            params.add("grant_type", "authorization_code");
+            
+            HttpEntity<MultiValueMap<String, String>> request = new HttpEntity<>(params, headers);
+            
+            ResponseEntity<GoogleTokenResponse> response = restTemplate.exchange(
+                    tokenUri,
+                    HttpMethod.POST,
+                    request,
+                    GoogleTokenResponse.class
+            );
+            
+            if (response.getBody() == null) {
+                throw new UnauthorizedException("Failed to get token from Google");
+            }
+            
+            return response.getBody();
+        });
     }
     
     /**
      * Fetch user information from Google using access token.
+     * Uses retry mechanism with exponential backoff for resilience.
      */
     private GoogleUserInfo fetchGoogleUserInfo(String accessToken) {
         log.debug("Fetching user info from Google");
         
-        HttpHeaders headers = new HttpHeaders();
-        headers.setBearerAuth(accessToken);
-        
-        HttpEntity<String> entity = new HttpEntity<>(headers);
-        
-        ResponseEntity<GoogleUserInfo> response = restTemplate.exchange(
-                userInfoUri,
-                HttpMethod.GET,
-                entity,
-                GoogleUserInfo.class
-        );
-        
-        if (response.getBody() == null) {
-            throw new UnauthorizedException("Failed to get user info from Google");
-        }
-        
-        return response.getBody();
+        // Wrap the API call with retry logic
+        return userInfoRetry.executeSupplier(() -> {
+            HttpHeaders headers = new HttpHeaders();
+            headers.setBearerAuth(accessToken);
+            
+            HttpEntity<String> entity = new HttpEntity<>(headers);
+            
+            ResponseEntity<GoogleUserInfo> response = restTemplate.exchange(
+                    userInfoUri,
+                    HttpMethod.GET,
+                    entity,
+                    GoogleUserInfo.class
+            );
+            
+            if (response.getBody() == null) {
+                throw new UnauthorizedException("Failed to get user info from Google");
+            }
+            
+            return response.getBody();
+        });
     }
     
     /**

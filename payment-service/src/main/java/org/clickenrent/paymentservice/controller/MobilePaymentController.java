@@ -161,6 +161,60 @@ public class MobilePaymentController {
         }
     }
 
+    @GetMapping("/refunds/{orderId}")
+    @Operation(
+        summary = "Get refund status for order",
+        description = "Retrieves refund information for a specific order. " +
+                     "Returns refund status, amount, and timestamps."
+    )
+    @PreAuthorize("hasAnyAuthority('USER', 'ADMIN', 'SUPERADMIN', 'B2B_CLIENT')")
+    public ResponseEntity<MobileRefundStatusDTO> getRefundStatus(
+            @PathVariable String orderId,
+            @AuthenticationPrincipal Jwt jwt) {
+        
+        String userExternalId = jwt.getSubject();
+        log.info("Getting refund status for order: {} by user: {}", orderId, userExternalId);
+        
+        try {
+            MobileRefundStatusDTO response = mobilePaymentService.getRefundStatus(orderId);
+            log.info("Successfully retrieved refund status for order: {}", orderId);
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            log.error("Failed to get refund status for order: {}", orderId, e);
+            throw e;
+        }
+    }
+
+    @GetMapping("/history")
+    @Operation(
+        summary = "Get payment history for user",
+        description = "Returns a paginated list of all payments made by the authenticated user, " +
+                     "including successful, pending, and failed transactions. " +
+                     "Includes refunds marked with isRefund flag."
+    )
+    @PreAuthorize("hasAnyAuthority('USER', 'ADMIN', 'SUPERADMIN', 'B2B_CLIENT')")
+    public ResponseEntity<List<MobilePaymentHistoryDTO>> getPaymentHistory(
+            @AuthenticationPrincipal Jwt jwt,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size) {
+        
+        String userExternalId = jwt.getSubject();
+        log.info("Getting payment history for user: {} (page: {}, size: {})", 
+            userExternalId, page, size);
+        
+        try {
+            List<MobilePaymentHistoryDTO> history = mobilePaymentService.getPaymentHistory(
+                userExternalId, page, size
+            );
+            log.info("Successfully retrieved {} payment records for user: {}", 
+                history.size(), userExternalId);
+            return ResponseEntity.ok(history);
+        } catch (Exception e) {
+            log.error("Failed to get payment history for user: {}", userExternalId, e);
+            throw e;
+        }
+    }
+
     @PostMapping("/direct/ideal")
     @Operation(
         summary = "Quick iDEAL payment",
