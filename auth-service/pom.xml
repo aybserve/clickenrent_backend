@@ -132,6 +132,20 @@
 		<version>2.2.0</version>
 	</dependency>
 
+	<!-- Nimbus JOSE+JWT for Apple ID token verification and client secret signing -->
+	<dependency>
+		<groupId>com.nimbusds</groupId>
+		<artifactId>nimbus-jose-jwt</artifactId>
+		<version>9.37.3</version>
+	</dependency>
+
+	<!-- Bouncy Castle for EC key support (Apple uses ES256 algorithm) -->
+	<dependency>
+		<groupId>org.bouncycastle</groupId>
+		<artifactId>bcpkix-jdk18on</artifactId>
+		<version>1.77</version>
+	</dependency>
+
 	<!-- MockWebServer for testing HTTP calls -->
 	<dependency>
 		<groupId>com.squareup.okhttp3</groupId>

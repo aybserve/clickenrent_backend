@@ -108,7 +108,7 @@ CREATE TABLE users (
     external_id                 VARCHAR(100) UNIQUE,
     user_name                   VARCHAR(100) NOT NULL UNIQUE,
     email                       VARCHAR(255) NOT NULL UNIQUE,
-    password                    VARCHAR(255) NOT NULL,
+    password                    VARCHAR(255),
     first_name                  VARCHAR(100),
     last_name                   VARCHAR(100),
     phone                       VARCHAR(20),
@@ -131,8 +131,7 @@ CREATE TABLE users (
     CONSTRAINT fk_users_language FOREIGN KEY (language_id) 
         REFERENCES language(id) ON DELETE SET NULL,
     CONSTRAINT chk_users_username_not_empty CHECK (user_name <> ''),
-    CONSTRAINT chk_users_email_not_empty CHECK (email <> ''),
-    CONSTRAINT chk_users_password_not_empty CHECK (password <> '')
+    CONSTRAINT chk_users_email_not_empty CHECK (email <> '')
 );
 
 -- ---------------------------------------------------------------------------------------------------------------------

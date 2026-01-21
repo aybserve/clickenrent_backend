@@ -15,7 +15,7 @@ import java.time.Duration;
 
 /**
  * Configuration for Resilience4j retry mechanism.
- * Provides retry logic for Google OAuth API calls with exponential backoff.
+ * Provides retry logic for OAuth API calls with exponential backoff.
  */
 @Configuration
 @Slf4j
@@ -104,6 +104,42 @@ public class Resilience4jConfig {
                         event.getNumberOfRetryAttempts(), 
                         event.getLastThrowable() != null ? event.getLastThrowable().getMessage() : "unknown"))
                 .onError(event -> log.error("All retry attempts exhausted for user info fetch: {}", 
+                        event.getLastThrowable() != null ? event.getLastThrowable().getMessage() : "unknown"));
+        
+        return retry;
+    }
+    
+    /**
+     * Create specific retry instance for Apple OAuth token exchange.
+     */
+    @Bean(name = "appleTokenExchangeRetry")
+    public Retry appleTokenExchangeRetry(RetryRegistry retryRegistry) {
+        Retry retry = retryRegistry.retry("appleTokenExchange");
+        
+        // Add event listeners for monitoring
+        retry.getEventPublisher()
+                .onRetry(event -> log.info("Retry attempt {} for Apple token exchange: {}", 
+                        event.getNumberOfRetryAttempts(), 
+                        event.getLastThrowable() != null ? event.getLastThrowable().getMessage() : "unknown"))
+                .onError(event -> log.error("All retry attempts exhausted for Apple token exchange: {}", 
+                        event.getLastThrowable() != null ? event.getLastThrowable().getMessage() : "unknown"));
+        
+        return retry;
+    }
+    
+    /**
+     * Create specific retry instance for fetching Apple JWKS (public keys).
+     */
+    @Bean(name = "appleJwksRetry")
+    public Retry appleJwksRetry(RetryRegistry retryRegistry) {
+        Retry retry = retryRegistry.retry("appleJwks");
+        
+        // Add event listeners for monitoring
+        retry.getEventPublisher()
+                .onRetry(event -> log.info("Retry attempt {} for Apple JWKS fetch: {}", 
+                        event.getNumberOfRetryAttempts(), 
+                        event.getLastThrowable() != null ? event.getLastThrowable().getMessage() : "unknown"))
+                .onError(event -> log.error("All retry attempts exhausted for Apple JWKS fetch: {}", 
                         event.getLastThrowable() != null ? event.getLastThrowable().getMessage() : "unknown"));
         
         return retry;

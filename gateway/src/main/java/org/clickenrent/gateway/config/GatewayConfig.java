@@ -104,6 +104,15 @@ public class GatewayConfig {
                                 .setStatusCode(HttpStatus.TOO_MANY_REQUESTS)))
                         .uri("lb://auth-service"))
                 
+                // Apple OAuth routes (public, v1 API)
+                .route("auth-v1-apple-login", r -> r
+                        .path("/api/v1/auth/apple/**")
+                        .filters(f -> f.requestRateLimiter(c -> c
+                                .setRateLimiter(ipRateLimiter)
+                                .setKeyResolver(ipKeyResolver)
+                                .setStatusCode(HttpStatus.TOO_MANY_REQUESTS)))
+                        .uri("lb://auth-service"))
+                
                 // Protected Auth Routes (v1 API) - JWT validation required, user-based rate limiting
                 .route("auth-v1-protected-me", r -> r
                         .path("/api/v1/auth/me")
