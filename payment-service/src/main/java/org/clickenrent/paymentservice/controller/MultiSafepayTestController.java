@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -288,15 +289,99 @@ public class MultiSafepayTestController {
             @RequestParam(defaultValue = "Test Order with Splits") String description,
             @RequestBody java.util.List<org.clickenrent.paymentservice.dto.SplitPaymentRequest> splits) {
         
-        log.info("Testing MultiSafePay order with splits creation");
+        log.info("Testing MultiSafePay order with splits creation: {} {} with {} splits", amount, currency, splits.size());
         
         try {
-            // For now, return a placeholder - full split payment implementation would be here
+            // Validate splits
+            if (splits == null || splits.isEmpty()) {
+                Map<String, Object> errorResponse = new HashMap<>();
+                errorResponse.put("success", false);
+                errorResponse.put("error", "At least one split payment is required");
+                return ResponseEntity.badRequest().body(errorResponse);
+            }
+            
+            // Build Affiliate object with split payments
+            org.clickenrent.paymentservice.client.multisafepay.model.Affiliate affiliate = 
+                new org.clickenrent.paymentservice.client.multisafepay.model.Affiliate();
+            affiliate.split_payments = new java.util.ArrayList<>();
+            
+            int amountInCents = amount.multiply(new BigDecimal(100)).intValue();
+            int totalSplitAmount = 0;
+            
+            for (org.clickenrent.paymentservice.dto.SplitPaymentRequest split : splits) {
+                org.clickenrent.paymentservice.client.multisafepay.model.SplitPayments sp = 
+                    new org.clickenrent.paymentservice.client.multisafepay.model.SplitPayments();
+                sp.merchant = split.getMerchantId();
+                
+                // Calculate split amount (either percentage or fixed amount)
+                if (split.getFixedAmountCents() != null && split.getFixedAmountCents() > 0) {
+                    sp.fixed = split.getFixedAmountCents();
+                    totalSplitAmount += split.getFixedAmountCents();
+                } else if (split.getPercentage() != null && split.getPercentage().compareTo(BigDecimal.ZERO) > 0) {
+                    int splitAmount = split.getPercentage()
+                        .multiply(new BigDecimal(amountInCents))
+                        .divide(new BigDecimal(100), RoundingMode.HALF_UP)
+                        .intValue();
+                    sp.fixed = splitAmount;
+                    totalSplitAmount += splitAmount;
+                } else {
+                    Map<String, Object> errorResponse = new HashMap<>();
+                    errorResponse.put("success", false);
+                    errorResponse.put("error", "Each split must have either percentage or fixedAmountCents specified");
+                    return ResponseEntity.badRequest().body(errorResponse);
+                }
+                
+                sp.description = split.getDescription() != null ? split.getDescription() : "Split payment";
+                affiliate.split_payments.add(sp);
+            }
+            
+            // Validate total split amount doesn't exceed order amount
+            if (totalSplitAmount > amountInCents) {
+                Map<String, Object> errorResponse = new HashMap<>();
+                errorResponse.put("success", false);
+                errorResponse.put("error", "Total split amount (" + totalSplitAmount + " cents) exceeds order amount (" + amountInCents + " cents)");
+                return ResponseEntity.badRequest().body(errorResponse);
+            }
+            
+            // Create order with splits using the service
+            JsonObject createResponse = multiSafepayService.createRedirectOrderWithSplits(
+                amount, currency, customerEmail, description, affiliate);
+            
+            // Extract order details
+            String orderId = null;
+            String paymentUrl = null;
+            String status = null;
+            
+            if (createResponse != null && createResponse.has("data")) {
+                JsonObject data = createResponse.getAsJsonObject("data");
+                
+                if (data.has("order_id") && !data.get("order_id").isJsonNull()) {
+                    orderId = data.get("order_id").getAsString();
+                }
+                
+                if (data.has("payment_url") && !data.get("payment_url").isJsonNull()) {
+                    paymentUrl = data.get("payment_url").getAsString();
+                }
+                
+                if (data.has("status") && !data.get("status").isJsonNull()) {
+                    status = data.get("status").getAsString();
+                }
+            }
+            
             Map<String, Object> response = new HashMap<>();
             response.put("success", true);
-            response.put("message", "Split payment endpoint ready - implement based on business requirements");
+            response.put("orderId", orderId);
+            response.put("paymentUrl", paymentUrl);
+            response.put("status", status);
             response.put("amount", amount);
-            response.put("splits", splits);
+            response.put("currency", currency);
+            response.put("splitsCount", splits.size());
+            response.put("totalSplitAmount", totalSplitAmount / 100.0);
+            response.put("remainingAmount", (amountInCents - totalSplitAmount) / 100.0);
+            response.put("message", "Order with split payments created successfully. Open the paymentUrl to complete payment.");
+            response.put("fullResponse", createResponse != null ? createResponse.toString() : "null");
+            
+            log.info("✅ Order with splits created: {} | Payment URL: {} | Splits: {}", orderId, paymentUrl, splits.size());
             
             return ResponseEntity.ok(response);
             
@@ -306,6 +391,7 @@ public class MultiSafepayTestController {
             Map<String, Object> errorResponse = new HashMap<>();
             errorResponse.put("success", false);
             errorResponse.put("error", e.getMessage());
+            errorResponse.put("message", "Failed to create order with splits. Check logs for details.");
             
             return ResponseEntity.status(500).body(errorResponse);
         }

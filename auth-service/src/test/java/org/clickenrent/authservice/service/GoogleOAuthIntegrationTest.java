@@ -38,12 +38,11 @@ import static org.mockito.Mockito.when;
  * Integration tests for Google OAuth flow.
  * Uses MockWebServer to simulate Google API responses.
  * Tests the complete flow from authorization code to JWT generation.
+ * Uses H2 in-memory database for fast, isolated testing.
  */
 @SpringBootTest
-@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-@TestPropertySource(properties = {
-        "oauth2.google.verify-id-token=false" // Disable ID token verification for integration tests
-})
+@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.ANY)
+@TestPropertySource(locations = "classpath:application-test.properties")
 @Transactional
 class GoogleOAuthIntegrationTest {
     

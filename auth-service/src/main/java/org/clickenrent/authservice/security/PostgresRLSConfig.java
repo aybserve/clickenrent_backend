@@ -1,5 +1,6 @@
 package org.clickenrent.authservice.security;
 
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.annotation.Aspect;
@@ -28,8 +29,40 @@ public class PostgresRLSConfig {
     
     private final JdbcTemplate jdbcTemplate;
     
+    // Cache the database type check to avoid getting a connection on every query
+    private boolean isPostgreSQL = false;
+    private boolean databaseTypeChecked = false;
+    
+    /**
+     * Check database type once during initialization instead of on every query.
+     * This prevents performance issues and connection hangs.
+     */
+    @PostConstruct
+    public void init() {
+        try {
+            String dbUrl = jdbcTemplate.getDataSource().getConnection().getMetaData().getURL();
+            isPostgreSQL = dbUrl.startsWith("jdbc:postgresql");
+            databaseTypeChecked = true;
+            
+            if (isPostgreSQL) {
+                log.info("PostgreSQL detected - RLS security policies will be enforced");
+            } else {
+                log.info("Non-PostgreSQL database detected ({}) - RLS security will be skipped", dbUrl);
+            }
+        } catch (Exception e) {
+            log.warn("Failed to detect database type during initialization. RLS will be disabled.", e);
+            isPostgreSQL = false;
+            databaseTypeChecked = true;
+        }
+    }
+    
     @Before("execution(* org.clickenrent.authservice.repository.*.*(..))")
     public void setPostgresSessionVariables() {
+        // Skip if not PostgreSQL (checked once during initialization)
+        if (!databaseTypeChecked || !isPostgreSQL) {
+            return;
+        }
+        
         boolean isAdmin = TenantContext.isSuperAdmin();
         List<String> companyIds = TenantContext.getCurrentCompanies();
         
