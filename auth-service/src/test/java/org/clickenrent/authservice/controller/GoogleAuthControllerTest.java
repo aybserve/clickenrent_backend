@@ -185,5 +185,129 @@ class GoogleAuthControllerTest {
                         .content("{}"))
                 .andExpect(status().isBadRequest());
     }
+    
+    // ========== Tests for Mobile Flow (ID Token) ==========
+    
+    @Test
+    void loginWithGoogle_MobileFlow_ValidIdToken_ReturnsAuthResponse() throws Exception {
+        // Arrange
+        String testIdToken = "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.test.token";
+        GoogleLoginRequest request = GoogleLoginRequest.builder()
+                .idToken(testIdToken)
+                .build();
+        
+        UserDTO userDTO = UserDTO.builder()
+                .id(1L)
+                .userName("mobileuser")
+                .email("mobile@example.com")
+                .firstName("Mobile")
+                .lastName("User")
+                .build();
+        
+        AuthResponse authResponse = new AuthResponse(
+                "jwt-access-token",
+                "jwt-refresh-token",
+                3600000L,
+                userDTO
+        );
+        
+        when(googleOAuthService.authenticateWithIdToken(testIdToken))
+                .thenReturn(authResponse);
+        
+        // Act & Assert
+        mockMvc.perform(post(GOOGLE_LOGIN_ENDPOINT)
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(jsonPath("$.accessToken").value("jwt-access-token"))
+                .andExpect(jsonPath("$.refreshToken").value("jwt-refresh-token"))
+                .andExpect(jsonPath("$.user.email").value("mobile@example.com"));
+    }
+    
+    @Test
+    void loginWithGoogle_MobileFlow_InvalidIdToken_ReturnsUnauthorized() throws Exception {
+        // Arrange
+        String testIdToken = "invalid.id.token";
+        GoogleLoginRequest request = GoogleLoginRequest.builder()
+                .idToken(testIdToken)
+                .build();
+        
+        when(googleOAuthService.authenticateWithIdToken(testIdToken))
+                .thenThrow(new UnauthorizedException("Invalid Google ID token"));
+        
+        // Act & Assert
+        mockMvc.perform(post(GOOGLE_LOGIN_ENDPOINT)
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isUnauthorized());
+    }
+    
+    @Test
+    void loginWithGoogle_MobileFlow_EmptyIdToken_ReturnsBadRequest() throws Exception {
+        // Arrange
+        GoogleLoginRequest request = GoogleLoginRequest.builder()
+                .idToken("")
+                .build();
+        
+        // Act & Assert
+        mockMvc.perform(post(GOOGLE_LOGIN_ENDPOINT)
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isBadRequest());
+    }
+    
+    @Test
+    void loginWithGoogle_MobileFlow_BlankIdToken_ReturnsBadRequest() throws Exception {
+        // Arrange
+        GoogleLoginRequest request = GoogleLoginRequest.builder()
+                .idToken("   ")
+                .build();
+        
+        // Act & Assert
+        mockMvc.perform(post(GOOGLE_LOGIN_ENDPOINT)
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isBadRequest());
+    }
+    
+    @Test
+    void loginWithGoogle_BothFlowsProvided_MobileFlowTakesPrecedence() throws Exception {
+        // Arrange
+        String testIdToken = "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.test.token";
+        GoogleLoginRequest request = GoogleLoginRequest.builder()
+                .idToken(testIdToken)
+                .code(TEST_CODE)
+                .redirectUri(TEST_REDIRECT_URI)
+                .build();
+        
+        UserDTO userDTO = UserDTO.builder()
+                .id(1L)
+                .userName("testuser")
+                .email("test@example.com")
+                .build();
+        
+        AuthResponse authResponse = new AuthResponse(
+                "jwt-access-token",
+                "jwt-refresh-token",
+                3600000L,
+                userDTO
+        );
+        
+        when(googleOAuthService.authenticateWithIdToken(testIdToken))
+                .thenReturn(authResponse);
+        
+        // Act & Assert
+        mockMvc.perform(post(GOOGLE_LOGIN_ENDPOINT)
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.accessToken").value("jwt-access-token"));
+    }
 }
 

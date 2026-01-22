@@ -375,5 +375,215 @@ class GoogleOAuthServiceTest {
                 Collections.singletonList(new SimpleGrantedAuthority("ROLE_CUSTOMER"))
         );
     }
+    
+    // ========== Tests for Mobile Flow (ID Token) ==========
+    
+    @Test
+    void authenticateWithIdToken_NewUser_Success() throws Exception {
+        // Arrange
+        GoogleUserInfo userInfo = createGoogleUserInfo();
+        User newUser = createUser();
+        GlobalRole customerRole = createCustomerRole();
+        UserDetails userDetails = createUserDetails();
+        
+        GoogleIdToken mockIdToken = mock(GoogleIdToken.class);
+        GoogleIdToken.Payload mockPayload = mock(GoogleIdToken.Payload.class);
+        when(googleIdTokenVerifier.verify(TEST_ID_TOKEN)).thenReturn(mockIdToken);
+        when(mockIdToken.getPayload()).thenReturn(mockPayload);
+        when(mockPayload.getAudience()).thenReturn(TEST_CLIENT_ID);
+        when(mockPayload.getIssuer()).thenReturn("accounts.google.com");
+        when(mockPayload.getSubject()).thenReturn(TEST_GOOGLE_ID);
+        when(mockPayload.getEmail()).thenReturn(TEST_EMAIL);
+        when(mockPayload.getEmailVerified()).thenReturn(true);
+        when(mockPayload.get("name")).thenReturn("Test User");
+        when(mockPayload.get("given_name")).thenReturn("Test");
+        when(mockPayload.get("family_name")).thenReturn("User");
+        when(mockPayload.get("picture")).thenReturn("https://example.com/picture.jpg");
+        when(mockPayload.get("locale")).thenReturn("en");
+        
+        when(userRepository.findByProviderIdAndProviderUserId("google", TEST_GOOGLE_ID))
+                .thenReturn(Optional.empty());
+        when(userRepository.findByEmail(TEST_EMAIL)).thenReturn(Optional.empty());
+        when(userRepository.existsByUserName(anyString())).thenReturn(false);
+        when(userRepository.save(any(User.class))).thenReturn(newUser);
+        
+        when(globalRoleRepository.findByNameIgnoreCase("CUSTOMER")).thenReturn(Optional.of(customerRole));
+        when(userGlobalRoleRepository.save(any(UserGlobalRole.class))).thenReturn(new UserGlobalRole());
+        
+        when(userDetailsService.loadUserByUsername(anyString())).thenReturn(userDetails);
+        when(jwtService.generateToken(anyMap(), any(UserDetails.class))).thenReturn("jwt-access-token");
+        when(jwtService.generateRefreshToken(any(UserDetails.class))).thenReturn("jwt-refresh-token");
+        when(jwtService.getExpirationTime()).thenReturn(3600000L);
+        when(userMapper.toDto(any(User.class))).thenReturn(null);
+        
+        // Act
+        AuthResponse response = googleOAuthService.authenticateWithIdToken(TEST_ID_TOKEN);
+        
+        // Assert
+        assertNotNull(response);
+        assertEquals("jwt-access-token", response.getAccessToken());
+        assertEquals("jwt-refresh-token", response.getRefreshToken());
+        
+        verify(oAuthMetrics).recordLoginAttempt("google", "mobile");
+        verify(oAuthMetrics).recordLoginSuccess("google", "mobile");
+        verify(oAuthMetrics).recordNewUserRegistration("google");
+        verify(userRepository).save(any(User.class));
+        verify(userGlobalRoleRepository).save(any(UserGlobalRole.class));
+    }
+    
+    @Test
+    void authenticateWithIdToken_ExistingUser_Success() throws Exception {
+        // Arrange
+        User existingUser = createUser();
+        UserDetails userDetails = createUserDetails();
+        
+        GoogleIdToken mockIdToken = mock(GoogleIdToken.class);
+        GoogleIdToken.Payload mockPayload = mock(GoogleIdToken.Payload.class);
+        when(googleIdTokenVerifier.verify(TEST_ID_TOKEN)).thenReturn(mockIdToken);
+        when(mockIdToken.getPayload()).thenReturn(mockPayload);
+        when(mockPayload.getAudience()).thenReturn(TEST_CLIENT_ID);
+        when(mockPayload.getIssuer()).thenReturn("accounts.google.com");
+        when(mockPayload.getSubject()).thenReturn(TEST_GOOGLE_ID);
+        when(mockPayload.getEmail()).thenReturn(TEST_EMAIL);
+        when(mockPayload.getEmailVerified()).thenReturn(true);
+        when(mockPayload.get("name")).thenReturn("Test User");
+        when(mockPayload.get("given_name")).thenReturn("Test");
+        when(mockPayload.get("family_name")).thenReturn("User");
+        when(mockPayload.get("picture")).thenReturn("https://example.com/picture.jpg");
+        
+        when(userRepository.findByProviderIdAndProviderUserId("google", TEST_GOOGLE_ID))
+                .thenReturn(Optional.of(existingUser));
+        
+        when(userDetailsService.loadUserByUsername(anyString())).thenReturn(userDetails);
+        when(jwtService.generateToken(anyMap(), any(UserDetails.class))).thenReturn("jwt-access-token");
+        when(jwtService.generateRefreshToken(any(UserDetails.class))).thenReturn("jwt-refresh-token");
+        when(jwtService.getExpirationTime()).thenReturn(3600000L);
+        when(userMapper.toDto(any(User.class))).thenReturn(null);
+        
+        // Act
+        AuthResponse response = googleOAuthService.authenticateWithIdToken(TEST_ID_TOKEN);
+        
+        // Assert
+        assertNotNull(response);
+        verify(oAuthMetrics).recordLoginSuccess("google", "mobile");
+        verify(userRepository, never()).save(any(User.class)); // No new user created
+    }
+    
+    @Test
+    void authenticateWithIdToken_AutoLinking_Success() throws Exception {
+        // Arrange
+        User existingUser = createUser();
+        existingUser.setIsEmailVerified(true);
+        existingUser.setProviderId(null);
+        existingUser.setProviderUserId(null);
+        UserDetails userDetails = createUserDetails();
+        
+        GoogleIdToken mockIdToken = mock(GoogleIdToken.class);
+        GoogleIdToken.Payload mockPayload = mock(GoogleIdToken.Payload.class);
+        when(googleIdTokenVerifier.verify(TEST_ID_TOKEN)).thenReturn(mockIdToken);
+        when(mockIdToken.getPayload()).thenReturn(mockPayload);
+        when(mockPayload.getAudience()).thenReturn(TEST_CLIENT_ID);
+        when(mockPayload.getIssuer()).thenReturn("accounts.google.com");
+        when(mockPayload.getSubject()).thenReturn(TEST_GOOGLE_ID);
+        when(mockPayload.getEmail()).thenReturn(TEST_EMAIL);
+        when(mockPayload.getEmailVerified()).thenReturn(true);
+        when(mockPayload.get("name")).thenReturn("Test User");
+        when(mockPayload.get("given_name")).thenReturn("Test");
+        when(mockPayload.get("family_name")).thenReturn("User");
+        when(mockPayload.get("picture")).thenReturn("https://example.com/picture.jpg");
+        
+        when(userRepository.findByProviderIdAndProviderUserId("google", TEST_GOOGLE_ID))
+                .thenReturn(Optional.empty());
+        when(userRepository.findByEmail(TEST_EMAIL)).thenReturn(Optional.of(existingUser));
+        when(userRepository.save(any(User.class))).thenReturn(existingUser);
+        
+        when(userDetailsService.loadUserByUsername(anyString())).thenReturn(userDetails);
+        when(jwtService.generateToken(anyMap(), any(UserDetails.class))).thenReturn("jwt-access-token");
+        when(jwtService.generateRefreshToken(any(UserDetails.class))).thenReturn("jwt-refresh-token");
+        when(jwtService.getExpirationTime()).thenReturn(3600000L);
+        when(userMapper.toDto(any(User.class))).thenReturn(null);
+        
+        // Act
+        AuthResponse response = googleOAuthService.authenticateWithIdToken(TEST_ID_TOKEN);
+        
+        // Assert
+        assertNotNull(response);
+        verify(oAuthMetrics).recordAutoLinking("google");
+        verify(userRepository).save(argThat(user -> 
+            "google".equals(user.getProviderId()) && TEST_GOOGLE_ID.equals(user.getProviderUserId())
+        ));
+    }
+    
+    @Test
+    void authenticateWithIdToken_InvalidToken_ThrowsException() throws Exception {
+        // Arrange
+        when(googleIdTokenVerifier.verify(TEST_ID_TOKEN)).thenReturn(null);
+        
+        // Act & Assert
+        UnauthorizedException exception = assertThrows(UnauthorizedException.class, () -> {
+            googleOAuthService.authenticateWithIdToken(TEST_ID_TOKEN);
+        });
+        
+        assertTrue(exception.getMessage().contains("Invalid Google ID token"));
+        verify(oAuthMetrics).recordLoginAttempt("google", "mobile");
+        verify(oAuthMetrics).recordLoginFailure("google", "mobile", "unauthorized");
+    }
+    
+    @Test
+    void authenticateWithIdToken_AudienceMismatch_ThrowsException() throws Exception {
+        // Arrange
+        GoogleIdToken mockIdToken = mock(GoogleIdToken.class);
+        GoogleIdToken.Payload mockPayload = mock(GoogleIdToken.Payload.class);
+        when(googleIdTokenVerifier.verify(TEST_ID_TOKEN)).thenReturn(mockIdToken);
+        when(mockIdToken.getPayload()).thenReturn(mockPayload);
+        when(mockPayload.getAudience()).thenReturn("wrong-client-id");
+        
+        // Act & Assert
+        UnauthorizedException exception = assertThrows(UnauthorizedException.class, () -> {
+            googleOAuthService.authenticateWithIdToken(TEST_ID_TOKEN);
+        });
+        
+        assertTrue(exception.getMessage().contains("audience mismatch"));
+        verify(oAuthMetrics).recordLoginFailure("google", "mobile", "unauthorized");
+    }
+    
+    @Test
+    void authenticateWithIdToken_InvalidIssuer_ThrowsException() throws Exception {
+        // Arrange
+        GoogleIdToken mockIdToken = mock(GoogleIdToken.class);
+        GoogleIdToken.Payload mockPayload = mock(GoogleIdToken.Payload.class);
+        when(googleIdTokenVerifier.verify(TEST_ID_TOKEN)).thenReturn(mockIdToken);
+        when(mockIdToken.getPayload()).thenReturn(mockPayload);
+        when(mockPayload.getAudience()).thenReturn(TEST_CLIENT_ID);
+        when(mockPayload.getIssuer()).thenReturn("invalid-issuer.com");
+        
+        // Act & Assert
+        UnauthorizedException exception = assertThrows(UnauthorizedException.class, () -> {
+            googleOAuthService.authenticateWithIdToken(TEST_ID_TOKEN);
+        });
+        
+        assertTrue(exception.getMessage().contains("Invalid ID token issuer"));
+        verify(oAuthMetrics).recordLoginFailure("google", "mobile", "unauthorized");
+    }
+    
+    @Test
+    void authenticateWithIdToken_UnverifiedEmail_ThrowsException() throws Exception {
+        // Arrange
+        GoogleIdToken mockIdToken = mock(GoogleIdToken.class);
+        GoogleIdToken.Payload mockPayload = mock(GoogleIdToken.Payload.class);
+        when(googleIdTokenVerifier.verify(TEST_ID_TOKEN)).thenReturn(mockIdToken);
+        when(mockIdToken.getPayload()).thenReturn(mockPayload);
+        when(mockPayload.getAudience()).thenReturn(TEST_CLIENT_ID);
+        when(mockPayload.getIssuer()).thenReturn("accounts.google.com");
+        when(mockPayload.getEmailVerified()).thenReturn(false); // Email not verified
+        
+        // Act & Assert
+        UnauthorizedException exception = assertThrows(UnauthorizedException.class, () -> {
+            googleOAuthService.authenticateWithIdToken(TEST_ID_TOKEN);
+        });
+        
+        assertTrue(exception.getMessage().contains("Email not verified"));
+        verify(oAuthMetrics).recordLoginFailure("google", "mobile", "unauthorized");
+    }
 }
 

@@ -36,9 +36,18 @@ public class GoogleAuthController {
      * Authenticate user with Google OAuth (Public endpoint).
      * POST /api/auth/google/login
      * 
-     * Frontend should:
-     * 1. Use Google Sign-In SDK to get authorization code
+     * Supports two authentication flows:
+     * 1. Web flow: Send authorization code + redirectUri (from OAuth redirect)
+     * 2. Mobile flow: Send idToken directly (from Google Sign-In SDK)
+     * 
+     * Web frontend should:
+     * 1. Use Google OAuth to get authorization code
      * 2. Send code and redirectUri to this endpoint
+     * 3. Receive JWT tokens in response
+     * 
+     * Mobile app should:
+     * 1. Use Google Sign-In SDK to get ID token
+     * 2. Send idToken to this endpoint
      * 3. Receive JWT tokens in response
      * 
      * Security: Public access - no authentication required.
@@ -48,7 +57,7 @@ public class GoogleAuthController {
     @PostMapping("/login")
     @Operation(
             summary = "Login with Google OAuth",
-            description = "Authenticates user with Google authorization code and returns JWT tokens. " +
+            description = "Authenticates user with Google using either web flow (code + redirectUri) or mobile flow (idToken). " +
                          "Creates new user if email doesn't exist, or links Google account to existing user. " +
                          "Public endpoint - no authentication required."
     )
@@ -60,11 +69,11 @@ public class GoogleAuthController {
             ),
             @ApiResponse(
                     responseCode = "400",
-                    description = "Invalid request - missing or invalid authorization code"
+                    description = "Invalid request - must provide either idToken (mobile) or code + redirectUri (web)"
             ),
             @ApiResponse(
                     responseCode = "401",
-                    description = "Authentication failed - invalid Google authorization code or token"
+                    description = "Authentication failed - invalid Google authorization code or ID token"
             ),
             @ApiResponse(
                     responseCode = "500",
@@ -75,10 +84,21 @@ public class GoogleAuthController {
     public ResponseEntity<AuthResponse> loginWithGoogle(@Valid @RequestBody GoogleLoginRequest request) {
         log.info("Google OAuth login request received");
         
-        AuthResponse response = googleOAuthService.authenticateWithGoogle(
-                request.getCode(),
-                request.getRedirectUri()
-        );
+        AuthResponse response;
+        
+        // Detect which flow is being used and route accordingly
+        if (request.getIdToken() != null && !request.getIdToken().isBlank()) {
+            // Mobile flow: ID token verification
+            log.debug("Using mobile flow (ID token)");
+            response = googleOAuthService.authenticateWithIdToken(request.getIdToken());
+        } else {
+            // Web flow: Authorization code exchange
+            log.debug("Using web flow (authorization code)");
+            response = googleOAuthService.authenticateWithGoogle(
+                    request.getCode(),
+                    request.getRedirectUri()
+            );
+        }
         
         log.info("Google OAuth login successful");
         return ResponseEntity.ok(response);

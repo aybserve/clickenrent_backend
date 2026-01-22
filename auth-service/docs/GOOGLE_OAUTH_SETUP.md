@@ -154,7 +154,7 @@ Verify the service is running:
 - Auth Service: http://localhost:8081/actuator/health
 - Google OAuth endpoint: http://localhost:8081/api/v1/auth/google/login
 
-## Frontend Integration
+## Frontend Integration (Web)
 
 ### Option 1: Using Google Sign-In JavaScript Library
 
@@ -271,6 +271,394 @@ async function authenticateWithBackend(code) {
 }
 ```
 
+## Mobile Integration (React Native / Expo)
+
+The auth-service supports mobile Google Sign-In by accepting ID tokens directly. This eliminates the need for authorization code exchange and simplifies the mobile authentication flow.
+
+### Flow Comparison
+
+**Web Flow:**
+```
+Mobile App → Google OAuth → Authorization Code → Backend → Token Exchange → User Info
+```
+
+**Mobile Flow (Recommended):**
+```
+Mobile App → Google Sign-In SDK → ID Token → Backend → Verify Token → User Info
+```
+
+### Benefits of Mobile Flow
+
+- ✅ **Simpler** - No redirect URIs or authorization code handling
+- ✅ **Faster** - One less API call (no token exchange needed)
+- ✅ **More Secure** - ID token verified directly by backend
+- ✅ **Better UX** - Native Google Sign-In experience
+
+### Prerequisites
+
+1. **Google Cloud Console Setup** - Complete the setup from above
+2. **Additional Client IDs** - You'll need client IDs for each platform:
+   - Web Client ID (already created)
+   - Android Client ID (auto-created by Firebase)
+   - iOS Client ID (auto-created by Firebase)
+
+### Step 1: Firebase Configuration (Recommended for React Native)
+
+If using React Native with Expo, Firebase makes Google Sign-In easier:
+
+1. Go to [Firebase Console](https://console.firebase.google.com/)
+2. Create a new project or select existing one
+3. Link your Google Cloud project
+4. Add Android and/or iOS apps to Firebase project
+5. Download configuration files:
+   - `google-services.json` (Android)
+   - `GoogleService-Info.plist` (iOS)
+
+### Step 2: Install Dependencies
+
+#### For React Native (Expo)
+
+```bash
+npx expo install @react-native-google-signin/google-signin
+```
+
+#### For React Native (without Expo)
+
+```bash
+npm install @react-native-google-signin/google-signin
+```
+
+### Step 3: Configure Google Sign-In
+
+#### React Native with Expo
+
+```javascript
+// app.json or app.config.js
+{
+  "expo": {
+    "plugins": [
+      [
+        "@react-native-google-signin/google-signin",
+        {
+          "iosUrlScheme": "com.googleusercontent.apps.YOUR_IOS_CLIENT_ID"
+        }
+      ]
+    ],
+    "android": {
+      "googleServicesFile": "./google-services.json"
+    },
+    "ios": {
+      "googleServicesFile": "./GoogleService-Info.plist"
+    }
+  }
+}
+```
+
+#### Initialize in App
+
+```javascript
+import { GoogleSignin } from '@react-native-google-signin/google-signin';
+
+// Configure Google Sign-In
+GoogleSignin.configure({
+  webClientId: 'YOUR_WEB_CLIENT_ID.apps.googleusercontent.com', // From Google Cloud Console
+  offlineAccess: false, // We don't need offline access
+  forceCodeForRefreshToken: false,
+});
+```
+
+### Step 4: Implement Sign-In
+
+```javascript
+import { GoogleSignin } from '@react-native-google-signin/google-signin';
+import axios from 'axios';
+
+const API_URL = 'https://your-api.com/api/v1/auth/google/login';
+
+export const signInWithGoogle = async () => {
+  try {
+    // Check if device supports Google Play Services (Android)
+    await GoogleSignin.hasPlayServices();
+    
+    // Sign in with Google
+    const userInfo = await GoogleSignin.signIn();
+    
+    // Get ID token
+    const idToken = userInfo.idToken;
+    
+    if (!idToken) {
+      throw new Error('No ID token received from Google');
+    }
+    
+    // Send ID token to your backend
+    const response = await axios.post(API_URL, {
+      idToken: idToken
+    });
+    
+    // Store JWT tokens
+    const { accessToken, refreshToken, user } = response.data;
+    await AsyncStorage.setItem('accessToken', accessToken);
+    await AsyncStorage.setItem('refreshToken', refreshToken);
+    
+    console.log('Logged in as:', user.email);
+    return response.data;
+    
+  } catch (error) {
+    if (error.code === statusCodes.SIGN_IN_CANCELLED) {
+      console.log('User cancelled the login');
+    } else if (error.code === statusCodes.IN_PROGRESS) {
+      console.log('Sign in is in progress');
+    } else if (error.code === statusCodes.PLAY_SERVICES_NOT_AVAILABLE) {
+      console.log('Google Play Services not available');
+    } else {
+      console.error('Google Sign-In Error:', error);
+    }
+    throw error;
+  }
+};
+
+// Sign out
+export const signOutGoogle = async () => {
+  try {
+    await GoogleSignin.signOut();
+    await AsyncStorage.removeItem('accessToken');
+    await AsyncStorage.removeItem('refreshToken');
+  } catch (error) {
+    console.error('Sign out error:', error);
+  }
+};
+
+// Check if user is signed in
+export const isSignedIn = async () => {
+  const isSignedIn = await GoogleSignin.isSignedIn();
+  return isSignedIn;
+};
+```
+
+### Step 5: UI Component Example
+
+```javascript
+import React, { useState } from 'react';
+import { View, TouchableOpacity, Text, ActivityIndicator, Alert } from 'react-native';
+import { GoogleSignin } from '@react-native-google-signin/google-signin';
+import { signInWithGoogle } from './auth-service';
+
+const GoogleSignInButton = ({ onSuccess }) => {
+  const [loading, setLoading] = useState(false);
+  
+  const handleGoogleSignIn = async () => {
+    setLoading(true);
+    try {
+      const result = await signInWithGoogle();
+      onSuccess(result);
+    } catch (error) {
+      Alert.alert('Sign In Failed', error.message || 'An error occurred');
+    } finally {
+      setLoading(false);
+    }
+  };
+  
+  return (
+    <TouchableOpacity
+      onPress={handleGoogleSignIn}
+      disabled={loading}
+      style={styles.googleButton}
+    >
+      {loading ? (
+        <ActivityIndicator color="#fff" />
+      ) : (
+        <>
+          <GoogleIcon />
+          <Text style={styles.buttonText}>Sign in with Google</Text>
+        </>
+      )}
+    </TouchableOpacity>
+  );
+};
+
+const styles = {
+  googleButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#4285F4',
+    padding: 12,
+    borderRadius: 8,
+    minHeight: 50,
+  },
+  buttonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: '600',
+    marginLeft: 12,
+  },
+};
+
+export default GoogleSignInButton;
+```
+
+### API Request Format (Mobile Flow)
+
+**Endpoint:** `POST /api/v1/auth/google/login`
+
+**Request Body:**
+```json
+{
+  "idToken": "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9..."
+}
+```
+
+**Response (Success - 200 OK):**
+```json
+{
+  "accessToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "tokenType": "Bearer",
+  "expiresIn": 86400000,
+  "user": {
+    "id": 1,
+    "userName": "john.doe",
+    "email": "john.doe@gmail.com",
+    "firstName": "John",
+    "lastName": "Doe",
+    "imageUrl": "https://lh3.googleusercontent.com/a/...",
+    "isEmailVerified": true,
+    "isActive": true
+  }
+}
+```
+
+**Response (Error - 401 Unauthorized):**
+```json
+{
+  "timestamp": "2024-01-15T10:30:00.000+00:00",
+  "status": 401,
+  "error": "Unauthorized",
+  "message": "Invalid Google ID token",
+  "path": "/api/v1/auth/google/login"
+}
+```
+
+### Testing Mobile Flow
+
+#### 1. Test with cURL
+
+```bash
+# Get a real ID token from Google Sign-In in your mobile app
+# Then test with:
+curl -X POST https://your-api.com/api/v1/auth/google/login \
+  -H "Content-Type: application/json" \
+  -d '{
+    "idToken": "YOUR_ACTUAL_ID_TOKEN_FROM_MOBILE_APP"
+  }'
+```
+
+#### 2. Test with Postman
+
+1. Sign in to your mobile app (development build)
+2. Add logging to capture the ID token
+3. Copy the ID token
+4. Send POST request to `/api/v1/auth/google/login`:
+   ```json
+   {
+     "idToken": "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9..."
+   }
+   ```
+
+### Security Considerations (Mobile)
+
+1. **ID Token Verification**
+   - Backend automatically verifies token signature using Google's public keys
+   - Checks token audience matches your client ID
+   - Validates token issuer is Google
+   - Ensures email is verified by Google
+   - Confirms token hasn't expired
+
+2. **Client ID Configuration**
+   - Use the **Web Client ID** in your mobile app configuration
+   - This is the same client ID used for web authentication
+   - Backend verifies ID tokens against this client ID
+
+3. **Package Name / Bundle ID**
+   - Android: Add your package name (e.g., `com.yourapp`) in Google Cloud Console
+   - iOS: Add your bundle ID (e.g., `com.yourapp.ios`) in Google Cloud Console
+   - Required for mobile app verification
+
+4. **SHA-1 Certificate (Android)**
+   - Add your app's SHA-1 fingerprint in Firebase/Google Cloud Console
+   - Development: Use debug keystore SHA-1
+   - Production: Use release keystore SHA-1
+   - Get SHA-1: `keytool -list -v -keystore ~/.android/debug.keystore -alias androiddebugkey`
+
+### Troubleshooting Mobile Flow
+
+#### Error: "No ID token received from Google"
+
+**Cause:** Google Sign-In didn't return an ID token
+
+**Solution:**
+- Ensure you're using the correct `webClientId` in configuration
+- Verify the web client ID matches the one in Google Cloud Console
+- Check that OAuth consent screen is properly configured
+
+#### Error: "Invalid Google ID token"
+
+**Cause:** ID token failed verification on backend
+
+**Solution:**
+- Verify backend has correct `GOOGLE_CLIENT_ID` configured
+- Ensure ID token hasn't expired (valid for 1 hour)
+- Check that `oauth2.google.verify-id-token=true` in backend config
+
+#### Error: "DEVELOPER_ERROR" on Android
+
+**Cause:** SHA-1 certificate fingerprint mismatch
+
+**Solution:**
+- Add correct SHA-1 to Firebase Console
+- Debug build uses debug keystore SHA-1
+- Release build uses release keystore SHA-1
+- Run: `./gradlew signingReport` to see all SHA-1 fingerprints
+
+#### Error: "SIGN_IN_REQUIRED" on iOS
+
+**Cause:** URL scheme not configured correctly
+
+**Solution:**
+- Verify `iosUrlScheme` in app.json matches your reversed client ID
+- Format: `com.googleusercontent.apps.YOUR_IOS_CLIENT_ID`
+- Rebuild app after configuration changes
+
+#### Error: "Play Services not available" on Android
+
+**Cause:** Google Play Services not installed or outdated
+
+**Solution:**
+- Test on device with Google Play Services
+- Emulator must have Google APIs
+- Update Google Play Services on test device
+
+### Web vs Mobile Flow Support
+
+The `/api/v1/auth/google/login` endpoint supports **both flows automatically**:
+
+**Mobile Flow (ID Token):**
+```json
+{
+  "idToken": "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9..."
+}
+```
+
+**Web Flow (Authorization Code):**
+```json
+{
+  "code": "4/0AY0e-g7...",
+  "redirectUri": "http://localhost:3000/auth/google/callback"
+}
+```
+
+The backend automatically detects which flow to use based on the request body. If `idToken` is present, it uses the mobile flow. Otherwise, it uses the web flow.
+
 ## Testing
 
 ### Manual Testing
@@ -329,6 +717,7 @@ async function authenticateWithBackend(code) {
 
 ### Test Cases
 
+**Web Flow:**
 - ✅ New user registration via Google
 - ✅ Existing user login via Google
 - ✅ Auto-linking Google account to existing verified email
@@ -336,6 +725,16 @@ async function authenticateWithBackend(code) {
 - ✅ Invalid authorization code handling
 - ✅ Network error retry mechanism
 - ✅ ID token verification
+
+**Mobile Flow:**
+- ✅ New user registration via ID token
+- ✅ Existing user login via ID token
+- ✅ Auto-linking via ID token
+- ✅ Invalid ID token handling
+- ✅ Expired ID token handling
+- ✅ Unverified email rejection
+- ✅ Audience mismatch detection
+- ✅ Issuer validation
 
 ## Production Deployment
 
@@ -433,12 +832,20 @@ async function authenticateWithBackend(code) {
 
 The auth-service exposes the following OAuth metrics via Actuator:
 
-- `oauth.login.attempts{provider="google"}` - Total login attempts
-- `oauth.login.success{provider="google"}` - Successful logins
-- `oauth.login.failure{provider="google",reason="..."}` - Failed logins by reason
+**General Metrics (all flows):**
 - `oauth.user.registration{provider="google"}` - New user registrations
 - `oauth.user.autolinking{provider="google"}` - Auto-linking events
-- `oauth.flow.duration{provider="google",outcome="success|failure"}` - Flow duration
+
+**Flow-Specific Metrics:**
+- `oauth.login.attempts{provider="google",flow="web|mobile"}` - Login attempts by flow
+- `oauth.login.success{provider="google",flow="web|mobile"}` - Successful logins by flow
+- `oauth.login.failure{provider="google",flow="web|mobile",reason="..."}` - Failed logins by flow and reason
+- `oauth.flow.duration{provider="google",flow="web|mobile",outcome="success|failure"}` - Flow duration by type
+
+**Example Queries:**
+- Total mobile login attempts: `oauth.login.attempts{provider="google",flow="mobile"}`
+- Web flow success rate: `oauth.login.success{provider="google",flow="web"} / oauth.login.attempts{provider="google",flow="web"}`
+- Mobile vs Web comparison: Compare metrics with `flow="mobile"` vs `flow="web"`
 
 Access metrics at: http://localhost:8081/actuator/prometheus
 

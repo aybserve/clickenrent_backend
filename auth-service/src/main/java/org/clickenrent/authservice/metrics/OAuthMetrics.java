@@ -40,6 +40,21 @@ public class OAuthMetrics {
     }
     
     /**
+     * Record an OAuth login attempt with flow type.
+     * 
+     * @param provider OAuth provider (e.g., "google")
+     * @param flow OAuth flow type (e.g., "web", "mobile")
+     */
+    public void recordLoginAttempt(String provider, String flow) {
+        Counter.builder(OAUTH_LOGIN_ATTEMPTS)
+                .tag("provider", provider)
+                .tag("flow", flow)
+                .description("Total number of OAuth login attempts by flow")
+                .register(meterRegistry)
+                .increment();
+    }
+    
+    /**
      * Record a successful OAuth login.
      * 
      * @param provider OAuth provider (e.g., "google")
@@ -48,6 +63,21 @@ public class OAuthMetrics {
         Counter.builder(OAUTH_LOGIN_SUCCESS)
                 .tag("provider", provider)
                 .description("Number of successful OAuth logins")
+                .register(meterRegistry)
+                .increment();
+    }
+    
+    /**
+     * Record a successful OAuth login with flow type.
+     * 
+     * @param provider OAuth provider (e.g., "google")
+     * @param flow OAuth flow type (e.g., "web", "mobile")
+     */
+    public void recordLoginSuccess(String provider, String flow) {
+        Counter.builder(OAUTH_LOGIN_SUCCESS)
+                .tag("provider", provider)
+                .tag("flow", flow)
+                .description("Number of successful OAuth logins by flow")
                 .register(meterRegistry)
                 .increment();
     }
@@ -63,6 +93,23 @@ public class OAuthMetrics {
                 .tag("provider", provider)
                 .tag("reason", reason)
                 .description("Number of failed OAuth logins")
+                .register(meterRegistry)
+                .increment();
+    }
+    
+    /**
+     * Record a failed OAuth login with flow type.
+     * 
+     * @param provider OAuth provider (e.g., "google")
+     * @param flow OAuth flow type (e.g., "web", "mobile")
+     * @param reason Failure reason (e.g., "invalid_token", "user_error")
+     */
+    public void recordLoginFailure(String provider, String flow, String reason) {
+        Counter.builder(OAUTH_LOGIN_FAILURE)
+                .tag("provider", provider)
+                .tag("flow", flow)
+                .tag("reason", reason)
+                .description("Number of failed OAuth logins by flow")
                 .register(meterRegistry)
                 .increment();
     }
@@ -116,6 +163,23 @@ public class OAuthMetrics {
                 .tag("provider", provider)
                 .tag("outcome", outcome)
                 .description("Duration of OAuth authentication flow")
+                .register(meterRegistry));
+    }
+    
+    /**
+     * Stop the timer and record OAuth flow duration with flow type.
+     * 
+     * @param sample Timer sample from startFlowTimer()
+     * @param provider OAuth provider (e.g., "google")
+     * @param flow OAuth flow type (e.g., "web", "mobile")
+     * @param outcome Flow outcome (e.g., "success", "failure")
+     */
+    public void recordFlowDuration(Timer.Sample sample, String provider, String flow, String outcome) {
+        sample.stop(Timer.builder(OAUTH_FLOW_DURATION)
+                .tag("provider", provider)
+                .tag("flow", flow)
+                .tag("outcome", outcome)
+                .description("Duration of OAuth authentication flow by type")
                 .register(meterRegistry));
     }
 }

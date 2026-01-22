@@ -137,6 +137,66 @@ public class GoogleOAuthService {
     }
     
     /**
+     * Authenticate user with Google ID token (mobile flow).
+     * This method verifies the ID token and extracts user information without making external API calls.
+     * 
+     * @param idToken Google ID token from mobile app
+     * @return AuthResponse with JWT tokens
+     */
+    @Transactional
+    public AuthResponse authenticateWithIdToken(String idToken) {
+        log.info("Starting Google OAuth authentication with ID token (mobile flow)");
+        
+        String flowType = "mobile";
+        
+        // Start metrics timer
+        Timer.Sample timerSample = oAuthMetrics.startFlowTimer(PROVIDER_GOOGLE);
+        oAuthMetrics.recordLoginAttempt(PROVIDER_GOOGLE, flowType);
+        
+        try {
+            // Step 1: Verify and extract user info from ID token
+            GoogleUserInfo googleUserInfo = verifyAndExtractUserInfo(idToken);
+            log.info("Verified ID token for email: {}", googleUserInfo.getEmail());
+            
+            // Step 2: Find or create user
+            User user = findOrCreateUser(googleUserInfo);
+            log.info("User processed: ID={}, email={}", user.getId(), user.getEmail());
+            
+            // Step 3: Generate JWT tokens (including company data)
+            UserDetails userDetails = userDetailsService.loadUserByUsername(user.getUserName());
+            
+            Map<String, Object> claims = buildJwtClaims(user, userDetails);
+            
+            String accessToken = jwtService.generateToken(claims, userDetails);
+            String refreshToken = jwtService.generateRefreshToken(userDetails);
+            
+            log.info("Successfully generated JWT tokens for user: {}", user.getEmail());
+            
+            // Record success metrics with flow type
+            oAuthMetrics.recordLoginSuccess(PROVIDER_GOOGLE, flowType);
+            oAuthMetrics.recordFlowDuration(timerSample, PROVIDER_GOOGLE, flowType, "success");
+            
+            return new AuthResponse(
+                    accessToken,
+                    refreshToken,
+                    jwtService.getExpirationTime(),
+                    userMapper.toDto(user)
+            );
+            
+        } catch (UnauthorizedException e) {
+            log.error("Unauthorized during Google OAuth (mobile flow): {}", e.getMessage());
+            oAuthMetrics.recordLoginFailure(PROVIDER_GOOGLE, flowType, "unauthorized");
+            oAuthMetrics.recordFlowDuration(timerSample, PROVIDER_GOOGLE, flowType, "failure");
+            throw e;
+        } catch (Exception e) {
+            log.error("Error during Google OAuth authentication (mobile flow)", e);
+            oAuthMetrics.recordLoginFailure(PROVIDER_GOOGLE, flowType, "internal_error");
+            oAuthMetrics.recordFlowDuration(timerSample, PROVIDER_GOOGLE, flowType, "failure");
+            throw new UnauthorizedException("Failed to authenticate with Google ID token: " + e.getMessage());
+        }
+    }
+    
+    /**
      * Authenticate user with Google OAuth authorization code.
      * 
      * @param code Authorization code from Google
@@ -147,9 +207,11 @@ public class GoogleOAuthService {
     public AuthResponse authenticateWithGoogle(String code, String redirectUri) {
         log.info("Starting Google OAuth authentication");
         
+        String flowType = "web";
+        
         // Start metrics timer
         Timer.Sample timerSample = oAuthMetrics.startFlowTimer(PROVIDER_GOOGLE);
-        oAuthMetrics.recordLoginAttempt(PROVIDER_GOOGLE);
+        oAuthMetrics.recordLoginAttempt(PROVIDER_GOOGLE, flowType);
         
         try {
             // Step 1: Exchange authorization code for access token
@@ -180,9 +242,9 @@ public class GoogleOAuthService {
             
             log.info("Successfully generated JWT tokens for user: {}", user.getEmail());
             
-            // Record success metrics
-            oAuthMetrics.recordLoginSuccess(PROVIDER_GOOGLE);
-            oAuthMetrics.recordFlowDuration(timerSample, PROVIDER_GOOGLE, "success");
+            // Record success metrics with flow type
+            oAuthMetrics.recordLoginSuccess(PROVIDER_GOOGLE, flowType);
+            oAuthMetrics.recordFlowDuration(timerSample, PROVIDER_GOOGLE, flowType, "success");
             
             return new AuthResponse(
                     accessToken,
@@ -193,19 +255,74 @@ public class GoogleOAuthService {
             
         } catch (HttpClientErrorException e) {
             log.error("HTTP error during Google OAuth: {}", e.getMessage());
-            oAuthMetrics.recordLoginFailure(PROVIDER_GOOGLE, "http_error");
-            oAuthMetrics.recordFlowDuration(timerSample, PROVIDER_GOOGLE, "failure");
+            oAuthMetrics.recordLoginFailure(PROVIDER_GOOGLE, flowType, "http_error");
+            oAuthMetrics.recordFlowDuration(timerSample, PROVIDER_GOOGLE, flowType, "failure");
             throw new UnauthorizedException("Failed to authenticate with Google: " + e.getMessage());
         } catch (UnauthorizedException e) {
             log.error("Unauthorized during Google OAuth: {}", e.getMessage());
-            oAuthMetrics.recordLoginFailure(PROVIDER_GOOGLE, "unauthorized");
-            oAuthMetrics.recordFlowDuration(timerSample, PROVIDER_GOOGLE, "failure");
+            oAuthMetrics.recordLoginFailure(PROVIDER_GOOGLE, flowType, "unauthorized");
+            oAuthMetrics.recordFlowDuration(timerSample, PROVIDER_GOOGLE, flowType, "failure");
             throw e;
         } catch (Exception e) {
             log.error("Error during Google OAuth authentication", e);
-            oAuthMetrics.recordLoginFailure(PROVIDER_GOOGLE, "internal_error");
-            oAuthMetrics.recordFlowDuration(timerSample, PROVIDER_GOOGLE, "failure");
+            oAuthMetrics.recordLoginFailure(PROVIDER_GOOGLE, flowType, "internal_error");
+            oAuthMetrics.recordFlowDuration(timerSample, PROVIDER_GOOGLE, flowType, "failure");
             throw new UnauthorizedException("Failed to authenticate with Google: " + e.getMessage());
+        }
+    }
+    
+    /**
+     * Verify Google ID token and extract user information.
+     * This method verifies the token signature, validates claims, and extracts user data.
+     * Used for mobile flow where ID token is sent directly from the mobile app.
+     * 
+     * @param idTokenString ID token from Google
+     * @return GoogleUserInfo with user data extracted from token
+     * @throws UnauthorizedException if token is invalid
+     */
+    private GoogleUserInfo verifyAndExtractUserInfo(String idTokenString) {
+        try {
+            GoogleIdToken idToken = googleIdTokenVerifier.verify(idTokenString);
+            if (idToken == null) {
+                throw new UnauthorizedException("Invalid Google ID token");
+            }
+            
+            GoogleIdToken.Payload payload = idToken.getPayload();
+            
+            // Verify the token is for our client
+            if (!clientId.equals(payload.getAudience())) {
+                throw new UnauthorizedException("ID token audience mismatch");
+            }
+            
+            // Verify the issuer
+            String issuer = payload.getIssuer();
+            if (!("accounts.google.com".equals(issuer) || "https://accounts.google.com".equals(issuer))) {
+                throw new UnauthorizedException("Invalid ID token issuer");
+            }
+            
+            // Verify email is verified by Google
+            Boolean emailVerified = payload.getEmailVerified();
+            if (!Boolean.TRUE.equals(emailVerified)) {
+                throw new UnauthorizedException("Email not verified by Google");
+            }
+            
+            log.debug("ID token verified for user: {}", payload.getEmail());
+            
+            // Extract user information from token payload
+            return GoogleUserInfo.builder()
+                    .id(payload.getSubject())
+                    .email(payload.getEmail())
+                    .verifiedEmail(emailVerified)
+                    .name((String) payload.get("name"))
+                    .givenName((String) payload.get("given_name"))
+                    .familyName((String) payload.get("family_name"))
+                    .picture((String) payload.get("picture"))
+                    .locale((String) payload.get("locale"))
+                    .build();
+            
+        } catch (GeneralSecurityException | IOException e) {
+            log.error("Failed to verify Google ID token", e);
+            throw new UnauthorizedException("Failed to verify Google ID token: " + e.getMessage());
         }
     }
     
