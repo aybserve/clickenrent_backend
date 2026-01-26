@@ -42,6 +42,20 @@ public class LocationService {
     }
 
     @Transactional(readOnly = true)
+    public Page<LocationDTO> getAllLocations(String companyId, int page, int size) {
+        Pageable pageable = org.springframework.data.domain.PageRequest.of(page, size);
+        
+        // If companyId is specified, filter by it
+        if (companyId != null && !companyId.isBlank()) {
+            return locationRepository.findByCompanyExternalId(companyId, pageable)
+                    .map(locationMapper::toDto);
+        }
+        
+        // Otherwise, use the existing method
+        return getAllLocations(pageable);
+    }
+
+    @Transactional(readOnly = true)
     public LocationDTO getLocationById(Long id) {
         Location location = locationRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Location", "id", id));

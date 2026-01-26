@@ -15,6 +15,7 @@ public interface LocationRepository extends JpaRepository<Location, Long> {
     Optional<Location> findByExternalId(String externalId);
     boolean existsByExternalId(String externalId);
     List<Location> findByCompanyExternalId(String companyExternalId);
+    org.springframework.data.domain.Page<Location> findByCompanyExternalId(String companyExternalId, org.springframework.data.domain.Pageable pageable);
     Optional<Location> findByErpPartnerId(String erpPartnerId);
 }
 

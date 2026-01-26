@@ -103,4 +103,14 @@ public class LocationController {
     public ResponseEntity<LocationDTO> getByExternalId(@PathVariable String externalId) {
         return ResponseEntity.ok(locationService.getLocationByExternalId(externalId));
     }
+
+    @GetMapping
+    @PreAuthorize("isAuthenticated()")
+    @Operation(summary = "Get all locations (paginated)", description = "Retrieve paginated list of locations for bulk indexing")
+    public ResponseEntity<org.springframework.data.domain.Page<LocationDTO>> getAllLocations(
+            @RequestParam(required = false) String companyId,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "100") int size) {
+        return ResponseEntity.ok(locationService.getAllLocations(companyId, page, size));
+    }
 }

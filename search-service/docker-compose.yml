@@ -1,0 +1,54 @@
+version: '3.8'
+
+services:
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.11.0
+    container_name: clickenrent-elasticsearch
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+      - bootstrap.memory_lock=true
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    volumes:
+      - es-data:/usr/share/elasticsearch/data
+    ports:
+      - "9200:9200"
+      - "9300:9300"
+    networks:
+      - clickenrent-network
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:9200/_cluster/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+
+  search-service:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: clickenrent-search-service
+    environment:
+      - ES_URIS=http://elasticsearch:9200
+      - EUREKA_URL=http://eureka-server:8761/eureka/
+      - JWT_SECRET=${JWT_SECRET}
+    ports:
+      - "8086:8086"
+    networks:
+      - clickenrent-network
+    depends_on:
+      elasticsearch:
+        condition: service_healthy
+    restart: unless-stopped
+
+volumes:
+  es-data:
+    driver: local
+
+networks:
+  clickenrent-network:
+    external: true

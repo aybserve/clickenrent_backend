@@ -1230,6 +1230,37 @@ public class GatewayConfig {
                                         .setStatusCode(HttpStatus.TOO_MANY_REQUESTS)))
                         .uri("lb://payment-service"))
 
+
+                // SEARCH SERVICE ROUTES
+
+                // Route for fetching search-service API docs (SpringDoc will aggregate)
+                .route("search-service-api-docs", r -> r
+                        .path("/search-service/v3/api-docs")
+                        .filters(f -> f.rewritePath("/search-service/v3/api-docs", "/v3/api-docs"))
+                        .uri("lb://search-service"))
+
+                // Global Search Routes (Protected - Authenticated users only)
+                .route("search", r -> r
+                        .path("/api/v1/search/**")
+                        .filters(f -> f
+                                .filter(jwtAuthenticationFilter)
+                                .requestRateLimiter(c -> c
+                                        .setRateLimiter(userRateLimiter)
+                                        .setKeyResolver(userKeyResolver)
+                                        .setStatusCode(HttpStatus.TOO_MANY_REQUESTS)))
+                        .uri("lb://search-service"))
+
+                // Indexing Routes (Protected - Admin only for sync, authenticated for events)
+                .route("indexing", r -> r
+                        .path("/api/v1/index/**")
+                        .filters(f -> f
+                                .filter(jwtAuthenticationFilter)
+                                .requestRateLimiter(c -> c
+                                        .setRateLimiter(userRateLimiter)
+                                        .setKeyResolver(userKeyResolver)
+                                        .setStatusCode(HttpStatus.TOO_MANY_REQUESTS)))
+                        .uri("lb://search-service"))
+
                 .build();
     }
 }
