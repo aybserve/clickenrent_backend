@@ -62,6 +62,60 @@ public class EmailService {
         log.info("");
         log.info("===========================================");
     }
+
+    /**
+     * Send password reset email with 6-digit token.
+     * Currently logs to console for development/testing.
+     * 
+     * @param to Recipient email address
+     * @param token 6-digit reset token
+     * @param firstName User's first name
+     */
+    public void sendPasswordResetEmail(String to, String token, String firstName) {
+        log.info("===========================================");
+        log.info("MOCK EMAIL SERVICE - Password Reset");
+        log.info("To: {}", to);
+        log.info("Subject: Reset Your Password");
+        log.info("===========================================");
+        log.info("");
+        log.info("Hello {},", firstName);
+        log.info("");
+        log.info("You have requested to reset your password.");
+        log.info("Your password reset code is: {}", token);
+        log.info("");
+        log.info("This code will expire in 30 minutes.");
+        log.info("Please do not share this code with anyone.");
+        log.info("");
+        log.info("If you did not request a password reset, please ignore this email.");
+        log.info("Your password will remain unchanged.");
+        log.info("");
+        log.info("===========================================");
+    }
+
+    /**
+     * Send password changed confirmation email.
+     * Currently logs to console for development/testing.
+     * 
+     * @param to Recipient email address
+     * @param firstName User's first name
+     */
+    public void sendPasswordChangedEmail(String to, String firstName) {
+        log.info("===========================================");
+        log.info("MOCK EMAIL SERVICE - Password Changed");
+        log.info("To: {}", to);
+        log.info("Subject: Password Successfully Changed");
+        log.info("===========================================");
+        log.info("");
+        log.info("Hello {},", firstName);
+        log.info("");
+        log.info("Your password has been successfully changed.");
+        log.info("");
+        log.info("If you did not make this change, please contact our support team immediately.");
+        log.info("");
+        log.info("Thank you for using ClickenRent!");
+        log.info("");
+        log.info("===========================================");
+    }
 }
 
 

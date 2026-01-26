@@ -95,6 +95,31 @@ public class GatewayConfig {
                                 .setStatusCode(HttpStatus.TOO_MANY_REQUESTS)))
                         .uri("lb://auth-service"))
                 
+                // Password reset routes (public, v1 API)
+                .route("auth-v1-forgot-password", r -> r
+                        .path("/api/v1/auth/forgot-password")
+                        .filters(f -> f.requestRateLimiter(c -> c
+                                .setRateLimiter(ipRateLimiter)
+                                .setKeyResolver(ipKeyResolver)
+                                .setStatusCode(HttpStatus.TOO_MANY_REQUESTS)))
+                        .uri("lb://auth-service"))
+                
+                .route("auth-v1-reset-password", r -> r
+                        .path("/api/v1/auth/reset-password")
+                        .filters(f -> f.requestRateLimiter(c -> c
+                                .setRateLimiter(ipRateLimiter)
+                                .setKeyResolver(ipKeyResolver)
+                                .setStatusCode(HttpStatus.TOO_MANY_REQUESTS)))
+                        .uri("lb://auth-service"))
+                
+                .route("auth-v1-validate-reset-token", r -> r
+                        .path("/api/v1/auth/validate-reset-token")
+                        .filters(f -> f.requestRateLimiter(c -> c
+                                .setRateLimiter(ipRateLimiter)
+                                .setKeyResolver(ipKeyResolver)
+                                .setStatusCode(HttpStatus.TOO_MANY_REQUESTS)))
+                        .uri("lb://auth-service"))
+                
                 // Google OAuth routes (public, v1 API)
                 .route("auth-v1-google-login", r -> r
                         .path("/api/v1/auth/google/**")

@@ -1,6 +1,7 @@
 package org.clickenrent.rentalservice.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -11,6 +12,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.clickenrent.rentalservice.dto.*;
 import org.clickenrent.rentalservice.service.MapboxService;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -112,5 +114,97 @@ public class LocationController {
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "100") int size) {
         return ResponseEntity.ok(locationService.getAllLocations(companyId, page, size));
+    }
+
+    /**
+     * Get location by ID.
+     * GET /api/v1/location/{id}
+     */
+    @GetMapping("/{id}")
+    @PreAuthorize("isAuthenticated()")
+    @Operation(
+            summary = "Get location by ID",
+            description = "Returns location details by location ID"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Location found",
+                    content = @Content(schema = @Schema(implementation = LocationDTO.class))),
+            @ApiResponse(responseCode = "401", description = "Not authenticated"),
+            @ApiResponse(responseCode = "403", description = "Insufficient permissions"),
+            @ApiResponse(responseCode = "404", description = "Location not found")
+    })
+    public ResponseEntity<LocationDTO> getLocationById(
+            @Parameter(description = "Location ID", required = true) @PathVariable Long id) {
+        LocationDTO location = locationService.getLocationById(id);
+        return ResponseEntity.ok(location);
+    }
+
+    /**
+     * Create a new location.
+     * POST /api/v1/location
+     */
+    @PostMapping
+    @PreAuthorize("hasAnyRole('SUPERADMIN', 'ADMIN', 'B2B')")
+    @Operation(
+            summary = "Create a new location",
+            description = "Creates a new location with automatic 'Main' hub creation. Requires SUPERADMIN, ADMIN or B2B role."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "Location created successfully",
+                    content = @Content(schema = @Schema(implementation = LocationDTO.class))),
+            @ApiResponse(responseCode = "400", description = "Invalid input data"),
+            @ApiResponse(responseCode = "401", description = "Not authenticated"),
+            @ApiResponse(responseCode = "403", description = "Insufficient permissions")
+    })
+    public ResponseEntity<LocationDTO> createLocation(@Valid @RequestBody LocationDTO locationDTO) {
+        LocationDTO createdLocation = locationService.createLocation(locationDTO);
+        return new ResponseEntity<>(createdLocation, HttpStatus.CREATED);
+    }
+
+    /**
+     * Update location by ID.
+     * PUT /api/v1/location/{id}
+     */
+    @PutMapping("/{id}")
+    @PreAuthorize("hasAnyRole('SUPERADMIN', 'ADMIN', 'B2B')")
+    @Operation(
+            summary = "Update location",
+            description = "Updates location information by ID"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Location updated successfully",
+                    content = @Content(schema = @Schema(implementation = LocationDTO.class))),
+            @ApiResponse(responseCode = "400", description = "Invalid input data"),
+            @ApiResponse(responseCode = "401", description = "Not authenticated"),
+            @ApiResponse(responseCode = "403", description = "Insufficient permissions"),
+            @ApiResponse(responseCode = "404", description = "Location not found")
+    })
+    public ResponseEntity<LocationDTO> updateLocation(
+            @Parameter(description = "Location ID", required = true) @PathVariable Long id,
+            @Valid @RequestBody LocationDTO locationDTO) {
+        LocationDTO updatedLocation = locationService.updateLocation(id, locationDTO);
+        return ResponseEntity.ok(updatedLocation);
+    }
+
+    /**
+     * Delete location by ID.
+     * DELETE /api/v1/location/{id}
+     */
+    @DeleteMapping("/{id}")
+    @PreAuthorize("hasAnyRole('SUPERADMIN', 'ADMIN')")
+    @Operation(
+            summary = "Delete location",
+            description = "Deletes a location by ID. Requires SUPERADMIN or ADMIN role."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "Location deleted successfully"),
+            @ApiResponse(responseCode = "401", description = "Not authenticated"),
+            @ApiResponse(responseCode = "403", description = "Insufficient permissions"),
+            @ApiResponse(responseCode = "404", description = "Location not found")
+    })
+    public ResponseEntity<Void> deleteLocation(
+            @Parameter(description = "Location ID", required = true) @PathVariable Long id) {
+        locationService.deleteLocation(id);
+        return ResponseEntity.noContent().build();
     }
 }

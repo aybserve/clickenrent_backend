@@ -14,6 +14,8 @@
 -- =====================================================================================================================
 
 -- Drop existing tables if they exist (in correct order to handle foreign key dependencies)
+DROP TABLE IF EXISTS password_reset_token CASCADE;
+DROP TABLE IF EXISTS email_verification CASCADE;
 DROP TABLE IF EXISTS invitation CASCADE;
 DROP TABLE IF EXISTS user_address CASCADE;
 DROP TABLE IF EXISTS user_company CASCADE;
@@ -189,6 +191,72 @@ CREATE TABLE address (
 );
 
 -- ---------------------------------------------------------------------------------------------------------------------
+-- Table: email_verification
+-- Description: Email verification codes for user email confirmation
+-- Audit Fields: date_created, last_date_modified, created_by, last_modified_by, is_deleted
+-- Soft Delete: Supports soft deletion via is_deleted flag
+-- Security: Tracks attempts and expiration for security
+-- ---------------------------------------------------------------------------------------------------------------------
+CREATE TABLE email_verification (
+    id                          BIGSERIAL PRIMARY KEY,
+    user_id                     BIGINT NOT NULL,
+    email                       VARCHAR(255) NOT NULL,
+    code                        VARCHAR(6) NOT NULL,
+    expires_at                  TIMESTAMP NOT NULL,
+    attempts                    INTEGER NOT NULL DEFAULT 0,
+    is_used                     BOOLEAN NOT NULL DEFAULT false,
+    used_at                     TIMESTAMP,
+    
+    -- Audit fields
+    date_created                TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    last_date_modified          TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    created_by                  VARCHAR(255),
+    last_modified_by            VARCHAR(255),
+    is_deleted                  BOOLEAN NOT NULL DEFAULT false,
+    
+    CONSTRAINT fk_email_verification_user FOREIGN KEY (user_id) 
+        REFERENCES users(id) ON DELETE CASCADE,
+    CONSTRAINT chk_email_verification_email_not_empty CHECK (email <> ''),
+    CONSTRAINT chk_email_verification_code_not_empty CHECK (code <> '')
+);
+
+-- ---------------------------------------------------------------------------------------------------------------------
+-- Table: password_reset_token
+-- Description: Password reset tokens for secure password recovery
+-- Audit Fields: date_created, last_date_modified, created_by, last_modified_by, is_deleted
+-- Soft Delete: Supports soft deletion via is_deleted flag
+-- Security: Tracks attempts and expiration for security, 6-digit numeric tokens
+-- ---------------------------------------------------------------------------------------------------------------------
+CREATE TABLE password_reset_token (
+    id                          BIGSERIAL PRIMARY KEY,
+    user_id                     BIGINT NOT NULL,
+    email                       VARCHAR(255) NOT NULL,
+    token                       VARCHAR(6) NOT NULL,
+    expires_at                  TIMESTAMP NOT NULL,
+    attempts                    INTEGER NOT NULL DEFAULT 0,
+    is_used                     BOOLEAN NOT NULL DEFAULT false,
+    used_at                     TIMESTAMP,
+    
+    -- Security tracking fields
+    ip_address                  VARCHAR(45),
+    user_agent                  VARCHAR(500),
+    used_ip_address             VARCHAR(45),
+    used_user_agent             VARCHAR(500),
+    
+    -- Audit fields
+    date_created                TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    last_date_modified          TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    created_by                  VARCHAR(255),
+    last_modified_by            VARCHAR(255),
+    is_deleted                  BOOLEAN NOT NULL DEFAULT false,
+    
+    CONSTRAINT fk_password_reset_user FOREIGN KEY (user_id) 
+        REFERENCES users(id) ON DELETE CASCADE,
+    CONSTRAINT chk_password_reset_email_not_empty CHECK (email <> ''),
+    CONSTRAINT chk_password_reset_token_not_empty CHECK (token <> '')
+);
+
+-- ---------------------------------------------------------------------------------------------------------------------
 -- Table: invitation
 -- Description: User invitation system for company onboarding
 -- Audit Fields: date_created, last_date_modified, created_by, last_modified_by, is_deleted
@@ -349,6 +417,18 @@ CREATE INDEX idx_user_company_external_id ON user_company(external_id);
 
 -- User address table indexes
 CREATE INDEX idx_user_address_external_id ON user_address(external_id);
+
+-- Email verification table indexes
+CREATE INDEX idx_email_verification_user ON email_verification(user_id);
+CREATE INDEX idx_email_verification_code ON email_verification(code);
+CREATE INDEX idx_email_verification_email ON email_verification(email);
+
+-- Password reset token table indexes
+CREATE INDEX idx_password_reset_user ON password_reset_token(user_id);
+CREATE INDEX idx_password_reset_email ON password_reset_token(email);
+CREATE INDEX idx_password_reset_token ON password_reset_token(token);
+CREATE INDEX idx_password_reset_ip ON password_reset_token(ip_address);
+CREATE INDEX idx_password_reset_used_ip ON password_reset_token(used_ip_address);
 
 -- Invitation table indexes
 CREATE INDEX idx_invitation_token ON invitation(token);
@@ -620,6 +700,8 @@ SELECT setval('company_id_seq', (SELECT COALESCE(MAX(id), 1) FROM company));
 SELECT setval('user_company_id_seq', (SELECT COALESCE(MAX(id), 1) FROM user_company));
 SELECT setval('address_id_seq', (SELECT COALESCE(MAX(id), 1) FROM address));
 SELECT setval('user_address_id_seq', (SELECT COALESCE(MAX(id), 1) FROM user_address));
+SELECT setval('email_verification_id_seq', (SELECT COALESCE(MAX(id), 1) FROM email_verification));
+SELECT setval('password_reset_token_id_seq', (SELECT COALESCE(MAX(id), 1) FROM password_reset_token));
 SELECT setval('invitation_id_seq', (SELECT COALESCE(MAX(id), 1) FROM invitation));
 
 -- =====================================================================================================================
@@ -657,9 +739,10 @@ CREATE INDEX IF NOT EXISTS idx_audit_logs_success ON audit_logs(success);
 -- END OF SCHEMA
 -- =====================================================================================================================
 -- Schema created successfully!
--- Total tables: 13
--- Test users: 13 (password: Test123!)
+-- Total tables: 15
+-- Test users: 14 (password: Test123!)
 -- Test companies: 6
+-- Security tables: email_verification, password_reset_token (for auth flows)
 -- =====================================================================================================================
 
 
