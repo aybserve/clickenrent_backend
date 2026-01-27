@@ -84,6 +84,9 @@ public class Location extends BaseAuditEntity implements TenantScoped {
         if (externalId == null || externalId.isEmpty()) {
             externalId = UUID.randomUUID().toString();
         }
+        if (getIsDeleted() == null) {
+            setIsDeleted(false);
+        }
     }
     
     @Override

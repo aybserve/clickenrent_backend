@@ -82,8 +82,7 @@ public class BikeController {
      * GET /api/bikes/external/{externalId}
      */
     @GetMapping("/external/{externalId}")
-    @PreAuthorize("isAuthenticated()")
-    @Operation(summary = "Get bike by external ID", description = "Retrieve bike details by external ID for cross-service communication")
+    @Operation(summary = "Get bike by external ID", description = "Retrieve bike details by external ID for cross-service communication (public for service-to-service calls)")
     public ResponseEntity<BikeDTO> getByExternalId(@PathVariable String externalId) {
         BikeDTO bike = bikeService.findByExternalId(externalId);
         return ResponseEntity.ok(bike);

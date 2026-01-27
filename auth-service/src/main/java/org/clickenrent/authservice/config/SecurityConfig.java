@@ -61,6 +61,9 @@ public class SecurityConfig {
                         .requestMatchers("/actuator/**").permitAll()
                         // OpenAPI/Swagger endpoints
                         .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
+                        // Service-to-service endpoints (for search-service indexing)
+                        .requestMatchers("/api/v1/users/external/**").permitAll()
+                        .requestMatchers("/api/v1/companies/external/**").permitAll()
                         // All other requests require authentication
                         .anyRequest().authenticated()
                 )

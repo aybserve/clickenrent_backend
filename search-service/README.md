@@ -415,31 +415,143 @@ http://localhost:8080/api/v1/search?q=...
 
 Gateway routes are configured in `gateway/src/main/java/org/clickenrent/gateway/config/GatewayConfig.java`
 
-### Event-Driven Indexing
+### Event-Driven Indexing (Real-Time Sync)
 
-Other services should send index events when entities change:
+The search-service receives real-time updates from auth-service and rental-service via Feign clients. When entities are created, updated, or deleted, the source services automatically notify search-service to update the Elasticsearch index.
 
-**Example from auth-service:**
+#### How It Works
+
+1. **Source service performs CRUD operation** (e.g., create user, update bike)
+2. **Entity saved to PostgreSQL**
+3. **Source service calls SearchServiceClient.notifyIndexEvent()**
+4. **search-service receives event** (HTTP 202 Accepted)
+5. **Background thread processes event** (fetches data, indexes in Elasticsearch)
+6. **Search results updated** within 100-500ms
+
+#### Implementation in Source Services
+
+**Step 1: Create SearchServiceClient**
 
 ```java
-@Autowired
-private RestTemplate restTemplate;
+// auth-service or rental-service
+package org.clickenrent.authservice.client;
 
-public void afterUserUpdate(User user) {
-    IndexEventRequest event = IndexEventRequest.builder()
-        .entityType("user")
-        .entityId(user.getExternalId())
-        .operation(IndexOperation.UPDATE)
-        .build();
+import org.clickenrent.contracts.search.IndexEventRequest;
+import org.clickenrent.authservice.config.FeignConfig;
+import org.springframework.cloud.openfeign.FeignClient;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+
+@FeignClient(name = "search-service", configuration = FeignConfig.class)
+public interface SearchServiceClient {
+    @PostMapping("/api/v1/index/event")
+    void notifyIndexEvent(@RequestBody IndexEventRequest event);
+}
+```
+
+**Step 2: Add notifications to service classes**
+
+```java
+// Example: UserService in auth-service
+@Service
+@RequiredArgsConstructor
+public class UserService {
+    private final UserRepository userRepository;
+    private final SearchServiceClient searchServiceClient;
     
-    // Send to search-service via service discovery
-    restTemplate.postForEntity(
-        "http://search-service/api/v1/index/event",
-        event,
-        Void.class
+    @Transactional
+    public UserDTO createUser(UserDTO userDTO, String password) {
+        User user = userRepository.save(...);
+        
+        // Notify search-service (fail-safe)
+        notifySearchService("user", user.getExternalId(), "CREATE");
+        
+        return userMapper.toDto(user);
+    }
+    
+    @Transactional
+    public UserDTO updateUser(Long id, UserDTO userDTO) {
+        User user = userRepository.save(...);
+        
+        // Notify search-service
+        notifySearchService("user", user.getExternalId(), "UPDATE");
+        
+        return userMapper.toDto(user);
+    }
+    
+    @Transactional
+    public void deleteUser(Long id) {
+        String externalId = user.getExternalId();
+        userRepository.delete(user);
+        
+        // Notify search-service
+        notifySearchService("user", externalId, "DELETE");
+    }
+    
+    private void notifySearchService(String entityType, String entityId, String operation) {
+        try {
+            searchServiceClient.notifyIndexEvent(
+                IndexEventRequest.builder()
+                    .entityType(entityType)
+                    .entityId(entityId)
+                    .operation(IndexEventRequest.IndexOperation.valueOf(operation))
+                    .build()
+            );
+        } catch (Exception e) {
+            // Don't fail main operation if search indexing fails
+            log.warn("Failed to notify search-service: {}", e.getMessage());
+        }
+    }
+}
+```
+
+**Services with notifications implemented:**
+- `auth-service/UserService` - User CRUD operations
+- `rental-service/BikeService` - Bike CRUD operations
+- `rental-service/LocationService` - Location CRUD operations
+- `rental-service/HubService` - Hub CRUD operations
+
+#### Scheduled Sync (Safety Net)
+
+A scheduled task runs nightly at 2 AM to re-sync all entities, catching any events that may have been missed:
+
+```java
+// Runs automatically every night
+@Scheduled(cron = "0 0 2 * * *")
+public void scheduledFullSync() {
+    indexingService.bulkSync(
+        BulkSyncRequest.builder()
+            .entityTypes(List.of("users", "bikes", "locations", "hubs"))
+            .build()
     );
 }
 ```
+
+**Configuration:**
+
+```properties
+# Enable/disable scheduled sync
+search.scheduled-sync.enabled=true
+
+# Cron expression (default: 2 AM daily)
+search.scheduled-sync.cron=0 0 2 * * *
+```
+
+**To disable scheduled sync:**
+
+```bash
+export SCHEDULED_SYNC_ENABLED=false
+```
+
+#### Synchronization Strategy Summary
+
+| Method | Trigger | Latency | Use Case |
+|--------|---------|---------|----------|
+| **Event-Driven** | Automatic (on entity changes) | 100-500ms | Primary sync method |
+| **Scheduled Sync** | Automatic (daily at 2 AM) | N/A | Safety net for missed events |
+| **Manual Bulk Sync** | Admin API call | Minutes | Initial setup, disaster recovery |
+
+**Best Practice:** Event-driven handles 99% of updates, scheduled sync catches the remaining 1% of edge cases.
 
 ## Multi-Tenant Security
 

@@ -1,4 +1,4 @@
-package org.clickenrent.searchservice.dto;
+package org.clickenrent.contracts.search;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -11,6 +11,9 @@ import lombok.NoArgsConstructor;
 /**
  * Request DTO for event-driven indexing operations.
  * Other services send this when entities are created/updated/deleted.
+ * 
+ * Consumers: auth-service, rental-service
+ * Owner: search-service
  * 
  * @author Vitaliy Shvetsov
  */

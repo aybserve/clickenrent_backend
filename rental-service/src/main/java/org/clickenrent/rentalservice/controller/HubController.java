@@ -123,8 +123,7 @@ public class HubController {
     }
 
     @GetMapping("/external/{externalId}")
-    @PreAuthorize("isAuthenticated()")
-    @Operation(summary = "Get hub by external ID", description = "Retrieve hub by external ID for cross-service communication")
+    @Operation(summary = "Get hub by external ID", description = "Retrieve hub by external ID for cross-service communication (public for service-to-service calls)")
     public ResponseEntity<HubDTO> getByExternalId(@PathVariable String externalId) {
         return ResponseEntity.ok(hubService.getHubByExternalId(externalId));
     }

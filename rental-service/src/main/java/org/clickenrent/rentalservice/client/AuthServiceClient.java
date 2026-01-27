@@ -2,6 +2,7 @@ package org.clickenrent.rentalservice.client;
 
 import org.clickenrent.contracts.auth.CompanyDTO;
 import org.clickenrent.contracts.auth.UserDTO;
+import org.clickenrent.rentalservice.config.FeignConfig;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -10,7 +11,7 @@ import org.springframework.web.bind.annotation.PathVariable;
  * Feign client for communicating with Auth Service.
  * Used to fetch user and company details.
  */
-@FeignClient(name = "auth-service", path = "/api/v1")
+@FeignClient(name = "auth-service", path = "/api/v1", configuration = FeignConfig.class)
 public interface AuthServiceClient {
 
     /**

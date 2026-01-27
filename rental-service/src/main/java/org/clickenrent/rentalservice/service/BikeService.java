@@ -2,6 +2,8 @@ package org.clickenrent.rentalservice.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.clickenrent.contracts.search.IndexEventRequest;
+import org.clickenrent.rentalservice.client.SearchServiceClient;
 import org.clickenrent.rentalservice.dto.BikeDTO;
 import org.clickenrent.rentalservice.dto.BikeLocationDTO;
 import org.clickenrent.rentalservice.dto.GeoPointDTO;
@@ -32,6 +34,7 @@ public class BikeService {
     private final BikeMapper bikeMapper;
     private final SecurityService securityService;
     private final LocationCalculationService locationCalculationService;
+    private final SearchServiceClient searchServiceClient;
 
     @Transactional(readOnly = true)
     public Page<BikeDTO> getAllBikes(Pageable pageable) {
@@ -78,6 +81,10 @@ public class BikeService {
 
         Bike bike = bikeMapper.toEntity(bikeDTO);
         bike = bikeRepository.save(bike);
+        
+        // Notify search-service for indexing
+        notifySearchService("bike", bike.getExternalId(), "CREATE");
+        
         return bikeMapper.toDto(bike);
     }
 
@@ -93,6 +100,10 @@ public class BikeService {
 
         bikeMapper.updateEntityFromDto(bikeDTO, bike);
         bike = bikeRepository.save(bike);
+        
+        // Notify search-service for indexing
+        notifySearchService("bike", bike.getExternalId(), "UPDATE");
+        
         return bikeMapper.toDto(bike);
     }
 
@@ -110,6 +121,10 @@ public class BikeService {
         bikeMapper.updateEntityFromDto(dto, bike);
         bike = bikeRepository.save(bike);
         log.info("Updated bike by externalId: {}", externalId);
+        
+        // Notify search-service for indexing
+        notifySearchService("bike", bike.getExternalId(), "UPDATE");
+        
         return bikeMapper.toDto(bike);
     }
 
@@ -123,7 +138,11 @@ public class BikeService {
             throw new UnauthorizedException("Only administrators can delete bikes");
         }
 
+        String externalId = bike.getExternalId();
         bikeRepository.delete(bike);
+        
+        // Notify search-service for indexing
+        notifySearchService("bike", externalId, "DELETE");
     }
 
     @Transactional
@@ -137,6 +156,9 @@ public class BikeService {
         
         bikeRepository.delete(bike);
         log.info("Deleted bike by externalId: {}", externalId);
+        
+        // Notify search-service for indexing
+        notifySearchService("bike", externalId, "DELETE");
     }
 
     /**
@@ -250,6 +272,27 @@ public class BikeService {
                 .hubExternalId(hubExternalId)
                 .hubName(hubName)
                 .build();
+    }
+    
+    /**
+     * Notify search-service of entity changes (async, fail-safe)
+     * This method never throws exceptions to prevent search failures from breaking bike operations
+     */
+    private void notifySearchService(String entityType, String entityId, String operation) {
+        try {
+            searchServiceClient.notifyIndexEvent(
+                IndexEventRequest.builder()
+                    .entityType(entityType)
+                    .entityId(entityId)
+                    .operation(IndexEventRequest.IndexOperation.valueOf(operation))
+                    .build()
+            );
+            log.debug("Notified search-service: {} {} {}", operation, entityType, entityId);
+        } catch (Exception e) {
+            // Don't fail the main operation if search indexing fails
+            log.warn("Failed to notify search-service for {} {} {}: {}", 
+                     operation, entityType, entityId, e.getMessage());
+        }
     }
 }
 

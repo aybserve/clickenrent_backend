@@ -8,6 +8,8 @@ import lombok.experimental.SuperBuilder;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
 
+import java.util.UUID;
+
 /**
  * Entity representing a company/organization in the system.
  * Companies can be hotels, B&Bs, or other types of rental properties.
@@ -60,6 +62,16 @@ public class Company extends BaseAuditEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "company_type_id")
     private CompanyType companyType;
+
+    @PrePersist
+    public void prePersist() {
+        if (externalId == null || externalId.isEmpty()) {
+            externalId = UUID.randomUUID().toString();
+        }
+        if (getIsDeleted() == null) {
+            setIsDeleted(false);
+        }
+    }
 }
 
 

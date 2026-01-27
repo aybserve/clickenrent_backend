@@ -9,6 +9,8 @@ import lombok.experimental.SuperBuilder;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
 
+import java.util.UUID;
+
 /**
  * Entity representing a user in the system.
  * Contains user profile information, credentials, and audit fields.
@@ -98,6 +100,16 @@ public class User extends BaseAuditEntity {
     @Size(max = 255, message = "Provider user ID must not exceed 255 characters")
     @Column(name = "provider_user_id", length = 255)
     private String providerUserId;
+
+    @PrePersist
+    public void prePersist() {
+        if (externalId == null || externalId.isEmpty()) {
+            externalId = UUID.randomUUID().toString();
+        }
+        if (getIsDeleted() == null) {
+            setIsDeleted(false);
+        }
+    }
 }
 
 

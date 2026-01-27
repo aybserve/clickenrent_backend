@@ -2,6 +2,8 @@ package org.clickenrent.rentalservice.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.clickenrent.contracts.search.IndexEventRequest;
+import org.clickenrent.rentalservice.client.SearchServiceClient;
 import org.clickenrent.rentalservice.dto.LocationDTO;
 import org.clickenrent.rentalservice.entity.Hub;
 import org.clickenrent.rentalservice.entity.Location;
@@ -27,6 +29,7 @@ public class LocationService {
     private final HubRepository hubRepository;
     private final LocationMapper locationMapper;
     private final SecurityService securityService;
+    private final SearchServiceClient searchServiceClient;
 
     @Transactional(readOnly = true)
     public Page<LocationDTO> getAllLocations(Pageable pageable) {
@@ -92,6 +95,9 @@ public class LocationService {
                 .build();
         hubRepository.save(mainHub);
 
+        // Notify search-service for indexing
+        notifySearchService("location", location.getExternalId(), "CREATE");
+
         return locationMapper.toDto(location);
     }
 
@@ -107,6 +113,10 @@ public class LocationService {
 
         locationMapper.updateEntityFromDto(locationDTO, location);
         location = locationRepository.save(location);
+        
+        // Notify search-service for indexing
+        notifySearchService("location", location.getExternalId(), "UPDATE");
+        
         return locationMapper.toDto(location);
     }
 
@@ -120,12 +130,37 @@ public class LocationService {
             throw new UnauthorizedException("You don't have permission to delete this location");
         }
 
+        String externalId = location.getExternalId();
         locationRepository.delete(location);
+        
+        // Notify search-service for indexing
+        notifySearchService("location", externalId, "DELETE");
     }
 
     @Transactional(readOnly = true)
     public boolean existsByExternalId(String externalId) {
         return locationRepository.existsByExternalId(externalId);
+    }
+    
+    /**
+     * Notify search-service of entity changes (async, fail-safe)
+     * This method never throws exceptions to prevent search failures from breaking location operations
+     */
+    private void notifySearchService(String entityType, String entityId, String operation) {
+        try {
+            searchServiceClient.notifyIndexEvent(
+                IndexEventRequest.builder()
+                    .entityType(entityType)
+                    .entityId(entityId)
+                    .operation(IndexEventRequest.IndexOperation.valueOf(operation))
+                    .build()
+            );
+            log.debug("Notified search-service: {} {} {}", operation, entityType, entityId);
+        } catch (Exception e) {
+            // Don't fail the main operation if search indexing fails
+            log.warn("Failed to notify search-service for {} {} {}: {}", 
+                     operation, entityType, entityId, e.getMessage());
+        }
     }
 }
 

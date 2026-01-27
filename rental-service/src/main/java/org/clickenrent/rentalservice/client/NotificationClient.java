@@ -2,6 +2,7 @@ package org.clickenrent.rentalservice.client;
 
 import org.clickenrent.contracts.notification.SendNotificationRequest;
 import org.clickenrent.contracts.notification.SendNotificationResponse;
+import org.clickenrent.rentalservice.config.FeignConfig;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -9,7 +10,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 /**
  * Feign client for communication with notification-service.
  */
-@FeignClient(name = "notification-service")
+@FeignClient(name = "notification-service", configuration = FeignConfig.class)
 public interface NotificationClient {
 
     /**

@@ -1,6 +1,8 @@
 package org.clickenrent.authservice.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.clickenrent.authservice.client.SearchServiceClient;
 import org.clickenrent.authservice.dto.UserDTO;
 import org.clickenrent.authservice.entity.Language;
 import org.clickenrent.authservice.entity.User;
@@ -10,6 +12,7 @@ import org.clickenrent.authservice.mapper.UserMapper;
 import org.clickenrent.authservice.repository.LanguageRepository;
 import org.clickenrent.authservice.repository.UserCompanyRepository;
 import org.clickenrent.authservice.repository.UserRepository;
+import org.clickenrent.contracts.search.IndexEventRequest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -26,6 +29,7 @@ import java.util.stream.Collectors;
  */
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class UserService {
     
     private final UserRepository userRepository;
@@ -34,6 +38,7 @@ public class UserService {
     private final PasswordEncoder passwordEncoder;
     private final SecurityService securityService;
     private final UserCompanyRepository userCompanyRepository;
+    private final SearchServiceClient searchServiceClient;
     
     @Transactional(readOnly = true)
     public Page<UserDTO> getAllUsers(Pageable pageable) {
@@ -136,6 +141,10 @@ public class UserService {
         }
         
         user = userRepository.save(user);
+        
+        // Notify search-service for indexing
+        notifySearchService("user", user.getExternalId(), "CREATE");
+        
         return userMapper.toDto(user);
     }
     
@@ -158,6 +167,10 @@ public class UserService {
         }
         
         user = userRepository.save(user);
+        
+        // Notify search-service for indexing
+        notifySearchService("user", user.getExternalId(), "UPDATE");
+        
         return userMapper.toDto(user);
     }
     
@@ -165,9 +178,13 @@ public class UserService {
     public void deleteUser(Long id) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("User", "id", id));
+        String externalId = user.getExternalId();
         user.setIsDeleted(true);
         user.setIsActive(false);
         userRepository.save(user);
+        
+        // Notify search-service for indexing
+        notifySearchService("user", externalId, "DELETE");
     }
     
     @Transactional
@@ -186,6 +203,27 @@ public class UserService {
         user.setIsActive(false);
         user = userRepository.save(user);
         return userMapper.toDto(user);
+    }
+    
+    /**
+     * Notify search-service of entity changes (async, fail-safe)
+     * This method never throws exceptions to prevent search failures from breaking user operations
+     */
+    private void notifySearchService(String entityType, String entityId, String operation) {
+        try {
+            searchServiceClient.notifyIndexEvent(
+                IndexEventRequest.builder()
+                    .entityType(entityType)
+                    .entityId(entityId)
+                    .operation(IndexEventRequest.IndexOperation.valueOf(operation))
+                    .build()
+            );
+            log.debug("Notified search-service: {} {} {}", operation, entityType, entityId);
+        } catch (Exception e) {
+            // Don't fail the main operation if search indexing fails
+            log.warn("Failed to notify search-service for {} {} {}: {}", 
+                     operation, entityType, entityId, e.getMessage());
+        }
     }
 }
 

@@ -50,6 +50,9 @@ public abstract class Product extends BaseAuditEntity {
         if (externalId == null || externalId.isEmpty()) {
             externalId = UUID.randomUUID().toString();
         }
+        if (getIsDeleted() == null) {
+            setIsDeleted(false);
+        }
     }
 }
 

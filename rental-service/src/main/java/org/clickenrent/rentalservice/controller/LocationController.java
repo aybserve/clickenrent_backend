@@ -100,8 +100,7 @@ public class LocationController {
     }
 
     @GetMapping("/external/{externalId}")
-    @PreAuthorize("isAuthenticated()")
-    @Operation(summary = "Get location by external ID", description = "Retrieve location by external ID for cross-service communication")
+    @Operation(summary = "Get location by external ID", description = "Retrieve location by external ID for cross-service communication (public for service-to-service calls)")
     public ResponseEntity<LocationDTO> getByExternalId(@PathVariable String externalId) {
         return ResponseEntity.ok(locationService.getLocationByExternalId(externalId));
     }

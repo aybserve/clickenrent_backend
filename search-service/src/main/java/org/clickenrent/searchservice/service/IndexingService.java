@@ -2,9 +2,9 @@ package org.clickenrent.searchservice.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.clickenrent.contracts.search.IndexEventRequest;
 import org.clickenrent.searchservice.dto.BulkSyncRequest;
 import org.clickenrent.searchservice.dto.BulkSyncResponse;
-import org.clickenrent.searchservice.dto.IndexEventRequest;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 

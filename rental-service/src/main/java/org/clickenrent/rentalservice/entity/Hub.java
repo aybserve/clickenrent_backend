@@ -9,6 +9,8 @@ import lombok.experimental.SuperBuilder;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
 
+import java.util.UUID;
+
 /**
  * Entity representing a hub within a location.
  * Auto-creates "Main" hub when a location is created.
@@ -54,4 +56,14 @@ public class Hub extends BaseAuditEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "coordinates_id")
     private Coordinates coordinates;
+
+    @PrePersist
+    public void prePersist() {
+        if (externalId == null || externalId.isEmpty()) {
+            externalId = UUID.randomUUID().toString();
+        }
+        if (getIsDeleted() == null) {
+            setIsDeleted(false);
+        }
+    }
 }
