@@ -3,12 +3,17 @@ package org.clickenrent.authservice.metrics;
 import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Timer;
+import io.sentry.ISpan;
+import io.sentry.ITransaction;
+import io.sentry.Sentry;
+import io.sentry.SpanStatus;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 /**
  * Metrics for OAuth authentication flows.
  * Tracks success rates, failures, and performance of OAuth operations.
+ * Integrates with Sentry for performance monitoring and transaction tracking.
  */
 @Component
 @RequiredArgsConstructor
@@ -181,6 +186,82 @@ public class OAuthMetrics {
                 .tag("outcome", outcome)
                 .description("Duration of OAuth authentication flow by type")
                 .register(meterRegistry));
+    }
+    
+    // ========================================
+    // Sentry Performance Monitoring
+    // ========================================
+    
+    /**
+     * Start a Sentry transaction for OAuth flow performance monitoring.
+     * This creates a top-level transaction that tracks the entire OAuth flow.
+     * 
+     * @param provider OAuth provider (e.g., "google", "apple")
+     * @return Sentry transaction to be finished when flow completes
+     */
+    public ITransaction startSentryTransaction(String provider) {
+        ITransaction transaction = Sentry.startTransaction(
+            "oauth.login",
+            "oauth." + provider.toLowerCase()
+        );
+        transaction.setTag("provider", provider);
+        return transaction;
+    }
+    
+    /**
+     * Start a child span within a Sentry transaction for specific OAuth operations.
+     * Use this to track individual steps like token exchange, user info fetch, etc.
+     * 
+     * @param transaction Parent transaction
+     * @param operation Operation name (e.g., "token_exchange", "user_info_fetch")
+     * @return Sentry span to be finished when operation completes
+     */
+    public ISpan startSentrySpan(ITransaction transaction, String operation) {
+        if (transaction != null) {
+            return transaction.startChild("oauth." + operation);
+        }
+        return null;
+    }
+    
+    /**
+     * Finish a Sentry transaction with success status.
+     * Call this when the OAuth flow completes successfully.
+     * 
+     * @param transaction Sentry transaction to finish
+     */
+    public void finishSentryTransactionSuccess(ITransaction transaction) {
+        if (transaction != null) {
+            transaction.setStatus(SpanStatus.OK);
+            transaction.finish();
+        }
+    }
+    
+    /**
+     * Finish a Sentry transaction with error status.
+     * Call this when the OAuth flow fails.
+     * 
+     * @param transaction Sentry transaction to finish
+     * @param throwable Error that occurred (optional, can be null)
+     */
+    public void finishSentryTransactionError(ITransaction transaction, Throwable throwable) {
+        if (transaction != null) {
+            transaction.setStatus(SpanStatus.INTERNAL_ERROR);
+            if (throwable != null) {
+                transaction.setThrowable(throwable);
+            }
+            transaction.finish();
+        }
+    }
+    
+    /**
+     * Finish a Sentry span (child operation).
+     * 
+     * @param span Sentry span to finish
+     */
+    public void finishSentrySpan(ISpan span) {
+        if (span != null) {
+            span.finish();
+        }
     }
 }
 

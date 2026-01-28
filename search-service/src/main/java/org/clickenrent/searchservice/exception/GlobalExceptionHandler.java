@@ -1,5 +1,7 @@
 package org.clickenrent.searchservice.exception;
 
+import io.sentry.Sentry;
+import io.sentry.SentryLevel;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -16,12 +18,26 @@ import java.util.stream.Collectors;
 /**
  * Global exception handler for search-service.
  * Provides consistent error responses across all endpoints.
+ * Integrates with Sentry for error tracking and monitoring.
  * 
  * @author Vitaliy Shvetsov
  */
 @RestControllerAdvice
 @Slf4j
 public class GlobalExceptionHandler {
+    
+    private void captureExceptionToSentry(Exception ex, HttpServletRequest request, HttpStatus status) {
+        try {
+            Sentry.withScope(scope -> {
+                scope.setTag("http_status", String.valueOf(status.value()));
+                scope.setTag("request_path", request.getRequestURI());
+                scope.setLevel(status.is5xxServerError() ? SentryLevel.ERROR : SentryLevel.WARNING);
+                Sentry.captureException(ex);
+            });
+        } catch (Exception sentryEx) {
+            log.warn("Failed to capture exception to Sentry: {}", sentryEx.getMessage());
+        }
+    }
 
     /**
      * Handle validation errors
@@ -96,6 +112,8 @@ public class GlobalExceptionHandler {
             Exception ex,
             HttpServletRequest request
     ) {
+        captureExceptionToSentry(ex, request, HttpStatus.INTERNAL_SERVER_ERROR);
+        
         ErrorResponse error = ErrorResponse.builder()
                 .timestamp(LocalDateTime.now())
                 .status(HttpStatus.INTERNAL_SERVER_ERROR.value())

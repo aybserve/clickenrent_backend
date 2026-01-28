@@ -157,11 +157,61 @@ The system automatically:
 
 ## 📊 Monitoring
 
+ClickEnRent uses a comprehensive monitoring stack for production observability:
+
+### Application Monitoring
 - **Eureka Dashboard**: http://46.224.148.235:8761
 - **Health Checks**: http://46.224.148.235:8080/actuator/health
 - **Prometheus Metrics**: http://46.224.148.235:8080/actuator/prometheus
 - **Redis Health**: http://46.224.148.235:8080/actuator/health (includes Redis status)
 - **Logs**: `docker-compose logs -f`
+
+### Sentry Error Tracking & Performance Monitoring
+
+ClickEnRent integrates **Sentry** for real-time error tracking and performance monitoring across all 7 microservices:
+
+**Features:**
+- Automatic error capture and grouping
+- Multi-tenant context enrichment (company IDs, user roles)
+- Performance transaction tracing (APM)
+- OAuth flow monitoring with detailed spans
+- Smart alerting (Slack, Email, PagerDuty)
+- Release tracking and error trends
+
+**Configuration:**
+
+Each service requires its own Sentry DSN in the `.env` file:
+
+```bash
+# Get DSN values from https://sentry.io
+SENTRY_DSN_AUTH=https://xxx@yyy.ingest.sentry.io/zzz
+SENTRY_DSN_RENTAL=https://xxx@yyy.ingest.sentry.io/zzz
+SENTRY_DSN_SUPPORT=https://xxx@yyy.ingest.sentry.io/zzz
+SENTRY_DSN_PAYMENT=https://xxx@yyy.ingest.sentry.io/zzz
+SENTRY_DSN_NOTIFICATION=https://xxx@yyy.ingest.sentry.io/zzz
+SENTRY_DSN_SEARCH=https://xxx@yyy.ingest.sentry.io/zzz
+SENTRY_DSN_GATEWAY=https://xxx@yyy.ingest.sentry.io/zzz
+
+# Environment and sampling
+SENTRY_ENVIRONMENT=production
+SENTRY_TRACES_SAMPLE_RATE=1.0  # 1.0 = 100% of transactions
+```
+
+**Setup Instructions:**
+
+See [SENTRY_SETUP.md](SENTRY_SETUP.md) for detailed setup instructions including:
+- Creating Sentry account and projects
+- Obtaining DSN values
+- Configuring alerts and dashboards
+- Team member access management
+
+**What Gets Tracked:**
+
+1. **Errors**: All unhandled exceptions automatically captured
+2. **Performance**: Transaction traces for API requests
+3. **OAuth Flows**: Detailed performance monitoring for Google/Apple OAuth
+4. **Context**: Every error tagged with tenant/company information
+5. **Releases**: Errors grouped by service version (1.0-SNAPSHOT)
 
 ## 🐛 Troubleshooting
 

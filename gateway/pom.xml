@@ -108,6 +108,16 @@
 		<artifactId>spring-boot-starter-test</artifactId>
 		<scope>test</scope>
 	</dependency>
+
+	<!-- Sentry for error tracking and performance monitoring -->
+	<dependency>
+		<groupId>io.sentry</groupId>
+		<artifactId>sentry-spring-boot-starter-jakarta</artifactId>
+	</dependency>
+	<dependency>
+		<groupId>io.sentry</groupId>
+		<artifactId>sentry-logback</artifactId>
+	</dependency>
 </dependencies>
 
 	<build>

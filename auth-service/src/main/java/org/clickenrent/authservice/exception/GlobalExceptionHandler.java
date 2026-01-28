@@ -1,5 +1,7 @@
 package org.clickenrent.authservice.exception;
 
+import io.sentry.Sentry;
+import io.sentry.SentryLevel;
 import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -21,10 +23,43 @@ import java.util.stream.Collectors;
 /**
  * Global exception handler for all REST controllers.
  * Provides consistent error responses across the application.
+ * Integrates with Sentry for error tracking and monitoring.
  */
 @Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+    
+    /**
+     * Capture exception to Sentry with request context.
+     * 
+     * @param ex Exception to capture
+     * @param request WebRequest containing request details
+     * @param status HTTP status code
+     */
+    private void captureExceptionToSentry(Exception ex, WebRequest request, HttpStatus status) {
+        try {
+            Sentry.withScope(scope -> {
+                // Add request context
+                scope.setTag("http_status", String.valueOf(status.value()));
+                scope.setTag("request_path", request.getDescription(false).replace("uri=", ""));
+                
+                // Set appropriate level based on status
+                if (status.is5xxServerError()) {
+                    scope.setLevel(SentryLevel.ERROR);
+                } else if (status.is4xxClientError()) {
+                    scope.setLevel(SentryLevel.WARNING);
+                } else {
+                    scope.setLevel(SentryLevel.INFO);
+                }
+                
+                // Capture the exception
+                Sentry.captureException(ex);
+            });
+        } catch (Exception sentryEx) {
+            // Don't let Sentry failures affect the response
+            log.warn("Failed to capture exception to Sentry: {}", sentryEx.getMessage());
+        }
+    }
 
     @ExceptionHandler(ResourceNotFoundException.class)
     public ResponseEntity<ErrorResponse> handleResourceNotFoundException(
@@ -178,6 +213,9 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleDataIntegrityViolationException(
             DataIntegrityViolationException ex, WebRequest request) {
         
+        // Capture to Sentry
+        captureExceptionToSentry(ex, request, HttpStatus.CONFLICT);
+        
         // Log detailed error information for debugging
         log.error("DataIntegrityViolationException occurred at path: {}", 
                 request.getDescription(false).replace("uri=", ""));
@@ -225,6 +263,9 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleGlobalException(
             Exception ex, WebRequest request) {
+        
+        // Capture to Sentry - this is critical for tracking unexpected errors
+        captureExceptionToSentry(ex, request, HttpStatus.INTERNAL_SERVER_ERROR);
         
         // Log detailed error information for debugging
         log.error("Unhandled exception occurred at path: {}", 

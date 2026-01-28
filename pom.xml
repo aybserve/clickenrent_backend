@@ -24,6 +24,7 @@
     <maven.compiler.source>${java.version}</maven.compiler.source>
     <maven.compiler.target>${java.version}</maven.compiler.target>
     <spring-cloud.version>2023.0.1</spring-cloud.version>
+    <sentry.version>7.17.0</sentry.version>
   </properties>
 
   <!-- ✔ BOM только Spring Cloud (Spring Boot уже в parent) -->
@@ -33,6 +34,15 @@
         <groupId>org.springframework.cloud</groupId>
         <artifactId>spring-cloud-dependencies</artifactId>
         <version>${spring-cloud.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+      
+      <!-- Sentry BOM for version consistency -->
+      <dependency>
+        <groupId>io.sentry</groupId>
+        <artifactId>sentry-bom</artifactId>
+        <version>${sentry.version}</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>

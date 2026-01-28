@@ -1,5 +1,7 @@
 package org.clickenrent.notificationservice.exception;
 
+import io.sentry.Sentry;
+import io.sentry.SentryLevel;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -13,10 +15,23 @@ import java.util.Map;
 
 /**
  * Global exception handler for the notification service.
+ * Integrates with Sentry for error tracking and monitoring.
  */
 @RestControllerAdvice
 @Slf4j
 public class GlobalExceptionHandler {
+    
+    private void captureExceptionToSentry(Exception ex, HttpStatus status) {
+        try {
+            Sentry.withScope(scope -> {
+                scope.setTag("http_status", String.valueOf(status.value()));
+                scope.setLevel(status.is5xxServerError() ? SentryLevel.ERROR : SentryLevel.WARNING);
+                Sentry.captureException(ex);
+            });
+        } catch (Exception sentryEx) {
+            log.warn("Failed to capture exception to Sentry: {}", sentryEx.getMessage());
+        }
+    }
 
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<Map<String, Object>> handleIllegalArgumentException(IllegalArgumentException ex) {
@@ -47,6 +62,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Map<String, Object>> handleGenericException(Exception ex) {
         log.error("Unexpected exception", ex);
+        captureExceptionToSentry(ex, HttpStatus.INTERNAL_SERVER_ERROR);
         return buildErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR, "An unexpected error occurred");
     }
 
