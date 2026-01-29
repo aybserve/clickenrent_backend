@@ -1,6 +1,10 @@
-# Sentry Setup Guide
+# Sentry Setup Guide (Cloud Version)
 
-Complete guide for setting up Sentry error tracking and performance monitoring for ClickEnRent microservices.
+Complete guide for setting up Sentry.io cloud error tracking and performance monitoring for ClickEnRent microservices.
+
+> **💡 Looking for Self-Hosted Sentry (FREE)?**  
+> See [SENTRY_SELF_HOSTED.md](SENTRY_SELF_HOSTED.md) for complete self-hosted deployment guide.  
+> Self-hosted is 100% free with unlimited events and full control.
 
 ## Table of Contents
 

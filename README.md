@@ -199,11 +199,12 @@ SENTRY_TRACES_SAMPLE_RATE=1.0  # 1.0 = 100% of transactions
 
 **Setup Instructions:**
 
-See [SENTRY_SETUP.md](SENTRY_SETUP.md) for detailed setup instructions including:
-- Creating Sentry account and projects
-- Obtaining DSN values
-- Configuring alerts and dashboards
-- Team member access management
+Choose your Sentry deployment option:
+
+- **Cloud Version**: [SENTRY_SETUP.md](SENTRY_SETUP.md) - Managed Sentry.io (starts at $26/mo)
+- **Self-Hosted** ⭐: [SENTRY_SELF_HOSTED.md](SENTRY_SELF_HOSTED.md) - Free, unlimited, full control
+
+Both options work identically with your application code - only the DSN URLs differ.
 
 **What Gets Tracked:**
 
