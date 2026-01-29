@@ -1,0 +1,2 @@
+-- Test data for Analytics Service
+-- This file is loaded during testing
