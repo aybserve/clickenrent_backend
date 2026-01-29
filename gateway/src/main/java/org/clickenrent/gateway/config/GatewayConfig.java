@@ -1286,6 +1286,70 @@ public class GatewayConfig {
                                         .setStatusCode(HttpStatus.TOO_MANY_REQUESTS)))
                         .uri("lb://search-service"))
 
+
+                // ANALYTICS SERVICE ROUTES
+
+                // Route for fetching analytics-service API docs (SpringDoc will aggregate)
+                .route("analytics-service-api-docs", r -> r
+                        .path("/analytics-service/v3/api-docs")
+                        .filters(f -> f.rewritePath("/analytics-service/v3/api-docs", "/v3/api-docs"))
+                        .uri("lb://analytics-service"))
+
+                // Dashboard Overview Routes (Protected - Admin and B2B only)
+                .route("analytics-dashboard", r -> r
+                        .path("/api/v1/analytics/dashboard/**")
+                        .filters(f -> f
+                                .filter(jwtAuthenticationFilter)
+                                .requestRateLimiter(c -> c
+                                        .setRateLimiter(userRateLimiter)
+                                        .setKeyResolver(userKeyResolver)
+                                        .setStatusCode(HttpStatus.TOO_MANY_REQUESTS)))
+                        .uri("lb://analytics-service"))
+
+                // Analytics Daily Summary Routes (Protected - Admin and B2B only)
+                .route("analytics-daily-summaries", r -> r
+                        .path("/api/v1/analytics/daily-summaries/**")
+                        .filters(f -> f
+                                .filter(jwtAuthenticationFilter)
+                                .requestRateLimiter(c -> c
+                                        .setRateLimiter(userRateLimiter)
+                                        .setKeyResolver(userKeyResolver)
+                                        .setStatusCode(HttpStatus.TOO_MANY_REQUESTS)))
+                        .uri("lb://analytics-service"))
+
+                // Analytics Hourly Metrics Routes (Protected - Admin and B2B only)
+                .route("analytics-hourly-metrics", r -> r
+                        .path("/api/v1/analytics/hourly-metrics/**")
+                        .filters(f -> f
+                                .filter(jwtAuthenticationFilter)
+                                .requestRateLimiter(c -> c
+                                        .setRateLimiter(userRateLimiter)
+                                        .setKeyResolver(userKeyResolver)
+                                        .setStatusCode(HttpStatus.TOO_MANY_REQUESTS)))
+                        .uri("lb://analytics-service"))
+
+                // Analytics Bike Metrics Routes (Protected - Admin and B2B only)
+                .route("analytics-bike-metrics", r -> r
+                        .path("/api/v1/analytics/bike-metrics/**")
+                        .filters(f -> f
+                                .filter(jwtAuthenticationFilter)
+                                .requestRateLimiter(c -> c
+                                        .setRateLimiter(userRateLimiter)
+                                        .setKeyResolver(userKeyResolver)
+                                        .setStatusCode(HttpStatus.TOO_MANY_REQUESTS)))
+                        .uri("lb://analytics-service"))
+
+                // Analytics Location Metrics Routes (Protected - Admin and B2B only)
+                .route("analytics-location-metrics", r -> r
+                        .path("/api/v1/analytics/location-metrics/**")
+                        .filters(f -> f
+                                .filter(jwtAuthenticationFilter)
+                                .requestRateLimiter(c -> c
+                                        .setRateLimiter(userRateLimiter)
+                                        .setKeyResolver(userKeyResolver)
+                                        .setStatusCode(HttpStatus.TOO_MANY_REQUESTS)))
+                        .uri("lb://analytics-service"))
+
                 .build();
     }
 }

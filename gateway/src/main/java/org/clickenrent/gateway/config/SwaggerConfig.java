@@ -1,16 +1,12 @@
 package org.clickenrent.gateway.config;
 
-import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.servers.Server;
 import org.springdoc.core.customizers.OpenApiCustomizer;
 import org.springdoc.core.models.GroupedOpenApi;
 import org.springdoc.core.properties.SwaggerUiConfigParameters;
-import org.springframework.cloud.gateway.route.RouteDefinition;
-import org.springframework.cloud.gateway.route.RouteDefinitionLocator;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Lazy;
-import org.springframework.web.server.ServerWebExchange;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,12 +23,17 @@ public class SwaggerConfig {
      */
     @Bean
     @Lazy(false)
-    public List<GroupedOpenApi> apis(RouteDefinitionLocator locator, SwaggerUiConfigParameters swaggerUiConfigParameters) {
+    public List<GroupedOpenApi> apis(SwaggerUiConfigParameters swaggerUiConfigParameters) {
         List<GroupedOpenApi> groups = new ArrayList<>();
-        List<RouteDefinition> definitions = locator.getRouteDefinitions().collectList().block();
         
-        // Add auth-service explicitly
+        // Add all microservices explicitly for Swagger UI aggregation
         swaggerUiConfigParameters.addGroup("auth-service");
+        swaggerUiConfigParameters.addGroup("rental-service");
+        swaggerUiConfigParameters.addGroup("support-service");
+        swaggerUiConfigParameters.addGroup("notification-service");
+        swaggerUiConfigParameters.addGroup("payment-service");
+        swaggerUiConfigParameters.addGroup("search-service");
+        swaggerUiConfigParameters.addGroup("analytics-service");
         
         return groups;
     }
