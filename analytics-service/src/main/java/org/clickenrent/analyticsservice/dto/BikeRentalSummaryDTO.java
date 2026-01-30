@@ -25,4 +25,5 @@ public class BikeRentalSummaryDTO {
     private BigDecimal totalPrice;
     private String bikeRentalStatusName;
     private Integer durationMinutes;
+    private String bikeTypeName;
 }

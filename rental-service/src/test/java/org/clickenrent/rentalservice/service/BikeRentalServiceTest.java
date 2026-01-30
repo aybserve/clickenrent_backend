@@ -122,7 +122,7 @@ class BikeRentalServiceTest {
         when(bikeRentalMapper.toDto(testBikeRental)).thenReturn(testBikeRentalDTO);
 
         // Act
-        Page<BikeRentalDTO> result = bikeRentalService.getAllBikeRentals(pageable);
+        Page<BikeRentalDTO> result = bikeRentalService.getAllBikeRentals(pageable, null, null);
 
         // Assert
         assertNotNull(result);
@@ -136,7 +136,7 @@ class BikeRentalServiceTest {
         // Arrange
         Pageable pageable = PageRequest.of(0, 20);
         // Act & Assert
-        assertThrows(UnauthorizedException.class, () -> bikeRentalService.getAllBikeRentals(pageable));
+        assertThrows(UnauthorizedException.class, () -> bikeRentalService.getAllBikeRentals(pageable, null, null));
     }
 
     @Test

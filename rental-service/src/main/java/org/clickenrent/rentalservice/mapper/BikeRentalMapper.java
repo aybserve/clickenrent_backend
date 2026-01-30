@@ -34,6 +34,8 @@ public class BikeRentalMapper {
                 .endDateTime(bikeRental.getEndDateTime())
                 .rentalUnitId(bikeRental.getRentalUnit() != null ? bikeRental.getRentalUnit().getId() : null)
                 .bikeRentalStatusId(bikeRental.getBikeRentalStatus() != null ? bikeRental.getBikeRentalStatus().getId() : null)
+                .bikeRentalStatusName(bikeRental.getBikeRentalStatus() != null ? bikeRental.getBikeRentalStatus().getName() : null)
+                .bikeTypeName(bikeRental.getBike() != null && bikeRental.getBike().getBikeType() != null ? bikeRental.getBike().getBikeType().getName() : null)
                 .isRevenueSharePaid(bikeRental.getIsRevenueSharePaid())
                 .photoUrl(bikeRental.getPhotoUrl())
                 .price(bikeRental.getPrice())

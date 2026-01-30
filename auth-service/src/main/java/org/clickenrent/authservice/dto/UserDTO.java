@@ -48,6 +48,7 @@ public class UserDTO {
     private String imageUrl;
     
     private Long languageId;
+    private String languageCode; // For analytics (external_id from Language entity)
     private Boolean isActive;
     private Boolean isDeleted;
     private Boolean isEmailVerified;

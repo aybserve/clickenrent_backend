@@ -30,10 +30,17 @@ public class BikeRentalController {
 
     @GetMapping
     @PreAuthorize("isAuthenticated()")
-    @Operation(summary = "Get all bike rentals")
+    @Operation(summary = "Get all bike rentals", 
+               description = "Get all bike rentals with optional date filtering")
     public ResponseEntity<Page<BikeRentalDTO>> getAllBikeRentals(
-            @PageableDefault(size = 20, sort = "startDateTime", direction = Sort.Direction.DESC) Pageable pageable) {
-        return ResponseEntity.ok(bikeRentalService.getAllBikeRentals(pageable));
+            @PageableDefault(size = 20, sort = "startDateTime", direction = Sort.Direction.DESC) Pageable pageable,
+            @RequestParam(required = false) 
+            @org.springframework.format.annotation.DateTimeFormat(iso = org.springframework.format.annotation.DateTimeFormat.ISO.DATE) 
+            java.time.LocalDate startDate,
+            @RequestParam(required = false) 
+            @org.springframework.format.annotation.DateTimeFormat(iso = org.springframework.format.annotation.DateTimeFormat.ISO.DATE) 
+            java.time.LocalDate endDate) {
+        return ResponseEntity.ok(bikeRentalService.getAllBikeRentals(pageable, startDate, endDate));
     }
 
     @GetMapping("/{id}")

@@ -43,8 +43,25 @@ public class BikeRentalService {
     private final NotificationClient notificationClient;
 
     @Transactional(readOnly = true)
-    public Page<BikeRentalDTO> getAllBikeRentals(Pageable pageable) {
+    public Page<BikeRentalDTO> getAllBikeRentals(Pageable pageable, java.time.LocalDate startDate, java.time.LocalDate endDate) {
         if (securityService.isAdmin()) {
+            // If date filters are provided, apply them
+            if (startDate != null || endDate != null) {
+                LocalDateTime startDateTime = startDate != null ? startDate.atStartOfDay() : null;
+                LocalDateTime endDateTime = endDate != null ? endDate.atTime(23, 59, 59) : null;
+                
+                if (startDateTime != null && endDateTime != null) {
+                    return bikeRentalRepository.findByStartDateTimeBetween(startDateTime, endDateTime, pageable)
+                            .map(bikeRentalMapper::toDto);
+                } else if (startDateTime != null) {
+                    return bikeRentalRepository.findByStartDateTimeAfter(startDateTime, pageable)
+                            .map(bikeRentalMapper::toDto);
+                } else {
+                    return bikeRentalRepository.findByStartDateTimeBefore(endDateTime, pageable)
+                            .map(bikeRentalMapper::toDto);
+                }
+            }
+            
             return bikeRentalRepository.findAll(pageable)
                     .map(bikeRentalMapper::toDto);
         }

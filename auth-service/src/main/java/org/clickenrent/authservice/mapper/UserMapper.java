@@ -26,6 +26,7 @@ public class UserMapper {
                 .phone(user.getPhone())
                 .imageUrl(user.getImageUrl())
                 .languageId(user.getLanguage() != null ? user.getLanguage().getId() : null)
+                .languageCode(user.getLanguage() != null ? user.getLanguage().getExternalId() : null)
                 .isActive(user.getIsActive())
                 .isDeleted(user.getIsDeleted())
                 .isEmailVerified(user.getIsEmailVerified())

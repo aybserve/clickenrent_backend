@@ -30,6 +30,10 @@ public class BikeRentalDTO {
     private String photoUrl;
     private BigDecimal price;
     private BigDecimal totalPrice;
+    
+    // Additional fields for analytics
+    private String bikeRentalStatusName;
+    private String bikeTypeName;
 
     // Audit fields
     private LocalDateTime dateCreated;

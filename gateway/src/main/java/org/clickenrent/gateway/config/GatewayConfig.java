@@ -1350,6 +1350,28 @@ public class GatewayConfig {
                                         .setStatusCode(HttpStatus.TOO_MANY_REQUESTS)))
                         .uri("lb://analytics-service"))
 
+                // Bike Rental Analytics Routes (Protected - Admin and B2B only)
+                .route("analytics-bike-rentals", r -> r
+                        .path("/api/v1/analytics/bike-rentals")
+                        .filters(f -> f
+                                .filter(jwtAuthenticationFilter)
+                                .requestRateLimiter(c -> c
+                                        .setRateLimiter(userRateLimiter)
+                                        .setKeyResolver(userKeyResolver)
+                                        .setStatusCode(HttpStatus.TOO_MANY_REQUESTS)))
+                        .uri("lb://analytics-service"))
+
+                // User Analytics Routes (Protected - Admin and B2B only)
+                .route("analytics-users", r -> r
+                        .path("/api/v1/analytics/users")
+                        .filters(f -> f
+                                .filter(jwtAuthenticationFilter)
+                                .requestRateLimiter(c -> c
+                                        .setRateLimiter(userRateLimiter)
+                                        .setKeyResolver(userKeyResolver)
+                                        .setStatusCode(HttpStatus.TOO_MANY_REQUESTS)))
+                        .uri("lb://analytics-service"))
+
                 .build();
     }
 }
