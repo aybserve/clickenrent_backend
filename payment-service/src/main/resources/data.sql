@@ -324,6 +324,71 @@ SELECT setval('b2b_revenue_share_payouts_id_seq', (SELECT COALESCE(MAX(id), 1) F
 SELECT setval('b2b_revenue_share_payout_items_id_seq', (SELECT COALESCE(MAX(id), 1) FROM b2b_revenue_share_payout_items));
 SELECT setval('payout_fin_transactions_id_seq', (SELECT COALESCE(MAX(id), 1) FROM payout_fin_transactions));
 SELECT setval('location_bank_accounts_id_seq', (SELECT COALESCE(MAX(id), 1) FROM location_bank_accounts));
+SELECT setval('refund_statuses_id_seq', (SELECT COALESCE(MAX(id), 1) FROM refund_statuses));
+SELECT setval('refund_reasons_id_seq', (SELECT COALESCE(MAX(id), 1) FROM refund_reasons));
+SELECT setval('refunds_id_seq', (SELECT COALESCE(MAX(id), 1) FROM refunds));
+
+-- =====================================================================================================================
+-- SECTION 5: REFUND SYSTEM
+-- =====================================================================================================================
+-- Description: Dedicated refund tracking system for better analytics and audit trails
+-- Added: 2026-02-01
+-- =====================================================================================================================
+
+-- ---------------------------------------------------------------------------------------------------------------------
+-- 5.1 REFUND STATUS
+-- ---------------------------------------------------------------------------------------------------------------------
+INSERT INTO refund_statuses (id, external_id, code, name, date_created, last_date_modified, created_by, last_modified_by, is_deleted) VALUES
+(1, '650e8400-e29b-41d4-a716-446655440001', 'PENDING', 'Pending', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(2, '650e8400-e29b-41d4-a716-446655440002', 'PROCESSING', 'Processing', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(3, '650e8400-e29b-41d4-a716-446655440003', 'SUCCEEDED', 'Succeeded', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(4, '650e8400-e29b-41d4-a716-446655440004', 'FAILED', 'Failed', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(5, '650e8400-e29b-41d4-a716-446655440005', 'CANCELED', 'Canceled', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false)
+ON CONFLICT (code) DO NOTHING;
+
+-- ---------------------------------------------------------------------------------------------------------------------
+-- 5.2 REFUND REASON
+-- ---------------------------------------------------------------------------------------------------------------------
+INSERT INTO refund_reasons (id, external_id, code, name, date_created, last_date_modified, created_by, last_modified_by, is_deleted) VALUES
+(1, '650e8400-e29b-41d4-a716-446655440011', 'CUSTOMER_REQUEST', 'Customer Request', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(2, '650e8400-e29b-41d4-a716-446655440012', 'DUPLICATE_CHARGE', 'Duplicate Charge', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(3, '650e8400-e29b-41d4-a716-446655440013', 'FRAUDULENT', 'Fraudulent Transaction', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(4, '650e8400-e29b-41d4-a716-446655440014', 'PRODUCT_NOT_AVAILABLE', 'Product/Service Not Available', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(5, '650e8400-e29b-41d4-a716-446655440015', 'SERVICE_UNSATISFACTORY', 'Service Unsatisfactory', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(6, '650e8400-e29b-41d4-a716-446655440016', 'OTHER', 'Other', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false)
+ON CONFLICT (code) DO NOTHING;
+
+-- ---------------------------------------------------------------------------------------------------------------------
+-- 5.3 ROW LEVEL SECURITY FOR REFUNDS
+-- ---------------------------------------------------------------------------------------------------------------------
+-- Enable RLS on refunds table
+ALTER TABLE refunds ENABLE ROW LEVEL SECURITY;
+ALTER TABLE refunds FORCE ROW LEVEL SECURITY;
+
+-- Drop existing policy if it exists
+DROP POLICY IF EXISTS refunds_tenant_isolation ON refunds;
+
+-- Create RLS policy for refunds
+CREATE POLICY refunds_tenant_isolation ON refunds
+    FOR ALL
+    USING (
+        -- Allow if user is superadmin
+        COALESCE(current_setting('app.is_superadmin', true)::boolean, false) = true
+        OR
+        -- Allow if refund belongs to one of user's companies
+        company_external_id = ANY(
+            string_to_array(
+                COALESCE(current_setting('app.company_external_ids', true), ''),
+                ','
+            )
+        )
+        OR
+        -- Allow if company_external_id is NULL (for backward compatibility)
+        company_external_id IS NULL
+    );
+
+-- Performance index for RLS
+CREATE INDEX IF NOT EXISTS idx_refunds_company_rls ON refunds(company_external_id) WHERE is_deleted = false;
 
 -- =====================================================================================================================
 -- END OF INITIALIZATION
@@ -332,6 +397,7 @@ SELECT setval('location_bank_accounts_id_seq', (SELECT COALESCE(MAX(id), 1) FROM
 -- 
 -- Summary:
 -- - Required lookup tables: payment_statuses (6), payment_methods (8), currencies (5), service_providers (4)
+-- - Required lookup tables: refund_statuses (5), refund_reasons (6)
 -- - Sample data: user_payment_profiles (6: 3 Stripe + 3 MultiSafePay)
 -- - Sample data: user_payment_methods (6: 3 Stripe + 3 MultiSafePay)
 -- - Sample data: financial_transactions (8: 4 Stripe + 4 MultiSafePay)
