@@ -26,4 +26,10 @@ public class BikeRentalSummaryDTO {
     private String bikeRentalStatusName;
     private Integer durationMinutes;
     private String bikeTypeName;
+    
+    // Additional fields for revenue analytics
+    private BigDecimal revenueSharePercent;
+    private Long locationId;
+    private String locationName;
+    private String rentalExternalId;
 }

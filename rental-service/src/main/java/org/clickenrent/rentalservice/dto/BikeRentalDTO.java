@@ -34,6 +34,9 @@ public class BikeRentalDTO {
     // Additional fields for analytics
     private String bikeRentalStatusName;
     private String bikeTypeName;
+    private String locationName;
+    private BigDecimal revenueSharePercent;
+    private String rentalExternalId;
 
     // Audit fields
     private LocalDateTime dateCreated;
