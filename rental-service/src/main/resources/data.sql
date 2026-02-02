@@ -28,6 +28,18 @@
 CREATE EXTENSION IF NOT EXISTS postgis;
 
 -- =====================================================================================================================
+-- SECTION 0.5: SCHEMA MIGRATIONS (AUTO-APPLIED ON STARTUP)
+-- =====================================================================================================================
+-- Note: This section handles schema changes that need to be applied to existing databases.
+-- Uses IF NOT EXISTS for safe idempotent operations that can run on every startup.
+-- These run AFTER Hibernate creates/updates tables but BEFORE data inserts.
+-- =====================================================================================================================
+
+-- Migration: Add is_active column to location table (Added: 2026-01-26)
+-- Purpose: Enable/disable locations without deleting them
+ALTER TABLE location ADD COLUMN IF NOT EXISTS is_active BOOLEAN DEFAULT true;
+
+-- =====================================================================================================================
 -- SECTION 1: STATUS & LOOKUP TABLES (REQUIRED)
 -- =====================================================================================================================
 
@@ -279,10 +291,10 @@ ON CONFLICT (id) DO NOTHING;
 -- ---------------------------------------------------------------------------------------------------------------------
 -- 3.2 LOCATIONS (HAS audit fields)
 -- ---------------------------------------------------------------------------------------------------------------------
-INSERT INTO location (id, external_id, erp_partner_id, name, address, description, company_external_id, is_public, directions, coordinates_id, date_created, last_date_modified, created_by, last_modified_by, is_deleted) VALUES
-(1, '550e8400-e29b-41d4-a716-446655440101', 'ERP-PARTNER-001', 'Downtown Bike Hub', '123 Main Street, Kyiv', 'Central bike rental location', 'company-ext-001', true, 'Near metro station', 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
-(2, '550e8400-e29b-41d4-a716-446655440102', 'ERP-PARTNER-002', 'Park Side Station', '456 Park Avenue, Kyiv', 'Bike rental near park', 'company-ext-001', true, 'Next to park entrance', 2, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
-(3, '550e8400-e29b-41d4-a716-446655440103', 'ERP-PARTNER-003', 'City Center Rentals', '789 Central Square, Lviv', 'Main rental location', 'company-ext-002', true, 'Central square', 3, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false)
+INSERT INTO location (id, external_id, erp_partner_id, name, address, description, company_external_id, is_public, is_active, directions, coordinates_id, date_created, last_date_modified, created_by, last_modified_by, is_deleted) VALUES
+(1, '550e8400-e29b-41d4-a716-446655440101', 'ERP-PARTNER-001', 'Downtown Bike Hub', '123 Main Street, Kyiv', 'Central bike rental location', 'company-ext-001', true, true, 'Near metro station', 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(2, '550e8400-e29b-41d4-a716-446655440102', 'ERP-PARTNER-002', 'Park Side Station', '456 Park Avenue, Kyiv', 'Bike rental near park', 'company-ext-001', true, true, 'Next to park entrance', 2, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(3, '550e8400-e29b-41d4-a716-446655440103', 'ERP-PARTNER-003', 'City Center Rentals', '789 Central Square, Lviv', 'Main rental location', 'company-ext-002', true, true, 'Central square', 3, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false)
 ON CONFLICT (id) DO NOTHING;
 
 -- ---------------------------------------------------------------------------------------------------------------------

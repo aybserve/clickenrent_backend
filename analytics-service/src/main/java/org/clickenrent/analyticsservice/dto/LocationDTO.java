@@ -1,5 +1,6 @@
-package org.clickenrent.contracts.rental;
+package org.clickenrent.analyticsservice.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -8,18 +9,14 @@ import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
 
 /**
- * Shared contract DTO for Location entity.
- * Used for cross-service communication.
- * 
- * Source: rental-service
- * Consumers: support-service
- * 
- * @version 1.0.0
+ * Data Transfer Object for Location from rental-service.
+ * Contains location information for analytics purposes.
  */
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class LocationDTO {
 
     private Long id;
@@ -40,9 +37,3 @@ public class LocationDTO {
     private String createdBy;
     private String lastModifiedBy;
 }
-
-
-
-
-
-

@@ -1372,6 +1372,50 @@ public class GatewayConfig {
                                         .setStatusCode(HttpStatus.TOO_MANY_REQUESTS)))
                         .uri("lb://analytics-service"))
 
+                // Revenue Analytics Routes (Protected - Admin and B2B only)
+                .route("analytics-revenue", r -> r
+                        .path("/api/v1/analytics/revenue")
+                        .filters(f -> f
+                                .filter(jwtAuthenticationFilter)
+                                .requestRateLimiter(c -> c
+                                        .setRateLimiter(userRateLimiter)
+                                        .setKeyResolver(userKeyResolver)
+                                        .setStatusCode(HttpStatus.TOO_MANY_REQUESTS)))
+                        .uri("lb://analytics-service"))
+
+                // Fleet Analytics Routes (Protected - Admin and B2B only)
+                .route("analytics-fleet", r -> r
+                        .path("/api/v1/analytics/fleet")
+                        .filters(f -> f
+                                .filter(jwtAuthenticationFilter)
+                                .requestRateLimiter(c -> c
+                                        .setRateLimiter(userRateLimiter)
+                                        .setKeyResolver(userKeyResolver)
+                                        .setStatusCode(HttpStatus.TOO_MANY_REQUESTS)))
+                        .uri("lb://analytics-service"))
+
+                // Location Analytics Routes (Protected - Admin and B2B only)
+                .route("analytics-locations", r -> r
+                        .path("/api/v1/analytics/locations")
+                        .filters(f -> f
+                                .filter(jwtAuthenticationFilter)
+                                .requestRateLimiter(c -> c
+                                        .setRateLimiter(userRateLimiter)
+                                        .setKeyResolver(userKeyResolver)
+                                        .setStatusCode(HttpStatus.TOO_MANY_REQUESTS)))
+                        .uri("lb://analytics-service"))
+
+                // Support Analytics Routes (Protected - Admin and B2B only)
+                .route("analytics-support", r -> r
+                        .path("/api/v1/analytics/support")
+                        .filters(f -> f
+                                .filter(jwtAuthenticationFilter)
+                                .requestRateLimiter(c -> c
+                                        .setRateLimiter(userRateLimiter)
+                                        .setKeyResolver(userKeyResolver)
+                                        .setStatusCode(HttpStatus.TOO_MANY_REQUESTS)))
+                        .uri("lb://analytics-service"))
+
                 .build();
     }
 }

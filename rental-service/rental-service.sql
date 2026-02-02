@@ -271,6 +271,7 @@ CREATE TABLE location (
     description             VARCHAR(1000),
     company_id              BIGINT NOT NULL,
     is_public               BOOLEAN NOT NULL DEFAULT true,
+    is_active               BOOLEAN NOT NULL DEFAULT true,
     directions              VARCHAR(1000),
     coordinates_id          BIGINT,
     

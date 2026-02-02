@@ -24,6 +24,7 @@ public class LocationDTO {
     private String description;
     private String companyExternalId;
     private Boolean isPublic;
+    private Boolean isActive;
     private String directions;
     private Long coordinatesId;
 

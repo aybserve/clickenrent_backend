@@ -2,6 +2,7 @@ package org.clickenrent.analyticsservice.client;
 
 import org.clickenrent.analyticsservice.dto.BikePageDTO;
 import org.clickenrent.analyticsservice.dto.BikeRentalPageDTO;
+import org.clickenrent.analyticsservice.dto.LocationPageDTO;
 import org.clickenrent.analyticsservice.dto.RideSummaryDTO;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -14,7 +15,7 @@ import java.util.List;
 
 /**
  * Feign client for communicating with rental-service.
- * Used to fetch real-time bike rental and fleet data for analytics.
+ * Used to fetch real-time bike rental, fleet, and location data for analytics.
  */
 @FeignClient(
     name = "rental-service",
@@ -61,6 +62,20 @@ public interface RentalServiceClient {
      */
     @GetMapping("/bikes")
     BikePageDTO getBikes(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "1000") int size
+    );
+
+    /**
+     * Get locations with pagination.
+     * The rental-service will automatically filter by the user's company via security context.
+     *
+     * @param page Page number (0-indexed)
+     * @param size Page size
+     * @return Page of locations
+     */
+    @GetMapping("/location")
+    LocationPageDTO getLocations(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "1000") int size
     );

@@ -29,6 +29,7 @@ public class LocationMapper {
                 .description(location.getDescription())
                 .companyExternalId(location.getCompanyExternalId())
                 .isPublic(location.getIsPublic())
+                .isActive(location.getIsActive())
                 .directions(location.getDirections())
                 .coordinatesId(location.getCoordinates() != null ? location.getCoordinates().getId() : null)
                 .dateCreated(location.getDateCreated())
@@ -52,6 +53,7 @@ public class LocationMapper {
                 .description(dto.getDescription())
                 .companyExternalId(dto.getCompanyExternalId())
                 .isPublic(dto.getIsPublic())
+                .isActive(dto.getIsActive())
                 .directions(dto.getDirections());
 
         if (dto.getCoordinatesId() != null) {
@@ -77,6 +79,9 @@ public class LocationMapper {
         }
         if (dto.getIsPublic() != null) {
             location.setIsPublic(dto.getIsPublic());
+        }
+        if (dto.getIsActive() != null) {
+            location.setIsActive(dto.getIsActive());
         }
         if (dto.getDirections() != null) {
             location.setDirections(dto.getDirections());

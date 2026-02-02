@@ -71,6 +71,10 @@ public class Location extends BaseAuditEntity implements TenantScoped {
     @Column(name = "is_public", nullable = false)
     private Boolean isPublic = true;
 
+    @Builder.Default
+    @Column(name = "is_active", nullable = false)
+    private Boolean isActive = true;
+
     @Size(max = 1000, message = "Directions must not exceed 1000 characters")
     @Column(name = "directions", length = 1000)
     private String directions;
