@@ -1416,6 +1416,17 @@ public class GatewayConfig {
                                         .setStatusCode(HttpStatus.TOO_MANY_REQUESTS)))
                         .uri("lb://analytics-service"))
 
+                // Real-time Analytics Routes (Protected - Admin and B2B only)
+                .route("analytics-realtime", r -> r
+                        .path("/api/v1/analytics/realtime")
+                        .filters(f -> f
+                                .filter(jwtAuthenticationFilter)
+                                .requestRateLimiter(c -> c
+                                        .setRateLimiter(userRateLimiter)
+                                        .setKeyResolver(userKeyResolver)
+                                        .setStatusCode(HttpStatus.TOO_MANY_REQUESTS)))
+                        .uri("lb://analytics-service"))
+
                 .build();
     }
 }
