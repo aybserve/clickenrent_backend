@@ -39,6 +39,7 @@ public class UserService {
     private final SecurityService securityService;
     private final UserCompanyRepository userCompanyRepository;
     private final SearchServiceClient searchServiceClient;
+    private final UserPreferenceService userPreferenceService;
     
     @Transactional(readOnly = true)
     public Page<UserDTO> getAllUsers(Pageable pageable) {
@@ -141,6 +142,10 @@ public class UserService {
         }
         
         user = userRepository.save(user);
+        
+        // Create default preferences for the new user
+        userPreferenceService.createDefaultPreferences(user);
+        log.info("Created default preferences for new user: {}", user.getUserName());
         
         // Notify search-service for indexing
         notifySearchService("user", user.getExternalId(), "CREATE");

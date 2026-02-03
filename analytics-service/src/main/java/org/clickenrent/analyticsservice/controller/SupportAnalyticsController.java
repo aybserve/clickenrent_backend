@@ -42,8 +42,8 @@ public class SupportAnalyticsController {
     @GetMapping
     @PreAuthorize("isAuthenticated()")
     @Operation(
-            summary = "Get support ticket analytics",
-            description = "Returns support ticket analytics including summary statistics " +
+            summary = "Get support requests analytics",
+            description = "Returns support requests analytics including summary statistics " +
                     "(total support requests, open, in progress, resolved) for the specified date range. " +
                     "Filters support requests by dateCreated field. " +
                     "Admin users can see all companies, B2B users see their companies. " +

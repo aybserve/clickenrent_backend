@@ -55,6 +55,7 @@ public class AuthService {
     private final UserMapper userMapper;
     private final TokenBlacklistService tokenBlacklistService;
     private final EmailVerificationService emailVerificationService;
+    private final UserPreferenceService userPreferenceService;
     
     /**
      * Build JWT claims with user information including company associations.
@@ -131,6 +132,10 @@ public class AuthService {
                     .build();
             userGlobalRoleRepository.save(userGlobalRole);
         });
+        
+        // Create default preferences for the new user
+        userPreferenceService.createDefaultPreferences(savedUser);
+        log.info("Created default preferences for new user: {}", savedUser.getUserName());
         
         // Generate and send email verification code
         emailVerificationService.generateAndSendCode(savedUser);
@@ -216,6 +221,10 @@ public class AuthService {
             
             userGlobalRoleRepository.save(userGlobalRole);
         }
+        
+        // Create default preferences for the new admin user
+        userPreferenceService.createDefaultPreferences(user);
+        log.info("Created default preferences for new admin user: {}", user.getUserName());
         
         return userMapper.toDto(user);
     }

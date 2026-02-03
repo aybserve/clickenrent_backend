@@ -28,7 +28,7 @@ import java.time.LocalDate;
 @RestController
 @RequestMapping("/api/v1/analytics/bike-rentals")
 @RequiredArgsConstructor
-@Tag(name = "Rental Analytics", description = "Bike rental patterns and trends")
+@Tag(name = "Bike Rental Analytics", description = "Bike rental patterns and trends")
 @SecurityRequirement(name = "bearerAuth")
 public class BikeRentalAnalyticsController {
 
@@ -43,7 +43,7 @@ public class BikeRentalAnalyticsController {
     @PreAuthorize("isAuthenticated()")
     @Operation(
             summary = "Get bike rental analytics",
-            description = "Returns rental patterns and trends including summary statistics, " +
+            description = "Returns bike rental patterns and trends including summary statistics, " +
                     "duration metrics (min, max, average), peak hours (top 3), peak days (top 2), " +
                     "and bike type breakdown. Admin users can see all companies, B2B users see their companies. " +
                     "Customer users are not allowed to access this endpoint."
@@ -51,7 +51,7 @@ public class BikeRentalAnalyticsController {
     @ApiResponses(value = {
             @ApiResponse(
                     responseCode = "200",
-                    description = "Rental analytics retrieved successfully",
+                    description = "Bike rental analytics retrieved successfully",
                     content = @Content(schema = @Schema(implementation = BikeRentalAnalyticsDTO.class))
             ),
             @ApiResponse(

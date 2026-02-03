@@ -20,6 +20,7 @@ DROP TABLE IF EXISTS invitation CASCADE;
 DROP TABLE IF EXISTS user_address CASCADE;
 DROP TABLE IF EXISTS user_company CASCADE;
 DROP TABLE IF EXISTS user_global_role CASCADE;
+DROP TABLE IF EXISTS user_preferences CASCADE;
 DROP TABLE IF EXISTS address CASCADE;
 DROP TABLE IF EXISTS company CASCADE;
 DROP TABLE IF EXISTS users CASCADE;
@@ -134,6 +135,58 @@ CREATE TABLE users (
         REFERENCES language(id) ON DELETE SET NULL,
     CONSTRAINT chk_users_username_not_empty CHECK (user_name <> ''),
     CONSTRAINT chk_users_email_not_empty CHECK (email <> '')
+);
+
+-- ---------------------------------------------------------------------------------------------------------------------
+-- Table: user_preferences
+-- Description: User preferences for personalized UI/UX settings
+-- Audit Fields: date_created, last_date_modified, created_by, last_modified_by, is_deleted
+-- Soft Delete: Supports soft deletion via is_deleted flag
+-- ---------------------------------------------------------------------------------------------------------------------
+CREATE TABLE user_preferences (
+    id                          BIGSERIAL PRIMARY KEY,
+    user_id                     BIGINT NOT NULL UNIQUE,
+    
+    -- Navigation (JSONB for role-specific menu ordering)
+    navigation_order            JSONB DEFAULT '{}',
+    
+    -- Appearance
+    theme                       VARCHAR(20) DEFAULT 'SYSTEM',
+    
+    -- Localization
+    language_id                 BIGINT,
+    timezone                    VARCHAR(100) DEFAULT 'UTC',
+    date_format                 VARCHAR(50) DEFAULT 'YYYY-MM-DD',
+    time_format                 VARCHAR(20) DEFAULT 'TWENTY_FOUR_HOUR',
+    currency                    VARCHAR(10) DEFAULT 'USD',
+    
+    -- Notifications
+    email_notifications         BOOLEAN DEFAULT true,
+    push_notifications          BOOLEAN DEFAULT true,
+    sms_notifications           BOOLEAN DEFAULT false,
+    notification_frequency      VARCHAR(20) DEFAULT 'IMMEDIATE',
+    
+    -- Display Preferences
+    items_per_page              INTEGER DEFAULT 20,
+    dashboard_layout            JSONB DEFAULT '{}',
+    table_preferences           JSONB DEFAULT '{}',
+    default_filters             JSONB DEFAULT '{}',
+    
+    -- Audit fields
+    date_created                TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    last_date_modified          TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    created_by                  VARCHAR(255),
+    last_modified_by            VARCHAR(255),
+    is_deleted                  BOOLEAN NOT NULL DEFAULT false,
+    
+    CONSTRAINT fk_user_preferences_user FOREIGN KEY (user_id) 
+        REFERENCES users(id) ON DELETE CASCADE,
+    CONSTRAINT fk_user_preferences_language FOREIGN KEY (language_id)
+        REFERENCES language(id) ON DELETE SET NULL,
+    CONSTRAINT chk_user_preferences_theme CHECK (theme IN ('SYSTEM', 'LIGHT', 'DARK')),
+    CONSTRAINT chk_user_preferences_time_format CHECK (time_format IN ('TWELVE_HOUR', 'TWENTY_FOUR_HOUR')),
+    CONSTRAINT chk_user_preferences_notification_frequency CHECK (notification_frequency IN ('IMMEDIATE', 'DAILY', 'WEEKLY')),
+    CONSTRAINT chk_user_preferences_items_per_page CHECK (items_per_page BETWEEN 10 AND 100)
 );
 
 -- ---------------------------------------------------------------------------------------------------------------------
@@ -385,6 +438,9 @@ CREATE INDEX idx_user_external_id ON users(external_id);
 CREATE INDEX idx_user_email ON users(email);
 CREATE INDEX idx_user_username ON users(user_name);
 CREATE INDEX idx_user_provider ON users(provider_id, provider_user_id);
+
+-- User preferences table indexes
+CREATE INDEX idx_user_preferences_user_id ON user_preferences(user_id);
 
 -- Company table indexes
 CREATE INDEX idx_company_external_id ON company(external_id);
@@ -641,6 +697,36 @@ INSERT INTO invitation (id, email, token, invited_by_user_id, company_id, status
 (5, 'cancelled@example.com', 'inv-token-cancelled-001', 5, 2, 'CANCELLED', NOW() + INTERVAL '7 days', NULL, NOW() - INTERVAL '3 days', NOW(), 'hotelowner_anna', 'hotelowner_anna', false)
 ON CONFLICT (id) DO NOTHING;
 
+-- ---------------------------------------------------------------------------------------------------------------------
+-- 5.9 USER PREFERENCES
+-- ---------------------------------------------------------------------------------------------------------------------
+
+INSERT INTO user_preferences (id, user_id, navigation_order, theme, language_id, timezone, date_format, time_format, currency, email_notifications, push_notifications, sms_notifications, notification_frequency, items_per_page, dashboard_layout, table_preferences, default_filters, date_created, last_date_modified, created_by, last_modified_by, is_deleted) VALUES
+-- SUPERADMIN preferences (language: English)
+(1, 1, '{"superadmin": ["dashboard", "companies", "locations", "bikes", "users", "bikeRentals", "analytics", "push-notifications", "legal-documents"]}'::jsonb, 'SYSTEM', 1, 'UTC', 'YYYY-MM-DD', 'TWENTY_FOUR_HOUR', 'USD', true, true, false, 'IMMEDIATE', 20, '{}'::jsonb, '{}'::jsonb, '{}'::jsonb, NOW(), NOW(), 'system', 'system', false),
+
+-- ADMIN preferences (languages: English, German)
+(2, 2, '{"admin": ["dashboard", "users", "locations", "bikes", "bikeRentals", "analytics"]}'::jsonb, 'LIGHT', 1, 'Europe/Berlin', 'DD/MM/YYYY', 'TWENTY_FOUR_HOUR', 'EUR', true, true, false, 'IMMEDIATE', 20, '{}'::jsonb, '{}'::jsonb, '{}'::jsonb, NOW(), NOW(), 'system', 'system', false),
+(3, 3, '{"admin": ["dashboard", "users", "bikeRentals", "analytics", "locations", "bikes"]}'::jsonb, 'DARK', 2, 'Europe/Zurich', 'DD.MM.YYYY', 'TWENTY_FOUR_HOUR', 'CHF', true, true, false, 'DAILY', 25, '{}'::jsonb, '{}'::jsonb, '{}'::jsonb, NOW(), NOW(), 'system', 'system', false),
+
+-- B2B preferences (languages: German, French)
+(4, 4, '{"b2b": ["dashboard", "bikes", "bikeRentals", "analytics"]}'::jsonb, 'LIGHT', 2, 'Europe/Berlin', 'DD.MM.YYYY', 'TWENTY_FOUR_HOUR', 'EUR', true, true, true, 'IMMEDIATE', 20, '{}'::jsonb, '{}'::jsonb, '{}'::jsonb, NOW(), NOW(), 'system', 'system', false),
+(5, 5, '{"b2b": ["bikes", "bikeRentals", "analytics", "dashboard"]}'::jsonb, 'SYSTEM', 2, 'Europe/Vienna', 'DD.MM.YYYY', 'TWENTY_FOUR_HOUR', 'EUR', true, true, false, 'IMMEDIATE', 20, '{}'::jsonb, '{}'::jsonb, '{}'::jsonb, NOW(), NOW(), 'system', 'system', false),
+(6, 6, '{"b2b": ["dashboard", "bikes", "bikeRentals", "analytics"]}'::jsonb, 'LIGHT', 3, 'Europe/Paris', 'DD/MM/YYYY', 'TWENTY_FOUR_HOUR', 'EUR', true, false, false, 'DAILY', 30, '{}'::jsonb, '{}'::jsonb, '{}'::jsonb, NOW(), NOW(), 'system', 'system', false),
+
+-- CUSTOMER preferences (languages: English, German, Italian, French)
+(7, 7, '{"customer": ["rentals", "bikes", "profile", "payment-methods"]}'::jsonb, 'DARK', 1, 'America/New_York', 'MM/DD/YYYY', 'TWELVE_HOUR', 'USD', true, true, false, 'IMMEDIATE', 20, '{}'::jsonb, '{}'::jsonb, '{}'::jsonb, NOW(), NOW(), 'system', 'system', false),
+(8, 8, '{"customer": ["rentals", "bikes", "profile", "payment-methods"]}'::jsonb, 'LIGHT', 2, 'Europe/Berlin', 'DD.MM.YYYY', 'TWENTY_FOUR_HOUR', 'EUR', true, true, false, 'IMMEDIATE', 20, '{}'::jsonb, '{}'::jsonb, '{}'::jsonb, NOW(), NOW(), 'system', 'system', false),
+(9, 9, '{"customer": ["bikes", "rentals", "profile", "payment-methods"]}'::jsonb, 'SYSTEM', 5, 'Europe/Rome', 'DD/MM/YYYY', 'TWENTY_FOUR_HOUR', 'EUR', true, true, false, 'DAILY', 20, '{}'::jsonb, '{}'::jsonb, '{}'::jsonb, NOW(), NOW(), 'system', 'system', false),
+(10, 10, '{"customer": ["rentals", "bikes", "profile", "payment-methods"]}'::jsonb, 'LIGHT', 3, 'Europe/Paris', 'DD/MM/YYYY', 'TWENTY_FOUR_HOUR', 'EUR', true, false, false, 'IMMEDIATE', 20, '{}'::jsonb, '{}'::jsonb, '{}'::jsonb, NOW(), NOW(), 'system', 'system', false),
+(11, 11, '{"customer": ["rentals", "bikes", "profile", "payment-methods"]}'::jsonb, 'SYSTEM', 2, 'Europe/Berlin', 'DD.MM.YYYY', 'TWENTY_FOUR_HOUR', 'EUR', true, true, false, 'IMMEDIATE', 20, '{}'::jsonb, '{}'::jsonb, '{}'::jsonb, NOW(), NOW(), 'system', 'system', false),
+(12, 12, '{"customer": ["rentals", "bikes", "profile", "payment-methods"]}'::jsonb, 'DARK', 1, 'Europe/Zurich', 'DD.MM.YYYY', 'TWENTY_FOUR_HOUR', 'CHF', true, true, false, 'IMMEDIATE', 25, '{}'::jsonb, '{}'::jsonb, '{}'::jsonb, NOW(), NOW(), 'system', 'system', false),
+(13, 13, '{"customer": ["rentals", "bikes", "profile", "payment-methods"]}'::jsonb, 'LIGHT', 1, 'America/Los_Angeles', 'MM/DD/YYYY', 'TWELVE_HOUR', 'USD', false, false, false, 'WEEKLY', 20, '{}'::jsonb, '{}'::jsonb, '{}'::jsonb, NOW(), NOW(), 'system', 'system', false),
+
+-- SYSTEM Service Account preferences (language: English)
+(14, 14, '{"system": ["status", "health", "metrics"]}'::jsonb, 'SYSTEM', 1, 'UTC', 'YYYY-MM-DD', 'TWENTY_FOUR_HOUR', 'USD', false, false, false, 'IMMEDIATE', 20, '{}'::jsonb, '{}'::jsonb, '{}'::jsonb, NOW(), NOW(), 'system', 'system', false)
+ON CONFLICT (id) DO NOTHING;
+
 -- =====================================================================================================================
 -- SECTION 6: ROW LEVEL SECURITY
 -- =====================================================================================================================
@@ -695,6 +781,7 @@ SELECT setval('company_type_id_seq', (SELECT COALESCE(MAX(id), 1) FROM company_t
 SELECT setval('company_role_id_seq', (SELECT COALESCE(MAX(id), 1) FROM company_role));
 SELECT setval('country_id_seq', (SELECT COALESCE(MAX(id), 1) FROM country));
 SELECT setval('users_id_seq', (SELECT COALESCE(MAX(id), 1) FROM users));
+SELECT setval('user_preferences_id_seq', (SELECT COALESCE(MAX(id), 1) FROM user_preferences));
 SELECT setval('user_global_role_id_seq', (SELECT COALESCE(MAX(id), 1) FROM user_global_role));
 SELECT setval('company_id_seq', (SELECT COALESCE(MAX(id), 1) FROM company));
 SELECT setval('user_company_id_seq', (SELECT COALESCE(MAX(id), 1) FROM user_company));
@@ -739,10 +826,11 @@ CREATE INDEX IF NOT EXISTS idx_audit_logs_success ON audit_logs(success);
 -- END OF SCHEMA
 -- =====================================================================================================================
 -- Schema created successfully!
--- Total tables: 15
+-- Total tables: 16
 -- Test users: 14 (password: Test123!)
 -- Test companies: 6
 -- Security tables: email_verification, password_reset_token (for auth flows)
+-- Preferences: user_preferences (personalized UI/UX settings)
 -- =====================================================================================================================
 
 
