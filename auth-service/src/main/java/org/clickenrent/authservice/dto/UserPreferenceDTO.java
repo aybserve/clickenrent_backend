@@ -66,7 +66,11 @@ public class UserPreferenceDTO {
     @Schema(description = "Preferred time format", example = "12h", allowableValues = {"12h", "24h"})
     private String timeFormat;
 
-    @Schema(description = "Preferred currency", example = "USD")
+    @Schema(
+        description = "Preferred currency code (ISO 4217) - matches payment-service Currency.code",
+        example = "USD",
+        allowableValues = {"USD", "EUR", "GBP", "UAH", "PLN"}
+    )
     private String currency;
 
     // ===========================

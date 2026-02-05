@@ -42,6 +42,7 @@ public class CorsConfig {
         // Allow origin patterns for wildcard subdomain support
         corsConfig.setAllowedOriginPatterns(Arrays.asList(
                 "https://*.clickenrent.nl",
+                "https://*.vercel.app",
                 "http://localhost:[*]",
                 "http://127.0.0.1:[*]"
         ));

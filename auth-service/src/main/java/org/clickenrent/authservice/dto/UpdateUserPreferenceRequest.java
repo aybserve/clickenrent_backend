@@ -75,12 +75,16 @@ public class UpdateUserPreferenceRequest {
     )
     private String timeFormat;
 
-    @Size(max = 10, message = "Currency must not exceed 10 characters")
+    @Size(min = 3, max = 3, message = "Currency must be exactly 3 characters")
     @Pattern(
         regexp = "^[A-Z]{3}$",
-        message = "Currency must be a valid 3-letter currency code (e.g., 'USD', 'EUR')"
+        message = "Currency must be a valid ISO 4217 currency code (e.g., 'USD', 'EUR', 'GBP'). Must match payment-service Currency.code"
     )
-    @Schema(description = "Preferred currency (optional)", example = "EUR")
+    @Schema(
+        description = "Preferred currency code (ISO 4217) - must match payment-service Currency.code (optional)",
+        example = "EUR",
+        allowableValues = {"USD", "EUR", "GBP", "UAH", "PLN"}
+    )
     private String currency;
 
     // ===========================

@@ -39,7 +39,7 @@ public interface RentalServiceClient {
     /**
      * Get location by ID
      */
-    @GetMapping("/locations/{id}")
+    @GetMapping("/location/{id}")
     LocationDTO getLocationById(@PathVariable("id") Long id);
 }
 

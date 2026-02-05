@@ -223,6 +223,10 @@ public class UserStatisticsService {
         }
     }
 
+
+
+
+
     /**
      * Calculate statistics from support-service data.
      */

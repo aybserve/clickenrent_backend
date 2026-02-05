@@ -158,7 +158,7 @@ CREATE TABLE user_preferences (
     timezone                    VARCHAR(100) DEFAULT 'UTC',
     date_format                 VARCHAR(50) DEFAULT 'YYYY-MM-DD',
     time_format                 VARCHAR(20) DEFAULT 'TWENTY_FOUR_HOUR',
-    currency                    VARCHAR(10) DEFAULT 'USD',
+    currency                    VARCHAR(3) DEFAULT 'USD',  -- ISO 4217 currency code, matches payment-service Currency.code
     
     -- Notifications
     email_notifications         BOOLEAN DEFAULT true,
@@ -707,7 +707,7 @@ INSERT INTO user_preferences (id, user_id, navigation_order, theme, language_id,
 
 -- ADMIN preferences (languages: English, German)
 (2, 2, '{"admin": ["dashboard", "users", "locations", "bikes", "bikeRentals", "analytics"]}'::jsonb, 'LIGHT', 1, 'Europe/Berlin', 'DD/MM/YYYY', 'TWENTY_FOUR_HOUR', 'EUR', true, true, false, 'IMMEDIATE', 20, '{}'::jsonb, '{}'::jsonb, '{}'::jsonb, NOW(), NOW(), 'system', 'system', false),
-(3, 3, '{"admin": ["dashboard", "users", "bikeRentals", "analytics", "locations", "bikes"]}'::jsonb, 'DARK', 2, 'Europe/Zurich', 'DD.MM.YYYY', 'TWENTY_FOUR_HOUR', 'CHF', true, true, false, 'DAILY', 25, '{}'::jsonb, '{}'::jsonb, '{}'::jsonb, NOW(), NOW(), 'system', 'system', false),
+(3, 3, '{"admin": ["dashboard", "users", "bikeRentals", "analytics", "locations", "bikes"]}'::jsonb, 'DARK', 2, 'Europe/Zurich', 'DD.MM.YYYY', 'TWENTY_FOUR_HOUR', 'EUR', true, true, false, 'DAILY', 25, '{}'::jsonb, '{}'::jsonb, '{}'::jsonb, NOW(), NOW(), 'system', 'system', false),
 
 -- B2B preferences (languages: German, French)
 (4, 4, '{"b2b": ["dashboard", "bikes", "bikeRentals", "analytics"]}'::jsonb, 'LIGHT', 2, 'Europe/Berlin', 'DD.MM.YYYY', 'TWENTY_FOUR_HOUR', 'EUR', true, true, true, 'IMMEDIATE', 20, '{}'::jsonb, '{}'::jsonb, '{}'::jsonb, NOW(), NOW(), 'system', 'system', false),
@@ -720,7 +720,7 @@ INSERT INTO user_preferences (id, user_id, navigation_order, theme, language_id,
 (9, 9, '{"customer": ["bikes", "rentals", "profile", "payment-methods"]}'::jsonb, 'SYSTEM', 5, 'Europe/Rome', 'DD/MM/YYYY', 'TWENTY_FOUR_HOUR', 'EUR', true, true, false, 'DAILY', 20, '{}'::jsonb, '{}'::jsonb, '{}'::jsonb, NOW(), NOW(), 'system', 'system', false),
 (10, 10, '{"customer": ["rentals", "bikes", "profile", "payment-methods"]}'::jsonb, 'LIGHT', 3, 'Europe/Paris', 'DD/MM/YYYY', 'TWENTY_FOUR_HOUR', 'EUR', true, false, false, 'IMMEDIATE', 20, '{}'::jsonb, '{}'::jsonb, '{}'::jsonb, NOW(), NOW(), 'system', 'system', false),
 (11, 11, '{"customer": ["rentals", "bikes", "profile", "payment-methods"]}'::jsonb, 'SYSTEM', 2, 'Europe/Berlin', 'DD.MM.YYYY', 'TWENTY_FOUR_HOUR', 'EUR', true, true, false, 'IMMEDIATE', 20, '{}'::jsonb, '{}'::jsonb, '{}'::jsonb, NOW(), NOW(), 'system', 'system', false),
-(12, 12, '{"customer": ["rentals", "bikes", "profile", "payment-methods"]}'::jsonb, 'DARK', 1, 'Europe/Zurich', 'DD.MM.YYYY', 'TWENTY_FOUR_HOUR', 'CHF', true, true, false, 'IMMEDIATE', 25, '{}'::jsonb, '{}'::jsonb, '{}'::jsonb, NOW(), NOW(), 'system', 'system', false),
+(12, 12, '{"customer": ["rentals", "bikes", "profile", "payment-methods"]}'::jsonb, 'DARK', 1, 'Europe/Zurich', 'DD.MM.YYYY', 'TWENTY_FOUR_HOUR', 'EUR', true, true, false, 'IMMEDIATE', 25, '{}'::jsonb, '{}'::jsonb, '{}'::jsonb, NOW(), NOW(), 'system', 'system', false),
 (13, 13, '{"customer": ["rentals", "bikes", "profile", "payment-methods"]}'::jsonb, 'LIGHT', 1, 'America/Los_Angeles', 'MM/DD/YYYY', 'TWELVE_HOUR', 'USD', false, false, false, 'WEEKLY', 20, '{}'::jsonb, '{}'::jsonb, '{}'::jsonb, NOW(), NOW(), 'system', 'system', false),
 
 -- SYSTEM Service Account preferences (language: English)

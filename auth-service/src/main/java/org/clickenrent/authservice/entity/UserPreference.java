@@ -89,10 +89,15 @@ public class UserPreference extends BaseAuditEntity {
     @Builder.Default
     private TimeFormat timeFormat = TimeFormat.TWENTY_FOUR_HOUR;
 
-    @Size(max = 10, message = "Currency must not exceed 10 characters")
-    @Column(name = "currency", length = 10)
+    /**
+     * Currency code (ISO 4217) referencing payment-service Currency entity.
+     * Must match Currency.code from payment-service (e.g., "USD", "EUR", "GBP", "UAH", "PLN").
+     * Default: "USD"
+     */
+    @Size(max = 3, message = "Currency code must be exactly 3 characters")
+    @Column(name = "currency", length = 3)
     @Builder.Default
-    private String currency = "USD";
+    private String currency = "EUR";
 
     // ===========================
     // Notification Preferences
