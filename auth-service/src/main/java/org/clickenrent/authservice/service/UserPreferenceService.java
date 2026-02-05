@@ -178,7 +178,7 @@ public class UserPreferenceService {
                 .timezone("UTC")
                 .dateFormat("YYYY-MM-DD")
                 .timeFormat(UserPreference.TimeFormat.TWENTY_FOUR_HOUR)
-                .currency("USD")
+                .currencyExternalId("550e8400-e29b-41d4-a716-446655440021") // USD
                 .emailNotifications(true)
                 .pushNotifications(true)
                 .smsNotifications(false)

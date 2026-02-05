@@ -71,7 +71,7 @@ public class UserPreferenceController {
                                       "timezone": "America/New_York",
                                       "dateFormat": "MM/DD/YYYY",
                                       "timeFormat": "12h",
-                                      "currency": "USD",
+                                      "currencyExternalId": "550e8400-e29b-41d4-a716-446655440021",
                                       "emailNotifications": true,
                                       "pushNotifications": true,
                                       "smsNotifications": false,

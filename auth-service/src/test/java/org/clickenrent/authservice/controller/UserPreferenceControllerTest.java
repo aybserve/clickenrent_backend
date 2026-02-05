@@ -76,7 +76,7 @@ class UserPreferenceControllerTest {
                 .timezone("UTC")
                 .dateFormat("YYYY-MM-DD")
                 .timeFormat("24h")
-                .currency("USD")
+                .currencyExternalId("550e8400-e29b-41d4-a716-446655440021")
                 .emailNotifications(true)
                 .pushNotifications(true)
                 .smsNotifications(false)
