@@ -40,8 +40,13 @@ public class UserPreference extends BaseAuditEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    /**
+     * User associated with these preferences.
+     * Note: Uniqueness is enforced by a partial unique index (WHERE is_deleted = false)
+     * to allow soft-deleted records for audit trail.
+     */
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false, unique = true)
+    @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
     // ===========================

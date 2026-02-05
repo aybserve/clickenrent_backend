@@ -1,22 +1,22 @@
 # Currency Integration with Payment Service
 
 ## Overview
-The UserPreference entity now properly references currency codes from the payment-service Currency entity, ensuring consistency across microservices.
+The UserPreference entity now properly references currencies from the payment-service Currency entity by storing the **currency external ID** (UUID), ensuring proper cross-service references.
 
 ## Changes Made
 
 ### 1. UserPreference Entity
 **File:** `src/main/java/org/clickenrent/authservice/entity/UserPreference.java`
 
-- Updated `currency` field from `VARCHAR(10)` to `VARCHAR(3)` (ISO 4217 standard)
-- Added documentation that it references `payment-service Currency.code`
-- Valid values: USD, EUR, GBP, UAH, PLN (must match payment-service currencies)
+- Added `currencyExternalId` field to reference `payment-service Currency.externalId`
+- Uses VARCHAR(100) to store UUID references
+- Default value: `"550e8400-e29b-41d4-a716-446655440021"` (USD)
 
 ```java
-@Size(max = 3, message = "Currency code must be exactly 3 characters")
-@Column(name = "currency", length = 3)
+@Size(max = 100, message = "Currency external ID must not exceed 100 characters")
+@Column(name = "currency_external_id", length = 100)
 @Builder.Default
-private String currency = "USD";
+private String currencyExternalId = "550e8400-e29b-41d4-a716-446655440021"; // USD
 ```
 
 ### 2. DTOs Updated
@@ -24,34 +24,39 @@ private String currency = "USD";
 #### UserPreferenceDTO
 **File:** `src/main/java/org/clickenrent/authservice/dto/UserPreferenceDTO.java`
 
-- Added schema documentation referencing payment-service
-- Listed allowable values from payment-service
+- Renamed `currency` to `currencyExternalId`
+- Added schema documentation referencing payment-service Currency.externalId
+- Example value shows UUID format
 
 #### UpdateUserPreferenceRequest
 **File:** `src/main/java/org/clickenrent/authservice/dto/UpdateUserPreferenceRequest.java`
 
-- Updated validation: `@Size(min = 3, max = 3)`
-- Enhanced pattern validation message to reference ISO 4217 and payment-service
-- Added allowable values to schema documentation
+- Renamed `currency` to `currencyExternalId`
+- Updated validation: `@Size(max = 100)` for UUID storage
+- Removed ISO 4217 pattern validation (now accepts UUIDs)
+- Added reference to payment-service Currency.externalId in documentation
 
 ### 3. Database Schema
 **File:** `src/main/resources/data.sql`
 
-- Updated column definition: `currency VARCHAR(3)` (line 161)
-- Added comment: `-- ISO 4217 currency code, matches payment-service Currency.code`
-- Updated all test data to use EUR instead of CHF (CHF not in payment-service)
+- Added column: `currency_external_id VARCHAR(100)`
+- Default value: `'550e8400-e29b-41d4-a716-446655440021'` (USD external ID)
+- Added comment: `-- References payment-service Currency.externalId (USD)`
+- Updated all test data to use external IDs from payment-service currencies table
 
-## Available Currency Codes
+## Available Currencies
 
 Based on payment-service `data.sql`:
 
-| ID | Code | Name              | Symbol |
-|----|------|-------------------|--------|
-| 1  | USD  | US Dollar         | $      |
-| 2  | EUR  | Euro              | €      |
-| 3  | GBP  | British Pound     | £      |
-| 4  | UAH  | Ukrainian Hryvnia | ₴      |
-| 5  | PLN  | Polish Zloty      | zł     |
+| ID | External ID                            | Code | Name              | Symbol |
+|----|----------------------------------------|------|-------------------|--------|
+| 1  | 550e8400-e29b-41d4-a716-446655440021   | USD  | US Dollar         | $      |
+| 2  | 550e8400-e29b-41d4-a716-446655440022   | EUR  | Euro              | €      |
+| 3  | 550e8400-e29b-41d4-a716-446655440023   | GBP  | British Pound     | £      |
+| 4  | 550e8400-e29b-41d4-a716-446655440024   | UAH  | Ukrainian Hryvnia | ₴      |
+| 5  | 550e8400-e29b-41d4-a716-446655440025   | PLN  | Polish Zloty      | zł     |
+
+**UserPreference stores the External ID column** to reference currencies across services.
 
 ## Adding New Currencies
 
@@ -68,16 +73,32 @@ To add a new currency:
 ## Migration Notes
 
 ### For Existing Databases:
+
+If you had the old `currency` column with codes, you need to migrate to external IDs:
+
 ```sql
--- Update column size if needed
-ALTER TABLE user_preferences ALTER COLUMN currency TYPE VARCHAR(3);
+-- Step 1: Add new column
+ALTER TABLE user_preferences 
+ADD COLUMN currency_external_id VARCHAR(100);
 
--- Validate existing data matches payment-service currencies
-SELECT DISTINCT currency FROM user_preferences 
-WHERE currency NOT IN ('USD', 'EUR', 'GBP', 'UAH', 'PLN');
+-- Step 2: Migrate data from codes to external IDs
+UPDATE user_preferences 
+SET currency_external_id = CASE 
+    WHEN currency = 'USD' THEN '550e8400-e29b-41d4-a716-446655440021'
+    WHEN currency = 'EUR' THEN '550e8400-e29b-41d4-a716-446655440022'
+    WHEN currency = 'GBP' THEN '550e8400-e29b-41d4-a716-446655440023'
+    WHEN currency = 'UAH' THEN '550e8400-e29b-41d4-a716-446655440024'
+    WHEN currency = 'PLN' THEN '550e8400-e29b-41d4-a716-446655440025'
+    ELSE '550e8400-e29b-41d4-a716-446655440021' -- Default to USD
+END;
 
--- Update any invalid currencies (example: CHF -> EUR)
-UPDATE user_preferences SET currency = 'EUR' WHERE currency = 'CHF';
+-- Step 3: Set default value
+ALTER TABLE user_preferences 
+ALTER COLUMN currency_external_id 
+SET DEFAULT '550e8400-e29b-41d4-a716-446655440021';
+
+-- Step 4: Drop old column (optional - after verifying migration)
+-- ALTER TABLE user_preferences DROP COLUMN currency;
 ```
 
 ## Testing
@@ -90,22 +111,40 @@ All existing tests pass without modification as they already use valid 3-charact
 
 ## Architecture Decision
 
-**Why String instead of Foreign Key?**
+**Why External ID (String UUID) instead of Foreign Key?**
 - Auth-service and payment-service are separate microservices with separate databases
 - Direct foreign keys would violate microservices independence
-- Using currency code (String) provides loose coupling while maintaining data consistency
-- Validation at application layer ensures referential integrity
+- Using external ID (UUID) provides:
+  - ✅ Loose coupling between services
+  - ✅ Stable references (IDs can change, external IDs don't)
+  - ✅ Standard microservices pattern for cross-service references
+  - ✅ Easy to resolve via API calls to payment-service when needed
 
 ## Validation Strategy
 
-1. **Entity level:** `@Size(max = 3)` ensures correct length
-2. **DTO level:** `@Pattern(regexp = "^[A-Z]{3}$")` ensures ISO 4217 format
-3. **API documentation:** OpenAPI schema lists allowable values
-4. **Runtime:** Currency codes should be validated against payment-service API if strict enforcement needed
+1. **Entity level:** `@Size(max = 100)` ensures external ID fits within column
+2. **DTO level:** Field accepts UUID format strings
+3. **API documentation:** OpenAPI schema shows example external IDs
+4. **Runtime:** External IDs should be validated against payment-service API
+   - Frontend can fetch available currencies: `GET /api/v1/currencies` (payment-service)
+   - Backend can validate external ID exists when setting preferences
 
 ## Future Enhancements
 
 Consider adding:
-- Currency validation service that checks against payment-service
-- Cache of valid currencies from payment-service
-- API endpoint to fetch available currencies from payment-service
+1. **Currency Validation Service**
+   - Validate `currencyExternalId` exists in payment-service before saving
+   - Call payment-service: `GET /api/v1/currencies/external/{externalId}`
+   
+2. **Caching Layer**
+   - Cache valid currency external IDs from payment-service
+   - Refresh cache periodically or on-demand
+   
+3. **Helper Endpoint**
+   - `GET /api/v1/users/preferences/currencies` - Proxy to payment-service
+   - Returns available currencies for dropdown/selection
+   
+4. **DTO Enhancement**
+   - Add `currencyCode`, `currencyName`, `currencySymbol` fields to response DTO
+   - Fetch from payment-service when building response
+   - Allows UI to display "USD" and "$" instead of UUID

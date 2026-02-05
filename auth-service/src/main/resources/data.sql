@@ -145,7 +145,7 @@ CREATE TABLE users (
 -- ---------------------------------------------------------------------------------------------------------------------
 CREATE TABLE user_preferences (
     id                          BIGSERIAL PRIMARY KEY,
-    user_id                     BIGINT NOT NULL UNIQUE,
+    user_id                     BIGINT NOT NULL,
     
     -- Navigation (JSONB for role-specific menu ordering)
     navigation_order            JSONB DEFAULT '{}',
@@ -442,6 +442,12 @@ CREATE INDEX idx_user_provider ON users(provider_id, provider_user_id);
 -- User preferences table indexes
 CREATE INDEX idx_user_preferences_user_id ON user_preferences(user_id);
 
+-- Partial unique index for user_preferences: ensures one active preference per user
+-- Allows multiple soft-deleted records for the same user (for audit trail)
+CREATE UNIQUE INDEX user_preferences_user_id_active_unique 
+ON user_preferences(user_id) 
+WHERE is_deleted = false;
+
 -- Company table indexes
 CREATE INDEX idx_company_external_id ON company(external_id);
 
@@ -702,29 +708,29 @@ ON CONFLICT (id) DO NOTHING;
 -- ---------------------------------------------------------------------------------------------------------------------
 
 INSERT INTO user_preferences (id, user_id, navigation_order, theme, language_id, timezone, date_format, time_format, currency, email_notifications, push_notifications, sms_notifications, notification_frequency, items_per_page, dashboard_layout, table_preferences, default_filters, date_created, last_date_modified, created_by, last_modified_by, is_deleted) VALUES
--- SUPERADMIN preferences (language: English)
-(1, 1, '{"superadmin": ["dashboard", "companies", "locations", "bikes", "users", "bikeRentals", "analytics", "push-notifications", "legal-documents"]}'::jsonb, 'SYSTEM', 1, 'UTC', 'YYYY-MM-DD', 'TWENTY_FOUR_HOUR', 'USD', true, true, false, 'IMMEDIATE', 20, '{}'::jsonb, '{}'::jsonb, '{}'::jsonb, NOW(), NOW(), 'system', 'system', false),
+-- SUPERADMIN preferences (language: English, currency: USD)
+(1, 1, '{"superadmin": ["dashboard", "companies", "locations", "bikes", "users", "bikeRentals", "analytics", "push-notifications", "legal-documents"]}'::jsonb, 'SYSTEM', 1, 'UTC', 'YYYY-MM-DD', 'TWENTY_FOUR_HOUR', '550e8400-e29b-41d4-a716-446655440021', true, true, false, 'IMMEDIATE', 20, '{}'::jsonb, '{}'::jsonb, '{}'::jsonb, NOW(), NOW(), 'system', 'system', false),
 
--- ADMIN preferences (languages: English, German)
-(2, 2, '{"admin": ["dashboard", "users", "locations", "bikes", "bikeRentals", "analytics"]}'::jsonb, 'LIGHT', 1, 'Europe/Berlin', 'DD/MM/YYYY', 'TWENTY_FOUR_HOUR', 'EUR', true, true, false, 'IMMEDIATE', 20, '{}'::jsonb, '{}'::jsonb, '{}'::jsonb, NOW(), NOW(), 'system', 'system', false),
-(3, 3, '{"admin": ["dashboard", "users", "bikeRentals", "analytics", "locations", "bikes"]}'::jsonb, 'DARK', 2, 'Europe/Zurich', 'DD.MM.YYYY', 'TWENTY_FOUR_HOUR', 'EUR', true, true, false, 'DAILY', 25, '{}'::jsonb, '{}'::jsonb, '{}'::jsonb, NOW(), NOW(), 'system', 'system', false),
+-- ADMIN preferences (languages: English, German, currency: EUR)
+(2, 2, '{"admin": ["dashboard", "users", "locations", "bikes", "bikeRentals", "analytics"]}'::jsonb, 'LIGHT', 1, 'Europe/Berlin', 'DD/MM/YYYY', 'TWENTY_FOUR_HOUR', '550e8400-e29b-41d4-a716-446655440022', true, true, false, 'IMMEDIATE', 20, '{}'::jsonb, '{}'::jsonb, '{}'::jsonb, NOW(), NOW(), 'system', 'system', false),
+(3, 3, '{"admin": ["dashboard", "users", "bikeRentals", "analytics", "locations", "bikes"]}'::jsonb, 'DARK', 2, 'Europe/Zurich', 'DD.MM.YYYY', 'TWENTY_FOUR_HOUR', '550e8400-e29b-41d4-a716-446655440022', true, true, false, 'DAILY', 25, '{}'::jsonb, '{}'::jsonb, '{}'::jsonb, NOW(), NOW(), 'system', 'system', false),
 
--- B2B preferences (languages: German, French)
-(4, 4, '{"b2b": ["dashboard", "bikes", "bikeRentals", "analytics"]}'::jsonb, 'LIGHT', 2, 'Europe/Berlin', 'DD.MM.YYYY', 'TWENTY_FOUR_HOUR', 'EUR', true, true, true, 'IMMEDIATE', 20, '{}'::jsonb, '{}'::jsonb, '{}'::jsonb, NOW(), NOW(), 'system', 'system', false),
-(5, 5, '{"b2b": ["bikes", "bikeRentals", "analytics", "dashboard"]}'::jsonb, 'SYSTEM', 2, 'Europe/Vienna', 'DD.MM.YYYY', 'TWENTY_FOUR_HOUR', 'EUR', true, true, false, 'IMMEDIATE', 20, '{}'::jsonb, '{}'::jsonb, '{}'::jsonb, NOW(), NOW(), 'system', 'system', false),
-(6, 6, '{"b2b": ["dashboard", "bikes", "bikeRentals", "analytics"]}'::jsonb, 'LIGHT', 3, 'Europe/Paris', 'DD/MM/YYYY', 'TWENTY_FOUR_HOUR', 'EUR', true, false, false, 'DAILY', 30, '{}'::jsonb, '{}'::jsonb, '{}'::jsonb, NOW(), NOW(), 'system', 'system', false),
+-- B2B preferences (languages: German, French, currency: EUR)
+(4, 4, '{"b2b": ["dashboard", "bikes", "bikeRentals", "analytics"]}'::jsonb, 'LIGHT', 2, 'Europe/Berlin', 'DD.MM.YYYY', 'TWENTY_FOUR_HOUR', '550e8400-e29b-41d4-a716-446655440022', true, true, true, 'IMMEDIATE', 20, '{}'::jsonb, '{}'::jsonb, '{}'::jsonb, NOW(), NOW(), 'system', 'system', false),
+(5, 5, '{"b2b": ["bikes", "bikeRentals", "analytics", "dashboard"]}'::jsonb, 'SYSTEM', 2, 'Europe/Vienna', 'DD.MM.YYYY', 'TWENTY_FOUR_HOUR', '550e8400-e29b-41d4-a716-446655440022', true, true, false, 'IMMEDIATE', 20, '{}'::jsonb, '{}'::jsonb, '{}'::jsonb, NOW(), NOW(), 'system', 'system', false),
+(6, 6, '{"b2b": ["dashboard", "bikes", "bikeRentals", "analytics"]}'::jsonb, 'LIGHT', 3, 'Europe/Paris', 'DD/MM/YYYY', 'TWENTY_FOUR_HOUR', '550e8400-e29b-41d4-a716-446655440022', true, false, false, 'DAILY', 30, '{}'::jsonb, '{}'::jsonb, '{}'::jsonb, NOW(), NOW(), 'system', 'system', false),
 
--- CUSTOMER preferences (languages: English, German, Italian, French)
-(7, 7, '{"customer": ["rentals", "bikes", "profile", "payment-methods"]}'::jsonb, 'DARK', 1, 'America/New_York', 'MM/DD/YYYY', 'TWELVE_HOUR', 'USD', true, true, false, 'IMMEDIATE', 20, '{}'::jsonb, '{}'::jsonb, '{}'::jsonb, NOW(), NOW(), 'system', 'system', false),
-(8, 8, '{"customer": ["rentals", "bikes", "profile", "payment-methods"]}'::jsonb, 'LIGHT', 2, 'Europe/Berlin', 'DD.MM.YYYY', 'TWENTY_FOUR_HOUR', 'EUR', true, true, false, 'IMMEDIATE', 20, '{}'::jsonb, '{}'::jsonb, '{}'::jsonb, NOW(), NOW(), 'system', 'system', false),
-(9, 9, '{"customer": ["bikes", "rentals", "profile", "payment-methods"]}'::jsonb, 'SYSTEM', 5, 'Europe/Rome', 'DD/MM/YYYY', 'TWENTY_FOUR_HOUR', 'EUR', true, true, false, 'DAILY', 20, '{}'::jsonb, '{}'::jsonb, '{}'::jsonb, NOW(), NOW(), 'system', 'system', false),
-(10, 10, '{"customer": ["rentals", "bikes", "profile", "payment-methods"]}'::jsonb, 'LIGHT', 3, 'Europe/Paris', 'DD/MM/YYYY', 'TWENTY_FOUR_HOUR', 'EUR', true, false, false, 'IMMEDIATE', 20, '{}'::jsonb, '{}'::jsonb, '{}'::jsonb, NOW(), NOW(), 'system', 'system', false),
-(11, 11, '{"customer": ["rentals", "bikes", "profile", "payment-methods"]}'::jsonb, 'SYSTEM', 2, 'Europe/Berlin', 'DD.MM.YYYY', 'TWENTY_FOUR_HOUR', 'EUR', true, true, false, 'IMMEDIATE', 20, '{}'::jsonb, '{}'::jsonb, '{}'::jsonb, NOW(), NOW(), 'system', 'system', false),
-(12, 12, '{"customer": ["rentals", "bikes", "profile", "payment-methods"]}'::jsonb, 'DARK', 1, 'Europe/Zurich', 'DD.MM.YYYY', 'TWENTY_FOUR_HOUR', 'EUR', true, true, false, 'IMMEDIATE', 25, '{}'::jsonb, '{}'::jsonb, '{}'::jsonb, NOW(), NOW(), 'system', 'system', false),
-(13, 13, '{"customer": ["rentals", "bikes", "profile", "payment-methods"]}'::jsonb, 'LIGHT', 1, 'America/Los_Angeles', 'MM/DD/YYYY', 'TWELVE_HOUR', 'USD', false, false, false, 'WEEKLY', 20, '{}'::jsonb, '{}'::jsonb, '{}'::jsonb, NOW(), NOW(), 'system', 'system', false),
+-- CUSTOMER preferences (languages: English/German/Italian/French, currencies: USD/EUR)
+(7, 7, '{"customer": ["rentals", "bikes", "profile", "payment-methods"]}'::jsonb, 'DARK', 1, 'America/New_York', 'MM/DD/YYYY', 'TWELVE_HOUR', '550e8400-e29b-41d4-a716-446655440021', true, true, false, 'IMMEDIATE', 20, '{}'::jsonb, '{}'::jsonb, '{}'::jsonb, NOW(), NOW(), 'system', 'system', false),
+(8, 8, '{"customer": ["rentals", "bikes", "profile", "payment-methods"]}'::jsonb, 'LIGHT', 2, 'Europe/Berlin', 'DD.MM.YYYY', 'TWENTY_FOUR_HOUR', '550e8400-e29b-41d4-a716-446655440022', true, true, false, 'IMMEDIATE', 20, '{}'::jsonb, '{}'::jsonb, '{}'::jsonb, NOW(), NOW(), 'system', 'system', false),
+(9, 9, '{"customer": ["bikes", "rentals", "profile", "payment-methods"]}'::jsonb, 'SYSTEM', 5, 'Europe/Rome', 'DD/MM/YYYY', 'TWENTY_FOUR_HOUR', '550e8400-e29b-41d4-a716-446655440022', true, true, false, 'DAILY', 20, '{}'::jsonb, '{}'::jsonb, '{}'::jsonb, NOW(), NOW(), 'system', 'system', false),
+(10, 10, '{"customer": ["rentals", "bikes", "profile", "payment-methods"]}'::jsonb, 'LIGHT', 3, 'Europe/Paris', 'DD/MM/YYYY', 'TWENTY_FOUR_HOUR', '550e8400-e29b-41d4-a716-446655440022', true, false, false, 'IMMEDIATE', 20, '{}'::jsonb, '{}'::jsonb, '{}'::jsonb, NOW(), NOW(), 'system', 'system', false),
+(11, 11, '{"customer": ["rentals", "bikes", "profile", "payment-methods"]}'::jsonb, 'SYSTEM', 2, 'Europe/Berlin', 'DD.MM.YYYY', 'TWENTY_FOUR_HOUR', '550e8400-e29b-41d4-a716-446655440022', true, true, false, 'IMMEDIATE', 20, '{}'::jsonb, '{}'::jsonb, '{}'::jsonb, NOW(), NOW(), 'system', 'system', false),
+(12, 12, '{"customer": ["rentals", "bikes", "profile", "payment-methods"]}'::jsonb, 'DARK', 1, 'Europe/Zurich', 'DD.MM.YYYY', 'TWENTY_FOUR_HOUR', '550e8400-e29b-41d4-a716-446655440022', true, true, false, 'IMMEDIATE', 25, '{}'::jsonb, '{}'::jsonb, '{}'::jsonb, NOW(), NOW(), 'system', 'system', false),
+(13, 13, '{"customer": ["rentals", "bikes", "profile", "payment-methods"]}'::jsonb, 'LIGHT', 1, 'America/Los_Angeles', 'MM/DD/YYYY', 'TWELVE_HOUR', '550e8400-e29b-41d4-a716-446655440021', false, false, false, 'WEEKLY', 20, '{}'::jsonb, '{}'::jsonb, '{}'::jsonb, NOW(), NOW(), 'system', 'system', false),
 
--- SYSTEM Service Account preferences (language: English)
-(14, 14, '{"system": ["status", "health", "metrics"]}'::jsonb, 'SYSTEM', 1, 'UTC', 'YYYY-MM-DD', 'TWENTY_FOUR_HOUR', 'USD', false, false, false, 'IMMEDIATE', 20, '{}'::jsonb, '{}'::jsonb, '{}'::jsonb, NOW(), NOW(), 'system', 'system', false)
+-- SYSTEM Service Account preferences (language: English, currency: USD)
+(14, 14, '{"system": ["status", "health", "metrics"]}'::jsonb, 'SYSTEM', 1, 'UTC', 'YYYY-MM-DD', 'TWENTY_FOUR_HOUR', '550e8400-e29b-41d4-a716-446655440021', false, false, false, 'IMMEDIATE', 20, '{}'::jsonb, '{}'::jsonb, '{}'::jsonb, NOW(), NOW(), 'system', 'system', false)
 ON CONFLICT (id) DO NOTHING;
 
 -- =====================================================================================================================
