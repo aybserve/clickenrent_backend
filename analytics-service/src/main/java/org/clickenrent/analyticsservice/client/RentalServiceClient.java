@@ -4,7 +4,9 @@ import org.clickenrent.analyticsservice.dto.BikePageDTO;
 import org.clickenrent.analyticsservice.dto.BikeRentalPageDTO;
 import org.clickenrent.analyticsservice.dto.LocationPageDTO;
 import org.clickenrent.analyticsservice.dto.RideSummaryDTO;
+import org.clickenrent.contracts.rental.RentalDTO;
 import org.springframework.cloud.openfeign.FeignClient;
+import org.springframework.data.domain.Page;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -76,6 +78,20 @@ public interface RentalServiceClient {
      */
     @GetMapping("/location")
     LocationPageDTO getLocations(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "1000") int size
+    );
+
+    /**
+     * Get rentals with pagination.
+     * The rental-service will automatically filter by the user's company via security context.
+     *
+     * @param page Page number (0-indexed)
+     * @param size Page size
+     * @return Page of rentals
+     */
+    @GetMapping("/rentals")
+    Page<RentalDTO> getRentals(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "1000") int size
     );

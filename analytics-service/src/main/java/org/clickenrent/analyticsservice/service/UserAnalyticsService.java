@@ -3,6 +3,7 @@ package org.clickenrent.analyticsservice.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.clickenrent.analyticsservice.client.AuthServiceClient;
+import org.clickenrent.analyticsservice.dto.LanguageDTO;
 import org.clickenrent.analyticsservice.dto.PeriodDTO;
 import org.clickenrent.analyticsservice.dto.UserAnalyticsDTO;
 import org.clickenrent.analyticsservice.dto.UserPageDTO;
@@ -95,40 +96,63 @@ public class UserAnalyticsService {
     }
 
     /**
-     * Calculate language distribution as percentages.
+     * Calculate language distribution as percentages using language IDs.
      */
     private Map<String, Double> calculateLanguageBreakdown(List<UserSimpleDTO> users) {
         if (users == null || users.isEmpty()) {
             return new HashMap<>();
         }
 
-        // Count users per language code
-        Map<String, Long> languageCounts = users.stream()
-                .filter(user -> user.getLanguageCode() != null && !user.getLanguageCode().isEmpty())
-                .collect(Collectors.groupingBy(
-                        UserSimpleDTO::getLanguageCode,
-                        Collectors.counting()
-                ));
+        try {
+            // Fetch all languages from auth-service
+            List<LanguageDTO> languages = authServiceClient.getAllLanguages();
+            
+            // Create mapping: languageId -> language name
+            Map<Long, String> languageIdToName = languages.stream()
+                    .collect(Collectors.toMap(
+                            LanguageDTO::getId,
+                            LanguageDTO::getName,
+                            (existing, replacement) -> existing // Keep first if duplicate
+                    ));
 
-        long totalUsersWithLanguage = languageCounts.values().stream()
-                .mapToLong(Long::longValue)
-                .sum();
+            // Count users per language ID
+            Map<Long, Long> languageCounts = users.stream()
+                    .filter(user -> user.getLanguageId() != null)
+                    .collect(Collectors.groupingBy(
+                            UserSimpleDTO::getLanguageId,
+                            Collectors.counting()
+                    ));
 
-        if (totalUsersWithLanguage == 0) {
+            long totalUsersWithLanguage = languageCounts.values().stream()
+                    .mapToLong(Long::longValue)
+                    .sum();
+
+            if (totalUsersWithLanguage == 0) {
+                return new HashMap<>();
+            }
+
+            // Convert counts to percentages with language names as keys
+            Map<String, Double> languagePercentages = new LinkedHashMap<>();
+            
+            // Sort by count descending
+            languageCounts.entrySet().stream()
+                    .sorted(Map.Entry.<Long, Long>comparingByValue().reversed())
+                    .forEach(entry -> {
+                        Long languageId = entry.getKey();
+                        Long count = entry.getValue();
+                        
+                        // Get language name from map (fallback to "Unknown" if not found)
+                        String languageName = languageIdToName.getOrDefault(languageId, "Unknown (ID: " + languageId + ")");
+                        
+                        double percentage = (count * 100.0) / totalUsersWithLanguage;
+                        languagePercentages.put(languageName, Math.round(percentage * 10.0) / 10.0);
+                    });
+
+            return languagePercentages;
+            
+        } catch (Exception e) {
+            log.error("Error calculating language breakdown: {}", e.getMessage());
             return new HashMap<>();
         }
-
-        // Convert counts to percentages
-        Map<String, Double> languagePercentages = new LinkedHashMap<>();
-        
-        // Sort by count descending
-        languageCounts.entrySet().stream()
-                .sorted(Map.Entry.<String, Long>comparingByValue().reversed())
-                .forEach(entry -> {
-                    double percentage = (entry.getValue() * 100.0) / totalUsersWithLanguage;
-                    languagePercentages.put(entry.getKey(), Math.round(percentage * 10.0) / 10.0);
-                });
-
-        return languagePercentages;
     }
 }

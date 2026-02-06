@@ -2,19 +2,27 @@ package org.clickenrent.analyticsservice.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.clickenrent.analyticsservice.client.AuthServiceClient;
 import org.clickenrent.analyticsservice.client.RentalServiceClient;
 import org.clickenrent.analyticsservice.dto.*;
 import org.clickenrent.analyticsservice.entity.AnalyticsDailySummary;
 import org.clickenrent.analyticsservice.exception.UnauthorizedException;
 import org.clickenrent.analyticsservice.repository.AnalyticsDailySummaryRepository;
+import org.clickenrent.contracts.auth.UserDTO;
+import org.clickenrent.contracts.rental.RentalDTO;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.ZonedDateTime;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
+import java.util.Set;
 
 /**
  * Service for generating dashboard overview with aggregated KPIs.
@@ -28,6 +36,7 @@ public class DashboardService {
     private final AnalyticsDailySummaryRepository repository;
     private final SecurityService securityService;
     private final RentalServiceClient rentalServiceClient;
+    private final AuthServiceClient authServiceClient;
 
     private static final int DEFAULT_PERIOD_DAYS = 30;
     private static final String CURRENCY_EUR = "EUR";
@@ -129,9 +138,16 @@ public class DashboardService {
                 metrics.totalBikeRentalDurationMinutes = totalDurationMinutesAllRentals;
             }
             
-            log.debug("Queried {} bike rentals from rental-service for period {} to {} (total duration: {} min, avg: {} min)", 
+            // Calculate active customers count (based on all rentals, not filtered by date)
+            metrics.activeCustomers = calculateActiveCustomers();
+            
+            // Calculate new registrations (users registered in the last 7 days)
+            metrics.newRegistrations = calculateNewRegistrations();
+            
+            log.debug("Queried {} bike rentals from rental-service for period {} to {} (total duration: {} min, avg: {} min, active customers: {}, new registrations: {})", 
                     metrics.totalBikeRentals, from, to, 
-                    metrics.totalBikeRentalDurationMinutes, metrics.averageBikeRentalDurationMinutes);
+                    metrics.totalBikeRentalDurationMinutes, metrics.averageBikeRentalDurationMinutes, 
+                    metrics.activeCustomers, metrics.newRegistrations);
             
             return metrics;
             
@@ -176,6 +192,108 @@ public class DashboardService {
             
         } catch (Exception e) {
             log.warn("Error calculating duration for bike rental {}: {}", bikeRentalExternalId, e.getMessage());
+            return 0;
+        }
+    }
+
+    /**
+     * Calculate the number of active customers for the current company.
+     * A customer is considered active if they have at least one rental and their user account is active.
+     * 
+     * @return Count of active customers
+     */
+    private int calculateActiveCustomers() {
+        try {
+            // 1. Fetch all rentals for current company (pagination handled automatically by security context)
+            Set<String> uniqueUserExternalIds = new HashSet<>();
+            int page = 0;
+            Page<RentalDTO> rentalPage;
+            
+            do {
+                rentalPage = rentalServiceClient.getRentals(page, 1000);
+                if (rentalPage.getContent() != null) {
+                    rentalPage.getContent().stream()
+                            .map(RentalDTO::getUserExternalId)
+                            .filter(Objects::nonNull)
+                            .forEach(uniqueUserExternalIds::add);
+                }
+                page++;
+            } while (!rentalPage.isLast());
+            
+            log.debug("Found {} unique users with rentals for current company", uniqueUserExternalIds.size());
+            
+            // 2. Check each unique user's active status
+            int activeCount = 0;
+            for (String userExternalId : uniqueUserExternalIds) {
+                try {
+                    UserDTO user = authServiceClient.getUserByExternalId(userExternalId);
+                    if (Boolean.TRUE.equals(user.getIsActive())) {
+                        activeCount++;
+                    }
+                } catch (Exception e) {
+                    log.warn("Could not fetch user {}: {}", userExternalId, e.getMessage());
+                }
+            }
+            
+            log.debug("Active customers count: {} out of {} total unique customers", activeCount, uniqueUserExternalIds.size());
+            return activeCount;
+            
+        } catch (Exception e) {
+            log.error("Error calculating active customers: {}", e.getMessage());
+            return 0;
+        }
+    }
+
+    /**
+     * Calculate the number of new registrations for the current company.
+     * A user is considered a new registration if they:
+     * - Have at least one rental with the current company
+     * - Were created within the last 7 days
+     * 
+     * @return Count of new registrations in the last 7 days
+     */
+    private int calculateNewRegistrations() {
+        try {
+            // Define the cutoff date (7 days ago)
+            LocalDateTime sevenDaysAgo = LocalDateTime.now().minusDays(7);
+            
+            // 1. Fetch all rentals for current company (pagination handled automatically by security context)
+            Set<String> uniqueUserExternalIds = new HashSet<>();
+            int page = 0;
+            Page<RentalDTO> rentalPage;
+            
+            do {
+                rentalPage = rentalServiceClient.getRentals(page, 1000);
+                if (rentalPage.getContent() != null) {
+                    rentalPage.getContent().stream()
+                            .map(RentalDTO::getUserExternalId)
+                            .filter(Objects::nonNull)
+                            .forEach(uniqueUserExternalIds::add);
+                }
+                page++;
+            } while (!rentalPage.isLast());
+            
+            log.debug("Found {} unique users with rentals for current company", uniqueUserExternalIds.size());
+            
+            // 2. Check each unique user's registration date
+            int newRegCount = 0;
+            for (String userExternalId : uniqueUserExternalIds) {
+                try {
+                    UserDTO user = authServiceClient.getUserByExternalId(userExternalId);
+                    // Check if user was created within the last 7 days
+                    if (user.getDateCreated() != null && user.getDateCreated().isAfter(sevenDaysAgo)) {
+                        newRegCount++;
+                    }
+                } catch (Exception e) {
+                    log.warn("Could not fetch user {}: {}", userExternalId, e.getMessage());
+                }
+            }
+            
+            log.debug("New registrations count: {} users registered in the last 7 days", newRegCount);
+            return newRegCount;
+            
+        } catch (Exception e) {
+            log.error("Error calculating new registrations: {}", e.getMessage());
             return 0;
         }
     }
