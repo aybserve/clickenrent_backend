@@ -95,14 +95,14 @@ public class UserPreference extends BaseAuditEntity {
     private TimeFormat timeFormat = TimeFormat.TWENTY_FOUR_HOUR;
 
     /**
-     * Currency code (ISO 4217) referencing payment-service Currency entity.
-     * Must match Currency.code from payment-service (e.g., "USD", "EUR", "GBP", "UAH", "PLN").
-     * Default: "USD"
+     * Currency external ID referencing payment-service Currency entity.
+     * References Currency.externalId from payment-service.
+     * Default: "550e8400-e29b-41d4-a716-446655440021" (USD)
      */
-    @Size(max = 3, message = "Currency code must be exactly 3 characters")
-    @Column(name = "currency", length = 3)
+    @Size(max = 100, message = "Currency external ID must not exceed 100 characters")
+    @Column(name = "currency_external_id", length = 100)
     @Builder.Default
-    private String currency = "EUR";
+    private String currencyExternalId = "550e8400-e29b-41d4-a716-446655440021"; // USD
 
     // ===========================
     // Notification Preferences

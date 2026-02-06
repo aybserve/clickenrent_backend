@@ -75,17 +75,12 @@ public class UpdateUserPreferenceRequest {
     )
     private String timeFormat;
 
-    @Size(min = 3, max = 3, message = "Currency must be exactly 3 characters")
-    @Pattern(
-        regexp = "^[A-Z]{3}$",
-        message = "Currency must be a valid ISO 4217 currency code (e.g., 'USD', 'EUR', 'GBP'). Must match payment-service Currency.code"
-    )
+    @Size(max = 100, message = "Currency external ID must not exceed 100 characters")
     @Schema(
-        description = "Preferred currency code (ISO 4217) - must match payment-service Currency.code (optional)",
-        example = "EUR",
-        allowableValues = {"USD", "EUR", "GBP", "UAH", "PLN"}
+        description = "Preferred currency external ID - must reference payment-service Currency.externalId (optional)",
+        example = "550e8400-e29b-41d4-a716-446655440022"
     )
-    private String currency;
+    private String currencyExternalId;
 
     // ===========================
     // Notification Preferences

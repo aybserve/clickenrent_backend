@@ -1,7 +1,7 @@
 package org.clickenrent.supportservice.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.clickenrent.supportservice.dto.BikeRentalFeedbackDTO;
+import org.clickenrent.contracts.support.BikeRentalFeedbackDTO;
 import org.clickenrent.supportservice.service.BikeRentalFeedbackService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

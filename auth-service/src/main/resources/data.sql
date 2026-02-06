@@ -158,7 +158,7 @@ CREATE TABLE user_preferences (
     timezone                    VARCHAR(100) DEFAULT 'UTC',
     date_format                 VARCHAR(50) DEFAULT 'YYYY-MM-DD',
     time_format                 VARCHAR(20) DEFAULT 'TWENTY_FOUR_HOUR',
-    currency                    VARCHAR(3) DEFAULT 'USD',  -- ISO 4217 currency code, matches payment-service Currency.code
+    currency_external_id        VARCHAR(100) DEFAULT '550e8400-e29b-41d4-a716-446655440021',  -- References payment-service Currency.externalId (USD)
     
     -- Notifications
     email_notifications         BOOLEAN DEFAULT true,
@@ -707,7 +707,7 @@ ON CONFLICT (id) DO NOTHING;
 -- 5.9 USER PREFERENCES
 -- ---------------------------------------------------------------------------------------------------------------------
 
-INSERT INTO user_preferences (id, user_id, navigation_order, theme, language_id, timezone, date_format, time_format, currency, email_notifications, push_notifications, sms_notifications, notification_frequency, items_per_page, dashboard_layout, table_preferences, default_filters, date_created, last_date_modified, created_by, last_modified_by, is_deleted) VALUES
+INSERT INTO user_preferences (id, user_id, navigation_order, theme, language_id, timezone, date_format, time_format, currency_external_id, email_notifications, push_notifications, sms_notifications, notification_frequency, items_per_page, dashboard_layout, table_preferences, default_filters, date_created, last_date_modified, created_by, last_modified_by, is_deleted) VALUES
 -- SUPERADMIN preferences (language: English, currency: USD)
 (1, 1, '{"superadmin": ["dashboard", "companies", "locations", "bikes", "users", "bikeRentals", "analytics", "push-notifications", "legal-documents"]}'::jsonb, 'SYSTEM', 1, 'UTC', 'YYYY-MM-DD', 'TWENTY_FOUR_HOUR', '550e8400-e29b-41d4-a716-446655440021', true, true, false, 'IMMEDIATE', 20, '{}'::jsonb, '{}'::jsonb, '{}'::jsonb, NOW(), NOW(), 'system', 'system', false),
 

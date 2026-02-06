@@ -5,7 +5,7 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.clickenrent.supportservice.dto.BikeRentalFeedbackDTO;
+import org.clickenrent.contracts.support.BikeRentalFeedbackDTO;
 import org.clickenrent.supportservice.service.BikeRentalFeedbackService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

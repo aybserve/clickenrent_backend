@@ -224,9 +224,6 @@ public class DashboardService {
                 .averageBikeRentalDuration(buildDurationKpi(
                         current.averageBikeRentalDurationMinutes,
                         previous != null ? previous.averageBikeRentalDurationMinutes : null))
-                .fleetUtilization(buildPercentageKpi(
-                        calculateFleetUtilization(current.inUseBikes, current.totalBikes),
-                        previous != null ? calculateFleetUtilization(previous.inUseBikes, previous.totalBikes) : null))
                 .build();
     }
 
@@ -349,9 +346,6 @@ public class DashboardService {
                 .averageBikeRentalDuration(buildDurationKpi(
                         current.averageBikeRentalDurationMinutes,
                         previous != null ? previous.averageBikeRentalDurationMinutes : null))
-                .fleetUtilization(buildPercentageKpi(
-                        calculateFleetUtilization(current.inUseBikes, current.totalBikes),
-                        previous != null ? calculateFleetUtilization(previous.inUseBikes, previous.totalBikes) : null))
                 .build();
     }
 
@@ -452,20 +446,6 @@ public class DashboardService {
             return null;
         }
         return change > 0 ? DIRECTION_UP : DIRECTION_DOWN;
-    }
-
-    /**
-     * Calculate fleet utilization percentage.
-     */
-    private Double calculateFleetUtilization(Integer inUseBikes, Integer totalBikes) {
-        if (totalBikes == null || totalBikes == 0) {
-            return 0.0;
-        }
-        
-        double utilization = (inUseBikes.doubleValue() / totalBikes.doubleValue()) * 100;
-        
-        // Round to 1 decimal place
-        return Math.round(utilization * 10.0) / 10.0;
     }
 
     /**

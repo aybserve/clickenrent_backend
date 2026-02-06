@@ -1,6 +1,6 @@
 package org.clickenrent.supportservice.service;
 
-import org.clickenrent.supportservice.dto.BikeRentalFeedbackDTO;
+import org.clickenrent.contracts.support.BikeRentalFeedbackDTO;
 import org.clickenrent.supportservice.entity.BikeRentalFeedback;
 import org.clickenrent.supportservice.exception.ResourceNotFoundException;
 import org.clickenrent.supportservice.exception.UnauthorizedException;

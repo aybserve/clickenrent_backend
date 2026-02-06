@@ -20,5 +20,4 @@ public class DashboardKPIsDTO {
     private KpiMetricDTO activeCustomers;
     private KpiMetricDTO newRegistrations;
     private KpiDurationDTO averageBikeRentalDuration;
-    private KpiPercentageDTO fleetUtilization;
 }

@@ -1,6 +1,6 @@
 package org.clickenrent.supportservice.mapper;
 
-import org.clickenrent.supportservice.dto.BikeRentalFeedbackDTO;
+import org.clickenrent.contracts.support.BikeRentalFeedbackDTO;
 import org.clickenrent.supportservice.entity.BikeRentalFeedback;
 import org.springframework.stereotype.Component;
 

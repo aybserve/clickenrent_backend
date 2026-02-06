@@ -34,7 +34,7 @@ public class UserPreferenceMapper {
                 .timezone(entity.getTimezone())
                 .dateFormat(entity.getDateFormat())
                 .timeFormat(mapTimeFormatToString(entity.getTimeFormat()))
-                .currency(entity.getCurrency())
+                .currencyExternalId(entity.getCurrencyExternalId())
                 .emailNotifications(entity.getEmailNotifications())
                 .pushNotifications(entity.getPushNotifications())
                 .smsNotifications(entity.getSmsNotifications())
@@ -79,8 +79,8 @@ public class UserPreferenceMapper {
         if (request.getTimeFormat() != null) {
             entity.setTimeFormat(mapStringToTimeFormat(request.getTimeFormat()));
         }
-        if (request.getCurrency() != null) {
-            entity.setCurrency(request.getCurrency());
+        if (request.getCurrencyExternalId() != null) {
+            entity.setCurrencyExternalId(request.getCurrencyExternalId());
         }
         if (request.getEmailNotifications() != null) {
             entity.setEmailNotifications(request.getEmailNotifications());

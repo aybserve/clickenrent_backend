@@ -67,11 +67,10 @@ public class UserPreferenceDTO {
     private String timeFormat;
 
     @Schema(
-        description = "Preferred currency code (ISO 4217) - matches payment-service Currency.code",
-        example = "USD",
-        allowableValues = {"USD", "EUR", "GBP", "UAH", "PLN"}
+        description = "Preferred currency external ID - references payment-service Currency.externalId",
+        example = "550e8400-e29b-41d4-a716-446655440021"
     )
-    private String currency;
+    private String currencyExternalId;
 
     // ===========================
     // Notification Preferences
