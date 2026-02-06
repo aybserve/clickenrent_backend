@@ -1,5 +1,6 @@
 package org.clickenrent.paymentservice.controller;
 
+import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -26,6 +27,7 @@ import java.util.Map;
 public class MultiSafepayTestController {
 
     private final MultiSafepayService multiSafepayService;
+    private final Gson gson = new Gson();
 
     @PostMapping("/create-order")
     @Operation(summary = "Test: Create a MultiSafePay order and get payment URL")
@@ -98,7 +100,7 @@ public class MultiSafepayTestController {
                 response.put("message", "Order created successfully. Payment URL not available - check fullResponse for details.");
             }
             
-            response.put("fullResponse", orderDetails != null ? orderDetails.toString() : "null");
+            response.put("fullResponse", orderDetails != null ? gson.fromJson(orderDetails.toString(), Object.class) : null);
             
             log.info("✅ Order created: {} | Payment URL: {}", orderId, paymentUrl);
             
@@ -153,7 +155,7 @@ public class MultiSafepayTestController {
                         : null);
             }
             
-            response.put("fullResponse", orderDetails != null ? orderDetails.toString() : "null");
+            response.put("fullResponse", orderDetails != null ? gson.fromJson(orderDetails.toString(), Object.class) : null);
             
             return ResponseEntity.ok(response);
             
@@ -180,7 +182,7 @@ public class MultiSafepayTestController {
             Map<String, Object> response = new HashMap<>();
             response.put("success", true);
             response.put("message", "Available payment gateways retrieved successfully");
-            response.put("gateways", gateways.toString());
+            response.put("gateways", gson.fromJson(gateways.toString(), Object.class));
             
             return ResponseEntity.ok(response);
             
@@ -379,7 +381,7 @@ public class MultiSafepayTestController {
             response.put("totalSplitAmount", totalSplitAmount / 100.0);
             response.put("remainingAmount", (amountInCents - totalSplitAmount) / 100.0);
             response.put("message", "Order with split payments created successfully. Open the paymentUrl to complete payment.");
-            response.put("fullResponse", createResponse != null ? createResponse.toString() : "null");
+            response.put("fullResponse", createResponse != null ? gson.fromJson(createResponse.toString(), Object.class) : null);
             
             log.info("✅ Order with splits created: {} | Payment URL: {} | Splits: {}", orderId, paymentUrl, splits.size());
             
@@ -409,7 +411,7 @@ public class MultiSafepayTestController {
             response.put("success", true);
             response.put("orderId", orderId);
             response.put("message", "Payment captured successfully");
-            response.put("fullResponse", result.toString());
+            response.put("fullResponse", gson.fromJson(result.toString(), Object.class));
             
             return ResponseEntity.ok(response);
             
@@ -436,7 +438,7 @@ public class MultiSafepayTestController {
             response.put("success", true);
             response.put("orderId", orderId);
             response.put("message", "Authorization cancelled successfully");
-            response.put("fullResponse", result.toString());
+            response.put("fullResponse", gson.fromJson(result.toString(), Object.class));
             
             return ResponseEntity.ok(response);
             
@@ -467,7 +469,7 @@ public class MultiSafepayTestController {
             response.put("orderId", orderId);
             response.put("daysExtended", days);
             response.put("message", "Expiration extended successfully");
-            response.put("fullResponse", result.toString());
+            response.put("fullResponse", gson.fromJson(result.toString(), Object.class));
             
             return ResponseEntity.ok(response);
             
@@ -498,7 +500,7 @@ public class MultiSafepayTestController {
             response.put("orderId", orderId);
             response.put("refundId", refundId);
             response.put("message", "Refund cancelled successfully");
-            response.put("fullResponse", result.toString());
+            response.put("fullResponse", gson.fromJson(result.toString(), Object.class));
             
             return ResponseEntity.ok(response);
             
@@ -529,7 +531,7 @@ public class MultiSafepayTestController {
             response.put("orderId", orderId);
             response.put("reason", reason);
             response.put("message", "Chargeback challenged successfully");
-            response.put("fullResponse", result.toString());
+            response.put("fullResponse", gson.fromJson(result.toString(), Object.class));
             
             return ResponseEntity.ok(response);
             
@@ -559,7 +561,7 @@ public class MultiSafepayTestController {
             response.put("success", true);
             response.put("page", page);
             response.put("pageSize", pageSize);
-            response.put("fullResponse", result.toString());
+            response.put("fullResponse", gson.fromJson(result.toString(), Object.class));
             
             return ResponseEntity.ok(response);
             
@@ -585,7 +587,7 @@ public class MultiSafepayTestController {
             Map<String, Object> response = new HashMap<>();
             response.put("success", true);
             response.put("tokenId", tokenId);
-            response.put("fullResponse", result.toString());
+            response.put("fullResponse", gson.fromJson(result.toString(), Object.class));
             
             return ResponseEntity.ok(response);
             
@@ -619,7 +621,7 @@ public class MultiSafepayTestController {
             response.put("success", true);
             response.put("tokenId", tokenId);
             response.put("message", "Token updated successfully");
-            response.put("fullResponse", result.toString());
+            response.put("fullResponse", gson.fromJson(result.toString(), Object.class));
             
             return ResponseEntity.ok(response);
             
@@ -646,7 +648,7 @@ public class MultiSafepayTestController {
             response.put("success", true);
             response.put("tokenId", tokenId);
             response.put("message", "Token deleted successfully");
-            response.put("fullResponse", result.toString());
+            response.put("fullResponse", gson.fromJson(result.toString(), Object.class));
             
             return ResponseEntity.ok(response);
             
@@ -676,7 +678,7 @@ public class MultiSafepayTestController {
             response.put("success", true);
             response.put("page", page);
             response.put("pageSize", pageSize);
-            response.put("fullResponse", result.toString());
+            response.put("fullResponse", gson.fromJson(result.toString(), Object.class));
             
             return ResponseEntity.ok(response);
             
@@ -702,7 +704,7 @@ public class MultiSafepayTestController {
             Map<String, Object> response = new HashMap<>();
             response.put("success", true);
             response.put("message", "Payment methods retrieved successfully");
-            response.put("fullResponse", result.toString());
+            response.put("fullResponse", gson.fromJson(result.toString(), Object.class));
             
             return ResponseEntity.ok(response);
             
@@ -728,7 +730,7 @@ public class MultiSafepayTestController {
             Map<String, Object> response = new HashMap<>();
             response.put("success", true);
             response.put("methodCode", methodCode);
-            response.put("fullResponse", result.toString());
+            response.put("fullResponse", gson.fromJson(result.toString(), Object.class));
             
             return ResponseEntity.ok(response);
             
@@ -754,7 +756,7 @@ public class MultiSafepayTestController {
             Map<String, Object> response = new HashMap<>();
             response.put("success", true);
             response.put("message", "Site configuration retrieved successfully");
-            response.put("fullResponse", result.toString());
+            response.put("fullResponse", gson.fromJson(result.toString(), Object.class));
             
             return ResponseEntity.ok(response);
             
@@ -786,7 +788,7 @@ public class MultiSafepayTestController {
             Map<String, Object> response = new HashMap<>();
             response.put("success", true);
             response.put("message", "Site configuration updated successfully");
-            response.put("fullResponse", result.toString());
+            response.put("fullResponse", gson.fromJson(result.toString(), Object.class));
             
             return ResponseEntity.ok(response);
             
@@ -815,7 +817,7 @@ public class MultiSafepayTestController {
                 response.put("success", true);
                 response.put("orderId", orderId);
                 response.put("message", "Bancontact QR payment cancelled successfully");
-                response.put("fullResponse", result.toString());
+                response.put("fullResponse", gson.fromJson(result.toString(), Object.class));
             } else {
                 response.put("success", false);
                 response.put("orderId", orderId);
@@ -849,7 +851,7 @@ public class MultiSafepayTestController {
                 response.put("success", true);
                 response.put("orderId", orderId);
                 response.put("message", "PAD order put on hold successfully");
-                response.put("fullResponse", result.toString());
+                response.put("fullResponse", gson.fromJson(result.toString(), Object.class));
             } else {
                 response.put("success", false);
                 response.put("orderId", orderId);
@@ -892,7 +894,7 @@ public class MultiSafepayTestController {
             response.put("success", true);
             response.put("fromDate", fromDate);
             response.put("toDate", toDate);
-            response.put("fullResponse", result.toString());
+            response.put("fullResponse", gson.fromJson(result.toString(), Object.class));
             
             return ResponseEntity.ok(response);
             

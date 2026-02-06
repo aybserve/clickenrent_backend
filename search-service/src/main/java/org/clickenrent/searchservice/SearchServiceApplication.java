@@ -11,6 +11,8 @@ import org.springframework.cloud.openfeign.EnableFeignClients;
  * Provides Elasticsearch-based global search across users, bikes, locations, and hubs
  * with multi-tenant isolation and service discovery via Eureka.
  * 
+ * Environment variables are loaded from .env file via DotenvConfig initializer.
+ * 
  * @author Vitaliy Shvetsov
  */
 @SpringBootApplication

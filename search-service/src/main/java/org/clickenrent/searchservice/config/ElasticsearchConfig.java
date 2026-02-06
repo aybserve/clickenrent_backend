@@ -6,6 +6,7 @@ import org.clickenrent.searchservice.document.BikeDocument;
 import org.clickenrent.searchservice.document.HubDocument;
 import org.clickenrent.searchservice.document.LocationDocument;
 import org.clickenrent.searchservice.document.UserDocument;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -34,6 +35,24 @@ import org.springframework.data.elasticsearch.repository.config.EnableElasticsea
 public class ElasticsearchConfig {
     
     private final ElasticsearchOperations elasticsearchOperations;
+    
+    /**
+     * Log Elasticsearch configuration at startup for debugging.
+     */
+    @Bean
+    public CommandLineRunner logElasticsearchConfig(
+            @Value("${spring.elasticsearch.uris}") String esUris,
+            @Value("${spring.elasticsearch.username}") String esUsername,
+            @Value("${spring.elasticsearch.password:NOT_SET}") String esPassword) {
+        return args -> {
+            log.info("=".repeat(60));
+            log.info("ELASTICSEARCH CONFIGURATION:");
+            log.info("  URI: {}", esUris);
+            log.info("  Username: {}", esUsername);
+            log.info("  Password: {}", esPassword.equals("NOT_SET") ? "NOT SET!!!" : "***SET*** (length: " + esPassword.length() + ")");
+            log.info("=".repeat(60));
+        };
+    }
     
     /**
      * Create Elasticsearch indices at application startup if they don't exist.
