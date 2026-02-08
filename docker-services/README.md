@@ -1,6 +1,8 @@
 # Docker Services Setup Guide
 
-This directory contains the docker-compose configuration for running Elasticsearch, Kibana, and Redis.
+This directory contains the docker-compose configuration for running Elasticsearch and Kibana.
+
+**Note:** Redis is provided by FastPanel and is not included in this docker-compose file.
 
 ## 🔐 Security Configuration
 

@@ -41,6 +41,8 @@ services:
     volumes:
       - redis-data:/data
 
+
+
 volumes:
   es-data:
   redis-data:
