@@ -20,6 +20,10 @@ public class PartBrandMapper {
                 .externalId(partBrand.getExternalId())
                 .name(partBrand.getName())
                 .companyExternalId(partBrand.getCompanyExternalId())
+                .dateCreated(partBrand.getDateCreated())
+                .lastDateModified(partBrand.getLastDateModified())
+                .createdBy(partBrand.getCreatedBy())
+                .lastModifiedBy(partBrand.getLastModifiedBy())
                 .build();
     }
 
