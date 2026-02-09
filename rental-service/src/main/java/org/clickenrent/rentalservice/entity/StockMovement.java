@@ -7,8 +7,6 @@ import lombok.experimental.SuperBuilder;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
 
-import java.time.LocalDateTime;
-
 /**
  * Entity representing stock movements between hubs.
  */
@@ -51,8 +49,4 @@ public class StockMovement extends BaseAuditEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "to_hub_id", nullable = false)
     private Hub toHub;
-
-    @NotNull(message = "Date time is required")
-    @Column(name = "date_time", nullable = false)
-    private LocalDateTime dateTime;
 }

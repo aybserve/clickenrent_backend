@@ -474,17 +474,17 @@ ON CONFLICT (id) DO NOTHING;
 -- ---------------------------------------------------------------------------------------------------------------------
 -- 8.1 B2B SALES (HAS audit fields)
 -- ---------------------------------------------------------------------------------------------------------------------
-INSERT INTO b2b_sale (id, external_id, location_id, b2b_sale_status_id, date_time, seller_company_external_id, buyer_company_external_id, date_created, last_date_modified, created_by, last_modified_by, is_deleted) VALUES
-(1, '550e8400-e29b-41d4-a716-446655440801', 1, 2, CURRENT_TIMESTAMP - INTERVAL '30 days', 'company-ext-001', 'company-ext-003', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
-(2, '550e8400-e29b-41d4-a716-446655440802', 1, 3, CURRENT_TIMESTAMP - INTERVAL '60 days', 'company-ext-001', 'company-ext-004', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false)
+INSERT INTO b2b_sale (id, external_id, location_id, b2b_sale_status_id, seller_company_external_id, buyer_company_external_id, date_created, last_date_modified, created_by, last_modified_by, is_deleted) VALUES
+(1, '550e8400-e29b-41d4-a716-446655440801', 1, 2, 'company-ext-001', 'company-ext-003', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(2, '550e8400-e29b-41d4-a716-446655440802', 1, 3, 'company-ext-001', 'company-ext-004', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false)
 ON CONFLICT (id) DO NOTHING;
 
 -- ---------------------------------------------------------------------------------------------------------------------
 -- 8.2 B2B SALE ORDERS (HAS audit fields)
 -- ---------------------------------------------------------------------------------------------------------------------
-INSERT INTO b2b_sale_order (id, external_id, seller_company_external_id, buyer_company_external_id, b2b_sale_order_status_id, location_id, b2b_sale_id, date_time, date_created, last_date_modified, created_by, last_modified_by, is_deleted) VALUES
-(1, '550e8400-e29b-41d4-a716-446655440811', 'company-001', 'company-002', 4, 1, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
-(2, '550e8400-e29b-41d4-a716-446655440812', 'company-002', 'company-001', 3, 2, 2, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false)
+INSERT INTO b2b_sale_order (id, external_id, seller_company_external_id, buyer_company_external_id, b2b_sale_order_status_id, location_id, b2b_sale_id, date_created, last_date_modified, created_by, last_modified_by, is_deleted) VALUES
+(1, '550e8400-e29b-41d4-a716-446655440811', 'company-001', 'company-002', 4, 1, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(2, '550e8400-e29b-41d4-a716-446655440812', 'company-002', 'company-001', 3, 2, 2, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false)
 ON CONFLICT (id) DO NOTHING;
 
 -- ---------------------------------------------------------------------------------------------------------------------
@@ -527,9 +527,9 @@ ON CONFLICT (id) DO NOTHING;
 -- ---------------------------------------------------------------------------------------------------------------------
 -- 8.7 B2B SUBSCRIPTION ORDERS (HAS audit fields)
 -- ---------------------------------------------------------------------------------------------------------------------
-INSERT INTO b2b_subscription_order (id, external_id, location_id, date_time, b2b_subscription_order_status_id, b2b_subscription_id, date_created, last_date_modified, created_by, last_modified_by, is_deleted) VALUES
-(1, '550e8400-e29b-41d4-a716-446655440841', 1, CURRENT_TIMESTAMP, 2, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
-(2, '550e8400-e29b-41d4-a716-446655440842', 2, CURRENT_TIMESTAMP, 3, 2, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false)
+INSERT INTO b2b_subscription_order (id, external_id, location_id, b2b_subscription_order_status_id, b2b_subscription_id, date_created, last_date_modified, created_by, last_modified_by, is_deleted) VALUES
+(1, '550e8400-e29b-41d4-a716-446655440841', 1, 2, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(2, '550e8400-e29b-41d4-a716-446655440842', 2, 3, 2, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false)
 ON CONFLICT (id) DO NOTHING;
 
 -- ---------------------------------------------------------------------------------------------------------------------
@@ -593,9 +593,9 @@ ON CONFLICT (id) DO NOTHING;
 -- 10.1 STOCK MOVEMENTS (HAS audit fields)
 -- ---------------------------------------------------------------------------------------------------------------------
 -- Note: product_id references Part products (IDs 202, 203)
-INSERT INTO stock_movement (id, external_id, product_id, from_hub_id, to_hub_id, date_time, date_created, last_date_modified, created_by, last_modified_by, is_deleted) VALUES
-(1, 'stock-mov-00101', 202, 1, 2, CURRENT_TIMESTAMP - INTERVAL '3 days', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
-(2, 'stock-mov-00102', 203, 2, 1, CURRENT_TIMESTAMP - INTERVAL '1 day', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false)
+INSERT INTO stock_movement (id, external_id, product_id, from_hub_id, to_hub_id, date_created, last_date_modified, created_by, last_modified_by, is_deleted) VALUES
+(1, 'stock-mov-00101', 202, 1, 2, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(2, 'stock-mov-00102', 203, 2, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false)
 ON CONFLICT (id) DO NOTHING;
 
 -- ---------------------------------------------------------------------------------------------------------------------

@@ -48,7 +48,6 @@ class B2BSaleServiceTest {
         testSale = B2BSale.builder()
         .id(1L)
         .externalId("B2BS001")
-        .dateTime(LocalDateTime.now())
         .build();
 
         testSaleDTO = B2BSaleDTO.builder()
@@ -56,7 +55,6 @@ class B2BSaleServiceTest {
         .externalId("B2BS001")
         .locationId(1L)
         .b2bSaleStatusId(2L)
-        .dateTime(LocalDateTime.now())
         .build();
     }
 

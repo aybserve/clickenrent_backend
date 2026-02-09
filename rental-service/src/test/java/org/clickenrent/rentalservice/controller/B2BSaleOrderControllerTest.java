@@ -50,7 +50,6 @@ class B2BSaleOrderControllerTest {
                 .b2bSaleOrderStatusId(2L)
                 .locationId(1L)
                 .b2bSaleId(1L)
-                .dateTime(LocalDateTime.now())
                 .build();
     }
 

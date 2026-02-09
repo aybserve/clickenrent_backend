@@ -27,7 +27,6 @@ public class StockMovementMapper {
                 .productId(stockMovement.getProduct() != null ? stockMovement.getProduct().getId() : null)
                 .fromHubId(stockMovement.getFromHub() != null ? stockMovement.getFromHub().getId() : null)
                 .toHubId(stockMovement.getToHub() != null ? stockMovement.getToHub().getId() : null)
-                .dateTime(stockMovement.getDateTime())
                 .dateCreated(stockMovement.getDateCreated())
                 .lastDateModified(stockMovement.getLastDateModified())
                 .createdBy(stockMovement.getCreatedBy())
@@ -42,8 +41,7 @@ public class StockMovementMapper {
 
         StockMovement.StockMovementBuilder builder = StockMovement.builder()
                 .id(dto.getId())
-                .externalId(dto.getExternalId())
-                .dateTime(dto.getDateTime());
+                .externalId(dto.getExternalId());
 
         if (dto.getProductId() != null) {
             builder.product(productRepository.findById(dto.getProductId()).orElse(null));

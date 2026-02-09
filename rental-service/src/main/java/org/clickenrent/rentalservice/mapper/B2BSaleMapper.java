@@ -27,7 +27,6 @@ public class B2BSaleMapper {
                 .externalId(b2bSale.getExternalId())
                 .locationId(b2bSale.getLocation() != null ? b2bSale.getLocation().getId() : null)
                 .b2bSaleStatusId(b2bSale.getB2bSaleStatus() != null ? b2bSale.getB2bSaleStatus().getId() : null)
-                .dateTime(b2bSale.getDateTime())
                 .sellerCompanyExternalId(b2bSale.getSellerCompanyExternalId())
                 .buyerCompanyExternalId(b2bSale.getBuyerCompanyExternalId())
                 .dateCreated(b2bSale.getDateCreated())
@@ -45,7 +44,6 @@ public class B2BSaleMapper {
         var builder = B2BSale.builder()
                 .id(dto.getId())
                 .externalId(dto.getExternalId())
-                .dateTime(dto.getDateTime())
                 .sellerCompanyExternalId(dto.getSellerCompanyExternalId())
                 .buyerCompanyExternalId(dto.getBuyerCompanyExternalId())
                 .dateCreated(dto.getDateCreated())
@@ -66,10 +64,6 @@ public class B2BSaleMapper {
     public void updateEntityFromDto(B2BSaleDTO dto, B2BSale b2bSale) {
         if (dto == null || b2bSale == null) {
             return;
-        }
-
-        if (dto.getDateTime() != null) {
-            b2bSale.setDateTime(dto.getDateTime());
         }
     }
 }

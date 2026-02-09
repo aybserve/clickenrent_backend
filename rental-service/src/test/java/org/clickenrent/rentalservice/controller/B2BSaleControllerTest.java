@@ -50,7 +50,6 @@ class B2BSaleControllerTest {
                 .externalId("B2BS001")
                 .locationId(1L)
                 .b2bSaleStatusId(2L)
-                .dateTime(LocalDateTime.now())
                 .build();
     }
 
@@ -139,7 +138,6 @@ class B2BSaleControllerTest {
                 .externalId("B2BS002")
                 .locationId(1L)
                 .b2bSaleStatusId(1L)
-                .dateTime(LocalDateTime.now())
                 .build();
 
         B2BSaleDTO createdSale = B2BSaleDTO.builder()
@@ -147,7 +145,6 @@ class B2BSaleControllerTest {
                 .externalId("B2BS002")
                 .locationId(1L)
                 .b2bSaleStatusId(1L)
-                .dateTime(LocalDateTime.now())
                 .build();
 
         when(b2bSaleService.createSale(any(B2BSaleDTO.class))).thenReturn(createdSale);

@@ -32,7 +32,6 @@ public class B2BSaleOrderMapper {
                 .b2bSaleOrderStatusId(b2bSaleOrder.getB2bSaleOrderStatus() != null ? b2bSaleOrder.getB2bSaleOrderStatus().getId() : null)
                 .locationId(b2bSaleOrder.getLocation() != null ? b2bSaleOrder.getLocation().getId() : null)
                 .b2bSaleId(b2bSaleOrder.getB2bSale() != null ? b2bSaleOrder.getB2bSale().getId() : null)
-                .dateTime(b2bSaleOrder.getDateTime())
                 .dateCreated(b2bSaleOrder.getDateCreated())
                 .lastDateModified(b2bSaleOrder.getLastDateModified())
                 .createdBy(b2bSaleOrder.getCreatedBy())
@@ -50,7 +49,6 @@ public class B2BSaleOrderMapper {
                 .externalId(dto.getExternalId())
                 .sellerCompanyExternalId(dto.getSellerCompanyExternalId())
                 .buyerCompanyExternalId(dto.getBuyerCompanyExternalId())
-                .dateTime(dto.getDateTime())
                 .dateCreated(dto.getDateCreated())
                 .lastDateModified(dto.getLastDateModified())
                 .createdBy(dto.getCreatedBy())
@@ -74,9 +72,6 @@ public class B2BSaleOrderMapper {
             return;
         }
 
-        if (dto.getDateTime() != null) {
-            b2bSaleOrder.setDateTime(dto.getDateTime());
-        }
         if (dto.getB2bSaleOrderStatusId() != null) {
             b2bSaleOrderStatusRepository.findById(dto.getB2bSaleOrderStatusId())
                     .ifPresent(b2bSaleOrder::setB2bSaleOrderStatus);

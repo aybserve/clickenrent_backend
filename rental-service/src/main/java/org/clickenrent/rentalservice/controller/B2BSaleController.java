@@ -31,7 +31,7 @@ public class B2BSaleController {
     @PreAuthorize("hasAnyRole('SUPERADMIN', 'ADMIN')")
     @Operation(summary = "Get all B2B sales")
     public ResponseEntity<Page<B2BSaleDTO>> getAllSales(
-            @PageableDefault(size = 20, sort = "dateTime", direction = Sort.Direction.DESC) Pageable pageable) {
+            @PageableDefault(size = 20, sort = "dateCreated", direction = Sort.Direction.DESC) Pageable pageable) {
         return ResponseEntity.ok(b2bSaleService.getAllSales(pageable));
     }
 

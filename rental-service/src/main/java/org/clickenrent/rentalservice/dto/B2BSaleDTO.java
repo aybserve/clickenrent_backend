@@ -20,7 +20,6 @@ public class B2BSaleDTO {
     private String externalId;
     private Long locationId;
     private Long b2bSaleStatusId;
-    private LocalDateTime dateTime;
     
     // Cross-service externalId references
     private String sellerCompanyExternalId;

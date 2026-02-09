@@ -9,7 +9,6 @@ import org.hibernate.annotations.Filter;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
 
-import java.time.LocalDateTime;
 import java.util.UUID;
 
 /**
@@ -55,10 +54,6 @@ public class B2BSale extends BaseAuditEntity implements TenantScoped {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "b2b_sale_status_id", nullable = false)
     private B2BSaleStatus b2bSaleStatus;
-
-    @NotNull(message = "Date time is required")
-    @Column(name = "date_time", nullable = false)
-    private LocalDateTime dateTime;
 
     @NotNull(message = "Seller company external ID is required")
     @Column(name = "seller_company_external_id", nullable = false, length = 100)

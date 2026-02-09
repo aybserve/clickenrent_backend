@@ -73,7 +73,6 @@ class StockMovementServiceTest {
         .product(testProduct)
         .fromHub(testFromHub)
         .toHub(testToHub)
-        .dateTime(LocalDateTime.now())
         .build();
 
         testMovementDTO = StockMovementDTO.builder()
@@ -82,7 +81,6 @@ class StockMovementServiceTest {
         .productId(1L)
         .fromHubId(1L)
         .toHubId(2L)
-        .dateTime(LocalDateTime.now())
         .build();
 
     }

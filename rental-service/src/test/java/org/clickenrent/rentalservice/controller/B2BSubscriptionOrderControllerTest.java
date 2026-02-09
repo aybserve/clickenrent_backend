@@ -45,7 +45,6 @@ class B2BSubscriptionOrderControllerTest {
                 .id(1L)
                 .externalId("B2BSORD001")
                 .locationId(1L)
-                .dateTime(LocalDateTime.now())
                 .b2bSubscriptionOrderStatusId(2L)
                 .b2bSubscriptionId(1L)
                 .build();

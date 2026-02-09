@@ -23,7 +23,6 @@ public class B2BSaleOrderDTO {
     private Long b2bSaleOrderStatusId;
     private Long locationId;
     private Long b2bSaleId;
-    private LocalDateTime dateTime;
 
     // Audit fields
     private LocalDateTime dateCreated;

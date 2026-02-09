@@ -21,7 +21,6 @@ public class StockMovementDTO {
     private Long productId;
     private Long fromHubId;
     private Long toHubId;
-    private LocalDateTime dateTime;
 
     // Audit fields
     private LocalDateTime dateCreated;

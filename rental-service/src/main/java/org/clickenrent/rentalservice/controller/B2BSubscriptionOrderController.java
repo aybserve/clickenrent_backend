@@ -29,7 +29,7 @@ public class B2BSubscriptionOrderController {
     @PreAuthorize("hasAnyRole('SUPERADMIN', 'ADMIN')")
     @Operation(summary = "Get all B2B subscription orders")
     public ResponseEntity<Page<B2BSubscriptionOrderDTO>> getAllOrders(
-            @PageableDefault(size = 20, sort = "dateTime", direction = Sort.Direction.DESC) Pageable pageable) {
+            @PageableDefault(size = 20, sort = "dateCreated", direction = Sort.Direction.DESC) Pageable pageable) {
         return ResponseEntity.ok(b2bSubscriptionOrderService.getAllOrders(pageable));
     }
 

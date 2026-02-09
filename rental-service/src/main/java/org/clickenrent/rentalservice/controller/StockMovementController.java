@@ -31,7 +31,7 @@ public class StockMovementController {
     @PreAuthorize("hasAnyRole('SUPERADMIN', 'ADMIN')")
     @Operation(summary = "Get all stock movements")
     public ResponseEntity<Page<StockMovementDTO>> getAllStockMovements(
-            @PageableDefault(size = 20, sort = "dateTime", direction = Sort.Direction.DESC) Pageable pageable) {
+            @PageableDefault(size = 20, sort = "dateCreated", direction = Sort.Direction.DESC) Pageable pageable) {
         return ResponseEntity.ok(stockMovementService.getAllStockMovements(pageable));
     }
 

@@ -9,8 +9,6 @@ import org.hibernate.annotations.Filter;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.SQLRestriction;
 
-import java.time.LocalDateTime;
-
 /**
  * Entity representing B2B sale orders between companies.
  * Orders that eventually create a B2BSale when completed/processed.
@@ -66,10 +64,6 @@ public class B2BSaleOrder extends BaseAuditEntity implements TenantScoped {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "b2b_sale_id")
     private B2BSale b2bSale;
-
-    @NotNull(message = "Date time is required")
-    @Column(name = "date_time", nullable = false)
-    private LocalDateTime dateTime;
     
     @Override
     public String getCompanyExternalId() {
