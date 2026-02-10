@@ -142,6 +142,7 @@ public class UserPaymentMethodService {
     @Transactional
     public UserPaymentMethodDTO create(UserPaymentMethodDTO dto) {
         UserPaymentMethod method = userPaymentMethodMapper.toEntity(dto);
+        method.sanitizeForCreate();
         UserPaymentMethod savedMethod = userPaymentMethodRepository.save(method);
         return userPaymentMethodMapper.toDTO(savedMethod);
     }

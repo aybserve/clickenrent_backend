@@ -78,6 +78,7 @@ public class CompanyService {
     @Transactional
     public CompanyDTO createCompany(CompanyDTO companyDTO) {
         Company company = companyMapper.toEntity(companyDTO);
+        company.sanitizeForCreate();
         
         if (company.getExternalId() == null) {
             company.setExternalId(UUID.randomUUID().toString());

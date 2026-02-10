@@ -55,6 +55,7 @@ public class ChargingStationBrandService {
         }
 
         ChargingStationBrand brand = chargingStationBrandMapper.toEntity(dto);
+        brand.sanitizeForCreate();
         brand = chargingStationBrandRepository.save(brand);
         return chargingStationBrandMapper.toDto(brand);
     }

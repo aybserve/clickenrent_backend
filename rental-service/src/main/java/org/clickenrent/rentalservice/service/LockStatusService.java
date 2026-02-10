@@ -46,6 +46,7 @@ public class LockStatusService {
         }
 
         LockStatus lockStatus = lockStatusMapper.toEntity(dto);
+        lockStatus.sanitizeForCreate();
         lockStatus = lockStatusRepository.save(lockStatus);
         return lockStatusMapper.toDto(lockStatus);
     }

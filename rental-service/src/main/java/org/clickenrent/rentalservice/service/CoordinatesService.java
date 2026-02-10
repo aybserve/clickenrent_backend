@@ -29,6 +29,7 @@ public class CoordinatesService {
     @Transactional
     public CoordinatesDTO createCoordinates(CoordinatesDTO dto) {
         Coordinates coordinates = coordinatesMapper.toEntity(dto);
+        coordinates.sanitizeForCreate();
         coordinates = coordinatesRepository.save(coordinates);
         return coordinatesMapper.toDto(coordinates);
     }
@@ -60,6 +61,7 @@ public class CoordinatesService {
         } else {
             // Create new coordinates
             Coordinates newCoordinates = coordinatesMapper.toEntity(dto);
+            newCoordinates.sanitizeForCreate();
             return coordinatesRepository.save(newCoordinates);
         }
     }

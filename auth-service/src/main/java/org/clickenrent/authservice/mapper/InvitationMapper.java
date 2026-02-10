@@ -25,6 +25,7 @@ public class InvitationMapper {
         
         return InvitationDTO.builder()
                 .id(invitation.getId())
+                .externalId(invitation.getExternalId())
                 .email(invitation.getEmail())
                 .token(invitation.getToken())
                 .invitedByUserId(invitation.getInvitedBy().getId())

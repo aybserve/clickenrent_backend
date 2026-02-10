@@ -35,6 +35,26 @@ public class BikeEngine extends BaseAuditEntity {
     @Size(max = 100, message = "Bike engine name must not exceed 100 characters")
     @Column(name = "name", nullable = false, length = 100)
     private String name;
+
+    @Override
+    public Long getId() {
+        return id;
+    }
+
+    @Override
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    @Override
+    public String getExternalId() {
+        return externalId;
+    }
+
+    @Override
+    public void setExternalId(String externalId) {
+        this.externalId = externalId;
+    }
 }
 
 

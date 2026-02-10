@@ -144,6 +144,26 @@ public class AnalyticsDailySummary extends BaseAuditEntity implements TenantScop
     @Builder.Default
     private Integer openTickets = 0;
 
+    @Override
+    public Long getId() {
+        return this.id;
+    }
+
+    @Override
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    @Override
+    public String getExternalId() {
+        return this.externalId;
+    }
+
+    @Override
+    public void setExternalId(String externalId) {
+        this.externalId = externalId;
+    }
+
     @PrePersist
     public void prePersist() {
         if (externalId == null || externalId.isEmpty()) {

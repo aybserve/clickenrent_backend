@@ -84,6 +84,7 @@ public class B2BRevenueSharePayoutService {
             throw new IllegalArgumentException("Company external ID is required");
         }
         
+        payout.sanitizeForCreate();
         B2BRevenueSharePayout savedPayout = b2bRevenueSharePayoutRepository.save(payout);
         return b2bRevenueSharePayoutMapper.toDTO(savedPayout);
     }

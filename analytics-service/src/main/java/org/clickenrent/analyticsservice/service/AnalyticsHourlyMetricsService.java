@@ -209,6 +209,7 @@ public class AnalyticsHourlyMetricsService {
         }
 
         AnalyticsHourlyMetrics metrics = mapper.toEntity(dto);
+        metrics.sanitizeForCreate();
         metrics = repository.save(metrics);
         
         log.info("Created analytics hourly metrics: id={}, companyExternalId={}, hour={}", 

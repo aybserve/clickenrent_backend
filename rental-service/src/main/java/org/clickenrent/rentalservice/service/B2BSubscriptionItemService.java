@@ -54,6 +54,7 @@ public class B2BSubscriptionItemService {
         }
 
         B2BSubscriptionItem item = b2bSubscriptionItemMapper.toEntity(dto);
+        item.sanitizeForCreate();
         item = b2bSubscriptionItemRepository.save(item);
         return b2bSubscriptionItemMapper.toDto(item);
     }

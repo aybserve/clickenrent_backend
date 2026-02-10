@@ -95,6 +95,7 @@ public class FinancialTransactionService {
             throw new IllegalArgumentException("Payer and recipient external IDs are required");
         }
         
+        transaction.sanitizeForCreate();
         FinancialTransaction savedTransaction = financialTransactionRepository.save(transaction);
         return financialTransactionMapper.toDTO(savedTransaction);
     }

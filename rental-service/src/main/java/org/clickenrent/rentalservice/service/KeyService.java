@@ -55,6 +55,7 @@ public class KeyService {
         }
 
         Key key = keyMapper.toEntity(dto);
+        key.sanitizeForCreate();
         key = keyRepository.save(key);
         return keyMapper.toDto(key);
     }

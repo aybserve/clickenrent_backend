@@ -1,5 +1,6 @@
 package org.clickenrent.paymentservice.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
@@ -16,6 +17,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class LocationBankAccountDTO {
     
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private String externalId;
     
     private String companyExternalId;
@@ -46,11 +48,15 @@ public class LocationBankAccountDTO {
     
     private String verificationNotes;
     
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private LocalDateTime createdAt;
     
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private LocalDateTime updatedAt;
     
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private String createdBy;
     
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private String updatedBy;
 }

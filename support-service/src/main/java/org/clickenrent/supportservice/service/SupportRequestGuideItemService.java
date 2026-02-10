@@ -67,6 +67,7 @@ public class SupportRequestGuideItemService {
         }
 
         SupportRequestGuideItem entity = supportRequestGuideItemMapper.toEntity(dto);
+        entity.sanitizeForCreate();
         entity = supportRequestGuideItemRepository.save(entity);
         return supportRequestGuideItemMapper.toDto(entity);
     }

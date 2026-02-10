@@ -1,5 +1,6 @@
 package org.clickenrent.authservice.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -19,8 +20,10 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class UserDTO {
 
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private Long id;
     
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     @Pattern(regexp = "^[a-zA-Z0-9-]{1,100}$", message = "Invalid external ID format")
     private String externalId;
     
@@ -56,9 +59,13 @@ public class UserDTO {
     private Boolean isAcceptedPrivacyPolicy;
 
     // Audit fields
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private LocalDateTime dateCreated;
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private LocalDateTime lastDateModified;
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private String createdBy;
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private String lastModifiedBy;
 }
 

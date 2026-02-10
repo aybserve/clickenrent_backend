@@ -80,6 +80,26 @@ public class AnalyticsHourlyMetrics extends BaseAuditEntity implements TenantSco
     @Builder.Default
     private Integer newRegistrations = 0;
 
+    @Override
+    public Long getId() {
+        return this.id;
+    }
+
+    @Override
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    @Override
+    public String getExternalId() {
+        return this.externalId;
+    }
+
+    @Override
+    public void setExternalId(String externalId) {
+        this.externalId = externalId;
+    }
+
     @PrePersist
     public void prePersist() {
         if (externalId == null || externalId.isEmpty()) {

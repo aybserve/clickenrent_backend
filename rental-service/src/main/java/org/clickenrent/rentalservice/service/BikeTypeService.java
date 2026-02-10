@@ -48,6 +48,7 @@ public class BikeTypeService {
         }
 
         BikeType bikeType = bikeTypeMapper.toEntity(dto);
+        bikeType.sanitizeForCreate();
         bikeType = bikeTypeRepository.save(bikeType);
         return bikeTypeMapper.toDto(bikeType);
     }

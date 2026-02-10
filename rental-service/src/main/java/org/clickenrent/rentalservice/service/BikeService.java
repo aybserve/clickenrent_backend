@@ -80,6 +80,7 @@ public class BikeService {
         }
 
         Bike bike = bikeMapper.toEntity(bikeDTO);
+        bike.sanitizeForCreate();
         bike = bikeRepository.save(bike);
         
         // Notify search-service for indexing

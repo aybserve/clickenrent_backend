@@ -201,8 +201,8 @@ SENTRY_TRACES_SAMPLE_RATE=1.0  # 1.0 = 100% of transactions
 
 Choose your Sentry deployment option:
 
-- **Cloud Version**: [SENTRY_SETUP.md](SENTRY_SETUP.md) - Managed Sentry.io (starts at $26/mo)
-- **Self-Hosted** ⭐: [SENTRY_SELF_HOSTED.md](SENTRY_SELF_HOSTED.md) - Free, unlimited, full control
+- **Cloud Version**: [SENTRY_SETUP.md](docs/SENTRY_SETUP.md) - Managed Sentry.io (starts at $26/mo)
+- **Self-Hosted** ⭐: [SENTRY_SELF_HOSTED.md](docs/SENTRY_SELF_HOSTED.md) - Free, unlimited, full control
 
 Both options work identically with your application code - only the DSN URLs differ.
 

@@ -35,6 +35,7 @@ public class LocationRoleService {
     @Transactional
     public LocationRoleDTO createLocationRole(LocationRoleDTO locationRoleDTO) {
         LocationRole role = locationRoleMapper.toEntity(locationRoleDTO);
+        role.sanitizeForCreate();
         LocationRole savedRole = locationRoleRepository.save(role);
         return locationRoleMapper.toDto(savedRole);
     }

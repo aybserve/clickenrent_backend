@@ -43,6 +43,7 @@ public class CorsConfig {
         corsConfig.setAllowedOriginPatterns(Arrays.asList(
                 "https://*.clickenrent.nl",
                 "https://*.vercel.app",
+                "https://*.readme.io",
                 "http://localhost:[*]",
                 "http://127.0.0.1:[*]"
         ));

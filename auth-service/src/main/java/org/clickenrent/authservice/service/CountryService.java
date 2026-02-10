@@ -53,6 +53,9 @@ public class CountryService {
     @Transactional
     public CountryDTO createCountry(CountryDTO countryDTO) {
         Country country = countryMapper.toEntity(countryDTO);
+        // Sanitize server-managed fields
+        country.setId(null);
+        country.setExternalId(null);
         country = countryRepository.save(country);
         return countryMapper.toDto(country);
     }

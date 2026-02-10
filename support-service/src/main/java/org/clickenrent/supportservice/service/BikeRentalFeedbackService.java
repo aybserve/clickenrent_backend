@@ -118,6 +118,7 @@ public class BikeRentalFeedbackService {
         }
 
         BikeRentalFeedback entity = bikeRentalFeedbackMapper.toEntity(dto);
+        entity.sanitizeForCreate();
         entity = bikeRentalFeedbackRepository.save(entity);
         return bikeRentalFeedbackMapper.toDto(entity);
     }

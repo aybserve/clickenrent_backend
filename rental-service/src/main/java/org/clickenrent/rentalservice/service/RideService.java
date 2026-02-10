@@ -109,6 +109,7 @@ public class RideService {
                 .orElseThrow(() -> new ResourceNotFoundException("RideStatus", "name", "Active"));
         ride.setRideStatus(activeStatus);
 
+        ride.sanitizeForCreate();
         ride = rideRepository.save(ride);
 
         // Send notification

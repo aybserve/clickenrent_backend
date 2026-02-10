@@ -135,6 +135,7 @@ public class RentalService {
         }
 
         Rental rental = rentalMapper.toEntity(rentalDTO);
+        rental.sanitizeForCreate();
         rental = rentalRepository.save(rental);
         return rentalMapper.toDto(rental);
     }

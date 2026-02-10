@@ -121,6 +121,7 @@ public class BikeReservationService {
         // TODO: Check for overlapping reservations
 
         BikeReservation reservation = bikeReservationMapper.toEntity(dto);
+        reservation.sanitizeForCreate();
         reservation = bikeReservationRepository.save(reservation);
         return bikeReservationMapper.toDto(reservation);
     }

@@ -82,6 +82,7 @@ public class HubService {
         }
 
         Hub hub = hubMapper.toEntity(hubDTO);
+        hub.sanitizeForCreate();
         hub = hubRepository.save(hub);
         
         // Notify search-service for indexing

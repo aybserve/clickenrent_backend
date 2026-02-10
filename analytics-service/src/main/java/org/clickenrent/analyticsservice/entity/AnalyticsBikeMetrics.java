@@ -94,6 +94,26 @@ public class AnalyticsBikeMetrics extends BaseAuditEntity implements TenantScope
     @Column(name = "maintenance_hours", precision = 5, scale = 2)
     private BigDecimal maintenanceHours;
 
+    @Override
+    public Long getId() {
+        return this.id;
+    }
+
+    @Override
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    @Override
+    public String getExternalId() {
+        return this.externalId;
+    }
+
+    @Override
+    public void setExternalId(String externalId) {
+        this.externalId = externalId;
+    }
+
     @PrePersist
     public void prePersist() {
         if (externalId == null || externalId.isEmpty()) {

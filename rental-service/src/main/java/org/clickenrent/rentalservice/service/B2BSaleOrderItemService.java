@@ -59,6 +59,7 @@ public class B2BSaleOrderItemService {
         }
 
         B2BSaleOrderItem item = b2bSaleOrderItemMapper.toEntity(dto);
+        item.sanitizeForCreate();
         item = b2bSaleOrderItemRepository.save(item);
         return b2bSaleOrderItemMapper.toDto(item);
     }

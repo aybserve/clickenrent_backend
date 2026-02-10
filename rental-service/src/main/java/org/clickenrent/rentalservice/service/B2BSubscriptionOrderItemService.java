@@ -59,6 +59,7 @@ public class B2BSubscriptionOrderItemService {
         }
 
         B2BSubscriptionOrderItem item = b2bSubscriptionOrderItemMapper.toEntity(dto);
+        item.sanitizeForCreate();
         item = b2bSubscriptionOrderItemRepository.save(item);
         return b2bSubscriptionOrderItemMapper.toDto(item);
     }

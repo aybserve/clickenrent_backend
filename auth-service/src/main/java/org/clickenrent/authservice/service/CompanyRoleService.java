@@ -46,6 +46,9 @@ public class CompanyRoleService {
     @Transactional
     public CompanyRoleDTO createCompanyRole(CompanyRoleDTO companyRoleDTO) {
         CompanyRole companyRole = companyRoleMapper.toEntity(companyRoleDTO);
+        // Sanitize server-managed fields
+        companyRole.setId(null);
+        companyRole.setExternalId(null);
         companyRole = companyRoleRepository.save(companyRole);
         return companyRoleMapper.toDto(companyRole);
     }

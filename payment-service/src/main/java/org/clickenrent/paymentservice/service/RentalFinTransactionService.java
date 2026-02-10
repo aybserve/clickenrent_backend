@@ -65,6 +65,7 @@ public class RentalFinTransactionService {
         log.debug("Creating rental transaction with rentalExternalId: {}", 
                 dto.getRentalExternalId());
         
+        transaction.sanitizeForCreate();
         RentalFinTransaction savedTransaction = rentalFinTransactionRepository.save(transaction);
         return rentalFinTransactionMapper.toDTO(savedTransaction);
     }

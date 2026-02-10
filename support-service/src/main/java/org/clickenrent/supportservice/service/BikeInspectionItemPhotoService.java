@@ -59,6 +59,7 @@ public class BikeInspectionItemPhotoService {
         }
 
         BikeInspectionItemPhoto entity = bikeInspectionItemPhotoMapper.toEntity(dto);
+        entity.sanitizeForCreate();
         entity = bikeInspectionItemPhotoRepository.save(entity);
         return bikeInspectionItemPhotoMapper.toDto(entity);
     }

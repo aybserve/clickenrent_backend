@@ -391,7 +391,7 @@ This implementation represents a **complete transformation** of the payment serv
 
 ## 📚 Documentation Index
 
-1. **[README.md](README.md)** - Service overview, quick start, deployment
+1. **[README.md](../README.md)** - Service overview, quick start, deployment
 2. **[PAYMENT_METHODS_GUIDE.md](PAYMENT_METHODS_GUIDE.md)** - Implementation examples, patterns, best practices
 3. **[PAYMENT_METHODS_TESTING.md](PAYMENT_METHODS_TESTING.md)** - Complete testing guide for all methods
 4. **[IMPLEMENTATION_STATUS.md](IMPLEMENTATION_STATUS.md)** - Detailed progress and statistics

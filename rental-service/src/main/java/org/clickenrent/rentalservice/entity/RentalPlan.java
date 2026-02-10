@@ -52,4 +52,24 @@ public class RentalPlan extends BaseAuditEntity {
 
     @Column(name = "default_price", precision = 10, scale = 2)
     private BigDecimal defaultPrice;
+
+    @Override
+    public Long getId() {
+        return id;
+    }
+
+    @Override
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    @Override
+    public String getExternalId() {
+        return externalId;
+    }
+
+    @Override
+    public void setExternalId(String externalId) {
+        this.externalId = externalId;
+    }
 }

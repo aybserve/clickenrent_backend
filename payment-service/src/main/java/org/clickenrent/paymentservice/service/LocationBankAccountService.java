@@ -30,6 +30,7 @@ public class LocationBankAccountService {
         }
         
         LocationBankAccount entity = locationBankAccountMapper.toEntity(dto);
+        entity.sanitizeForCreate();
         LocationBankAccount saved = locationBankAccountRepository.save(entity);
         
         log.info("Created location bank account with external ID: {}", saved.getExternalId());

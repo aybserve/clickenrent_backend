@@ -59,6 +59,7 @@ public class SupportRequestStatusService {
         }
 
         SupportRequestStatus entity = supportRequestStatusMapper.toEntity(dto);
+        entity.sanitizeForCreate();
         entity = supportRequestStatusRepository.save(entity);
         return supportRequestStatusMapper.toDto(entity);
     }

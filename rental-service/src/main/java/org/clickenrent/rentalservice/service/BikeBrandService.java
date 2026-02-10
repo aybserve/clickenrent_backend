@@ -55,6 +55,7 @@ public class BikeBrandService {
         }
 
         BikeBrand bikeBrand = bikeBrandMapper.toEntity(dto);
+        bikeBrand.sanitizeForCreate();
         bikeBrand = bikeBrandRepository.save(bikeBrand);
         return bikeBrandMapper.toDto(bikeBrand);
     }

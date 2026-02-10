@@ -55,6 +55,7 @@ public class PartBrandService {
         }
 
         PartBrand brand = partBrandMapper.toEntity(dto);
+        brand.sanitizeForCreate();
         brand = partBrandRepository.save(brand);
         return partBrandMapper.toDto(brand);
     }

@@ -60,6 +60,7 @@ public class PaymentMethodService {
         }
 
         PaymentMethod method = paymentMethodMapper.toEntity(dto);
+        method.sanitizeForCreate();
         PaymentMethod savedMethod = paymentMethodRepository.save(method);
         return paymentMethodMapper.toDTO(savedMethod);
     }

@@ -44,6 +44,7 @@ public class ChargingStationService {
         }
 
         ChargingStation chargingStation = chargingStationMapper.toEntity(dto);
+        chargingStation.sanitizeForCreate();
         chargingStation = chargingStationRepository.save(chargingStation);
         return chargingStationMapper.toDto(chargingStation);
     }

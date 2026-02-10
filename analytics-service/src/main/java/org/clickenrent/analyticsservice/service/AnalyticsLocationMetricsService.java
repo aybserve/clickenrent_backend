@@ -304,6 +304,7 @@ public class AnalyticsLocationMetricsService {
         }
 
         AnalyticsLocationMetrics metrics = mapper.toEntity(dto);
+        metrics.sanitizeForCreate();
         metrics = repository.save(metrics);
         
         log.info("Created analytics location metrics: id={}, companyExternalId={}, date={}, locationExternalId={}", 

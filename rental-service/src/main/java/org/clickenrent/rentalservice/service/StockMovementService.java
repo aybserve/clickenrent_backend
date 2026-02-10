@@ -75,6 +75,7 @@ public class StockMovementService {
                 .orElseThrow(() -> new ResourceNotFoundException("Hub", "id", dto.getToHubId()));
 
         StockMovement stockMovement = stockMovementMapper.toEntity(dto);
+        stockMovement.sanitizeForCreate();
         stockMovement = stockMovementRepository.save(stockMovement);
         return stockMovementMapper.toDto(stockMovement);
     }

@@ -197,7 +197,7 @@ payment.testing.enabled=true
 
 ### Test Credentials
 
-See [PAYMENT_METHODS_TESTING.md](PAYMENT_METHODS_TESTING.md) for comprehensive testing guide including:
+See [PAYMENT_METHODS_TESTING.md](docs/PAYMENT_METHODS_TESTING.md) for comprehensive testing guide including:
 - Test card numbers
 - Test IBANs
 - Test phone numbers
@@ -221,8 +221,8 @@ curl -X POST http://localhost:8080/api/v1/payments/mobile/test/direct \
 
 | Document | Description |
 |----------|-------------|
-| [PAYMENT_METHODS_GUIDE.md](PAYMENT_METHODS_GUIDE.md) | Implementation guide with code examples |
-| [PAYMENT_METHODS_TESTING.md](PAYMENT_METHODS_TESTING.md) | Comprehensive testing guide for all methods |
+| [PAYMENT_METHODS_GUIDE.md](docs/PAYMENT_METHODS_GUIDE.md) | Implementation guide with code examples |
+| [PAYMENT_METHODS_TESTING.md](docs/PAYMENT_METHODS_TESTING.md) | Comprehensive testing guide for all methods |
 | [MULTISAFEPAY_PAYOUT_SYSTEM.md](MULTISAFEPAY_PAYOUT_SYSTEM.md) | Automated payout system documentation |
 | [IMPLEMENTATION_STATUS.md](IMPLEMENTATION_STATUS.md) | Current implementation status and roadmap |
 

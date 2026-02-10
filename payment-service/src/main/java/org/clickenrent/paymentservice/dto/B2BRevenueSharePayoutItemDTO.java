@@ -1,5 +1,6 @@
 package org.clickenrent.paymentservice.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import lombok.AllArgsConstructor;
@@ -19,8 +20,10 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class B2BRevenueSharePayoutItemDTO {
     
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private Long id;
     
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private String externalId;
     
     private Long b2bRevenueSharePayoutId;
@@ -33,9 +36,16 @@ public class B2BRevenueSharePayoutItemDTO {
     private BigDecimal amount;
     
     // Audit fields
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private LocalDateTime dateCreated;
+    
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private LocalDateTime lastDateModified;
+    
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private String createdBy;
+    
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private String lastModifiedBy;
 }
 

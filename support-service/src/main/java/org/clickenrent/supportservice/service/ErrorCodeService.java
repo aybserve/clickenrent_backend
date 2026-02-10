@@ -59,6 +59,7 @@ public class ErrorCodeService {
         }
 
         ErrorCode entity = errorCodeMapper.toEntity(dto);
+        entity.sanitizeForCreate();
         entity = errorCodeRepository.save(entity);
         return errorCodeMapper.toDto(entity);
     }

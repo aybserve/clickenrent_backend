@@ -55,6 +55,7 @@ public class PaymentStatusService {
         }
 
         PaymentStatus status = paymentStatusMapper.toEntity(dto);
+        status.sanitizeForCreate();
         PaymentStatus savedStatus = paymentStatusRepository.save(status);
         return paymentStatusMapper.toDTO(savedStatus);
     }

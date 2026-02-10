@@ -66,6 +66,7 @@ public class UserAddressService {
     @Transactional
     public UserAddressDTO createUserAddress(UserAddressDTO userAddressDTO) {
         UserAddress userAddress = userAddressMapper.toEntity(userAddressDTO);
+        userAddress.sanitizeForCreate();
         
         // Set the user relationship
         if (userAddressDTO.getUserId() != null) {

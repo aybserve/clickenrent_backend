@@ -49,6 +49,7 @@ public class LockService {
         }
 
         Lock lock = lockMapper.toEntity(dto);
+        lock.sanitizeForCreate();
         lock = lockRepository.save(lock);
         return lockMapper.toDto(lock);
     }

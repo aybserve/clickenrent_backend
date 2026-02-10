@@ -40,6 +40,7 @@ public class PartCategoryService {
         }
 
         PartCategory category = partCategoryMapper.toEntity(dto);
+        category.sanitizeForCreate();
         category = partCategoryRepository.save(category);
         return partCategoryMapper.toDto(category);
     }

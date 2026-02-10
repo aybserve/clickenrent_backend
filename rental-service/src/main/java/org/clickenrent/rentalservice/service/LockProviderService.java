@@ -54,6 +54,7 @@ public class LockProviderService {
         }
 
         LockProvider lockProvider = lockProviderMapper.toEntity(dto);
+        lockProvider.sanitizeForCreate();
         lockProvider = lockProviderRepository.save(lockProvider);
         return lockProviderMapper.toDto(lockProvider);
     }

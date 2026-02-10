@@ -135,6 +135,7 @@ public class SupportRequestService {
         }
 
         SupportRequest entity = supportRequestMapper.toEntity(dto);
+        entity.sanitizeForCreate();
         entity = supportRequestRepository.save(entity);
         return supportRequestMapper.toDto(entity);
     }

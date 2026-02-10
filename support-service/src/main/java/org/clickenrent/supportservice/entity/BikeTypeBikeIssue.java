@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
+import java.util.UUID;
+
 /**
  * Junction entity linking bike types to their common issues.
  */
@@ -38,6 +40,29 @@ public class BikeTypeBikeIssue {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "bike_issue_id", nullable = false)
     private BikeIssue bikeIssue;
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public String getExternalId() {
+        return externalId;
+    }
+
+    public void setExternalId(String externalId) {
+        this.externalId = externalId;
+    }
+
+    @PrePersist
+    protected void prePersist() {
+        if (externalId == null || externalId.isEmpty()) {
+            externalId = UUID.randomUUID().toString();
+        }
+    }
 }
 
 

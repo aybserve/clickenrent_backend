@@ -116,6 +116,7 @@ public class UserPaymentProfileService {
             throw new IllegalArgumentException("User external ID is required");
         }
         
+        profile.sanitizeForCreate();
         UserPaymentProfile savedProfile = userPaymentProfileRepository.save(profile);
         return userPaymentProfileMapper.toDTO(savedProfile);
     }

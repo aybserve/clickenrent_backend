@@ -55,6 +55,7 @@ public class ServiceProviderService {
         }
 
         ServiceProvider provider = serviceProviderMapper.toEntity(dto);
+        provider.sanitizeForCreate();
         ServiceProvider savedProvider = serviceProviderRepository.save(provider);
         return serviceProviderMapper.toDTO(savedProvider);
     }

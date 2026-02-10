@@ -79,6 +79,26 @@ public class B2BRevenueSharePayout extends BaseAuditEntity implements TenantScop
     @Builder.Default
     private List<B2BRevenueSharePayoutItem> payoutItems = new ArrayList<>();
 
+    @Override
+    public Long getId() {
+        return id;
+    }
+
+    @Override
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    @Override
+    public String getExternalId() {
+        return externalId;
+    }
+
+    @Override
+    public void setExternalId(String externalId) {
+        this.externalId = externalId;
+    }
+
     @PrePersist
     public void prePersist() {
         if (externalId == null || externalId.isEmpty()) {

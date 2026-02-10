@@ -40,6 +40,10 @@ public class UserPreference extends BaseAuditEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Size(max = 100, message = "External ID must not exceed 100 characters")
+    @Column(name = "external_id", unique = true, length = 100)
+    private String externalId;
+
     /**
      * User associated with these preferences.
      * Note: Uniqueness is enforced by a partial unique index (WHERE is_deleted = false)
@@ -190,5 +194,25 @@ public class UserPreference extends BaseAuditEntity {
         IMMEDIATE,  // Send notifications immediately
         DAILY,      // Digest once per day
         WEEKLY      // Digest once per week
+    }
+
+    @Override
+    public Long getId() {
+        return id;
+    }
+
+    @Override
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    @Override
+    public String getExternalId() {
+        return externalId;
+    }
+
+    @Override
+    public void setExternalId(String externalId) {
+        this.externalId = externalId;
     }
 }

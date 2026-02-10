@@ -25,6 +25,7 @@ public class UserPreferenceMapper {
         
         return UserPreferenceDTO.builder()
                 .id(entity.getId())
+                .externalId(entity.getExternalId())
                 .userId(entity.getUser() != null ? entity.getUser().getId() : null)
                 .userExternalId(entity.getUser() != null ? entity.getUser().getExternalId() : null)
                 .navigationOrder(entity.getNavigationOrder())

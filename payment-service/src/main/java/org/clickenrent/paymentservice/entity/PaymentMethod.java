@@ -38,6 +38,26 @@ public class PaymentMethod extends BaseAuditEntity {
     @Column(nullable = false)
     private Boolean isActive = true;
 
+    @Override
+    public Long getId() {
+        return id;
+    }
+
+    @Override
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    @Override
+    public String getExternalId() {
+        return externalId;
+    }
+
+    @Override
+    public void setExternalId(String externalId) {
+        this.externalId = externalId;
+    }
+
     @PrePersist
     public void prePersist() {
         if (externalId == null || externalId.isEmpty()) {

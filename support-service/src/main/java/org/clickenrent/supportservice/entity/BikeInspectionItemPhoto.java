@@ -37,6 +37,9 @@ public class BikeInspectionItemPhoto extends BaseAuditEntity implements TenantSc
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "external_id", length = 100, unique = true)
+    private String externalId;
+
     @NotNull(message = "Bike inspection item is required")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "bike_inspection_item_id", nullable = false)
@@ -54,5 +57,25 @@ public class BikeInspectionItemPhoto extends BaseAuditEntity implements TenantSc
     @Override
     public String getCompanyExternalId() {
         return companyExternalId;
+    }
+
+    @Override
+    public Long getId() {
+        return id;
+    }
+
+    @Override
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    @Override
+    public String getExternalId() {
+        return externalId;
+    }
+
+    @Override
+    public void setExternalId(String externalId) {
+        this.externalId = externalId;
     }
 }

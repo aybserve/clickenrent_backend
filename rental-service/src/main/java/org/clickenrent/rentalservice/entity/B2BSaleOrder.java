@@ -70,6 +70,26 @@ public class B2BSaleOrder extends BaseAuditEntity implements TenantScoped {
         // For B2BSaleOrder, return seller company ID as primary tenant
         return this.sellerCompanyExternalId;
     }
+
+    @Override
+    public Long getId() {
+        return id;
+    }
+
+    @Override
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    @Override
+    public String getExternalId() {
+        return externalId;
+    }
+
+    @Override
+    public void setExternalId(String externalId) {
+        this.externalId = externalId;
+    }
 }
 
 

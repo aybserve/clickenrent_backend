@@ -40,6 +40,7 @@ public class PartService {
         }
 
         Part part = partMapper.toEntity(dto);
+        part.sanitizeForCreate();
         part = partRepository.save(part);
         return partMapper.toDto(part);
     }

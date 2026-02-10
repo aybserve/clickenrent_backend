@@ -209,6 +209,7 @@ public class AnalyticsDailySummaryService {
         }
 
         AnalyticsDailySummary summary = mapper.toEntity(dto);
+        summary.sanitizeForCreate();
         summary = repository.save(summary);
         
         log.info("Created analytics summary: id={}, companyExternalId={}, date={}", 

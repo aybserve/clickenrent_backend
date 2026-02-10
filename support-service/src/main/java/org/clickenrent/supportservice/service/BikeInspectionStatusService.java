@@ -59,6 +59,7 @@ public class BikeInspectionStatusService {
         }
 
         BikeInspectionStatus entity = bikeInspectionStatusMapper.toEntity(dto);
+        entity.sanitizeForCreate();
         entity = bikeInspectionStatusRepository.save(entity);
         return bikeInspectionStatusMapper.toDto(entity);
     }

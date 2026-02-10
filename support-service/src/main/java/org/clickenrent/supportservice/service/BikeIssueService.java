@@ -80,6 +80,7 @@ public class BikeIssueService {
         }
 
         BikeIssue entity = bikeIssueMapper.toEntity(dto);
+        entity.sanitizeForCreate();
         entity = bikeIssueRepository.save(entity);
         return bikeIssueMapper.toDto(entity);
     }

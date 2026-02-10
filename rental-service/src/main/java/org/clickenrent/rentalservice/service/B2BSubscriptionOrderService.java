@@ -51,6 +51,7 @@ public class B2BSubscriptionOrderService {
         }
 
         B2BSubscriptionOrder order = b2bSubscriptionOrderMapper.toEntity(dto);
+        order.sanitizeForCreate();
         order = b2bSubscriptionOrderRepository.save(order);
         return b2bSubscriptionOrderMapper.toDto(order);
     }

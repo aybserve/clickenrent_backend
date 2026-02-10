@@ -63,6 +63,7 @@ public class B2BSaleFinTransactionService {
         log.debug("Creating B2B sale transaction with b2bSaleExternalId: {}", dto.getB2bSaleExternalId());
         
         B2BSaleFinTransaction transaction = b2bSaleFinTransactionMapper.toEntity(dto);
+        transaction.sanitizeForCreate();
         B2BSaleFinTransaction savedTransaction = b2bSaleFinTransactionRepository.save(transaction);
         return b2bSaleFinTransactionMapper.toDTO(savedTransaction);
     }

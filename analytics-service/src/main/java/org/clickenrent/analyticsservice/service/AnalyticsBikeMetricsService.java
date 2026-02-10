@@ -337,6 +337,7 @@ public class AnalyticsBikeMetricsService {
         }
 
         AnalyticsBikeMetrics metrics = mapper.toEntity(dto);
+        metrics.sanitizeForCreate();
         metrics = repository.save(metrics);
         
         log.info("Created analytics bike metrics: id={}, companyExternalId={}, date={}, bikeExternalId={}", 

@@ -63,6 +63,7 @@ public class B2BSubscriptionFinTransactionService {
         log.debug("Creating B2B subscription transaction with b2bSubscriptionExternalId: {}", dto.getB2bSubscriptionExternalId());
         
         B2BSubscriptionFinTransaction transaction = b2bSubscriptionFinTransactionMapper.toEntity(dto);
+        transaction.sanitizeForCreate();
         B2BSubscriptionFinTransaction savedTransaction = b2bSubscriptionFinTransactionRepository.save(transaction);
         return b2bSubscriptionFinTransactionMapper.toDTO(savedTransaction);
     }

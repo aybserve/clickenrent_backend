@@ -41,6 +41,7 @@ public class RentalUnitService {
         }
 
         RentalUnit unit = rentalUnitMapper.toEntity(dto);
+        unit.sanitizeForCreate();
         unit = rentalUnitRepository.save(unit);
         return rentalUnitMapper.toDto(unit);
     }

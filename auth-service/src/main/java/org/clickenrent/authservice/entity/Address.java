@@ -55,5 +55,25 @@ public class Address extends BaseAuditEntity {
     @Size(max = 20, message = "Postcode must not exceed 20 characters")
     @Column(name = "postcode", length = 20)
     private String postcode;
+
+    @Override
+    public Long getId() {
+        return id;
+    }
+
+    @Override
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    @Override
+    public String getExternalId() {
+        return externalId;
+    }
+
+    @Override
+    public void setExternalId(String externalId) {
+        this.externalId = externalId;
+    }
 }
 

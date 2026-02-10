@@ -47,6 +47,7 @@ public class BikeModelRentalPlanService {
         }
 
         BikeModelRentalPlan plan = bikeModelRentalPlanMapper.toEntity(dto);
+        plan.sanitizeForCreate();
         plan = bikeModelRentalPlanRepository.save(plan);
         return bikeModelRentalPlanMapper.toDto(plan);
     }

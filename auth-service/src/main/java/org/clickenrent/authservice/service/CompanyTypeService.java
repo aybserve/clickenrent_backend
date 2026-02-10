@@ -46,6 +46,9 @@ public class CompanyTypeService {
     @Transactional
     public CompanyTypeDTO createCompanyType(CompanyTypeDTO companyTypeDTO) {
         CompanyType companyType = companyTypeMapper.toEntity(companyTypeDTO);
+        // Sanitize server-managed fields
+        companyType.setId(null);
+        companyType.setExternalId(null);
         companyType = companyTypeRepository.save(companyType);
         return companyTypeMapper.toDto(companyType);
     }

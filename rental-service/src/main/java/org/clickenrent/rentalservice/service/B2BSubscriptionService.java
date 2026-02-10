@@ -63,6 +63,7 @@ public class B2BSubscriptionService {
         }
 
         B2BSubscription subscription = b2bSubscriptionMapper.toEntity(dto);
+        subscription.sanitizeForCreate();
         subscription = b2bSubscriptionRepository.save(subscription);
         return b2bSubscriptionMapper.toDto(subscription);
     }

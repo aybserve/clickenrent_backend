@@ -58,6 +58,7 @@ public class PayoutFinTransactionService {
     @Transactional
     public PayoutFinTransactionDTO create(PayoutFinTransactionDTO dto) {
         PayoutFinTransaction transaction = payoutFinTransactionMapper.toEntity(dto);
+        transaction.sanitizeForCreate();
         PayoutFinTransaction savedTransaction = payoutFinTransactionRepository.save(transaction);
         return payoutFinTransactionMapper.toDTO(savedTransaction);
     }

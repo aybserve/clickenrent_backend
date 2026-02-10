@@ -5,6 +5,8 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 
+import java.util.UUID;
+
 /**
  * Entity representing types of companies.
  * Examples: Hotel, B&B, Camping, etc.
@@ -32,6 +34,13 @@ public class CompanyType {
     @Size(max = 100, message = "Company type name must not exceed 100 characters")
     @Column(name = "name", nullable = false, unique = true, length = 100)
     private String name;
+
+    @PrePersist
+    protected void prePersist() {
+        if (externalId == null || externalId.isEmpty()) {
+            externalId = UUID.randomUUID().toString();
+        }
+    }
 }
 
 

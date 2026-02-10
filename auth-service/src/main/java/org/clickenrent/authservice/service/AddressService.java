@@ -73,6 +73,7 @@ public class AddressService {
     @Transactional
     public AddressDTO createAddress(AddressDTO addressDTO) {
         Address address = addressMapper.toEntity(addressDTO);
+        address.sanitizeForCreate();
         
         // Set the country relationship
         if (addressDTO.getCountryId() != null) {

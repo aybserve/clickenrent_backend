@@ -42,6 +42,7 @@ public class ServiceService {
         }
 
         Service service = serviceMapper.toEntity(dto);
+        service.sanitizeForCreate();
         service = serviceRepository.save(service);
         return serviceMapper.toDto(service);
     }

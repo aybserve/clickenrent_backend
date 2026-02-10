@@ -1,5 +1,6 @@
 package org.clickenrent.authservice.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -21,8 +22,13 @@ import java.util.Map;
 @Schema(description = "User preferences for personalized UI/UX settings")
 public class UserPreferenceDTO {
 
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     @Schema(description = "Unique identifier for preferences", example = "1")
     private Long id;
+
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    @Schema(description = "External ID for cross-service communication", example = "550e8400-e29b-41d4-a716-446655440000")
+    private String externalId;
 
     @Schema(description = "User ID", example = "123")
     private Long userId;
@@ -112,15 +118,19 @@ public class UserPreferenceDTO {
     // Audit Fields
     // ===========================
     
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     @Schema(description = "Timestamp when preferences were created", example = "2024-01-15T10:30:00")
     private LocalDateTime dateCreated;
 
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     @Schema(description = "Timestamp when preferences were last modified", example = "2024-02-01T14:20:00")
     private LocalDateTime lastDateModified;
 
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     @Schema(description = "User who created the preferences", example = "system")
     private String createdBy;
 
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     @Schema(description = "User who last modified the preferences", example = "user@example.com")
     private String lastModifiedBy;
 }

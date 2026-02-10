@@ -41,6 +41,7 @@ public class BikeStatusService {
         }
 
         BikeStatus bikeStatus = bikeStatusMapper.toEntity(dto);
+        bikeStatus.sanitizeForCreate();
         bikeStatus = bikeStatusRepository.save(bikeStatus);
         return bikeStatusMapper.toDto(bikeStatus);
     }

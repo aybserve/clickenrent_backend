@@ -40,6 +40,7 @@ public class BikeModelService {
         }
 
         BikeModel bikeModel = bikeModelMapper.toEntity(dto);
+        bikeModel.sanitizeForCreate();
         bikeModel = bikeModelRepository.save(bikeModel);
         return bikeModelMapper.toDto(bikeModel);
     }

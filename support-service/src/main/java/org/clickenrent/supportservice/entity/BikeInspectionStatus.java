@@ -35,4 +35,24 @@ public class BikeInspectionStatus extends BaseAuditEntity {
     @Size(max = 100, message = "Name must not exceed 100 characters")
     @Column(name = "name", nullable = false, unique = true, length = 100)
     private String name;
+
+    @Override
+    public Long getId() {
+        return id;
+    }
+
+    @Override
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    @Override
+    public String getExternalId() {
+        return externalId;
+    }
+
+    @Override
+    public void setExternalId(String externalId) {
+        this.externalId = externalId;
+    }
 }

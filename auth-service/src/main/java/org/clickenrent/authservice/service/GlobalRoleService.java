@@ -46,6 +46,9 @@ public class GlobalRoleService {
     @Transactional
     public GlobalRoleDTO createGlobalRole(GlobalRoleDTO globalRoleDTO) {
         GlobalRole globalRole = globalRoleMapper.toEntity(globalRoleDTO);
+        // Sanitize server-managed fields
+        globalRole.setId(null);
+        globalRole.setExternalId(null);
         globalRole = globalRoleRepository.save(globalRole);
         return globalRoleMapper.toDto(globalRole);
     }

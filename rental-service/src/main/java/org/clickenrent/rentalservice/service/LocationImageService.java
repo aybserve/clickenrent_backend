@@ -62,6 +62,7 @@ public class LocationImageService {
         }
 
         LocationImage locationImage = locationImageMapper.toEntity(dto);
+        locationImage.sanitizeForCreate();
         locationImage = locationImageRepository.save(locationImage);
         return locationImageMapper.toDto(locationImage);
     }

@@ -65,4 +65,24 @@ public class Lock extends BaseAuditEntity {
     @Size(max = 50, message = "Firmware version must not exceed 50 characters")
     @Column(name = "firmware_version", length = 50)
     private String firmwareVersion;
+
+    @Override
+    public Long getId() {
+        return id;
+    }
+
+    @Override
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    @Override
+    public String getExternalId() {
+        return externalId;
+    }
+
+    @Override
+    public void setExternalId(String externalId) {
+        this.externalId = externalId;
+    }
 }

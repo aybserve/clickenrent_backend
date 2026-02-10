@@ -86,6 +86,7 @@ public class LocationService {
         }
 
         Location location = locationMapper.toEntity(locationDTO);
+        location.sanitizeForCreate();
         location = locationRepository.save(location);
 
         // Auto-create "Main" hub for this location

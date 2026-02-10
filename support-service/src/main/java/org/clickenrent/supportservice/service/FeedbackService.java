@@ -103,6 +103,7 @@ public class FeedbackService {
         }
 
         Feedback entity = feedbackMapper.toEntity(dto);
+        entity.sanitizeForCreate();
         entity = feedbackRepository.save(entity);
         return feedbackMapper.toDto(entity);
     }

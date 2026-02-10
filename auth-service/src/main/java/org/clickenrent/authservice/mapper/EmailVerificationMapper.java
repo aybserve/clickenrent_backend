@@ -17,6 +17,7 @@ public class EmailVerificationMapper {
 
         return EmailVerificationDTO.builder()
                 .id(entity.getId())
+                .externalId(entity.getExternalId())
                 .userId(entity.getUser() != null ? entity.getUser().getId() : null)
                 .email(entity.getEmail())
                 .code(entity.getCode())
@@ -34,6 +35,7 @@ public class EmailVerificationMapper {
 
         return EmailVerification.builder()
                 .id(dto.getId())
+                .externalId(dto.getExternalId())
                 .email(dto.getEmail())
                 .code(dto.getCode())
                 .expiresAt(dto.getExpiresAt())

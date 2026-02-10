@@ -40,6 +40,7 @@ public class ChargingStationModelService {
         }
 
         ChargingStationModel model = chargingStationModelMapper.toEntity(dto);
+        model.sanitizeForCreate();
         model = chargingStationModelRepository.save(model);
         return chargingStationModelMapper.toDto(model);
     }

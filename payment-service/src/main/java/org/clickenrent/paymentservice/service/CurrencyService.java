@@ -56,6 +56,7 @@ public class CurrencyService {
         }
 
         Currency currency = currencyMapper.toEntity(dto);
+        currency.sanitizeForCreate();
         Currency savedCurrency = currencyRepository.save(currency);
         return currencyMapper.toDTO(savedCurrency);
     }

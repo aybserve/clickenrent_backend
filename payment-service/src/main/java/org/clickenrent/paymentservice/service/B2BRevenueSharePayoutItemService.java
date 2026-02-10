@@ -73,6 +73,7 @@ public class B2BRevenueSharePayoutItemService {
         log.debug("Creating payout item with bikeRentalExternalId: {}", dto.getBikeRentalExternalId());
         
         B2BRevenueSharePayoutItem item = payoutItemMapper.toEntity(dto);
+        item.sanitizeForCreate();
         B2BRevenueSharePayoutItem savedItem = payoutItemRepository.save(item);
         return payoutItemMapper.toDTO(savedItem);
     }

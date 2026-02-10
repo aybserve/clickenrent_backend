@@ -58,6 +58,7 @@ public class RentalPlanService {
         }
 
         RentalPlan rentalPlan = rentalPlanMapper.toEntity(dto);
+        rentalPlan.sanitizeForCreate();
         rentalPlan = rentalPlanRepository.save(rentalPlan);
         return rentalPlanMapper.toDto(rentalPlan);
     }

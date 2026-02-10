@@ -46,6 +46,9 @@ public class LanguageService {
     @Transactional
     public LanguageDTO createLanguage(LanguageDTO languageDTO) {
         Language language = languageMapper.toEntity(languageDTO);
+        // Sanitize server-managed fields
+        language.setId(null);
+        language.setExternalId(null);
         language = languageRepository.save(language);
         return languageMapper.toDto(language);
     }

@@ -52,6 +52,7 @@ public class ResponsiblePersonService {
         }
 
         ResponsiblePerson entity = responsiblePersonMapper.toEntity(dto);
+        entity.sanitizeForCreate();
         entity = responsiblePersonRepository.save(entity);
         return responsiblePersonMapper.toDto(entity);
     }

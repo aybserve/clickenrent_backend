@@ -158,6 +158,7 @@ public class BikeRentalService {
             bikeRental.setIsRevenueSharePaid(false);
         }
 
+        bikeRental.sanitizeForCreate();
         bikeRental = bikeRentalRepository.save(bikeRental);
         return bikeRentalMapper.toDto(bikeRental);
     }

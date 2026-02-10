@@ -1,5 +1,6 @@
 package org.clickenrent.rentalservice.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -18,8 +19,12 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class BikeDTO {
 
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private Long id;
+    
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private String externalId;
+    
     private String code;
     private String qrCodeUrl;
     private String frameNumber;
@@ -38,8 +43,15 @@ public class BikeDTO {
     private BigDecimal revenueSharePercent;
 
     // Audit fields
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private LocalDateTime dateCreated;
+    
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private LocalDateTime lastDateModified;
+    
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private String createdBy;
+    
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private String lastModifiedBy;
 }

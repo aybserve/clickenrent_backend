@@ -62,6 +62,7 @@ public class HubImageService {
         }
 
         HubImage hubImage = hubImageMapper.toEntity(dto);
+        hubImage.sanitizeForCreate();
         hubImage = hubImageRepository.save(hubImage);
         return hubImageMapper.toDto(hubImage);
     }

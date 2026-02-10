@@ -127,6 +127,7 @@ public class UserService {
     public UserDTO createUser(UserDTO userDTO, String password) {
         User user = userMapper.toEntity(userDTO);
         user.setPassword(passwordEncoder.encode(password));
+        user.sanitizeForCreate();
         
         if (userDTO.getLanguageId() != null) {
             Language language = languageRepository.findById(userDTO.getLanguageId())

@@ -1,5 +1,6 @@
 package org.clickenrent.rentalservice.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -16,14 +17,25 @@ import java.math.BigDecimal;
 @AllArgsConstructor
 public class ServiceDTO {
 
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private Long id;
+    
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private String externalId;
+    
     private String name;
     private BigDecimal b2bSubscriptionPrice;
 
     // Audit fields
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private java.time.LocalDateTime dateCreated;
+    
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private java.time.LocalDateTime lastDateModified;
+    
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private String createdBy;
+    
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private String lastModifiedBy;
 }

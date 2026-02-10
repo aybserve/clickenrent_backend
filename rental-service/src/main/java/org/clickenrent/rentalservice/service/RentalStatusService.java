@@ -41,6 +41,7 @@ public class RentalStatusService {
         }
 
         RentalStatus status = rentalStatusMapper.toEntity(dto);
+        status.sanitizeForCreate();
         status = rentalStatusRepository.save(status);
         return rentalStatusMapper.toDto(status);
     }
