@@ -210,6 +210,84 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
     }
 
+    /**
+     * Handle SQL Grammar exceptions (e.g., missing columns, invalid SQL syntax).
+     * Provides specific error messages for PostGIS-related issues.
+     */
+    @ExceptionHandler(org.hibernate.exception.SQLGrammarException.class)
+    public ResponseEntity<ErrorResponse> handleSQLGrammarException(
+            org.hibernate.exception.SQLGrammarException ex, WebRequest request) {
+        
+        String message = "Database query error";
+        String details = null;
+        
+        // Check for PostGIS-related errors
+        if (ex.getMessage().contains("geom") || ex.getMessage().contains("ST_")) {
+            message = "Spatial database feature not configured properly. Please contact support.";
+            details = "PostGIS geometry column or functions may be missing";
+        } else if (ex.getMessage().contains("column") && ex.getMessage().contains("does not exist")) {
+            message = "Database schema mismatch detected";
+            details = "Required database columns are missing";
+        }
+        
+        // Log the actual error for debugging
+        log.error("SQL Grammar Exception: {}", ex.getMessage(), ex);
+        captureExceptionToSentry(ex, request, HttpStatus.INTERNAL_SERVER_ERROR);
+        
+        ErrorResponse errorResponse = ErrorResponse.builder()
+                .timestamp(LocalDateTime.now())
+                .status(HttpStatus.INTERNAL_SERVER_ERROR.value())
+                .error("Database Error")
+                .message(message)
+                .path(request.getDescription(false).replace("uri=", ""))
+                .details(details != null ? List.of(details) : null)
+                .build();
+        
+        return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    /**
+     * Handle invalid data access resource usage (e.g., missing tables or columns).
+     * This catches PostgreSQL errors wrapped by Spring's exception translation.
+     */
+    @ExceptionHandler(org.springframework.dao.InvalidDataAccessResourceUsageException.class)
+    public ResponseEntity<ErrorResponse> handleInvalidDataAccessResourceUsageException(
+            org.springframework.dao.InvalidDataAccessResourceUsageException ex, WebRequest request) {
+        
+        String message = "Database resource error";
+        String details = null;
+        
+        if (ex.getMessage() != null) {
+            if (ex.getMessage().contains("column") && ex.getMessage().contains("does not exist")) {
+                message = "Database schema is missing required columns. Please run database migrations.";
+                details = "Required database column is missing";
+            } else if (ex.getMessage().contains("relation") && ex.getMessage().contains("does not exist")) {
+                message = "Database table is missing. Please verify database setup.";
+                details = "Required database table is missing";
+            } else if (ex.getMessage().contains("geom") || ex.getMessage().contains("ST_")) {
+                message = "PostGIS spatial feature not configured properly. Please contact support.";
+                details = "PostGIS geometry column or functions may be missing";
+            } else if (ex.getMessage().contains("extension") || ex.getMessage().contains("postgis")) {
+                message = "PostGIS extension is not installed or configured";
+                details = "PostGIS extension required for spatial queries";
+            }
+        }
+        
+        log.error("Invalid Data Access Resource Usage: {}", ex.getMessage(), ex);
+        captureExceptionToSentry(ex, request, HttpStatus.INTERNAL_SERVER_ERROR);
+        
+        ErrorResponse errorResponse = ErrorResponse.builder()
+                .timestamp(LocalDateTime.now())
+                .status(HttpStatus.INTERNAL_SERVER_ERROR.value())
+                .error("Database Configuration Error")
+                .message(message)
+                .path(request.getDescription(false).replace("uri=", ""))
+                .details(details != null ? List.of(details) : null)
+                .build();
+        
+        return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleGlobalException(
             Exception ex, WebRequest request) {

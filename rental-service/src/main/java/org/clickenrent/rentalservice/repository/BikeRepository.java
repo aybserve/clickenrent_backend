@@ -20,6 +20,7 @@ public interface BikeRepository extends JpaRepository<Bike, Long> {
     /**
      * Find bikes within a specified radius of a given location using PostGIS.
      * Returns bikes with their distance from the center point.
+     * Uses CTE to avoid creating target point multiple times.
      * 
      * @param latitude Center point latitude
      * @param longitude Center point longitude
@@ -28,31 +29,32 @@ public interface BikeRepository extends JpaRepository<Bike, Long> {
      * @return List of Object arrays containing bike data and distance
      */
     @Query(value = """
+        WITH target_point AS (
+            SELECT ST_SetSRID(ST_MakePoint(:longitude, :latitude), 4326)::geography AS geom
+        )
         SELECT 
-            b.id,
-            b.external_id,
+            p.id,
+            p.external_id,
             b.code,
-            b.name,
+            bm.name,
             bs.id as bike_status_id,
             bs.name as bike_status_name,
             b.battery_level,
             c.latitude,
             c.longitude,
-            ST_Distance(c.geom, ST_SetSRID(ST_MakePoint(:longitude, :latitude), 4326)::geography) as distance_meters,
+            ST_Distance(c.geom, target_point.geom) as distance_meters,
             h.external_id as hub_external_id,
             h.name as hub_name
-        FROM product b
+        FROM product p
+        CROSS JOIN target_point
+        INNER JOIN bike b ON p.id = b.id
         INNER JOIN coordinates c ON b.coordinates_id = c.id
         LEFT JOIN bike_status bs ON b.bike_status_id = bs.id
+        LEFT JOIN bike_model bm ON b.bike_model_id = bm.id
         LEFT JOIN hub h ON b.hub_id = h.id
-        WHERE b.dtype = 'BIKE'
-            AND b.is_deleted = false
+        WHERE p.is_deleted = false
             AND c.geom IS NOT NULL
-            AND ST_DWithin(
-                c.geom,
-                ST_SetSRID(ST_MakePoint(:longitude, :latitude), 4326)::geography,
-                :radiusMeters
-            )
+            AND ST_DWithin(c.geom, target_point.geom, :radiusMeters)
         ORDER BY distance_meters ASC
         LIMIT :limit
         """, nativeQuery = true)
@@ -65,6 +67,7 @@ public interface BikeRepository extends JpaRepository<Bike, Long> {
 
     /**
      * Find bikes within a specified radius with bike status filter.
+     * Uses CTE to avoid creating target point multiple times.
      * 
      * @param latitude Center point latitude
      * @param longitude Center point longitude
@@ -74,32 +77,33 @@ public interface BikeRepository extends JpaRepository<Bike, Long> {
      * @return List of Object arrays containing bike data and distance
      */
     @Query(value = """
+        WITH target_point AS (
+            SELECT ST_SetSRID(ST_MakePoint(:longitude, :latitude), 4326)::geography AS geom
+        )
         SELECT 
-            b.id,
-            b.external_id,
+            p.id,
+            p.external_id,
             b.code,
-            b.name,
+            bm.name,
             bs.id as bike_status_id,
             bs.name as bike_status_name,
             b.battery_level,
             c.latitude,
             c.longitude,
-            ST_Distance(c.geom, ST_SetSRID(ST_MakePoint(:longitude, :latitude), 4326)::geography) as distance_meters,
+            ST_Distance(c.geom, target_point.geom) as distance_meters,
             h.external_id as hub_external_id,
             h.name as hub_name
-        FROM product b
+        FROM product p
+        CROSS JOIN target_point
+        INNER JOIN bike b ON p.id = b.id
         INNER JOIN coordinates c ON b.coordinates_id = c.id
         LEFT JOIN bike_status bs ON b.bike_status_id = bs.id
+        LEFT JOIN bike_model bm ON b.bike_model_id = bm.id
         LEFT JOIN hub h ON b.hub_id = h.id
-        WHERE b.dtype = 'BIKE'
-            AND b.is_deleted = false
+        WHERE p.is_deleted = false
             AND c.geom IS NOT NULL
             AND bs.id = :bikeStatusId
-            AND ST_DWithin(
-                c.geom,
-                ST_SetSRID(ST_MakePoint(:longitude, :latitude), 4326)::geography,
-                :radiusMeters
-            )
+            AND ST_DWithin(c.geom, target_point.geom, :radiusMeters)
         ORDER BY distance_meters ASC
         LIMIT :limit
         """, nativeQuery = true)
@@ -113,6 +117,7 @@ public interface BikeRepository extends JpaRepository<Bike, Long> {
 
     /**
      * Count bikes within a specified radius.
+     * Uses CTE to avoid creating target point multiple times.
      * 
      * @param latitude Center point latitude
      * @param longitude Center point longitude
@@ -120,17 +125,17 @@ public interface BikeRepository extends JpaRepository<Bike, Long> {
      * @return Count of bikes within radius
      */
     @Query(value = """
+        WITH target_point AS (
+            SELECT ST_SetSRID(ST_MakePoint(:longitude, :latitude), 4326)::geography AS geom
+        )
         SELECT COUNT(*)
-        FROM product b
+        FROM product p
+        CROSS JOIN target_point
+        INNER JOIN bike b ON p.id = b.id
         INNER JOIN coordinates c ON b.coordinates_id = c.id
-        WHERE b.dtype = 'BIKE'
-            AND b.is_deleted = false
+        WHERE p.is_deleted = false
             AND c.geom IS NOT NULL
-            AND ST_DWithin(
-                c.geom,
-                ST_SetSRID(ST_MakePoint(:longitude, :latitude), 4326)::geography,
-                :radiusMeters
-            )
+            AND ST_DWithin(c.geom, target_point.geom, :radiusMeters)
         """, nativeQuery = true)
     Long countNearbyBikes(
             @Param("latitude") Double latitude,

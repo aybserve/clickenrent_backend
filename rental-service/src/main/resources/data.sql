@@ -28,6 +28,38 @@
 CREATE EXTENSION IF NOT EXISTS postgis;
 
 -- =====================================================================================================================
+-- SECTION 0.1: POSTGIS GEOMETRY COLUMN SETUP
+-- =====================================================================================================================
+-- CRITICAL: This section MUST run after Hibernate creates the coordinates table
+-- The geom column enables spatial queries for the nearby bikes feature
+-- CRITICAL DEPENDENCY: The queries in BikeRepository.java depend on this geom column.
+-- If this script fails to execute, the /api/v1/bikes/nearby endpoint will return 500 errors.
+-- =====================================================================================================================
+
+-- Add geom column to coordinates table (Hibernate does not create this from the entity)
+ALTER TABLE coordinates ADD COLUMN IF NOT EXISTS geom GEOGRAPHY(POINT, 4326);
+
+-- Create spatial index on geometry column for fast proximity queries
+-- This index is essential for performance with ST_DWithin queries
+CREATE INDEX IF NOT EXISTS idx_coordinates_geom ON coordinates USING GIST (geom);
+
+-- Trigger function to automatically update geometry from latitude/longitude
+-- Uses single-quote syntax because Spring Boot ScriptUtils cannot parse $$ blocks correctly
+CREATE OR REPLACE FUNCTION update_coordinates_geom() RETURNS TRIGGER AS
+'BEGIN NEW.geom = ST_SetSRID(ST_MakePoint(NEW.longitude, NEW.latitude), 4326)::geography; RETURN NEW; END;'
+LANGUAGE plpgsql;
+
+-- Drop trigger if exists, then recreate (safe for repeated startup)
+DROP TRIGGER IF EXISTS trg_coordinates_geom_update ON coordinates;
+CREATE TRIGGER trg_coordinates_geom_update
+    BEFORE INSERT OR UPDATE OF latitude, longitude ON coordinates
+    FOR EACH ROW EXECUTE FUNCTION update_coordinates_geom();
+
+-- Populate geom for any existing coordinates rows that have NULL geom
+UPDATE coordinates SET geom = ST_SetSRID(ST_MakePoint(longitude, latitude), 4326)::geography
+    WHERE geom IS NULL AND latitude IS NOT NULL AND longitude IS NOT NULL;
+
+-- =====================================================================================================================
 -- SECTION 0.5: SCHEMA MIGRATIONS (AUTO-APPLIED ON STARTUP)
 -- =====================================================================================================================
 -- Note: This section handles schema changes that need to be applied to existing databases.
@@ -361,9 +393,9 @@ ON CONFLICT (id) DO NOTHING;
 
 -- Then insert into bike table (subclass) - referencing bike_model_id 1001, 1001, 1002
 INSERT INTO bike (id, code, qr_code_url, vat, is_vat_include, in_service_date, hub_id, coordinates_id, frame_number, bike_status_id, battery_level, lock_id, bike_type_id, currency_external_id, bike_model_id, revenue_share_percent) VALUES
-(1, 'BIKE-001', 'https://qr.example.com/bike/001', 20.00, true, CURRENT_DATE - INTERVAL '6 months', 1, NULL, 'TREK-FX3-001', 1, 85, 1, 2, 'currency-ext-eur', 1001, 10.00),
-(2, 'BIKE-002', 'https://qr.example.com/bike/002', 20.00, true, CURRENT_DATE - INTERVAL '6 months', 1, NULL, 'TREK-FX3-002', 1, 92, 2, 2, 'currency-ext-eur', 1001, 10.00),
-(3, 'BIKE-003', 'https://qr.example.com/bike/003', 20.00, true, CURRENT_DATE - INTERVAL '4 months', 2, NULL, 'TREK-M7-001', 1, 100, 3, 2, 'currency-ext-eur', 1002, 10.00)
+(1, 'BIKE-001', 'https://qr.example.com/bike/001', 20.00, true, CURRENT_DATE - INTERVAL '6 months', 1, 1, 'TREK-FX3-001', 1, 85, 1, 2, 'currency-ext-eur', 1001, 10.00),
+(2, 'BIKE-002', 'https://qr.example.com/bike/002', 20.00, true, CURRENT_DATE - INTERVAL '6 months', 1, 2, 'TREK-FX3-002', 1, 92, 2, 2, 'currency-ext-eur', 1001, 10.00),
+(3, 'BIKE-003', 'https://qr.example.com/bike/003', 20.00, true, CURRENT_DATE - INTERVAL '4 months', 2, 3, 'TREK-M7-001', 1, 100, 3, 2, 'currency-ext-eur', 1002, 10.00)
 ON CONFLICT (id) DO NOTHING;
 
 -- ---------------------------------------------------------------------------------------------------------------------
