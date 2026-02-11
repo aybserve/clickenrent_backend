@@ -19,11 +19,6 @@ import java.util.Map;
 public class SearchResult {
 
     /**
-     * Internal ID
-     */
-    private Long id;
-
-    /**
      * External ID (UUID)
      */
     private String externalId;

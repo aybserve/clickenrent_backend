@@ -42,6 +42,7 @@ public class BikeMapper {
                 .currencyExternalId(bike.getCurrencyExternalId())
                 .inServiceDate(bike.getInServiceDate())
                 .bikeModelId(bike.getBikeModel() != null ? bike.getBikeModel().getId() : null)
+                .bikeModelImageUrl(bike.getBikeModel() != null ? bike.getBikeModel().getImageUrl() : null)
                 .isB2BRentable(bike.getIsB2BRentable())
                 .revenueSharePercent(bike.getRevenueSharePercent())
                 .dateCreated(bike.getDateCreated())

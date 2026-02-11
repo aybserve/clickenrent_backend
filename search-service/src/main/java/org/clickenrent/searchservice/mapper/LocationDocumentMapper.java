@@ -31,6 +31,7 @@ public class LocationDocumentMapper {
                 .description(dto.getDescription())
                 .isPublic(dto.getIsPublic())
                 .coordinatesId(dto.getCoordinatesId())
+                .imageUrl(dto.getThumbnailImageUrl())
                 .searchableText(searchableText)
                 .build();
     }

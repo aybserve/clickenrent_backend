@@ -48,6 +48,9 @@ public class LocationDocument {
     @Field(type = FieldType.Long)
     private Long coordinatesId;
     
+    @Field(type = FieldType.Keyword)
+    private String imageUrl;
+    
     // Combined searchable text field for full-text search
     @Field(type = FieldType.Text, analyzer = "standard")
     private String searchableText;

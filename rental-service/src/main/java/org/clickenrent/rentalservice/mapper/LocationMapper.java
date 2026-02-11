@@ -3,7 +3,9 @@ package org.clickenrent.rentalservice.mapper;
 import lombok.RequiredArgsConstructor;
 import org.clickenrent.rentalservice.dto.LocationDTO;
 import org.clickenrent.rentalservice.entity.Location;
+import org.clickenrent.rentalservice.entity.LocationImage;
 import org.clickenrent.rentalservice.repository.CoordinatesRepository;
+import org.clickenrent.rentalservice.repository.LocationImageRepository;
 import org.springframework.stereotype.Component;
 
 /**
@@ -14,11 +16,17 @@ import org.springframework.stereotype.Component;
 public class LocationMapper {
 
     private final CoordinatesRepository coordinatesRepository;
+    private final LocationImageRepository locationImageRepository;
 
     public LocationDTO toDto(Location location) {
         if (location == null) {
             return null;
         }
+
+        // Get thumbnail image URL
+        String thumbnailImageUrl = locationImageRepository.findByLocationAndIsThumbnailTrue(location)
+                .map(LocationImage::getImageUrl)
+                .orElse(null);
 
         return LocationDTO.builder()
                 .id(location.getId())
@@ -32,6 +40,7 @@ public class LocationMapper {
                 .isActive(location.getIsActive())
                 .directions(location.getDirections())
                 .coordinatesId(location.getCoordinates() != null ? location.getCoordinates().getId() : null)
+                .thumbnailImageUrl(thumbnailImageUrl)
                 .dateCreated(location.getDateCreated())
                 .lastDateModified(location.getLastDateModified())
                 .createdBy(location.getCreatedBy())

@@ -15,7 +15,6 @@ import org.clickenrent.searchservice.security.SecurityService;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.elasticsearch.client.elc.NativeQuery;
 import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
-import org.springframework.data.elasticsearch.core.SearchHit;
 import org.springframework.data.elasticsearch.core.SearchHits;
 import org.springframework.stereotype.Service;
 
@@ -270,6 +269,7 @@ public class GlobalSearchService {
                 .title(doc.getCode() != null ? doc.getCode() : "Bike " + doc.getExternalId())
                 .subtitle("Frame: " + (doc.getFrameNumber() != null ? doc.getFrameNumber() : "N/A"))
                 .url("/bikes/" + doc.getExternalId())
+                .imageUrl(doc.getImageUrl())
                 .metadata(Map.of(
                         "batteryLevel", doc.getBatteryLevel() != null ? doc.getBatteryLevel() : 0
                 ))
@@ -283,6 +283,7 @@ public class GlobalSearchService {
                 .title(doc.getName())
                 .subtitle(doc.getAddress())
                 .url("/locations/" + doc.getExternalId())
+                .imageUrl(doc.getImageUrl())
                 .metadata(Map.of(
                         "isPublic", doc.getIsPublic() != null ? doc.getIsPublic() : false
                 ))

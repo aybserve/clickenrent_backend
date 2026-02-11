@@ -33,6 +33,7 @@ public class LocationDTO {
     private Boolean isActive;
     private String directions;
     private Long coordinatesId;
+    private String thumbnailImageUrl;
 
     // Audit fields
     private LocalDateTime dateCreated;

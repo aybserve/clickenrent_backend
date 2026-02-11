@@ -34,6 +34,7 @@ public class BikeDocumentMapper {
                 .bikeTypeId(dto.getBikeTypeId())
                 .bikeModelId(dto.getBikeModelId())
                 .hubId(dto.getHubId())
+                .imageUrl(dto.getBikeModelImageUrl())
                 .searchableText(searchableText)
                 .build();
     }

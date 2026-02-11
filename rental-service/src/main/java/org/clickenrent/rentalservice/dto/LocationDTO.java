@@ -32,6 +32,9 @@ public class LocationDTO {
     private Boolean isActive;
     private String directions;
     private Long coordinatesId;
+    
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    private String thumbnailImageUrl;
 
     // Audit fields
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)

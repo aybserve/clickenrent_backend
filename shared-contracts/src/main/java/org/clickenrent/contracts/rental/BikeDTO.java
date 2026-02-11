@@ -40,6 +40,7 @@ public class BikeDTO {
     private String currencyExternalId;
     private LocalDate inServiceDate;
     private Long bikeModelId;
+    private String bikeModelImageUrl;
     private Boolean isB2BRentable;
     private BigDecimal revenueSharePercent;
 

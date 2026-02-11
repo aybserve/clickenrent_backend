@@ -39,6 +39,10 @@ public class BikeDTO {
     private String currencyExternalId;
     private LocalDate inServiceDate;
     private Long bikeModelId;
+    
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    private String bikeModelImageUrl;
+    
     private Boolean isB2BRentable;
     private BigDecimal revenueSharePercent;
 
