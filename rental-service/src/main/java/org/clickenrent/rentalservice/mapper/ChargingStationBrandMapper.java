@@ -20,6 +20,10 @@ public class ChargingStationBrandMapper {
                 .externalId(brand.getExternalId())
                 .name(brand.getName())
                 .companyExternalId(brand.getCompanyExternalId())
+                .dateCreated(brand.getDateCreated())
+                .lastDateModified(brand.getLastDateModified())
+                .createdBy(brand.getCreatedBy())
+                .lastModifiedBy(brand.getLastModifiedBy())
                 .build();
     }
 

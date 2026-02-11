@@ -2,6 +2,8 @@ package org.clickenrent.rentalservice.service;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -11,6 +13,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import java.math.BigDecimal;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -27,6 +31,7 @@ public class MapboxService {
 
     private final WebClient webClient;
     private final MapboxConfigProperties mapboxConfig;
+    private final ObjectMapper objectMapper;
 
     /**
      * Geocode an address to coordinates.
@@ -224,7 +229,7 @@ public class MapboxService {
                             return DirectionsResponseDTO.Route.builder()
                                     .distance(route.getDistance())
                                     .duration(route.getDuration())
-                                    .geometry(route.getGeometry() != null ? route.getGeometry().toString() : null)
+                                    .geometry(serializeGeometry(route.getGeometry()))
                                     .steps(steps)
                                     .build();
                         })
@@ -249,9 +254,26 @@ public class MapboxService {
 
     /**
      * URL encode query string for geocoding.
+     * Properly handles special characters including German umlauts (ä, ö, ü) and eszett (ß).
      */
     private String encodeQuery(String query) {
-        return query.replace(" ", "%20").replace(",", "%2C");
+        return URLEncoder.encode(query, StandardCharsets.UTF_8);
+    }
+
+    /**
+     * Serialize geometry object to GeoJSON string for frontend map display.
+     * Converts Mapbox geometry objects to valid JSON that can be parsed by mapping libraries.
+     */
+    private String serializeGeometry(Object geometry) {
+        if (geometry == null) {
+            return null;
+        }
+        try {
+            return objectMapper.writeValueAsString(geometry);
+        } catch (JsonProcessingException e) {
+            log.error("Failed to serialize geometry", e);
+            return null;
+        }
     }
 
     // ==================== Mapbox API Response Models ====================
