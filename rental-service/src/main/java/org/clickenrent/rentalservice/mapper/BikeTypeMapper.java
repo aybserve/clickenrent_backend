@@ -13,6 +13,10 @@ public class BikeTypeMapper {
                 .id(bikeType.getId())
                 .externalId(bikeType.getExternalId())
                 .name(bikeType.getName())
+                .dateCreated(bikeType.getDateCreated())
+                .lastDateModified(bikeType.getLastDateModified())
+                .createdBy(bikeType.getCreatedBy())
+                .lastModifiedBy(bikeType.getLastModifiedBy())
                 .build();
     }
 
