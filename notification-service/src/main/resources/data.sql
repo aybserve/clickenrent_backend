@@ -235,6 +235,7 @@ ALTER TABLE notification_logs FORCE ROW LEVEL SECURITY;
 
 -- Policy: Allow superadmins to see all notifications, B2B users see their company's notifications,
 -- and all users see user-scoped notifications (company_external_id IS NULL)
+DROP POLICY IF EXISTS notification_logs_tenant_isolation ON notification_logs;
 CREATE POLICY notification_logs_tenant_isolation ON notification_logs
 USING (
     current_setting('app.is_superadmin', true)::boolean = true

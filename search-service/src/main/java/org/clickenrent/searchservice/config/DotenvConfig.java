@@ -24,21 +24,42 @@ public class DotenvConfig implements ApplicationContextInitializer<ConfigurableA
         ConfigurableEnvironment environment = applicationContext.getEnvironment();
         
         try {
-            // Try to load .env from project root (parent directory)
-            Dotenv dotenv = Dotenv.configure()
-                    .directory("../")
-                    .ignoreIfMissing()
-                    .load();
+            Dotenv dotenv = null;
+            
+            // Try multiple locations for .env file
+            String[] possiblePaths = {"./", "../", "../../"};
+            for (String path : possiblePaths) {
+                try {
+                    dotenv = Dotenv.configure()
+                            .directory(path)
+                            .ignoreIfMissing()
+                            .load();
+                    
+                    // If we found any entries, we've loaded the file successfully
+                    if (dotenv.entries().iterator().hasNext()) {
+                        log.info("✅ Found .env file at: {}", path);
+                        break;
+                    }
+                } catch (Exception e) {
+                    // Continue to next path
+                }
+            }
+            
+            if (dotenv == null || !dotenv.entries().iterator().hasNext()) {
+                log.warn("⚠️ Could not find .env file in any location");
+                log.warn("   Continuing with system environment variables...");
+                return;
+            }
             
             // Convert dotenv entries to a Map
             Map<String, Object> dotenvMap = new HashMap<>();
             dotenv.entries().forEach(entry -> {
                 dotenvMap.put(entry.getKey(), entry.getValue());
                 log.debug("Loaded env variable: {} = {}", entry.getKey(), 
-                        entry.getKey().contains("PASSWORD") ? "***" : entry.getValue());
+                        entry.getKey().contains("PASSWORD") || entry.getKey().contains("SECRET") || entry.getKey().contains("KEY") ? "***" : entry.getValue());
             });
             
-            // Add to Spring Environment as a property source
+            // Add to Spring Environment as a property source with highest priority
             environment.getPropertySources().addFirst(
                     new MapPropertySource("dotenvProperties", dotenvMap)
             );
@@ -51,7 +72,7 @@ public class DotenvConfig implements ApplicationContextInitializer<ConfigurableA
             log.info("Elasticsearch Password: {}", dotenvMap.containsKey("ES_PASSWORD") ? "***SET***" : "NOT SET");
             
         } catch (Exception e) {
-            log.warn("⚠️ Could not load .env file: {}", e.getMessage());
+            log.error("⚠️ Error loading .env file: {}", e.getMessage(), e);
             log.warn("   Continuing with system environment variables...");
         }
     }

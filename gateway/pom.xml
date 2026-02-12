@@ -118,6 +118,12 @@
 		<groupId>io.sentry</groupId>
 		<artifactId>sentry-logback</artifactId>
 	</dependency>
+
+	<!-- dotenv-java for loading .env files -->
+	<dependency>
+		<groupId>io.github.cdimascio</groupId>
+		<artifactId>dotenv-java</artifactId>
+	</dependency>
 </dependencies>
 
 	<build>
