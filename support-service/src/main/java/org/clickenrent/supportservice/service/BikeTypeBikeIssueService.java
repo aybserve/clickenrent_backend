@@ -66,9 +66,7 @@ public class BikeTypeBikeIssueService {
         }
 
         BikeTypeBikeIssue entity = bikeTypeBikeIssueMapper.toEntity(dto);
-        // Sanitize server-managed fields
-        entity.setId(null);
-        entity.setExternalId(null);
+        entity.sanitizeForCreate();
         entity = bikeTypeBikeIssueRepository.save(entity);
         return bikeTypeBikeIssueMapper.toDto(entity);
     }

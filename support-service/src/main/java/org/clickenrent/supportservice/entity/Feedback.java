@@ -10,7 +10,6 @@ import lombok.experimental.SuperBuilder;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
 
-import java.time.LocalDateTime;
 import java.util.UUID;
 
 /**
@@ -53,10 +52,6 @@ public class Feedback extends BaseAuditEntity {
     @Size(max = 2000, message = "Comment must not exceed 2000 characters")
     @Column(name = "comment", length = 2000)
     private String comment;
-
-    @NotNull(message = "Date time is required")
-    @Column(name = "date_time", nullable = false)
-    private LocalDateTime dateTime;
 
     @PrePersist
     public void prePersist() {

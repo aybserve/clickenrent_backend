@@ -26,7 +26,6 @@ public class BikeRentalFeedbackDTO {
     private String externalId;
     private Integer rate;
     private String comment;
-    private LocalDateTime dateTime;
 
     // Cross-service externalId references
     private String userExternalId;

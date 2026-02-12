@@ -37,9 +37,8 @@ ON CONFLICT (id) DO NOTHING;
 -- 1.2 RESPONSIBLE PERSON
 -- ---------------------------------------------------------------------------------------------------------------------
 INSERT INTO responsible_person (id, external_id, name, date_created, last_date_modified, created_by, last_modified_by, is_deleted) VALUES
-(1, '550e8400-e29b-41d4-a716-446655440001', 'Mechanical Team', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
-(2, '550e8400-e29b-41d4-a716-446655440002', 'Electrical Team', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
-(3, '550e8400-e29b-41d4-a716-446655440003', 'Support Staff', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false)
+(1, '550e8400-e29b-41d4-a716-446655440001', 'System Company', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(2, '550e8400-e29b-41d4-a716-446655440002', 'B2B Partner', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false)
 ON CONFLICT (id) DO NOTHING;
 
 -- ---------------------------------------------------------------------------------------------------------------------
@@ -127,15 +126,35 @@ ON CONFLICT (id) DO NOTHING;
 -- ---------------------------------------------------------------------------------------------------------------------
 -- 2.3 ERROR CODE
 -- ---------------------------------------------------------------------------------------------------------------------
-INSERT INTO error_code (id, external_id, name, bike_engine_external_id, description, common_cause, diagnostic_steps, recommended_fix, notes, is_fixable_by_client, date_created, last_date_modified, created_by, last_modified_by, is_deleted) VALUES
-(1, '550e8400-e29b-41d4-a716-446655440201', 'E001', 'bike-engine-ext-001', 'Battery Low Voltage', 'Battery discharged or faulty cell', 'Check battery voltage with multimeter', 'Charge or replace battery', 'Common error in cold weather', false, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
-(2, '550e8400-e29b-41d4-a716-446655440202', 'E002', 'bike-engine-ext-001', 'Motor Controller Error', 'Faulty controller or wiring', 'Inspect controller connections', 'Replace motor controller', 'May require professional service', false, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
-(3, '550e8400-e29b-41d4-a716-446655440203', 'E003', 'bike-engine-ext-002', 'Throttle Sensor Fault', 'Throttle sensor disconnected or damaged', 'Check throttle sensor connection', 'Reconnect or replace sensor', 'Client can check connection', true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
-(4, '550e8400-e29b-41d4-a716-446655440204', 'E004', 'bike-engine-ext-002', 'Brake Sensor Active', 'Brake lever engaged or sensor stuck', 'Check brake lever and sensor', 'Adjust or clean brake sensor', 'Usually easy fix', true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
-(5, '550e8400-e29b-41d4-a716-446655440205', 'E005', 'bike-engine-ext-003', 'Overheat Protection', 'Motor or controller overheating', 'Let bike cool down for 30 minutes', 'Avoid steep hills or heavy loads', 'Temporary error', true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
-(6, '550e8400-e29b-41d4-a716-446655440206', 'E006', 'bike-engine-ext-001', 'Communication Error', 'Loss of communication between components', 'Check all cable connections', 'Reconnect or replace cables', 'Check for loose connections', false, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
-(7, '550e8400-e29b-41d4-a716-446655440207', 'E007', 'bike-engine-ext-002', 'Speed Sensor Error', 'Speed sensor not detecting wheel rotation', 'Check sensor alignment and magnet position', 'Adjust sensor or replace if damaged', 'Affects speed display and motor assist', false, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
-(8, '550e8400-e29b-41d4-a716-446655440208', 'E008', 'bike-engine-ext-003', 'Torque Sensor Error', 'Pedal assist sensor malfunction', 'Check torque sensor connections', 'Recalibrate or replace sensor', 'Affects pedal assist functionality', false, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false)
+-- Note: bike_engine_external_id has been removed. Use bike_engine_error_code junction table for associations.
+INSERT INTO error_code (id, external_id, name, description, common_cause, diagnostic_steps, recommended_fix, notes, is_fixable_by_client, date_created, last_date_modified, created_by, last_modified_by, is_deleted) VALUES
+(1, '550e8400-e29b-41d4-a716-446655440201', 'E001', 'Battery Low Voltage', 'Battery discharged or faulty cell', 'Check battery voltage with multimeter', 'Charge or replace battery', 'Common error in cold weather', false, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(2, '550e8400-e29b-41d4-a716-446655440202', 'E002', 'Motor Controller Error', 'Faulty controller or wiring', 'Inspect controller connections', 'Replace motor controller', 'May require professional service', false, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(3, '550e8400-e29b-41d4-a716-446655440203', 'E003', 'Throttle Sensor Fault', 'Throttle sensor disconnected or damaged', 'Check throttle sensor connection', 'Reconnect or replace sensor', 'Client can check connection', true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(4, '550e8400-e29b-41d4-a716-446655440204', 'E004', 'Brake Sensor Active', 'Brake lever engaged or sensor stuck', 'Check brake lever and sensor', 'Adjust or clean brake sensor', 'Usually easy fix', true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(5, '550e8400-e29b-41d4-a716-446655440205', 'E005', 'Overheat Protection', 'Motor or controller overheating', 'Let bike cool down for 30 minutes', 'Avoid steep hills or heavy loads', 'Temporary error', true, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(6, '550e8400-e29b-41d4-a716-446655440206', 'E006', 'Communication Error', 'Loss of communication between components', 'Check all cable connections', 'Reconnect or replace cables', 'Check for loose connections', false, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(7, '550e8400-e29b-41d4-a716-446655440207', 'E007', 'Speed Sensor Error', 'Speed sensor not detecting wheel rotation', 'Check sensor alignment and magnet position', 'Adjust sensor or replace if damaged', 'Affects speed display and motor assist', false, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(8, '550e8400-e29b-41d4-a716-446655440208', 'E008', 'Torque Sensor Error', 'Pedal assist sensor malfunction', 'Check torque sensor connections', 'Recalibrate or replace sensor', 'Affects pedal assist functionality', false, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false)
+ON CONFLICT (id) DO NOTHING;
+
+-- ---------------------------------------------------------------------------------------------------------------------
+-- 2.4 BIKE ENGINE ERROR CODE (Junction Table - Many-to-Many)
+-- ---------------------------------------------------------------------------------------------------------------------
+-- Links error codes to bike engines (one error code can be associated with multiple bike engines)
+INSERT INTO bike_engine_error_code (id, external_id, bike_engine_external_id, error_code_id, date_created, last_date_modified, created_by, last_modified_by, is_deleted) VALUES
+(1, '550e8400-e29b-41d4-a716-446655440211', 'bike-engine-ext-001', 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(2, '550e8400-e29b-41d4-a716-446655440212', 'bike-engine-ext-001', 2, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(3, '550e8400-e29b-41d4-a716-446655440213', 'bike-engine-ext-001', 6, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(4, '550e8400-e29b-41d4-a716-446655440214', 'bike-engine-ext-002', 3, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(5, '550e8400-e29b-41d4-a716-446655440215', 'bike-engine-ext-002', 4, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(6, '550e8400-e29b-41d4-a716-446655440216', 'bike-engine-ext-002', 7, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(7, '550e8400-e29b-41d4-a716-446655440217', 'bike-engine-ext-003', 5, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(8, '550e8400-e29b-41d4-a716-446655440218', 'bike-engine-ext-003', 8, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+-- Example: E001 can also occur on bike-engine-ext-002 (demonstrates many-to-many)
+(9, '550e8400-e29b-41d4-a716-446655440219', 'bike-engine-ext-002', 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+-- Example: E002 can also occur on bike-engine-ext-003 (demonstrates many-to-many)
+(10, '550e8400-e29b-41d4-a716-446655440220', 'bike-engine-ext-003', 2, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false)
 ON CONFLICT (id) DO NOTHING;
 
 -- =====================================================================================================================
@@ -148,21 +167,21 @@ ON CONFLICT (id) DO NOTHING;
 -- ---------------------------------------------------------------------------------------------------------------------
 -- 3.1 FEEDBACK (Sample data - references users from auth-service)
 -- ---------------------------------------------------------------------------------------------------------------------
-INSERT INTO feedback (id, external_id, user_external_id, rate, comment, date_time, date_created, last_date_modified, created_by, last_modified_by, is_deleted) VALUES
-(1, '550e8400-e29b-41d4-a716-446655440301', 'usr-ext-00007', 5, 'Excellent service, very responsive support team!', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
-(2, '550e8400-e29b-41d4-a716-446655440302', 'usr-ext-00008', 4, 'Good overall experience, minor delay in response.', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
-(3, '550e8400-e29b-41d4-a716-446655440303', 'usr-ext-00009', 3, 'Average service, could be improved.', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
-(4, '550e8400-e29b-41d4-a716-446655440304', 'usr-ext-00007', 2, 'Not satisfied, took too long to resolve issue.', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false)
+INSERT INTO feedback (id, external_id, user_external_id, rate, comment, date_created, last_date_modified, created_by, last_modified_by, is_deleted) VALUES
+(1, '550e8400-e29b-41d4-a716-446655440301', 'usr-ext-00007', 5, 'Excellent service, very responsive support team!', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(2, '550e8400-e29b-41d4-a716-446655440302', 'usr-ext-00008', 4, 'Good overall experience, minor delay in response.', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(3, '550e8400-e29b-41d4-a716-446655440303', 'usr-ext-00009', 3, 'Average service, could be improved.', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(4, '550e8400-e29b-41d4-a716-446655440304', 'usr-ext-00007', 2, 'Not satisfied, took too long to resolve issue.', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false)
 ON CONFLICT (id) DO NOTHING;
 
 -- ---------------------------------------------------------------------------------------------------------------------
 -- 3.2 BIKE RENTAL FEEDBACK (Sample data - references users and bike rentals from other services)
 -- ---------------------------------------------------------------------------------------------------------------------
-INSERT INTO bike_rental_feedback (id, external_id, user_external_id, bike_rental_external_id, rate, comment, date_time, date_created, last_date_modified, created_by, last_modified_by, is_deleted) VALUES
-(1, '550e8400-e29b-41d4-a716-446655440501', 'usr-ext-00007', 'bike-rental-ext-00101', 5, 'Great bike, smooth ride!', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
-(2, '550e8400-e29b-41d4-a716-446655440502', 'usr-ext-00008', 'bike-rental-ext-00102', 4, 'Good bike, but battery could last longer.', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
-(3, '550e8400-e29b-41d4-a716-446655440503', 'usr-ext-00009', 'bike-rental-ext-00103', 3, 'Average experience, brakes were squeaky.', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
-(4, '550e8400-e29b-41d4-a716-446655440504', 'usr-ext-00007', 'bike-rental-ext-00104', 2, 'Poor condition, motor had issues.', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false)
+INSERT INTO bike_rental_feedback (id, external_id, user_external_id, bike_rental_external_id, rate, comment, date_created, last_date_modified, created_by, last_modified_by, is_deleted) VALUES
+(1, '550e8400-e29b-41d4-a716-446655440501', 'usr-ext-00007', 'bike-rental-ext-00101', 5, 'Great bike, smooth ride!', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(2, '550e8400-e29b-41d4-a716-446655440502', 'usr-ext-00008', 'bike-rental-ext-00102', 4, 'Good bike, but battery could last longer.', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(3, '550e8400-e29b-41d4-a716-446655440503', 'usr-ext-00009', 'bike-rental-ext-00103', 3, 'Average experience, brakes were squeaky.', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(4, '550e8400-e29b-41d4-a716-446655440504', 'usr-ext-00007', 'bike-rental-ext-00104', 2, 'Poor condition, motor had issues.', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false)
 ON CONFLICT (id) DO NOTHING;
 
 -- ---------------------------------------------------------------------------------------------------------------------
@@ -179,29 +198,29 @@ ON CONFLICT (id) DO NOTHING;
 -- ---------------------------------------------------------------------------------------------------------------------
 -- 3.4 BIKE TYPE BIKE ISSUE (Junction Table - references bike types from rental-service)
 -- ---------------------------------------------------------------------------------------------------------------------
-INSERT INTO bike_type_bike_issue (id, external_id, bike_type_external_id, bike_issue_id) VALUES
-(1, '550e8400-e29b-41d4-a716-446655440601', 'bike-type-ext-001', 1),
-(2, '550e8400-e29b-41d4-a716-446655440602', 'bike-type-ext-001', 2),
-(3, '550e8400-e29b-41d4-a716-446655440603', 'bike-type-ext-001', 3),
-(4, '550e8400-e29b-41d4-a716-446655440604', 'bike-type-ext-002', 1),
-(5, '550e8400-e29b-41d4-a716-446655440605', 'bike-type-ext-002', 3),
-(6, '550e8400-e29b-41d4-a716-446655440606', 'bike-type-ext-002', 4),
-(7, '550e8400-e29b-41d4-a716-446655440607', 'bike-type-ext-003', 2),
-(8, '550e8400-e29b-41d4-a716-446655440608', 'bike-type-ext-003', 3),
-(9, '550e8400-e29b-41d4-a716-446655440609', 'bike-type-ext-003', 5)
+INSERT INTO bike_type_bike_issue (id, external_id, bike_type_external_id, bike_issue_id, date_created, last_date_modified, created_by, last_modified_by, is_deleted) VALUES
+(1, '550e8400-e29b-41d4-a716-446655440601', 'bike-type-ext-001', 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(2, '550e8400-e29b-41d4-a716-446655440602', 'bike-type-ext-001', 2, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(3, '550e8400-e29b-41d4-a716-446655440603', 'bike-type-ext-001', 3, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(4, '550e8400-e29b-41d4-a716-446655440604', 'bike-type-ext-002', 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(5, '550e8400-e29b-41d4-a716-446655440605', 'bike-type-ext-002', 3, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(6, '550e8400-e29b-41d4-a716-446655440606', 'bike-type-ext-002', 4, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(7, '550e8400-e29b-41d4-a716-446655440607', 'bike-type-ext-003', 2, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(8, '550e8400-e29b-41d4-a716-446655440608', 'bike-type-ext-003', 3, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(9, '550e8400-e29b-41d4-a716-446655440609', 'bike-type-ext-003', 5, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false)
 ON CONFLICT (id) DO NOTHING;
 
 -- ---------------------------------------------------------------------------------------------------------------------
 -- 3.5 SUPPORT REQUEST BIKE ISSUE (Junction Table)
 -- ---------------------------------------------------------------------------------------------------------------------
-INSERT INTO support_request_bike_issue (id, external_id, support_request_id, bike_issue_id) VALUES
-(1, '550e8400-e29b-41d4-a716-446655440701', 1, 1),
-(2, '550e8400-e29b-41d4-a716-446655440702', 1, 6),
-(3, '550e8400-e29b-41d4-a716-446655440703', 2, 3),
-(4, '550e8400-e29b-41d4-a716-446655440704', 2, 12),
-(5, '550e8400-e29b-41d4-a716-446655440705', 3, 2),
-(6, '550e8400-e29b-41d4-a716-446655440706', 4, 7),
-(7, '550e8400-e29b-41d4-a716-446655440707', 5, 9)
+INSERT INTO support_request_bike_issue (id, external_id, support_request_id, bike_issue_id, date_created, last_date_modified, created_by, last_modified_by, is_deleted) VALUES
+(1, '550e8400-e29b-41d4-a716-446655440701', 1, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(2, '550e8400-e29b-41d4-a716-446655440702', 1, 6, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(3, '550e8400-e29b-41d4-a716-446655440703', 2, 3, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(4, '550e8400-e29b-41d4-a716-446655440704', 2, 12, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(5, '550e8400-e29b-41d4-a716-446655440705', 3, 2, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(6, '550e8400-e29b-41d4-a716-446655440706', 4, 7, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(7, '550e8400-e29b-41d4-a716-446655440707', 5, 9, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false)
 ON CONFLICT (id) DO NOTHING;
 
 -- ---------------------------------------------------------------------------------------------------------------------
@@ -288,6 +307,7 @@ SELECT setval('support_request_status_id_seq', (SELECT COALESCE(MAX(id), 1) FROM
 SELECT setval('bike_inspection_status_id_seq', (SELECT COALESCE(MAX(id), 1) FROM bike_inspection_status));
 SELECT setval('bike_inspection_item_status_id_seq', (SELECT COALESCE(MAX(id), 1) FROM bike_inspection_item_status));
 SELECT setval('error_code_id_seq', (SELECT COALESCE(MAX(id), 1) FROM error_code));
+SELECT setval('bike_engine_error_code_id_seq', (SELECT COALESCE(MAX(id), 1) FROM bike_engine_error_code));
 SELECT setval('bike_unit_id_seq', (SELECT COALESCE(MAX(id), 1) FROM bike_unit));
 SELECT setval('bike_issue_id_seq', (SELECT COALESCE(MAX(id), 1) FROM bike_issue));
 SELECT setval('feedback_id_seq', (SELECT COALESCE(MAX(id), 1) FROM feedback));
@@ -309,7 +329,7 @@ SELECT setval('bike_inspection_item_bike_unit_id_seq', (SELECT COALESCE(MAX(id),
 -- 
 -- Summary:
 -- - Required lookup tables: support_request_status, responsible_person, bike_inspection_status, bike_inspection_item_status
--- - Reference data: bike_issue (18 issues), error_code (8 codes)
+-- - Reference data: bike_issue (18 issues), error_code (8 codes), bike_engine_error_code (10 links)
 -- - Sample data: feedback (4), bike_rental_feedback (4), support_request (5), bike_inspection (4), bike_inspection_item (8)
 -- 
 -- Cross-Service References:

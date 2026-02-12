@@ -3,8 +3,7 @@ package org.clickenrent.supportservice.entity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
-
-import java.util.UUID;
+import lombok.experimental.SuperBuilder;
 
 /**
  * Junction entity linking bike types to their common issues.
@@ -21,10 +20,10 @@ import java.util.UUID;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
-@ToString
-@EqualsAndHashCode(of = "id")
-public class BikeTypeBikeIssue {
+@SuperBuilder
+@ToString(callSuper = true)
+@EqualsAndHashCode(of = "id", callSuper = false)
+public class BikeTypeBikeIssue extends BaseAuditEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -41,27 +40,24 @@ public class BikeTypeBikeIssue {
     @JoinColumn(name = "bike_issue_id", nullable = false)
     private BikeIssue bikeIssue;
 
+    @Override
     public Long getId() {
         return id;
     }
 
+    @Override
     public void setId(Long id) {
         this.id = id;
     }
 
+    @Override
     public String getExternalId() {
         return externalId;
     }
 
+    @Override
     public void setExternalId(String externalId) {
         this.externalId = externalId;
-    }
-
-    @PrePersist
-    protected void prePersist() {
-        if (externalId == null || externalId.isEmpty()) {
-            externalId = UUID.randomUUID().toString();
-        }
     }
 }
 

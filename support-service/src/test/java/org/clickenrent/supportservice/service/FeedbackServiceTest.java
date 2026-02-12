@@ -39,19 +39,15 @@ class FeedbackServiceTest {
 
     private Feedback testFeedback;
     private FeedbackDTO testFeedbackDTO;
-    private LocalDateTime testDateTime;
 
     @BeforeEach
     void setUp() {
-        testDateTime = LocalDateTime.now();
-
         testFeedback = Feedback.builder()
                 .id(1L)
                 .externalId("550e8400-e29b-41d4-a716-446655440301")
                 .userExternalId("user-uuid-1")
                 .rate(5)
                 .comment("Excellent service")
-                .dateTime(testDateTime)
                 .build();
 
         testFeedbackDTO = FeedbackDTO.builder()
@@ -60,7 +56,6 @@ class FeedbackServiceTest {
                 .userExternalId("user-uuid-1")
                 .rate(5)
                 .comment("Excellent service")
-                .dateTime(testDateTime)
                 .build();
     }
 
@@ -160,7 +155,6 @@ class FeedbackServiceTest {
         FeedbackDTO dtoWithoutUserExternalId = FeedbackDTO.builder()
                 .rate(5)
                 .comment("Test")
-                .dateTime(testDateTime)
                 .build();
         
         when(securityService.getCurrentUserExternalId()).thenReturn("user-uuid-1");

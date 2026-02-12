@@ -20,6 +20,10 @@ public class BikeBrandMapper {
                 .externalId(bikeBrand.getExternalId())
                 .name(bikeBrand.getName())
                 .companyExternalId(bikeBrand.getCompanyExternalId())
+                .dateCreated(bikeBrand.getDateCreated())
+                .lastDateModified(bikeBrand.getLastDateModified())
+                .createdBy(bikeBrand.getCreatedBy())
+                .lastModifiedBy(bikeBrand.getLastModifiedBy())
                 .build();
     }
 

@@ -46,7 +46,6 @@ class FeedbackControllerTest {
                 .userExternalId("user-uuid-1")
                 .rate(5)
                 .comment("Excellent service")
-                .dateTime(LocalDateTime.now())
                 .build();
     }
 

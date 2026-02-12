@@ -22,7 +22,6 @@ public class BikeRentalFeedbackMapper {
                 .bikeRentalExternalId(entity.getBikeRentalExternalId())
                 .rate(entity.getRate())
                 .comment(entity.getComment())
-                .dateTime(entity.getDateTime())
                 .dateCreated(entity.getDateCreated())
                 .lastDateModified(entity.getLastDateModified())
                 .createdBy(entity.getCreatedBy())
@@ -42,7 +41,6 @@ public class BikeRentalFeedbackMapper {
                 .bikeRentalExternalId(dto.getBikeRentalExternalId())
                 .rate(dto.getRate())
                 .comment(dto.getComment())
-                .dateTime(dto.getDateTime())
                 .build();
     }
 
@@ -62,9 +60,6 @@ public class BikeRentalFeedbackMapper {
         }
         if (dto.getComment() != null) {
             entity.setComment(dto.getComment());
-        }
-        if (dto.getDateTime() != null) {
-            entity.setDateTime(dto.getDateTime());
         }
     }
 }

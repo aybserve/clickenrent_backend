@@ -104,9 +104,7 @@ public class SupportRequestBikeIssueService {
         }
 
         SupportRequestBikeIssue entity = supportRequestBikeIssueMapper.toEntity(dto);
-        // Sanitize server-managed fields
-        entity.setId(null);
-        entity.setExternalId(null);
+        entity.sanitizeForCreate();
         entity = supportRequestBikeIssueRepository.save(entity);
         return supportRequestBikeIssueMapper.toDto(entity);
     }

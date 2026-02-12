@@ -6,14 +6,14 @@ import lombok.*;
 import lombok.experimental.SuperBuilder;
 
 /**
- * Junction entity linking support requests to multiple bike issues.
+ * Junction entity linking bike engines to error codes.
  */
 @Entity
 @Table(
-    name = "support_request_bike_issue",
+    name = "bike_engine_error_code",
     indexes = {
-        @Index(name = "idx_support_request_bike_issue_request", columnList = "support_request_id"),
-        @Index(name = "idx_support_request_bike_issue_issue", columnList = "bike_issue_id")
+        @Index(name = "idx_bee_code_error_code", columnList = "error_code_id"),
+        @Index(name = "idx_bee_code_bike_engine_ext_id", columnList = "bike_engine_external_id")
     }
 )
 @Getter
@@ -23,7 +23,7 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder
 @ToString(callSuper = true)
 @EqualsAndHashCode(of = "id", callSuper = false)
-public class SupportRequestBikeIssue extends BaseAuditEntity {
+public class BikeEngineErrorCode extends BaseAuditEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -32,15 +32,13 @@ public class SupportRequestBikeIssue extends BaseAuditEntity {
     @Column(name = "external_id", length = 100, unique = true)
     private String externalId;
 
-    @NotNull(message = "Support request is required")
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "support_request_id", nullable = false)
-    private SupportRequest supportRequest;
+    @Column(name = "bike_engine_external_id", length = 100)
+    private String bikeEngineExternalId;
 
-    @NotNull(message = "Bike issue is required")
+    @NotNull(message = "Error code is required")
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "bike_issue_id", nullable = false)
-    private BikeIssue bikeIssue;
+    @JoinColumn(name = "error_code_id", nullable = false)
+    private ErrorCode errorCode;
 
     @Override
     public Long getId() {
@@ -62,11 +60,3 @@ public class SupportRequestBikeIssue extends BaseAuditEntity {
         this.externalId = externalId;
     }
 }
-
-
-
-
-
-
-
-

@@ -26,6 +26,10 @@ public class BikeTypeBikeIssueMapper {
                 .bikeTypeExternalId(entity.getBikeTypeExternalId())
                 .bikeIssueId(entity.getBikeIssue() != null ? entity.getBikeIssue().getId() : null)
                 .bikeIssueName(entity.getBikeIssue() != null ? entity.getBikeIssue().getName() : null)
+                .dateCreated(entity.getDateCreated())
+                .lastDateModified(entity.getLastDateModified())
+                .createdBy(entity.getCreatedBy())
+                .lastModifiedBy(entity.getLastModifiedBy())
                 .build();
     }
 

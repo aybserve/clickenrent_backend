@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 /**
  * Data Transfer Object for ErrorCode entity.
@@ -22,7 +23,7 @@ public class ErrorCodeDTO {
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private String externalId;
     private String name;
-    private String bikeEngineExternalId;
+    private List<String> bikeEngineExternalIds;
     private String description;
     private String commonCause;
     private String diagnosticSteps;

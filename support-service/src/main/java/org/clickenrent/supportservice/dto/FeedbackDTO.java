@@ -23,7 +23,6 @@ public class FeedbackDTO {
     private String externalId;
     private Integer rate;
     private String comment;
-    private LocalDateTime dateTime;
 
     // Cross-service externalId reference
     private String userExternalId;

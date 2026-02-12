@@ -46,7 +46,6 @@ class BikeRentalFeedbackControllerTest {
                 .bikeRentalExternalId("bike-rental-uuid-101")
                 .rate(5)
                 .comment("Great bike!")
-                .dateTime(LocalDateTime.now())
                 .build();
     }
 

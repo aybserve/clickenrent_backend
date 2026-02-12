@@ -9,24 +9,21 @@ import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
 
 /**
- * Data Transfer Object for BikeRentalFeedback entity.
+ * Data Transfer Object for BikeEngineErrorCode junction entity.
  */
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class BikeRentalFeedbackDTO {
+public class BikeEngineErrorCodeDTO {
 
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private Long id;
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private String externalId;
-    private Integer rate;
-    private String comment;
-
-    // Cross-service externalId references
-    private String userExternalId;
-    private String bikeRentalExternalId;
+    private String bikeEngineExternalId;
+    private Long errorCodeId;
+    private String errorCodeName;
 
     // Audit fields
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
@@ -38,11 +35,3 @@ public class BikeRentalFeedbackDTO {
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private String lastModifiedBy;
 }
-
-
-
-
-
-
-
-

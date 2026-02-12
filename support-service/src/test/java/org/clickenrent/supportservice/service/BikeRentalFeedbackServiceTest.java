@@ -39,19 +39,15 @@ class BikeRentalFeedbackServiceTest {
 
     private BikeRentalFeedback testFeedback;
     private BikeRentalFeedbackDTO testFeedbackDTO;
-    private LocalDateTime testDateTime;
 
     @BeforeEach
     void setUp() {
-        testDateTime = LocalDateTime.now();
-
         testFeedback = BikeRentalFeedback.builder()
                 .id(1L)
                 .userExternalId("user-uuid-1")
                 .bikeRentalExternalId("bike-rental-uuid-101")
                 .rate(5)
                 .comment("Great bike!")
-                .dateTime(testDateTime)
                 .build();
 
         testFeedbackDTO = BikeRentalFeedbackDTO.builder()
@@ -60,7 +56,6 @@ class BikeRentalFeedbackServiceTest {
                 .bikeRentalExternalId("bike-rental-uuid-101")
                 .rate(5)
                 .comment("Great bike!")
-                .dateTime(testDateTime)
                 .build();
     }
 
@@ -160,7 +155,6 @@ class BikeRentalFeedbackServiceTest {
                 .bikeRentalExternalId("bike-rental-uuid-101")
                 .rate(5)
                 .comment("Test")
-                .dateTime(testDateTime)
                 .build();
         
         when(securityService.getCurrentUserExternalId()).thenReturn("user-uuid-1");

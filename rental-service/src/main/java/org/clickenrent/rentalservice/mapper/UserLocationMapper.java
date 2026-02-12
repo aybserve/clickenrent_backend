@@ -28,6 +28,10 @@ public class UserLocationMapper {
                 .userExternalId(userLocation.getUserExternalId())
                 .locationId(userLocation.getLocation() != null ? userLocation.getLocation().getId() : null)
                 .locationRoleId(userLocation.getLocationRole() != null ? userLocation.getLocationRole().getId() : null)
+                .dateCreated(userLocation.getDateCreated())
+                .lastDateModified(userLocation.getLastDateModified())
+                .createdBy(userLocation.getCreatedBy())
+                .lastModifiedBy(userLocation.getLastModifiedBy())
                 .build();
     }
 

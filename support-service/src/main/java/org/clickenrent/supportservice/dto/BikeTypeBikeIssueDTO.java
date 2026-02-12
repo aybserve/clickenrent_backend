@@ -6,6 +6,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
+
 /**
  * Data Transfer Object for BikeTypeBikeIssue junction entity.
  */
@@ -22,6 +24,16 @@ public class BikeTypeBikeIssueDTO {
     private String bikeTypeExternalId;
     private Long bikeIssueId;
     private String bikeIssueName;
+
+    // Audit fields
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    private LocalDateTime dateCreated;
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    private LocalDateTime lastDateModified;
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    private String createdBy;
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    private String lastModifiedBy;
 }
 
 

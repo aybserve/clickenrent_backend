@@ -843,6 +843,17 @@ public class GatewayConfig {
                                         .setStatusCode(HttpStatus.TOO_MANY_REQUESTS)))
                         .uri("lb://support-service"))
 
+                // Bike Engine Error Code Routes
+                .route("bike-engine-error-codes", r -> r
+                        .path("/api/v1/bike-engine-error-codes/**")
+                        .filters(f -> f
+                                .filter(jwtAuthenticationFilter)
+                                .requestRateLimiter(c -> c
+                                        .setRateLimiter(userRateLimiter)
+                                        .setKeyResolver(userKeyResolver)
+                                        .setStatusCode(HttpStatus.TOO_MANY_REQUESTS)))
+                        .uri("lb://support-service"))
+
                 // Support Request Routes
                 .route("support-requests", r -> r
                         .path("/api/v1/support-requests/**")
