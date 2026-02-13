@@ -62,7 +62,7 @@ public class HubIndexService {
     /**
      * Bulk index all hubs (paginated)
      */
-    public int bulkIndexHubs(String companyId) {
+    public int bulkIndexHubs(String companyExternalId) {
         int totalIndexed = 0;
         int page = 0;
         int pageSize = 100;
@@ -70,7 +70,7 @@ public class HubIndexService {
         try {
             Page<HubDTO> hubPage;
             do {
-                hubPage = rentalServiceClient.getHubs(companyId, page, pageSize);
+                hubPage = rentalServiceClient.getHubs(companyExternalId, page, pageSize);
                 
                 List<HubDocument> documents = new ArrayList<>();
                 for (HubDTO hubDTO : hubPage.getContent()) {

@@ -62,7 +62,7 @@ public class LocationIndexService {
     /**
      * Bulk index all locations (paginated)
      */
-    public int bulkIndexLocations(String companyId) {
+    public int bulkIndexLocations(String companyExternalId) {
         int totalIndexed = 0;
         int page = 0;
         int pageSize = 100;
@@ -70,7 +70,7 @@ public class LocationIndexService {
         try {
             Page<LocationDTO> locationPage;
             do {
-                locationPage = rentalServiceClient.getLocations(companyId, page, pageSize);
+                locationPage = rentalServiceClient.getLocations(companyExternalId, page, pageSize);
                 
                 List<LocationDocument> documents = new ArrayList<>();
                 for (LocationDTO locationDTO : locationPage.getContent()) {

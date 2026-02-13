@@ -37,11 +37,11 @@ public class GlobalSearchService {
     /**
      * Perform global search across specified entity types
      */
-    public GlobalSearchResponse search(String query, Set<String> types, String companyId, Integer limit) {
+    public GlobalSearchResponse search(String query, Set<String> types, String companyExternalId, Integer limit) {
         long startTime = System.currentTimeMillis();
         
         // Get tenant context
-        List<String> allowedCompanies = resolveAllowedCompanies(companyId);
+        List<String> allowedCompanies = resolveAllowedCompanies(companyExternalId);
         
         Map<String, List<SearchResult>> results = new HashMap<>();
         int totalResults = 0;
@@ -90,8 +90,8 @@ public class GlobalSearchService {
     /**
      * Get search suggestions for autocomplete
      */
-    public List<SearchSuggestion> getSuggestions(String query, String companyId, Integer limit) {
-        List<String> allowedCompanies = resolveAllowedCompanies(companyId);
+    public List<SearchSuggestion> getSuggestions(String query, String companyExternalId, Integer limit) {
+        List<String> allowedCompanies = resolveAllowedCompanies(companyExternalId);
         List<SearchSuggestion> suggestions = new ArrayList<>();
         
         // Get suggestions from each type (3 per type)
@@ -107,13 +107,13 @@ public class GlobalSearchService {
 
     // ==================== Private Helper Methods ====================
 
-    private List<String> resolveAllowedCompanies(String companyId) {
+    private List<String> resolveAllowedCompanies(String companyExternalId) {
         if (securityService.isAdmin()) {
             return List.of(); // Admin can see all
         }
         
-        if (companyId != null) {
-            return List.of(companyId);
+        if (companyExternalId != null) {
+            return List.of(companyExternalId);
         }
         
         return securityService.getCurrentUserCompanyExternalIds();

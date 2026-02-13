@@ -20,6 +20,7 @@ public class AddressMapper {
                 .externalId(address.getExternalId())
                 .city(address.getCity())
                 .countryId(address.getCountry() != null ? address.getCountry().getId() : null)
+                .countryName(address.getCountry() != null ? address.getCountry().getName() : null)
                 .street(address.getStreet())
                 .postcode(address.getPostcode())
                 .dateCreated(address.getDateCreated())

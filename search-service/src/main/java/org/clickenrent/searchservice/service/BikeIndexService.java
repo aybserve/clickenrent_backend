@@ -64,7 +64,7 @@ public class BikeIndexService {
     /**
      * Bulk index all bikes (paginated)
      */
-    public int bulkIndexBikes(String companyId) {
+    public int bulkIndexBikes(String companyExternalId) {
         int totalIndexed = 0;
         int page = 0;
         int pageSize = 100;
@@ -72,12 +72,12 @@ public class BikeIndexService {
         try {
             Page<BikeDTO> bikePage;
             do {
-                bikePage = rentalServiceClient.getBikes(companyId, page, pageSize);
+                bikePage = rentalServiceClient.getBikes(companyExternalId, page, pageSize);
                 
                 List<BikeDocument> documents = new ArrayList<>();
                 for (BikeDTO bikeDTO : bikePage.getContent()) {
-                    String companyExternalId = companyId != null ? companyId : "default-company";
-                    BikeDocument document = bikeDocumentMapper.toDocument(bikeDTO, companyExternalId);
+                    String companyExtId = companyExternalId != null ? companyExternalId : "default-company";
+                    BikeDocument document = bikeDocumentMapper.toDocument(bikeDTO, companyExtId);
                     documents.add(document);
                 }
                 

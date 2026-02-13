@@ -32,7 +32,7 @@ public interface RentalServiceClient {
      */
     @GetMapping("/bikes")
     Page<BikeDTO> getBikes(
-            @RequestParam(required = false) String companyId,
+            @RequestParam(required = false) String companyExternalId,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "100") int size
     );
@@ -50,7 +50,7 @@ public interface RentalServiceClient {
      */
     @GetMapping("/location")
     Page<LocationDTO> getLocations(
-            @RequestParam(required = false) String companyId,
+            @RequestParam(required = false) String companyExternalId,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "100") int size
     );
@@ -68,7 +68,7 @@ public interface RentalServiceClient {
      */
     @GetMapping("/hubs")
     Page<HubDTO> getHubs(
-            @RequestParam(required = false) String companyId,
+            @RequestParam(required = false) String companyExternalId,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "100") int size
     );

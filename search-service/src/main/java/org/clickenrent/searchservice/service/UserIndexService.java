@@ -66,7 +66,7 @@ public class UserIndexService {
     /**
      * Bulk index all users (paginated)
      */
-    public int bulkIndexUsers(String companyId) {
+    public int bulkIndexUsers(String companyExternalId) {
         int totalIndexed = 0;
         int page = 0;
         int pageSize = 100;
@@ -74,7 +74,7 @@ public class UserIndexService {
         try {
             Page<UserDTO> userPage;
             do {
-                userPage = authServiceClient.getUsers(companyId, page, pageSize);
+                userPage = authServiceClient.getUsers(companyExternalId, page, pageSize);
                 
                 List<UserDocument> documents = new ArrayList<>();
                 for (UserDTO userDTO : userPage.getContent()) {

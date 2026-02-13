@@ -26,7 +26,7 @@ public class BulkSyncRequest {
     private List<String> entityTypes;
 
     /**
-     * Optional company ID to filter results (null = all companies)
+     * Optional company external ID to filter results (null = all companies)
      */
-    private String companyId;
+    private String companyExternalId;
 }

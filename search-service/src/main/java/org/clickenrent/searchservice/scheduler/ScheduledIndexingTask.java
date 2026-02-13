@@ -44,7 +44,7 @@ public class ScheduledIndexingTask {
         try {
             BulkSyncRequest request = BulkSyncRequest.builder()
                     .entityTypes(List.of("users", "bikes", "locations", "hubs"))
-                    .companyId(null) // Sync all companies
+                    .companyExternalId(null) // Sync all companies
                     .build();
             
             BulkSyncResponse response = indexingService.bulkSync(request);

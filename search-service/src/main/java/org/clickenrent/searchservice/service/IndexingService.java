@@ -39,10 +39,10 @@ public class IndexingService {
         for (String entityType : request.getEntityTypes()) {
             try {
                 int count = switch (entityType.toLowerCase()) {
-                    case "users" -> userIndexService.bulkIndexUsers(request.getCompanyId());
-                    case "bikes" -> bikeIndexService.bulkIndexBikes(request.getCompanyId());
-                    case "locations" -> locationIndexService.bulkIndexLocations(request.getCompanyId());
-                    case "hubs" -> hubIndexService.bulkIndexHubs(request.getCompanyId());
+                    case "users" -> userIndexService.bulkIndexUsers(request.getCompanyExternalId());
+                    case "bikes" -> bikeIndexService.bulkIndexBikes(request.getCompanyExternalId());
+                    case "locations" -> locationIndexService.bulkIndexLocations(request.getCompanyExternalId());
+                    case "hubs" -> hubIndexService.bulkIndexHubs(request.getCompanyExternalId());
                     default -> {
                         errors.put(entityType, "Unknown entity type");
                         yield 0;

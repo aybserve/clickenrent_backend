@@ -24,6 +24,8 @@ public class AddressDTO {
     private String externalId;
     private String city;
     private Long countryId;
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    private String countryName;
     private String street;
     private String postcode;
 

@@ -51,20 +51,20 @@ public class SearchController {
             @Parameter(description = "Comma-separated entity types: users,bikes,locations,hubs")
             @RequestParam(required = false) String types,
             
-            @Parameter(description = "Company ID filter (optional, defaults to user's companies)")
-            @RequestParam(required = false) String companyId,
+            @Parameter(description = "Company external ID filter (optional, defaults to user's companies)")
+            @RequestParam(required = false) String companyExternalId,
             
             @Parameter(description = "Maximum results per type")
             @RequestParam(defaultValue = "20") @Min(1) @Max(100) Integer limit
     ) {
-        log.info("Search request: q={}, types={}, companyId={}, limit={}", q, types, companyId, limit);
+        log.info("Search request: q={}, types={}, companyExternalId={}, limit={}", q, types, companyExternalId, limit);
         
         // Parse types
         Set<String> searchTypes = types != null && !types.isBlank()
                 ? Set.of(types.split(","))
                 : Set.of("users", "bikes", "locations", "hubs");
         
-        GlobalSearchResponse response = searchService.search(q, searchTypes, companyId, limit);
+        GlobalSearchResponse response = searchService.search(q, searchTypes, companyExternalId, limit);
         
         return ResponseEntity.ok(response);
     }
@@ -81,15 +81,15 @@ public class SearchController {
             @Parameter(description = "Search prefix", required = true)
             @RequestParam @Size(min = 1, max = 50) String q,
             
-            @Parameter(description = "Company ID filter (optional)")
-            @RequestParam(required = false) String companyId,
+            @Parameter(description = "Company external ID filter (optional)")
+            @RequestParam(required = false) String companyExternalId,
             
             @Parameter(description = "Maximum suggestions to return")
             @RequestParam(defaultValue = "10") @Min(1) @Max(20) Integer limit
     ) {
-        log.info("Suggestions request: q={}, companyId={}, limit={}", q, companyId, limit);
+        log.info("Suggestions request: q={}, companyExternalId={}, limit={}", q, companyExternalId, limit);
         
-        List<SearchSuggestion> suggestions = searchService.getSuggestions(q, companyId, limit);
+        List<SearchSuggestion> suggestions = searchService.getSuggestions(q, companyExternalId, limit);
         
         return ResponseEntity.ok(suggestions);
     }

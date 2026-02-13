@@ -28,7 +28,7 @@ public interface AuthServiceClient {
      */
     @GetMapping("/users")
     Page<UserDTO> getUsers(
-            @RequestParam(required = false) String companyId,
+            @RequestParam(required = false) String companyExternalId,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "100") int size
     );
