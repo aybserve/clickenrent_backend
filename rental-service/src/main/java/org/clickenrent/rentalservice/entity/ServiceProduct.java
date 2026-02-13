@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 
+import java.math.BigDecimal;
+
 /**
  * Entity representing a service product (extends Product).
  * Links services to products.
@@ -27,4 +29,7 @@ public class ServiceProduct extends Product {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "related_product_id", nullable = true)
     private Product relatedProduct;
+
+    @Column(name = "b2b_subscription_price", precision = 10, scale = 2)
+    private BigDecimal b2bSubscriptionPrice;
 }

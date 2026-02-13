@@ -19,7 +19,6 @@ public class ServiceMapper {
                 .id(service.getId())
                 .externalId(service.getExternalId())
                 .name(service.getName())
-                .b2bSubscriptionPrice(service.getB2bSubscriptionPrice())
                 .dateCreated(service.getDateCreated())
                 .lastDateModified(service.getLastDateModified())
                 .createdBy(service.getCreatedBy())
@@ -36,7 +35,6 @@ public class ServiceMapper {
                 .id(dto.getId())
                 .externalId(dto.getExternalId())
                 .name(dto.getName())
-                .b2bSubscriptionPrice(dto.getB2bSubscriptionPrice())
                 .build();
     }
 
@@ -50,9 +48,6 @@ public class ServiceMapper {
         }
         if (dto.getName() != null) {
             service.setName(dto.getName());
-        }
-        if (dto.getB2bSubscriptionPrice() != null) {
-            service.setB2bSubscriptionPrice(dto.getB2bSubscriptionPrice());
         }
     }
 }

@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 /**
@@ -26,6 +27,7 @@ public class ServiceProductDTO {
     private Long serviceId;
     private Long relatedProductId;
     private Boolean isB2BRentable;
+    private BigDecimal b2bSubscriptionPrice;
 
     // Audit fields
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)

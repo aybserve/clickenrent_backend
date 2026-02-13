@@ -442,12 +442,12 @@ ON CONFLICT (id) DO NOTHING;
 -- =====================================================================================================================
 
 -- ---------------------------------------------------------------------------------------------------------------------
--- 6.1 SERVICES (HAS audit fields and external_id, only has name and b2b_subscription_price)
+-- 6.1 SERVICES (HAS audit fields and external_id, only has name)
 -- ---------------------------------------------------------------------------------------------------------------------
-INSERT INTO service (id, external_id, name, b2b_subscription_price, date_created, last_date_modified, created_by, last_modified_by, is_deleted) VALUES
-(1, '550e8400-e29b-41d4-a716-446655440701', 'Basic Tune-Up', 25.00, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
-(2, '550e8400-e29b-41d4-a716-446655440702', 'Full Service', 75.00, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
-(3, '550e8400-e29b-41d4-a716-446655440703', 'Tire Replacement', 30.00, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false)
+INSERT INTO service (id, external_id, name, date_created, last_date_modified, created_by, last_modified_by, is_deleted) VALUES
+(1, '550e8400-e29b-41d4-a716-446655440701', 'Basic Tune-Up', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(2, '550e8400-e29b-41d4-a716-446655440702', 'Full Service', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(3, '550e8400-e29b-41d4-a716-446655440703', 'Tire Replacement', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false)
 ON CONFLICT (id) DO NOTHING;
 
 -- ---------------------------------------------------------------------------------------------------------------------
@@ -460,9 +460,9 @@ INSERT INTO product (id, external_id, product_type, is_b2b_rentable, date_create
 ON CONFLICT (id) DO NOTHING;
 
 -- Then insert into service_product table (subclass)
-INSERT INTO service_product (id, service_id, related_product_id) VALUES
-(301, 1, NULL),
-(302, 2, NULL)
+INSERT INTO service_product (id, service_id, related_product_id, b2b_subscription_price) VALUES
+(301, 1, NULL, 25.00),
+(302, 2, NULL, 75.00)
 ON CONFLICT (id) DO NOTHING;
 
 -- =====================================================================================================================

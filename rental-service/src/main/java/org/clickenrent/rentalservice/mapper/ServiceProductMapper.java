@@ -27,6 +27,7 @@ public class ServiceProductMapper {
                 .serviceId(serviceProduct.getService() != null ? serviceProduct.getService().getId() : null)
                 .relatedProductId(serviceProduct.getRelatedProduct() != null ? serviceProduct.getRelatedProduct().getId() : null)
                 .isB2BRentable(serviceProduct.getIsB2BRentable())
+                .b2bSubscriptionPrice(serviceProduct.getB2bSubscriptionPrice())
                 .dateCreated(serviceProduct.getDateCreated())
                 .lastDateModified(serviceProduct.getLastDateModified())
                 .createdBy(serviceProduct.getCreatedBy())
@@ -42,7 +43,8 @@ public class ServiceProductMapper {
         ServiceProduct.ServiceProductBuilder<?, ?> builder = ServiceProduct.builder()
                 .id(dto.getId())
                 .externalId(dto.getExternalId())
-                .isB2BRentable(dto.getIsB2BRentable());
+                .isB2BRentable(dto.getIsB2BRentable())
+                .b2bSubscriptionPrice(dto.getB2bSubscriptionPrice());
 
         if (dto.getServiceId() != null) {
             builder.service(serviceRepository.findById(dto.getServiceId()).orElse(null));
