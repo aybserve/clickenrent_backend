@@ -16,12 +16,12 @@ import lombok.NoArgsConstructor;
 public class BikeLocationDTO {
 
     private String id;
-    private String code;
-    private String name;
+    private String bikeCode;
+    private String bikeModelName;
     private Long bikeStatus;
     private String bikeStatusName;
     private Integer batteryLevel;
-    private GeoPointDTO location;
+    private GeoPointDTO coordinates;
     private Double distance;
     private String distanceUnit;
     private String hubExternalId;
