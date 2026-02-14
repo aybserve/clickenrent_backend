@@ -24,9 +24,14 @@ public class UserLocationMapper {
 
         return UserLocationDTO.builder()
                 .id(userLocation.getId())
-                .userId(userLocation.getUserId())
+                .externalId(userLocation.getExternalId())
+                .userExternalId(userLocation.getUserExternalId())
                 .locationId(userLocation.getLocation() != null ? userLocation.getLocation().getId() : null)
                 .locationRoleId(userLocation.getLocationRole() != null ? userLocation.getLocationRole().getId() : null)
+                .dateCreated(userLocation.getDateCreated())
+                .lastDateModified(userLocation.getLastDateModified())
+                .createdBy(userLocation.getCreatedBy())
+                .lastModifiedBy(userLocation.getLastModifiedBy())
                 .build();
     }
 
@@ -37,7 +42,8 @@ public class UserLocationMapper {
 
         UserLocation.UserLocationBuilder builder = UserLocation.builder()
                 .id(dto.getId())
-                .userId(dto.getUserId());
+                .externalId(dto.getExternalId())
+                .userExternalId(dto.getUserExternalId());
 
         if (dto.getLocationId() != null) {
             builder.location(locationRepository.findById(dto.getLocationId()).orElse(null));
@@ -49,3 +55,7 @@ public class UserLocationMapper {
         return builder.build();
     }
 }
+
+
+
+

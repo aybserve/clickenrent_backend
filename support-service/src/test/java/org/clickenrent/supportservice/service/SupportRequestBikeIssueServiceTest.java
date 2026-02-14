@@ -51,7 +51,7 @@ class SupportRequestBikeIssueServiceTest {
     void setUp() {
         testRequest = SupportRequest.builder()
                 .id(1L)
-                .userId(1L)
+                .userExternalId("user-ext-123")
                 .build();
 
         testBikeIssue = BikeIssue.builder()
@@ -61,12 +61,14 @@ class SupportRequestBikeIssueServiceTest {
 
         testJunction = SupportRequestBikeIssue.builder()
                 .id(1L)
+                .externalId("junction-uuid-1")
                 .supportRequest(testRequest)
                 .bikeIssue(testBikeIssue)
                 .build();
 
         testJunctionDTO = SupportRequestBikeIssueDTO.builder()
                 .id(1L)
+                .externalId("junction-uuid-1")
                 .supportRequestId(1L)
                 .build();
     }
@@ -215,3 +217,7 @@ class SupportRequestBikeIssueServiceTest {
         assertThrows(UnauthorizedException.class, () -> supportRequestBikeIssueService.delete(1L));
     }
 }
+
+
+
+

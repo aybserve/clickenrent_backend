@@ -54,7 +54,7 @@ class BikeBrandServiceTest {
         .id(1L)
         .externalId("BB001")
         .name("VanMoof")
-        .companyId(1L)
+        .companyExternalId("company-ext-001")
         .build();
     }
 
@@ -128,3 +128,7 @@ class BikeBrandServiceTest {
         verify(bikeBrandRepository, times(1)).delete(testBrand);
     }
 }
+
+
+
+

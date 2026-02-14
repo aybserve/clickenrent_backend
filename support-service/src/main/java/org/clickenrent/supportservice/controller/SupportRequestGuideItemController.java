@@ -18,7 +18,7 @@ import java.util.List;
  * REST controller for managing SupportRequestGuideItem entities.
  */
 @RestController
-@RequestMapping("/api/support-request-guide-items")
+@RequestMapping("/api/v1/support-request-guide-items")
 @RequiredArgsConstructor
 @Tag(name = "Support Request Guide Item", description = "Support request guide item management")
 @SecurityRequirement(name = "bearerAuth")
@@ -38,6 +38,13 @@ public class SupportRequestGuideItemController {
     @Operation(summary = "Get guide item by ID")
     public ResponseEntity<SupportRequestGuideItemDTO> getById(@PathVariable Long id) {
         return ResponseEntity.ok(supportRequestGuideItemService.getById(id));
+    }
+
+    @GetMapping("/external/{externalId}")
+    @PreAuthorize("isAuthenticated()")
+    @Operation(summary = "Get guide item by external ID")
+    public ResponseEntity<SupportRequestGuideItemDTO> getByExternalId(@PathVariable String externalId) {
+        return ResponseEntity.ok(supportRequestGuideItemService.getByExternalId(externalId));
     }
 
     @GetMapping("/bike-issue/{bikeIssueId}")
@@ -77,3 +84,11 @@ public class SupportRequestGuideItemController {
         return ResponseEntity.noContent().build();
     }
 }
+
+
+
+
+
+
+
+

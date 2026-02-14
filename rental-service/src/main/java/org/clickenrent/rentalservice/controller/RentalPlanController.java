@@ -19,9 +19,9 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/rental-plans")
+@RequestMapping("/api/v1/rental-plans")
 @RequiredArgsConstructor
-@Tag(name = "RentalPlan", description = "Rental plan management")
+@Tag(name = "Rental Plan", description = "Rental plan management")
 @SecurityRequirement(name = "bearerAuth")
 public class RentalPlanController {
 
@@ -70,4 +70,19 @@ public class RentalPlanController {
         rentalPlanService.deleteRentalPlan(id);
         return ResponseEntity.noContent().build();
     }
+
+    @GetMapping("/external/{externalId}")
+    @PreAuthorize("isAuthenticated()")
+    @Operation(summary = "Get rental plan by external ID", description = "Retrieve rental plan by external ID for cross-service communication")
+    public ResponseEntity<RentalPlanDTO> getByExternalId(@PathVariable String externalId) {
+        return ResponseEntity.ok(rentalPlanService.getRentalPlanByExternalId(externalId));
+    }
 }
+
+
+
+
+
+
+
+

@@ -35,7 +35,7 @@ class B2BSubscriptionFinTransactionControllerTest {
     void setUp() {
         b2bSubscriptionFinTransactionDTO = B2BSubscriptionFinTransactionDTO.builder()
                 .id(1L)
-                .b2bSubscriptionId(1L)
+                .b2bSubscriptionExternalId("b2b-subscription-ext-123")
                 .financialTransaction(FinancialTransactionDTO.builder().id(1L).build())
                 .build();
     }
@@ -49,3 +49,7 @@ class B2BSubscriptionFinTransactionControllerTest {
                 .andExpect(status().isOk());
     }
 }
+
+
+
+

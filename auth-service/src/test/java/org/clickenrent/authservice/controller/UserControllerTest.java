@@ -71,9 +71,6 @@ class UserControllerTest {
                 .firstName("Test")
                 .lastName("User")
                 .phone("+1234567890")
-                .city("New York")
-                .address("123 Main St")
-                .zipcode("10001")
                 .languageId(1L)
                 .isActive(true)
                 .build();
@@ -85,9 +82,6 @@ class UserControllerTest {
                 .firstName("New")
                 .lastName("User")
                 .phone("+9876543210")
-                .city("Boston")
-                .address("456 Oak Ave")
-                .zipcode("02101")
                 .languageId(1L)
                 .isActive(true)
                 .build();

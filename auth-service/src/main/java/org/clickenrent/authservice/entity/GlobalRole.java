@@ -5,6 +5,8 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 
+import java.util.UUID;
+
 /**
  * Entity representing global system roles.
  * Predefined values: SuperAdmin, Admin, B2B, Customer
@@ -24,10 +26,29 @@ public class GlobalRole {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Size(max = 100, message = "External ID must not exceed 100 characters")
+    @Column(name = "external_id", unique = true, length = 100)
+    private String externalId;
+
     @NotBlank(message = "Global role name is required")
     @Size(max = 50, message = "Global role name must not exceed 50 characters")
     @Column(name = "name", nullable = false, unique = true, length = 50)
     private String name;
+
+    @PrePersist
+    protected void prePersist() {
+        if (externalId == null || externalId.isEmpty()) {
+            externalId = UUID.randomUUID().toString();
+        }
+    }
 }
+
+
+
+
+
+
+
+
 
 

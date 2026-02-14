@@ -2,6 +2,7 @@ package org.clickenrent.rentalservice.service;
 
 import org.clickenrent.rentalservice.dto.B2BSubscriptionOrderItemDTO;
 import org.clickenrent.rentalservice.entity.B2BSubscriptionOrderItem;
+import org.clickenrent.rentalservice.entity.Product;
 import org.clickenrent.rentalservice.exception.ResourceNotFoundException;
 import org.clickenrent.rentalservice.mapper.B2BSubscriptionOrderItemMapper;
 import org.clickenrent.rentalservice.repository.B2BSubscriptionOrderItemRepository;
@@ -48,8 +49,6 @@ class B2BSubscriptionOrderItemServiceTest {
         testItem = B2BSubscriptionOrderItem.builder()
         .id(1L)
         .externalId("BSOI001")
-        .productModelType("BikeModel")
-        .productModelId(1L)
         .quantity(10)
         .price(new BigDecimal("100.00"))
         .totalPrice(new BigDecimal("1000.00"))
@@ -59,8 +58,7 @@ class B2BSubscriptionOrderItemServiceTest {
         .id(1L)
         .externalId("BSOI001")
         .b2bSubscriptionOrderId(1L)
-        .productModelType("BikeModel")
-        .productModelId(1L)
+        .productId(1L)
         .quantity(10)
         .price(new BigDecimal("100.00"))
         .totalPrice(new BigDecimal("1000.00"))
@@ -148,3 +146,7 @@ class B2BSubscriptionOrderItemServiceTest {
         verify(b2bSubscriptionOrderItemRepository, times(1)).delete(testItem);
     }
 }
+
+
+
+

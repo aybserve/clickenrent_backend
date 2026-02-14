@@ -1,6 +1,7 @@
 package org.clickenrent.rentalservice.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.clickenrent.rentalservice.dto.PartBrandDTO;
 import org.clickenrent.rentalservice.entity.PartBrand;
 import org.clickenrent.rentalservice.exception.ResourceNotFoundException;
@@ -14,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class PartBrandService {
@@ -29,12 +31,12 @@ public class PartBrandService {
     }
 
     @Transactional(readOnly = true)
-    public List<PartBrandDTO> getBrandsByCompany(Long companyId) {
-        if (!securityService.isAdmin() && !securityService.hasAccessToCompany(companyId)) {
+    public List<PartBrandDTO> getBrandsByCompanyExternalId(String companyExternalId) {
+        if (!securityService.isAdmin() && !securityService.hasAccessToCompanyByExternalId(companyExternalId)) {
             throw new UnauthorizedException("You don't have permission to view brands for this company");
         }
 
-        return partBrandRepository.findByCompanyId(companyId).stream()
+        return partBrandRepository.findByCompanyExternalId(companyExternalId).stream()
                 .map(partBrandMapper::toDto)
                 .toList();
     }
@@ -48,11 +50,12 @@ public class PartBrandService {
 
     @Transactional
     public PartBrandDTO createBrand(PartBrandDTO dto) {
-        if (!securityService.isAdmin() && !securityService.hasAccessToCompany(dto.getCompanyId())) {
+        if (!securityService.isAdmin() && !securityService.hasAccessToCompanyByExternalId(dto.getCompanyExternalId())) {
             throw new UnauthorizedException("You don't have permission to create brands for this company");
         }
 
         PartBrand brand = partBrandMapper.toEntity(dto);
+        brand.sanitizeForCreate();
         brand = partBrandRepository.save(brand);
         return partBrandMapper.toDto(brand);
     }
@@ -62,7 +65,7 @@ public class PartBrandService {
         PartBrand brand = partBrandRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("PartBrand", "id", id));
 
-        if (!securityService.isAdmin() && !securityService.hasAccessToCompany(brand.getCompanyId())) {
+        if (!securityService.isAdmin() && !securityService.hasAccessToCompanyByExternalId(brand.getCompanyExternalId())) {
             throw new UnauthorizedException("You don't have permission to update this brand");
         }
 
@@ -81,4 +84,15 @@ public class PartBrandService {
                 .orElseThrow(() -> new ResourceNotFoundException("PartBrand", "id", id));
         partBrandRepository.delete(brand);
     }
+
+    @Transactional(readOnly = true)
+    public PartBrandDTO getPartBrandByExternalId(String externalId) {
+        PartBrand partBrand = partBrandRepository.findByExternalId(externalId)
+                .orElseThrow(() -> new ResourceNotFoundException("PartBrand", "externalId", externalId));
+        return partBrandMapper.toDto(partBrand);
+    }
 }
+
+
+
+

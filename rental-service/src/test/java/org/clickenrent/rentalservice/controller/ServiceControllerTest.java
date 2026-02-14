@@ -15,7 +15,6 @@ import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 
-import java.math.BigDecimal;
 import java.util.Collections;
 
 import static org.mockito.ArgumentMatchers.*;
@@ -44,7 +43,6 @@ class ServiceControllerTest {
         serviceDTO = ServiceDTO.builder()
                 .id(1L)
                 .name("Bike Maintenance")
-                .b2bSubscriptionPrice(new BigDecimal("50.00"))
                 .build();
     }
 
@@ -100,3 +98,11 @@ class ServiceControllerTest {
                 .andExpect(status().isNoContent());
     }
 }
+
+
+
+
+
+
+
+

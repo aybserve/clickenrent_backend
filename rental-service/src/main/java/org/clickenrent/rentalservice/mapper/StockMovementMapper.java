@@ -14,6 +14,7 @@ import org.springframework.stereotype.Component;
 public class StockMovementMapper {
 
     private final HubRepository hubRepository;
+    private final org.clickenrent.rentalservice.repository.ProductRepository productRepository;
 
     public StockMovementDTO toDto(StockMovement stockMovement) {
         if (stockMovement == null) {
@@ -23,10 +24,13 @@ public class StockMovementMapper {
         return StockMovementDTO.builder()
                 .id(stockMovement.getId())
                 .externalId(stockMovement.getExternalId())
-                .productId(stockMovement.getProductId())
+                .productId(stockMovement.getProduct() != null ? stockMovement.getProduct().getId() : null)
                 .fromHubId(stockMovement.getFromHub() != null ? stockMovement.getFromHub().getId() : null)
                 .toHubId(stockMovement.getToHub() != null ? stockMovement.getToHub().getId() : null)
-                .dateTime(stockMovement.getDateTime())
+                .dateCreated(stockMovement.getDateCreated())
+                .lastDateModified(stockMovement.getLastDateModified())
+                .createdBy(stockMovement.getCreatedBy())
+                .lastModifiedBy(stockMovement.getLastModifiedBy())
                 .build();
     }
 
@@ -37,10 +41,11 @@ public class StockMovementMapper {
 
         StockMovement.StockMovementBuilder builder = StockMovement.builder()
                 .id(dto.getId())
-                .externalId(dto.getExternalId())
-                .productId(dto.getProductId())
-                .dateTime(dto.getDateTime());
+                .externalId(dto.getExternalId());
 
+        if (dto.getProductId() != null) {
+            builder.product(productRepository.findById(dto.getProductId()).orElse(null));
+        }
         if (dto.getFromHubId() != null) {
             builder.fromHub(hubRepository.findById(dto.getFromHubId()).orElse(null));
         }
@@ -51,3 +56,11 @@ public class StockMovementMapper {
         return builder.build();
     }
 }
+
+
+
+
+
+
+
+

@@ -71,7 +71,8 @@ class RideServiceTest {
         .endDateTime(null)
         .startLocationId(1L)
         .endLocationId(2L)
-        .coordinatesId(1L)
+        .startCoordinatesId(1L)
+        .endCoordinatesId(2L)
         .rideStatusId(1L)
         .build();
         
@@ -97,7 +98,7 @@ class RideServiceTest {
         when(securityService.isAdmin()).thenReturn(true);
         BikeRental bikeRental = new BikeRental();
         Rental rental = new Rental();
-        rental.setUserId(1L);
+        rental.setUserExternalId("usr-ext-00001");
         bikeRental.setRental(rental);
         testRide.setBikeRental(bikeRental);
         
@@ -123,7 +124,7 @@ class RideServiceTest {
         when(securityService.isAdmin()).thenReturn(true);
         BikeRental bikeRental = new BikeRental();
         Rental rental = new Rental();
-        rental.setUserId(1L);
+        rental.setUserExternalId("usr-ext-00001");
         bikeRental.setRental(rental);
         
         when(bikeRentalRepository.findById(1L)).thenReturn(Optional.of(bikeRental));
@@ -142,7 +143,7 @@ class RideServiceTest {
         when(securityService.isAdmin()).thenReturn(true);
         BikeRental bikeRental = new BikeRental();
         Rental rental = new Rental();
-        rental.setUserId(1L);
+        rental.setUserExternalId("usr-ext-00001");
         bikeRental.setRental(rental);
         
         RideStatus activeStatus = new RideStatus();
@@ -165,7 +166,7 @@ class RideServiceTest {
         when(securityService.isAdmin()).thenReturn(true);
         BikeRental bikeRental = new BikeRental();
         Rental rental = new Rental();
-        rental.setUserId(1L);
+        rental.setUserExternalId("usr-ext-00001");
         bikeRental.setRental(rental);
         testRide.setBikeRental(bikeRental);
         
@@ -201,3 +202,7 @@ class RideServiceTest {
         assertThrows(ResourceNotFoundException.class, () -> rideService.deleteRide(999L));
     }
 }
+
+
+
+

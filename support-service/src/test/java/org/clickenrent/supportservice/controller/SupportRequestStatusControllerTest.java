@@ -41,6 +41,7 @@ class SupportRequestStatusControllerTest {
     void setUp() {
         statusDTO = SupportRequestStatusDTO.builder()
                 .id(1L)
+                .externalId("status-uuid-1")
                 .name("OPEN")
                 .build();
     }
@@ -98,3 +99,11 @@ class SupportRequestStatusControllerTest {
                 .andExpect(status().isNoContent());
     }
 }
+
+
+
+
+
+
+
+

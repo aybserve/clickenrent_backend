@@ -52,4 +52,24 @@ public class HubImage extends BaseAuditEntity {
     @Builder.Default
     @Column(name = "is_thumbnail", nullable = false)
     private Boolean isThumbnail = false;
+
+    @Override
+    public Long getId() {
+        return id;
+    }
+
+    @Override
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    @Override
+    public String getExternalId() {
+        return externalId;
+    }
+
+    @Override
+    public void setExternalId(String externalId) {
+        this.externalId = externalId;
+    }
 }

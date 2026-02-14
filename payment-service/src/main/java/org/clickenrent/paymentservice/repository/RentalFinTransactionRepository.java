@@ -5,7 +5,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
-import java.util.UUID;
 
 /**
  * Repository for RentalFinTransaction entity
@@ -13,7 +12,11 @@ import java.util.UUID;
 @Repository
 public interface RentalFinTransactionRepository extends JpaRepository<RentalFinTransaction, Long> {
     
-    Optional<RentalFinTransaction> findByRentalId(Long rentalId);
+    Optional<RentalFinTransaction> findByRentalExternalId(String rentalExternalId);
     
-    Optional<RentalFinTransaction> findByExternalId(UUID externalId);
+    Optional<RentalFinTransaction> findByExternalId(String externalId);
 }
+
+
+
+

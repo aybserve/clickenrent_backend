@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/keys")
+@RequestMapping("/api/v1/keys")
 @RequiredArgsConstructor
 @Tag(name = "Key", description = "Lock key management (Admin only)")
 @SecurityRequirement(name = "bearerAuth")
@@ -51,4 +51,19 @@ public class KeyController {
         keyService.deleteKey(id);
         return ResponseEntity.noContent().build();
     }
+
+    @GetMapping("/external/{externalId}")
+    @PreAuthorize("isAuthenticated()")
+    @Operation(summary = "Get key by external ID", description = "Retrieve key by external ID for cross-service communication")
+    public ResponseEntity<KeyDTO> getByExternalId(@PathVariable String externalId) {
+        return ResponseEntity.ok(keyService.findByExternalId(externalId));
+    }
 }
+
+
+
+
+
+
+
+

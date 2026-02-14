@@ -41,6 +41,7 @@ public class RentalUnitService {
         }
 
         RentalUnit unit = rentalUnitMapper.toEntity(dto);
+        unit.sanitizeForCreate();
         unit = rentalUnitRepository.save(unit);
         return rentalUnitMapper.toDto(unit);
     }
@@ -55,4 +56,19 @@ public class RentalUnitService {
                 .orElseThrow(() -> new ResourceNotFoundException("RentalUnit", "id", id));
         rentalUnitRepository.delete(unit);
     }
+
+    @Transactional(readOnly = true)
+    public RentalUnitDTO findByExternalId(String externalId) {
+        RentalUnit unit = rentalUnitRepository.findByExternalId(externalId)
+                .orElseThrow(() -> new ResourceNotFoundException("RentalUnit", "externalId", externalId));
+        return rentalUnitMapper.toDto(unit);
+    }
 }
+
+
+
+
+
+
+
+

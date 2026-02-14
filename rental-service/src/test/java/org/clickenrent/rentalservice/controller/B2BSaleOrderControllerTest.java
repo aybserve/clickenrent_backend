@@ -45,12 +45,11 @@ class B2BSaleOrderControllerTest {
         orderDTO = B2BSaleOrderDTO.builder()
                 .id(1L)
                 .externalId("B2BSO001")
-                .sellerCompanyId(1L)
-                .buyerCompanyId(2L)
+                .sellerCompanyExternalId("company-ext-001")
+                .buyerCompanyExternalId("company-ext-002")
                 .b2bSaleOrderStatusId(2L)
                 .locationId(1L)
                 .b2bSaleId(1L)
-                .dateTime(LocalDateTime.now())
                 .build();
     }
 
@@ -69,12 +68,12 @@ class B2BSaleOrderControllerTest {
     @Test
     @WithMockUser(roles = "B2B")
     void getOrdersBySellerCompany_ReturnsOk() throws Exception {
-        when(b2bSaleOrderService.getOrdersBySellerCompany(1L)).thenReturn(Arrays.asList(orderDTO));
+        when(b2bSaleOrderService.getOrdersBySellerCompanyExternalId("company-ext-001")).thenReturn(Arrays.asList(orderDTO));
 
         mockMvc.perform(get("/api/b2b-sale-orders/by-seller/1").with(csrf()))
                 .andExpect(status().isOk());
 
-        verify(b2bSaleOrderService, times(1)).getOrdersBySellerCompany(1L);
+        verify(b2bSaleOrderService, times(1)).getOrdersBySellerCompanyExternalId("company-ext-001");
     }
 
     @Test
@@ -119,3 +118,7 @@ class B2BSaleOrderControllerTest {
                 .andExpect(status().isNoContent());
     }
 }
+
+
+
+

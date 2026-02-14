@@ -53,11 +53,12 @@ public class RentalPlanService {
         Location location = locationRepository.findById(dto.getLocationId())
                 .orElseThrow(() -> new ResourceNotFoundException("Location", "id", dto.getLocationId()));
 
-        if (!securityService.isAdmin() && !securityService.hasAccessToCompany(location.getCompanyId())) {
+        if (!securityService.isAdmin() && !securityService.hasAccessToCompanyByExternalId(location.getCompanyExternalId())) {
             throw new UnauthorizedException("You don't have permission to create rental plans for this location");
         }
 
         RentalPlan rentalPlan = rentalPlanMapper.toEntity(dto);
+        rentalPlan.sanitizeForCreate();
         rentalPlan = rentalPlanRepository.save(rentalPlan);
         return rentalPlanMapper.toDto(rentalPlan);
     }
@@ -67,7 +68,7 @@ public class RentalPlanService {
         RentalPlan rentalPlan = rentalPlanRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("RentalPlan", "id", id));
 
-        if (!securityService.isAdmin() && !securityService.hasAccessToCompany(rentalPlan.getLocation().getCompanyId())) {
+        if (!securityService.isAdmin() && !securityService.hasAccessToCompanyByExternalId(rentalPlan.getLocation().getCompanyExternalId())) {
             throw new UnauthorizedException("You don't have permission to update this rental plan");
         }
 
@@ -87,4 +88,15 @@ public class RentalPlanService {
 
         rentalPlanRepository.delete(rentalPlan);
     }
+
+    @Transactional(readOnly = true)
+    public RentalPlanDTO getRentalPlanByExternalId(String externalId) {
+        RentalPlan rentalPlan = rentalPlanRepository.findByExternalId(externalId)
+                .orElseThrow(() -> new ResourceNotFoundException("RentalPlan", "externalId", externalId));
+        return rentalPlanMapper.toDto(rentalPlan);
+    }
 }
+
+
+
+

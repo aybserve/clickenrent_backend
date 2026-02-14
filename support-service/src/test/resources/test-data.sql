@@ -81,32 +81,32 @@ VALUES (5, '550e8400-e29b-41d4-a716-446655440205', 'E005', 3, 'Overheat Protecti
 -- ========================================
 -- 5. FEEDBACK
 -- ========================================
-INSERT INTO feedback (id, external_id, user_id, rate, comment, date_time, is_deleted, created_at, updated_at, created_by, last_modified_by)
-VALUES (1, '550e8400-e29b-41d4-a716-446655440301', 1, 5, 'Excellent service, very responsive support team!', CURRENT_TIMESTAMP, false, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system');
+INSERT INTO feedback (id, external_id, user_id, rate, comment, is_deleted, created_at, updated_at, created_by, last_modified_by)
+VALUES (1, '550e8400-e29b-41d4-a716-446655440301', 1, 5, 'Excellent service, very responsive support team!', false, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system');
 
-INSERT INTO feedback (id, external_id, user_id, rate, comment, date_time, is_deleted, created_at, updated_at, created_by, last_modified_by)
-VALUES (2, '550e8400-e29b-41d4-a716-446655440302', 2, 4, 'Good overall experience, minor delay in response.', CURRENT_TIMESTAMP, false, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system');
+INSERT INTO feedback (id, external_id, user_id, rate, comment, is_deleted, created_at, updated_at, created_by, last_modified_by)
+VALUES (2, '550e8400-e29b-41d4-a716-446655440302', 2, 4, 'Good overall experience, minor delay in response.', false, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system');
 
-INSERT INTO feedback (id, external_id, user_id, rate, comment, date_time, is_deleted, created_at, updated_at, created_by, last_modified_by)
-VALUES (3, '550e8400-e29b-41d4-a716-446655440303', 3, 3, 'Average service, could be improved.', CURRENT_TIMESTAMP, false, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system');
+INSERT INTO feedback (id, external_id, user_id, rate, comment, is_deleted, created_at, updated_at, created_by, last_modified_by)
+VALUES (3, '550e8400-e29b-41d4-a716-446655440303', 3, 3, 'Average service, could be improved.', false, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system');
 
-INSERT INTO feedback (id, external_id, user_id, rate, comment, date_time, is_deleted, created_at, updated_at, created_by, last_modified_by)
-VALUES (4, '550e8400-e29b-41d4-a716-446655440304', 1, 2, 'Not satisfied, took too long to resolve issue.', CURRENT_TIMESTAMP, false, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system');
+INSERT INTO feedback (id, external_id, user_id, rate, comment, is_deleted, created_at, updated_at, created_by, last_modified_by)
+VALUES (4, '550e8400-e29b-41d4-a716-446655440304', 1, 2, 'Not satisfied, took too long to resolve issue.', false, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system');
 
 -- ========================================
 -- 6. BIKE RENTAL FEEDBACK
 -- ========================================
-INSERT INTO bike_rental_feedback (id, user_id, bike_rental_id, rate, comment, date_time, is_deleted, created_at, updated_at, created_by, last_modified_by)
-VALUES (1, 1, 101, 5, 'Great bike, smooth ride!', CURRENT_TIMESTAMP, false, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system');
+INSERT INTO bike_rental_feedback (id, user_id, bike_rental_id, rate, comment, is_deleted, created_at, updated_at, created_by, last_modified_by)
+VALUES (1, 1, 101, 5, 'Great bike, smooth ride!', false, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system');
 
-INSERT INTO bike_rental_feedback (id, user_id, bike_rental_id, rate, comment, date_time, is_deleted, created_at, updated_at, created_by, last_modified_by)
-VALUES (2, 2, 102, 4, 'Good bike, but battery could last longer.', CURRENT_TIMESTAMP, false, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system');
+INSERT INTO bike_rental_feedback (id, user_id, bike_rental_id, rate, comment, is_deleted, created_at, updated_at, created_by, last_modified_by)
+VALUES (2, 2, 102, 4, 'Good bike, but battery could last longer.', false, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system');
 
-INSERT INTO bike_rental_feedback (id, user_id, bike_rental_id, rate, comment, date_time, is_deleted, created_at, updated_at, created_by, last_modified_by)
-VALUES (3, 3, 103, 3, 'Average experience, brakes were squeaky.', CURRENT_TIMESTAMP, false, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system');
+INSERT INTO bike_rental_feedback (id, user_id, bike_rental_id, rate, comment, is_deleted, created_at, updated_at, created_by, last_modified_by)
+VALUES (3, 3, 103, 3, 'Average experience, brakes were squeaky.', false, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system');
 
-INSERT INTO bike_rental_feedback (id, user_id, bike_rental_id, rate, comment, date_time, is_deleted, created_at, updated_at, created_by, last_modified_by)
-VALUES (4, 1, 104, 2, 'Poor condition, motor had issues.', CURRENT_TIMESTAMP, false, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system');
+INSERT INTO bike_rental_feedback (id, user_id, bike_rental_id, rate, comment, is_deleted, created_at, updated_at, created_by, last_modified_by)
+VALUES (4, 1, 104, 2, 'Poor condition, motor had issues.', false, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system');
 
 -- ========================================
 -- 7. SUPPORT REQUEST
@@ -197,3 +197,11 @@ VALUES (7, 1, 'Power cycle the bike (turn off and on)', 3, 1, false, CURRENT_TIM
 
 INSERT INTO support_request_guide_item (id, item_index, description, bike_issue_id, support_request_status_id, is_deleted, created_at, updated_at, created_by, last_modified_by)
 VALUES (8, 2, 'Check for error codes on display', 3, 1, false, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system');
+
+
+
+
+
+
+
+

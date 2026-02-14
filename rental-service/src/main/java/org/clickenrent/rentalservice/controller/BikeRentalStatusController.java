@@ -13,9 +13,9 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/bike-rental-statuses")
+@RequestMapping("/api/v1/bike-rental-statuses")
 @RequiredArgsConstructor
-@Tag(name = "BikeRentalStatus", description = "Bike rental status management")
+@Tag(name = "Bike Rental Status", description = "Bike rental status management")
 @SecurityRequirement(name = "bearerAuth")
 public class BikeRentalStatusController {
 
@@ -34,4 +34,19 @@ public class BikeRentalStatusController {
     public ResponseEntity<BikeRentalStatusDTO> getStatusById(@PathVariable Long id) {
         return ResponseEntity.ok(bikeRentalStatusService.getStatusById(id));
     }
+
+    @GetMapping("/external/{externalId}")
+    @PreAuthorize("isAuthenticated()")
+    @Operation(summary = "Get bike rental status by external ID", description = "Retrieve status by external ID for cross-service communication")
+    public ResponseEntity<BikeRentalStatusDTO> getByExternalId(@PathVariable String externalId) {
+        return ResponseEntity.ok(bikeRentalStatusService.findByExternalId(externalId));
+    }
 }
+
+
+
+
+
+
+
+

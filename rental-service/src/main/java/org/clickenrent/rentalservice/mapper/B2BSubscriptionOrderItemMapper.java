@@ -14,6 +14,7 @@ import org.springframework.stereotype.Component;
 public class B2BSubscriptionOrderItemMapper {
 
     private final B2BSubscriptionOrderRepository b2bSubscriptionOrderRepository;
+    private final org.clickenrent.rentalservice.repository.ProductRepository productRepository;
 
     public B2BSubscriptionOrderItemDTO toDto(B2BSubscriptionOrderItem item) {
         if (item == null) {
@@ -24,11 +25,14 @@ public class B2BSubscriptionOrderItemMapper {
                 .id(item.getId())
                 .externalId(item.getExternalId())
                 .b2bSubscriptionOrderId(item.getB2bSubscriptionOrder() != null ? item.getB2bSubscriptionOrder().getId() : null)
-                .productModelType(item.getProductModelType())
-                .productModelId(item.getProductModelId())
+                .productId(item.getProduct() != null ? item.getProduct().getId() : null)
                 .quantity(item.getQuantity())
                 .price(item.getPrice())
                 .totalPrice(item.getTotalPrice())
+                .dateCreated(item.getDateCreated())
+                .lastDateModified(item.getLastDateModified())
+                .createdBy(item.getCreatedBy())
+                .lastModifiedBy(item.getLastModifiedBy())
                 .build();
     }
 
@@ -40,14 +44,19 @@ public class B2BSubscriptionOrderItemMapper {
         var builder = B2BSubscriptionOrderItem.builder()
                 .id(dto.getId())
                 .externalId(dto.getExternalId())
-                .productModelType(dto.getProductModelType())
-                .productModelId(dto.getProductModelId())
                 .quantity(dto.getQuantity())
                 .price(dto.getPrice())
-                .totalPrice(dto.getTotalPrice());
+                .totalPrice(dto.getTotalPrice())
+                .dateCreated(dto.getDateCreated())
+                .lastDateModified(dto.getLastDateModified())
+                .createdBy(dto.getCreatedBy())
+                .lastModifiedBy(dto.getLastModifiedBy());
 
         if (dto.getB2bSubscriptionOrderId() != null) {
             builder.b2bSubscriptionOrder(b2bSubscriptionOrderRepository.findById(dto.getB2bSubscriptionOrderId()).orElse(null));
+        }
+        if (dto.getProductId() != null) {
+            builder.product(productRepository.findById(dto.getProductId()).orElse(null));
         }
 
         return builder.build();
@@ -69,3 +78,7 @@ public class B2BSubscriptionOrderItemMapper {
         }
     }
 }
+
+
+
+

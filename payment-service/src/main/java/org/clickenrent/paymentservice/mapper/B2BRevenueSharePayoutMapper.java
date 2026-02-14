@@ -27,13 +27,17 @@ public class B2BRevenueSharePayoutMapper {
         return B2BRevenueSharePayoutDTO.builder()
                 .id(entity.getId())
                 .externalId(entity.getExternalId())
-                .companyId(entity.getCompanyId())
+                .companyExternalId(entity.getCompanyExternalId())
                 .paymentStatus(paymentStatusMapper.toDTO(entity.getPaymentStatus()))
                 .dueDate(entity.getDueDate())
                 .totalAmount(entity.getTotalAmount())
                 .paidAmount(entity.getPaidAmount())
                 .remainingAmount(entity.getRemainingAmount())
                 .payoutItems(payoutItemMapper.toDTOList(entity.getPayoutItems()))
+                .dateCreated(entity.getDateCreated())
+                .lastDateModified(entity.getLastDateModified())
+                .createdBy(entity.getCreatedBy())
+                .lastModifiedBy(entity.getLastModifiedBy())
                 .build();
     }
 
@@ -45,7 +49,7 @@ public class B2BRevenueSharePayoutMapper {
         B2BRevenueSharePayout entity = B2BRevenueSharePayout.builder()
                 .id(dto.getId())
                 .externalId(dto.getExternalId())
-                .companyId(dto.getCompanyId())
+                .companyExternalId(dto.getCompanyExternalId())
                 .paymentStatus(paymentStatusMapper.toEntity(dto.getPaymentStatus()))
                 .dueDate(dto.getDueDate())
                 .totalAmount(dto.getTotalAmount())
@@ -78,3 +82,7 @@ public class B2BRevenueSharePayoutMapper {
                 .collect(Collectors.toList());
     }
 }
+
+
+
+

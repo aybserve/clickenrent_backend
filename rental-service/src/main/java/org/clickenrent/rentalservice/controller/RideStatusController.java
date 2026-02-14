@@ -13,9 +13,9 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/ride-statuses")
+@RequestMapping("/api/v1/ride-statuses")
 @RequiredArgsConstructor
-@Tag(name = "RideStatus", description = "Ride status management (Active, Finished)")
+@Tag(name = "Ride Status", description = "Ride status management (Active, Finished)")
 @SecurityRequirement(name = "bearerAuth")
 public class RideStatusController {
 
@@ -34,4 +34,19 @@ public class RideStatusController {
     public ResponseEntity<RideStatusDTO> getStatusById(@PathVariable Long id) {
         return ResponseEntity.ok(rideStatusService.getStatusById(id));
     }
+
+    @GetMapping("/external/{externalId}")
+    @PreAuthorize("isAuthenticated()")
+    @Operation(summary = "Get ride status by external ID", description = "Retrieve status by external ID for cross-service communication")
+    public ResponseEntity<RideStatusDTO> getByExternalId(@PathVariable String externalId) {
+        return ResponseEntity.ok(rideStatusService.findByExternalId(externalId));
+    }
 }
+
+
+
+
+
+
+
+

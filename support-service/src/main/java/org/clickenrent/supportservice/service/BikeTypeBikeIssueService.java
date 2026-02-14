@@ -39,8 +39,15 @@ public class BikeTypeBikeIssueService {
     }
 
     @Transactional(readOnly = true)
-    public List<BikeTypeBikeIssueDTO> getByBikeTypeId(Long bikeTypeId) {
-        return bikeTypeBikeIssueRepository.findByBikeTypeId(bikeTypeId).stream()
+    public BikeTypeBikeIssueDTO getByExternalId(String externalId) {
+        BikeTypeBikeIssue entity = bikeTypeBikeIssueRepository.findByExternalId(externalId)
+                .orElseThrow(() -> new ResourceNotFoundException("BikeTypeBikeIssue", "externalId", externalId));
+        return bikeTypeBikeIssueMapper.toDto(entity);
+    }
+
+    @Transactional(readOnly = true)
+    public List<BikeTypeBikeIssueDTO> getByBikeTypeExternalId(String bikeTypeExternalId) {
+        return bikeTypeBikeIssueRepository.findByBikeTypeExternalId(bikeTypeExternalId).stream()
                 .map(bikeTypeBikeIssueMapper::toDto)
                 .collect(Collectors.toList());
     }
@@ -59,6 +66,7 @@ public class BikeTypeBikeIssueService {
         }
 
         BikeTypeBikeIssue entity = bikeTypeBikeIssueMapper.toEntity(dto);
+        entity.sanitizeForCreate();
         entity = bikeTypeBikeIssueRepository.save(entity);
         return bikeTypeBikeIssueMapper.toDto(entity);
     }
@@ -88,3 +96,11 @@ public class BikeTypeBikeIssueService {
         bikeTypeBikeIssueRepository.delete(entity);
     }
 }
+
+
+
+
+
+
+
+

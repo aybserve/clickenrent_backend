@@ -43,6 +43,13 @@ public class UserAddressService {
     }
     
     @Transactional(readOnly = true)
+    public UserAddressDTO getUserAddressByExternalId(String externalId) {
+        UserAddress userAddress = userAddressRepository.findByExternalId(externalId)
+                .orElseThrow(() -> new ResourceNotFoundException("UserAddress", "externalId", externalId));
+        return userAddressMapper.toDto(userAddress);
+    }
+    
+    @Transactional(readOnly = true)
     public List<UserAddressDTO> getUserAddressesByUserId(Long userId) {
         return userAddressRepository.findByUserId(userId).stream()
                 .map(userAddressMapper::toDto)
@@ -59,6 +66,7 @@ public class UserAddressService {
     @Transactional
     public UserAddressDTO createUserAddress(UserAddressDTO userAddressDTO) {
         UserAddress userAddress = userAddressMapper.toEntity(userAddressDTO);
+        userAddress.sanitizeForCreate();
         
         // Set the user relationship
         if (userAddressDTO.getUserId() != null) {
@@ -110,4 +118,12 @@ public class UserAddressService {
         userAddressRepository.delete(userAddress);
     }
 }
+
+
+
+
+
+
+
+
 

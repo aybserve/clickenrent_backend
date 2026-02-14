@@ -15,9 +15,9 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/bike-types")
+@RequestMapping("/api/v1/bike-types")
 @RequiredArgsConstructor
-@Tag(name = "BikeType", description = "Bike type management (Electric bike, Non-electric bike)")
+@Tag(name = "Bike Type", description = "Bike type management (Electric bike, Non-electric bike)")
 @SecurityRequirement(name = "bearerAuth")
 public class BikeTypeController {
 
@@ -35,6 +35,13 @@ public class BikeTypeController {
     @Operation(summary = "Get bike type by ID")
     public ResponseEntity<BikeTypeDTO> getBikeTypeById(@PathVariable Long id) {
         return ResponseEntity.ok(bikeTypeService.getBikeTypeById(id));
+    }
+
+    @GetMapping("/external/{externalId}")
+    @PreAuthorize("isAuthenticated()")
+    @Operation(summary = "Get bike type by external ID")
+    public ResponseEntity<BikeTypeDTO> getBikeTypeByExternalId(@PathVariable String externalId) {
+        return ResponseEntity.ok(bikeTypeService.getBikeTypeByExternalId(externalId));
     }
 
     @PostMapping
@@ -59,3 +66,11 @@ public class BikeTypeController {
         return ResponseEntity.noContent().build();
     }
 }
+
+
+
+
+
+
+
+

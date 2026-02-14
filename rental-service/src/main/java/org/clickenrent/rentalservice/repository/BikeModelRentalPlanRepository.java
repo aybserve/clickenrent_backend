@@ -16,3 +16,11 @@ public interface BikeModelRentalPlanRepository extends JpaRepository<BikeModelRe
     List<BikeModelRentalPlan> findByBikeModel(BikeModel bikeModel);
     List<BikeModelRentalPlan> findByRentalPlan(RentalPlan rentalPlan);
 }
+
+
+
+
+
+
+
+

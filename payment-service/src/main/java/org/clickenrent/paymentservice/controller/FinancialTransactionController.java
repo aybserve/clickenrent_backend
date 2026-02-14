@@ -13,10 +13,9 @@ import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
 import java.util.List;
-import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/financial-transactions")
+@RequestMapping("/api/v1/financial-transactions")
 @RequiredArgsConstructor
 @Tag(name = "Financial Transaction", description = "Financial transaction management and payment processing API")
 public class FinancialTransactionController {
@@ -30,25 +29,50 @@ public class FinancialTransactionController {
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'SUPERADMIN')")
     @Operation(summary = "Get financial transaction by ID")
     public ResponseEntity<FinancialTransactionDTO> getById(@PathVariable Long id) {
         return ResponseEntity.ok(financialTransactionService.findById(id));
     }
 
     @GetMapping("/external/{externalId}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'SUPERADMIN')")
     @Operation(summary = "Get financial transaction by external ID")
-    public ResponseEntity<FinancialTransactionDTO> getByExternalId(@PathVariable UUID externalId) {
+    public ResponseEntity<FinancialTransactionDTO> getByExternalId(@PathVariable String externalId) {
         return ResponseEntity.ok(financialTransactionService.findByExternalId(externalId));
     }
 
-    @GetMapping("/payer/{payerId}")
-    @Operation(summary = "Get transactions by payer ID")
-    public ResponseEntity<List<FinancialTransactionDTO>> getByPayerId(@PathVariable Long payerId) {
-        return ResponseEntity.ok(financialTransactionService.findByPayerId(payerId));
+    @PutMapping("/external/{externalId}")
+    @PreAuthorize("hasAnyRole('SUPERADMIN', 'ADMIN')")
+    @Operation(summary = "Update financial transaction by external ID", description = "Admin only - updates payment status")
+    public ResponseEntity<FinancialTransactionDTO> updateByExternalId(
+            @PathVariable String externalId,
+            @Valid @RequestBody FinancialTransactionDTO dto) {
+        return ResponseEntity.ok(financialTransactionService.updateByExternalId(externalId, dto));
+    }
+
+    @DeleteMapping("/external/{externalId}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'SUPERADMIN')")
+    @Operation(summary = "Delete financial transaction by external ID", description = "SUPERADMIN only - for data correction")
+    public ResponseEntity<Void> deleteByExternalId(@PathVariable String externalId) {
+        financialTransactionService.deleteByExternalId(externalId);
+        return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/payer/{payerExternalId}")
+    @Operation(summary = "Get transactions by payer external ID")
+    public ResponseEntity<List<FinancialTransactionDTO>> getByPayerExternalId(@PathVariable String payerExternalId) {
+        return ResponseEntity.ok(financialTransactionService.findByPayerExternalId(payerExternalId));
+    }
+    
+    @GetMapping("/recipient/{recipientExternalId}")
+    @Operation(summary = "Get transactions by recipient external ID")
+    public ResponseEntity<List<FinancialTransactionDTO>> getByRecipientExternalId(@PathVariable String recipientExternalId) {
+        return ResponseEntity.ok(financialTransactionService.findByRecipientExternalId(recipientExternalId));
     }
 
     @PostMapping
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'SUPERADMIN')")
     @Operation(summary = "Create new financial transaction")
     public ResponseEntity<FinancialTransactionDTO> create(@Valid @RequestBody FinancialTransactionDTO dto) {
         return ResponseEntity.status(HttpStatus.CREATED).body(financialTransactionService.create(dto));

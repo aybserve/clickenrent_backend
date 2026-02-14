@@ -26,6 +26,10 @@ public class PartCategoryMapper {
                 .externalId(partCategory.getExternalId())
                 .name(partCategory.getName())
                 .parentCategoryId(partCategory.getParentCategory() != null ? partCategory.getParentCategory().getId() : null)
+                .dateCreated(partCategory.getDateCreated())
+                .lastDateModified(partCategory.getLastDateModified())
+                .createdBy(partCategory.getCreatedBy())
+                .lastModifiedBy(partCategory.getLastModifiedBy())
                 .build();
     }
 
@@ -56,3 +60,11 @@ public class PartCategoryMapper {
         }
     }
 }
+
+
+
+
+
+
+
+

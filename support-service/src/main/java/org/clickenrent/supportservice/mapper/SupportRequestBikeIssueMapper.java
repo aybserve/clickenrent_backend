@@ -24,10 +24,15 @@ public class SupportRequestBikeIssueMapper {
 
         return SupportRequestBikeIssueDTO.builder()
                 .id(entity.getId())
+                .externalId(entity.getExternalId())
                 .supportRequestId(entity.getSupportRequest() != null ? entity.getSupportRequest().getId() : null)
                 .supportRequestExternalId(entity.getSupportRequest() != null ? entity.getSupportRequest().getExternalId() : null)
                 .bikeIssueId(entity.getBikeIssue() != null ? entity.getBikeIssue().getId() : null)
                 .bikeIssueName(entity.getBikeIssue() != null ? entity.getBikeIssue().getName() : null)
+                .dateCreated(entity.getDateCreated())
+                .lastDateModified(entity.getLastDateModified())
+                .createdBy(entity.getCreatedBy())
+                .lastModifiedBy(entity.getLastModifiedBy())
                 .build();
     }
 
@@ -37,7 +42,8 @@ public class SupportRequestBikeIssueMapper {
         }
 
         SupportRequestBikeIssue.SupportRequestBikeIssueBuilder builder = SupportRequestBikeIssue.builder()
-                .id(dto.getId());
+                .id(dto.getId())
+                .externalId(dto.getExternalId());
 
         if (dto.getSupportRequestId() != null) {
             builder.supportRequest(supportRequestRepository.findById(dto.getSupportRequestId()).orElse(null));
@@ -54,6 +60,9 @@ public class SupportRequestBikeIssueMapper {
             return;
         }
 
+        if (dto.getExternalId() != null) {
+            entity.setExternalId(dto.getExternalId());
+        }
         if (dto.getSupportRequestId() != null) {
             supportRequestRepository.findById(dto.getSupportRequestId()).ifPresent(entity::setSupportRequest);
         }
@@ -62,3 +71,11 @@ public class SupportRequestBikeIssueMapper {
         }
     }
 }
+
+
+
+
+
+
+
+

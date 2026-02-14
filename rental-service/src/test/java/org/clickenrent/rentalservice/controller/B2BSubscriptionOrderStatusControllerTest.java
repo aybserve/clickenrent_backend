@@ -62,3 +62,11 @@ class B2BSubscriptionOrderStatusControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.name").value("Pending"));}
 }
+
+
+
+
+
+
+
+

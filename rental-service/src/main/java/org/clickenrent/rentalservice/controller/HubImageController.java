@@ -15,9 +15,9 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/hub-images")
+@RequestMapping("/api/v1/hub-images")
 @RequiredArgsConstructor
-@Tag(name = "HubImage", description = "Hub image management endpoints")
+@Tag(name = "Hub Image", description = "Hub image management endpoints")
 @SecurityRequirement(name = "bearerAuth")
 public class HubImageController {
 
@@ -58,4 +58,19 @@ public class HubImageController {
         hubImageService.deleteImage(id);
         return ResponseEntity.noContent().build();
     }
+
+    @GetMapping("/external/{externalId}")
+    @PreAuthorize("isAuthenticated()")
+    @Operation(summary = "Get hub image by external ID", description = "Retrieve hub image by external ID for cross-service communication")
+    public ResponseEntity<HubImageDTO> getByExternalId(@PathVariable String externalId) {
+        return ResponseEntity.ok(hubImageService.getImageByExternalId(externalId));
+    }
 }
+
+
+
+
+
+
+
+

@@ -17,7 +17,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/parts")
+@RequestMapping("/api/v1/parts")
 @RequiredArgsConstructor
 @Tag(name = "Part", description = "Part management")
 @SecurityRequirement(name = "bearerAuth")
@@ -61,4 +61,19 @@ public class PartController {
         partService.deletePart(id);
         return ResponseEntity.noContent().build();
     }
+
+    @GetMapping("/external/{externalId}")
+    @PreAuthorize("isAuthenticated()")
+    @Operation(summary = "Get part by external ID", description = "Retrieve part by external ID for cross-service communication")
+    public ResponseEntity<PartDTO> getByExternalId(@PathVariable String externalId) {
+        return ResponseEntity.ok(partService.findByExternalId(externalId));
+    }
 }
+
+
+
+
+
+
+
+

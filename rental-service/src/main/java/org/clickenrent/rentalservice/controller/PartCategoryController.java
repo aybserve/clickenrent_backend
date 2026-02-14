@@ -17,9 +17,9 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/part-categories")
+@RequestMapping("/api/v1/part-categories")
 @RequiredArgsConstructor
-@Tag(name = "PartCategory", description = "Part category management with hierarchical structure")
+@Tag(name = "Part Category", description = "Part category management with hierarchical structure")
 @SecurityRequirement(name = "bearerAuth")
 public class PartCategoryController {
 
@@ -62,3 +62,11 @@ public class PartCategoryController {
         return ResponseEntity.noContent().build();
     }
 }
+
+
+
+
+
+
+
+

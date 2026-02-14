@@ -48,7 +48,6 @@ class StockMovementControllerTest {
                 .productId(1L)
                 .fromHubId(1L)
                 .toHubId(2L)
-                .dateTime(LocalDateTime.now())
                 .build();
     }
 
@@ -103,3 +102,11 @@ class StockMovementControllerTest {
                 .andExpect(status().isNoContent());
     }
 }
+
+
+
+
+
+
+
+

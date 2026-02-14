@@ -31,8 +31,13 @@ public class RideMapper {
                 .endDateTime(ride.getEndDateTime())
                 .startLocationId(ride.getStartLocation() != null ? ride.getStartLocation().getId() : null)
                 .endLocationId(ride.getEndLocation() != null ? ride.getEndLocation().getId() : null)
-                .coordinatesId(ride.getCoordinates() != null ? ride.getCoordinates().getId() : null)
+                .startCoordinatesId(ride.getStartCoordinates() != null ? ride.getStartCoordinates().getId() : null)
+                .endCoordinatesId(ride.getEndCoordinates() != null ? ride.getEndCoordinates().getId() : null)
                 .rideStatusId(ride.getRideStatus() != null ? ride.getRideStatus().getId() : null)
+                .dateCreated(ride.getDateCreated())
+                .lastDateModified(ride.getLastDateModified())
+                .createdBy(ride.getCreatedBy())
+                .lastModifiedBy(ride.getLastModifiedBy())
                 .build();
     }
 
@@ -56,8 +61,11 @@ public class RideMapper {
         if (dto.getEndLocationId() != null) {
             builder.endLocation(locationRepository.findById(dto.getEndLocationId()).orElse(null));
         }
-        if (dto.getCoordinatesId() != null) {
-            builder.coordinates(coordinatesRepository.findById(dto.getCoordinatesId()).orElse(null));
+        if (dto.getStartCoordinatesId() != null) {
+            builder.startCoordinates(coordinatesRepository.findById(dto.getStartCoordinatesId()).orElse(null));
+        }
+        if (dto.getEndCoordinatesId() != null) {
+            builder.endCoordinates(coordinatesRepository.findById(dto.getEndCoordinatesId()).orElse(null));
         }
         if (dto.getRideStatusId() != null) {
             builder.rideStatus(rideStatusRepository.findById(dto.getRideStatusId()).orElse(null));

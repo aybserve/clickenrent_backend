@@ -11,14 +11,15 @@ import java.math.BigDecimal;
 
 /**
  * Entity representing B2B subscription order items.
- * Links subscription orders to product model types (BikeModel, BikeType, Part, ServiceProduct).
+ * Links subscription orders to any Product subtype (BikeModel, ChargingStationModel, Part, ServiceProduct).
  */
 @Entity
 @Table(
     name = "b2b_subscription_order_item",
     indexes = {
         @Index(name = "idx_b2b_subscription_order_item_external_id", columnList = "external_id"),
-        @Index(name = "idx_b2b_subscription_order_item_order_id", columnList = "b2b_subscription_order_id")
+        @Index(name = "idx_b2b_subscription_order_item_order_id", columnList = "b2b_subscription_order_id"),
+        @Index(name = "idx_b2b_subscription_order_item_product_id", columnList = "product_id")
     }
 )
 @SQLDelete(sql = "UPDATE b2b_subscription_order_item SET is_deleted = true WHERE id = ?")
@@ -43,13 +44,10 @@ public class B2BSubscriptionOrderItem extends BaseAuditEntity {
     @JoinColumn(name = "b2b_subscription_order_id", nullable = false)
     private B2BSubscriptionOrder b2bSubscriptionOrder;
 
-    @NotNull(message = "Product model type is required")
-    @Column(name = "product_model_type", nullable = false, length = 50)
-    private String productModelType;
-
-    @NotNull(message = "Product model ID is required")
-    @Column(name = "product_model_id", nullable = false)
-    private Long productModelId;
+    @NotNull(message = "Product is required")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "product_id", nullable = false)
+    private Product product;
 
     @NotNull(message = "Quantity is required")
     @Column(name = "quantity", nullable = false)
@@ -62,4 +60,28 @@ public class B2BSubscriptionOrderItem extends BaseAuditEntity {
     @NotNull(message = "Total price is required")
     @Column(name = "total_price", nullable = false, precision = 10, scale = 2)
     private BigDecimal totalPrice;
+
+    @Override
+    public Long getId() {
+        return id;
+    }
+
+    @Override
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    @Override
+    public String getExternalId() {
+        return externalId;
+    }
+
+    @Override
+    public void setExternalId(String externalId) {
+        this.externalId = externalId;
+    }
 }
+
+
+
+

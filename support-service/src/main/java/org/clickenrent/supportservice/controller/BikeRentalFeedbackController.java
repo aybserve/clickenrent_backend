@@ -5,7 +5,7 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.clickenrent.supportservice.dto.BikeRentalFeedbackDTO;
+import org.clickenrent.contracts.support.BikeRentalFeedbackDTO;
 import org.clickenrent.supportservice.service.BikeRentalFeedbackService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,7 +18,7 @@ import java.util.List;
  * REST controller for managing BikeRentalFeedback entities.
  */
 @RestController
-@RequestMapping("/api/bike-rental-feedbacks")
+@RequestMapping("/api/v1/bike-rental-feedbacks")
 @RequiredArgsConstructor
 @Tag(name = "Bike Rental Feedback", description = "Bike rental feedback management")
 @SecurityRequirement(name = "bearerAuth")
@@ -40,18 +40,25 @@ public class BikeRentalFeedbackController {
         return ResponseEntity.ok(bikeRentalFeedbackService.getById(id));
     }
 
-    @GetMapping("/bike-rental/{bikeRentalId}")
+    @GetMapping("/external/{externalId}")
     @PreAuthorize("isAuthenticated()")
-    @Operation(summary = "Get bike rental feedback by bike rental ID")
-    public ResponseEntity<BikeRentalFeedbackDTO> getByBikeRentalId(@PathVariable Long bikeRentalId) {
-        return ResponseEntity.ok(bikeRentalFeedbackService.getByBikeRentalId(bikeRentalId));
+    @Operation(summary = "Get bike rental feedback by external ID")
+    public ResponseEntity<BikeRentalFeedbackDTO> getByExternalId(@PathVariable String externalId) {
+        return ResponseEntity.ok(bikeRentalFeedbackService.getByExternalId(externalId));
     }
 
-    @GetMapping("/user/{userId}")
+    @GetMapping("/bike-rental/{bikeRentalExternalId}")
     @PreAuthorize("isAuthenticated()")
-    @Operation(summary = "Get bike rental feedbacks by user ID")
-    public ResponseEntity<List<BikeRentalFeedbackDTO>> getByUserId(@PathVariable Long userId) {
-        return ResponseEntity.ok(bikeRentalFeedbackService.getByUserId(userId));
+    @Operation(summary = "Get bike rental feedback by bike rental external ID")
+    public ResponseEntity<BikeRentalFeedbackDTO> getByBikeRentalExternalId(@PathVariable String bikeRentalExternalId) {
+        return ResponseEntity.ok(bikeRentalFeedbackService.getByBikeRentalExternalId(bikeRentalExternalId));
+    }
+
+    @GetMapping("/user/{userExternalId}")
+    @PreAuthorize("isAuthenticated()")
+    @Operation(summary = "Get bike rental feedbacks by user external ID")
+    public ResponseEntity<List<BikeRentalFeedbackDTO>> getByUserExternalId(@PathVariable String userExternalId) {
+        return ResponseEntity.ok(bikeRentalFeedbackService.getByUserExternalId(userExternalId));
     }
 
     @PostMapping
@@ -76,3 +83,11 @@ public class BikeRentalFeedbackController {
         return ResponseEntity.noContent().build();
     }
 }
+
+
+
+
+
+
+
+

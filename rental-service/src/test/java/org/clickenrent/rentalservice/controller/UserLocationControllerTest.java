@@ -41,7 +41,7 @@ class UserLocationControllerTest {
     void setUp() {
         userLocationDTO = UserLocationDTO.builder()
                 .id(1L)
-                .userId(1L)
+                .userExternalId("usr-ext-00001")
                 .locationId(1L)
                 .locationRoleId(1L)
                 .build();
@@ -51,7 +51,7 @@ class UserLocationControllerTest {
     @WithMockUser(roles = "ADMIN")
     void getUserLocationsByUser_ReturnsOk() throws Exception {
         List<UserLocationDTO> locations = Collections.singletonList(userLocationDTO);
-        when(userLocationService.getUserLocationsByUser(1L)).thenReturn(locations);
+        when(userLocationService.getUserLocationsByUserExternalId("usr-ext-00001")).thenReturn(locations);
 
         mockMvc.perform(get("/api/user-locations/by-user/1").with(csrf()))
                 .andExpect(status().isOk())
@@ -89,3 +89,7 @@ class UserLocationControllerTest {
                 .andExpect(status().isNoContent());
     }
 }
+
+
+
+

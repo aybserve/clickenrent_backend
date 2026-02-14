@@ -29,6 +29,10 @@ public class ChargingStationModelMapper {
                 .imageUrl(model.getImageUrl())
                 .b2bSalePrice(model.getB2bSalePrice())
                 .b2bSubscriptionPrice(model.getB2bSubscriptionPrice())
+                .dateCreated(model.getDateCreated())
+                .lastDateModified(model.getLastDateModified())
+                .createdBy(model.getCreatedBy())
+                .lastModifiedBy(model.getLastModifiedBy())
                 .build();
     }
 
@@ -43,7 +47,11 @@ public class ChargingStationModelMapper {
                 .name(dto.getName())
                 .imageUrl(dto.getImageUrl())
                 .b2bSalePrice(dto.getB2bSalePrice())
-                .b2bSubscriptionPrice(dto.getB2bSubscriptionPrice());
+                .b2bSubscriptionPrice(dto.getB2bSubscriptionPrice())
+                .dateCreated(dto.getDateCreated())
+                .lastDateModified(dto.getLastDateModified())
+                .createdBy(dto.getCreatedBy())
+                .lastModifiedBy(dto.getLastModifiedBy());
 
         if (dto.getChargingStationBrandId() != null) {
             builder.chargingStationBrand(chargingStationBrandRepository.findById(dto.getChargingStationBrandId()).orElse(null));

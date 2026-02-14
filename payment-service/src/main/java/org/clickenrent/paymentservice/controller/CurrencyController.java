@@ -13,13 +13,12 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.UUID;
 
 /**
  * REST controller for Currency management
  */
 @RestController
-@RequestMapping("/api/currencies")
+@RequestMapping("/api/v1/currencies")
 @RequiredArgsConstructor
 @Tag(name = "Currency", description = "Currency management API")
 public class CurrencyController {
@@ -34,6 +33,7 @@ public class CurrencyController {
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'SUPERADMIN')")
     @Operation(summary = "Get currency by ID")
     @ApiResponse(responseCode = "200", description = "Successfully retrieved currency")
     @ApiResponse(responseCode = "404", description = "Currency not found")
@@ -42,15 +42,16 @@ public class CurrencyController {
     }
 
     @GetMapping("/external/{externalId}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'SUPERADMIN')")
     @Operation(summary = "Get currency by external ID")
     @ApiResponse(responseCode = "200", description = "Successfully retrieved currency")
     @ApiResponse(responseCode = "404", description = "Currency not found")
-    public ResponseEntity<CurrencyDTO> getCurrencyByExternalId(@PathVariable UUID externalId) {
+    public ResponseEntity<CurrencyDTO> getCurrencyByExternalId(@PathVariable String externalId) {
         return ResponseEntity.ok(currencyService.findByExternalId(externalId));
     }
 
     @PostMapping
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'SUPERADMIN')")
     @Operation(summary = "Create new currency")
     @ApiResponse(responseCode = "201", description = "Currency created successfully")
     @ApiResponse(responseCode = "400", description = "Invalid input")

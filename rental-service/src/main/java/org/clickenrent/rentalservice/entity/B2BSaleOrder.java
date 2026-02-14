@@ -4,33 +4,37 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
+import org.clickenrent.contracts.security.TenantScoped;
+import org.hibernate.annotations.Filter;
 import org.hibernate.annotations.SQLDelete;
-import org.hibernate.annotations.Where;
-
-import java.time.LocalDateTime;
+import org.hibernate.annotations.SQLRestriction;
 
 /**
  * Entity representing B2B sale orders between companies.
  * Orders that eventually create a B2BSale when completed/processed.
+ * Implements TenantScoped for multi-tenant isolation.
+ * Note: B2BSaleOrder has TWO company filters (seller and buyer).
  */
 @Entity
 @Table(
     name = "b2b_sale_order",
     indexes = {
         @Index(name = "idx_b2b_sale_order_external_id", columnList = "external_id"),
-        @Index(name = "idx_b2b_sale_order_seller_company_id", columnList = "seller_company_id"),
-        @Index(name = "idx_b2b_sale_order_buyer_company_id", columnList = "buyer_company_id")
+        @Index(name = "idx_b2b_sale_order_seller_company_external_id", columnList = "seller_company_external_id"),
+        @Index(name = "idx_b2b_sale_order_buyer_company_external_id", columnList = "buyer_company_external_id")
     }
 )
+@Filter(name = "sellerCompanyFilter", condition = "seller_company_external_id IN (:companyExternalIds)")
+@Filter(name = "buyerCompanyFilter", condition = "buyer_company_external_id IN (:companyExternalIds)")
 @SQLDelete(sql = "UPDATE b2b_sale_order SET is_deleted = true WHERE id = ?")
-@Where(clause = "is_deleted = false")
+@SQLRestriction("is_deleted = false")
 @Getter
 @Setter
 @NoArgsConstructor
 @SuperBuilder
 @ToString(callSuper = true)
 @EqualsAndHashCode(of = "id", callSuper = false)
-public class B2BSaleOrder extends BaseAuditEntity {
+public class B2BSaleOrder extends BaseAuditEntity implements TenantScoped {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -39,13 +43,13 @@ public class B2BSaleOrder extends BaseAuditEntity {
     @Column(name = "external_id", unique = true, length = 100)
     private String externalId;
 
-    @NotNull(message = "Seller company ID is required")
-    @Column(name = "seller_company_id", nullable = false)
-    private Long sellerCompanyId;
+    @NotNull(message = "Seller company external ID is required")
+    @Column(name = "seller_company_external_id", nullable = false, length = 100)
+    private String sellerCompanyExternalId;
 
-    @NotNull(message = "Buyer company ID is required")
-    @Column(name = "buyer_company_id", nullable = false)
-    private Long buyerCompanyId;
+    @NotNull(message = "Buyer company external ID is required")
+    @Column(name = "buyer_company_external_id", nullable = false, length = 100)
+    private String buyerCompanyExternalId;
 
     @NotNull(message = "B2B sale order status is required")
     @ManyToOne(fetch = FetchType.LAZY)
@@ -60,8 +64,34 @@ public class B2BSaleOrder extends BaseAuditEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "b2b_sale_id")
     private B2BSale b2bSale;
+    
+    @Override
+    public String getCompanyExternalId() {
+        // For B2BSaleOrder, return seller company ID as primary tenant
+        return this.sellerCompanyExternalId;
+    }
 
-    @NotNull(message = "Date time is required")
-    @Column(name = "date_time", nullable = false)
-    private LocalDateTime dateTime;
+    @Override
+    public Long getId() {
+        return id;
+    }
+
+    @Override
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    @Override
+    public String getExternalId() {
+        return externalId;
+    }
+
+    @Override
+    public void setExternalId(String externalId) {
+        this.externalId = externalId;
+    }
 }
+
+
+
+

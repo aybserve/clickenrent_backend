@@ -2,13 +2,10 @@ package org.clickenrent.paymentservice.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.springframework.data.annotation.CreatedBy;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedBy;
-import org.springframework.data.annotation.LastModifiedDate;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+import lombok.experimental.SuperBuilder;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.Where;
 
-import java.time.LocalDateTime;
 import java.util.UUID;
 
 /**
@@ -16,47 +13,53 @@ import java.util.UUID;
  */
 @Entity
 @Table(name = "b2b_subscription_fin_transactions")
-@EntityListeners(AuditingEntityListener.class)
+@SQLDelete(sql = "UPDATE b2b_subscription_fin_transactions SET is_deleted = true WHERE id = ?")
+@Where(clause = "is_deleted = false")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
-public class B2BSubscriptionFinTransaction {
+@SuperBuilder
+public class B2BSubscriptionFinTransaction extends BaseAuditEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(unique = true, nullable = false, updatable = false)
-    private UUID externalId;
+    @Column(name = "external_id", unique = true, length = 100)
+    private String externalId;
 
-    @Column(nullable = false)
-    private Long b2bSubscriptionId; // References B2B subscription in rental-service
+    @Column(name = "b2b_subscription_external_id", length = 100)
+    private String b2bSubscriptionExternalId;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "financial_transaction_id", nullable = false)
     private FinancialTransaction financialTransaction;
 
-    @CreatedDate
-    @Column(nullable = false, updatable = false)
-    private LocalDateTime createdAt;
+    @Override
+    public Long getId() {
+        return id;
+    }
 
-    @LastModifiedDate
-    @Column(nullable = false)
-    private LocalDateTime updatedAt;
+    @Override
+    public void setId(Long id) {
+        this.id = id;
+    }
 
-    @CreatedBy
-    @Column(updatable = false)
-    private String createdBy;
+    @Override
+    public String getExternalId() {
+        return externalId;
+    }
 
-    @LastModifiedBy
-    private String lastModifiedBy;
+    @Override
+    public void setExternalId(String externalId) {
+        this.externalId = externalId;
+    }
 
     @PrePersist
     public void prePersist() {
-        if (externalId == null) {
-            externalId = UUID.randomUUID();
+        if (externalId == null || externalId.isEmpty()) {
+            externalId = UUID.randomUUID().toString();
         }
     }
 
@@ -73,3 +76,7 @@ public class B2BSubscriptionFinTransaction {
         return getClass().hashCode();
     }
 }
+
+
+
+

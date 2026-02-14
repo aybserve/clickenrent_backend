@@ -27,8 +27,39 @@ public class ResponsiblePerson extends BaseAuditEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "external_id", length = 100, unique = true)
+    private String externalId;
+
     @NotBlank(message = "Name is required")
     @Size(max = 255, message = "Name must not exceed 255 characters")
     @Column(name = "name", nullable = false, length = 255)
     private String name;
+
+    @Override
+    public Long getId() {
+        return id;
+    }
+
+    @Override
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    @Override
+    public String getExternalId() {
+        return externalId;
+    }
+
+    @Override
+    public void setExternalId(String externalId) {
+        this.externalId = externalId;
+    }
 }
+
+
+
+
+
+
+
+

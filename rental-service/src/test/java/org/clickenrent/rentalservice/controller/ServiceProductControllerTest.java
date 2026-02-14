@@ -44,8 +44,9 @@ class ServiceProductControllerTest {
                 .id(1L)
                 .externalId("SP001")
                 .serviceId(1L)
-                .productId(1L)
+                .relatedProductId(1L)
                 .isB2BRentable(true)
+                .b2bSubscriptionPrice(new java.math.BigDecimal("25.00"))
                 .build();
     }
 
@@ -89,3 +90,11 @@ class ServiceProductControllerTest {
                 .andExpect(status().isNoContent());
     }
 }
+
+
+
+
+
+
+
+

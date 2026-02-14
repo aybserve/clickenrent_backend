@@ -48,14 +48,12 @@ class B2BSubscriptionOrderServiceTest {
         testOrder = B2BSubscriptionOrder.builder()
         .id(1L)
         .externalId("B2BSORD001")
-        .dateTime(LocalDateTime.now())
         .build();
 
         testOrderDTO = B2BSubscriptionOrderDTO.builder()
         .id(1L)
         .externalId("B2BSORD001")
         .locationId(1L)
-        .dateTime(LocalDateTime.now())
         .b2bSubscriptionOrderStatusId(2L)
         .b2bSubscriptionId(1L)
         .build();
@@ -145,3 +143,11 @@ class B2BSubscriptionOrderServiceTest {
         assertThrows(ResourceNotFoundException.class, () -> b2bSubscriptionOrderService.deleteOrder(999L));
     }
 }
+
+
+
+
+
+
+
+

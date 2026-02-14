@@ -15,4 +15,13 @@ import java.util.Optional;
 public interface LocationImageRepository extends JpaRepository<LocationImage, Long> {
     Optional<LocationImage> findByExternalId(String externalId);
     List<LocationImage> findByLocation(Location location);
+    Optional<LocationImage> findByLocationAndIsThumbnailTrue(Location location);
 }
+
+
+
+
+
+
+
+

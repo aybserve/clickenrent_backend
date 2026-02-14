@@ -1,5 +1,6 @@
 package org.clickenrent.paymentservice.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import lombok.AllArgsConstructor;
@@ -9,7 +10,6 @@ import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.UUID;
 
 /**
  * DTO for FinancialTransaction entity
@@ -20,15 +20,18 @@ import java.util.UUID;
 @AllArgsConstructor
 public class FinancialTransactionDTO {
     
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private Long id;
     
-    private UUID externalId;
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    private String externalId;
     
-    @NotNull(message = "Payer ID is required")
-    private Long payerId;
+    // Cross-service externalId references
+    @NotNull(message = "Payer external ID is required")
+    private String payerExternalId;
     
-    @NotNull(message = "Recipient ID is required")
-    private Long recipientId;
+    @NotNull(message = "Recipient external ID is required")
+    private String recipientExternalId;
     
     @NotNull(message = "Amount is required")
     @Positive(message = "Amount must be positive")
@@ -53,5 +56,26 @@ public class FinancialTransactionDTO {
     
     private String stripeRefundId;
     
+    private String multiSafepayOrderId;
+    
+    private String multiSafepayTransactionId;
+    
     private Long originalTransactionId;
+    
+    // Audit fields
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    private LocalDateTime dateCreated;
+    
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    private LocalDateTime lastDateModified;
+    
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    private String createdBy;
+    
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    private String lastModifiedBy;
 }
+
+
+
+

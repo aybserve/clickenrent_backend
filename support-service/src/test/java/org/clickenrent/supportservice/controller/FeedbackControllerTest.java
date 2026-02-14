@@ -43,10 +43,9 @@ class FeedbackControllerTest {
         feedbackDTO = FeedbackDTO.builder()
                 .id(1L)
                 .externalId("550e8400-e29b-41d4-a716-446655440301")
-                .userId(1L)
+                .userExternalId("user-uuid-1")
                 .rate(5)
                 .comment("Excellent service")
-                .dateTime(LocalDateTime.now())
                 .build();
     }
 
@@ -103,3 +102,11 @@ class FeedbackControllerTest {
                 .andExpect(status().isNoContent());
     }
 }
+
+
+
+
+
+
+
+

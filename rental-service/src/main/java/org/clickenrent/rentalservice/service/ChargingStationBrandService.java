@@ -1,6 +1,7 @@
 package org.clickenrent.rentalservice.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.clickenrent.rentalservice.dto.ChargingStationBrandDTO;
 import org.clickenrent.rentalservice.entity.ChargingStationBrand;
 import org.clickenrent.rentalservice.exception.ResourceNotFoundException;
@@ -14,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class ChargingStationBrandService {
@@ -29,12 +31,12 @@ public class ChargingStationBrandService {
     }
 
     @Transactional(readOnly = true)
-    public List<ChargingStationBrandDTO> getBrandsByCompany(Long companyId) {
-        if (!securityService.isAdmin() && !securityService.hasAccessToCompany(companyId)) {
+    public List<ChargingStationBrandDTO> getBrandsByCompanyExternalId(String companyExternalId) {
+        if (!securityService.isAdmin() && !securityService.hasAccessToCompanyByExternalId(companyExternalId)) {
             throw new UnauthorizedException("You don't have permission to view brands for this company");
         }
 
-        return chargingStationBrandRepository.findByCompanyId(companyId).stream()
+        return chargingStationBrandRepository.findByCompanyExternalId(companyExternalId).stream()
                 .map(chargingStationBrandMapper::toDto)
                 .toList();
     }
@@ -48,11 +50,12 @@ public class ChargingStationBrandService {
 
     @Transactional
     public ChargingStationBrandDTO createBrand(ChargingStationBrandDTO dto) {
-        if (!securityService.isAdmin() && !securityService.hasAccessToCompany(dto.getCompanyId())) {
+        if (!securityService.isAdmin() && !securityService.hasAccessToCompanyByExternalId(dto.getCompanyExternalId())) {
             throw new UnauthorizedException("You don't have permission to create brands for this company");
         }
 
         ChargingStationBrand brand = chargingStationBrandMapper.toEntity(dto);
+        brand.sanitizeForCreate();
         brand = chargingStationBrandRepository.save(brand);
         return chargingStationBrandMapper.toDto(brand);
     }
@@ -62,7 +65,7 @@ public class ChargingStationBrandService {
         ChargingStationBrand brand = chargingStationBrandRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("ChargingStationBrand", "id", id));
 
-        if (!securityService.isAdmin() && !securityService.hasAccessToCompany(brand.getCompanyId())) {
+        if (!securityService.isAdmin() && !securityService.hasAccessToCompanyByExternalId(brand.getCompanyExternalId())) {
             throw new UnauthorizedException("You don't have permission to update this brand");
         }
 
@@ -81,4 +84,15 @@ public class ChargingStationBrandService {
                 .orElseThrow(() -> new ResourceNotFoundException("ChargingStationBrand", "id", id));
         chargingStationBrandRepository.delete(brand);
     }
+
+    @Transactional(readOnly = true)
+    public ChargingStationBrandDTO getChargingStationBrandByExternalId(String externalId) {
+        ChargingStationBrand brand = chargingStationBrandRepository.findByExternalId(externalId)
+                .orElseThrow(() -> new ResourceNotFoundException("ChargingStationBrand", "externalId", externalId));
+        return chargingStationBrandMapper.toDto(brand);
+    }
 }
+
+
+
+

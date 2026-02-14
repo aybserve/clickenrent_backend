@@ -105,3 +105,11 @@ class RentalUnitServiceTest {
         verify(rentalUnitRepository, times(1)).delete(testUnit);
     }
 }
+
+
+
+
+
+
+
+

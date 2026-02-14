@@ -23,8 +23,12 @@ public class B2BRevenueSharePayoutItemMapper {
                 .externalId(entity.getExternalId())
                 .b2bRevenueSharePayoutId(entity.getB2bRevenueSharePayout() != null ? 
                         entity.getB2bRevenueSharePayout().getId() : null)
-                .bikeRentalId(entity.getBikeRentalId())
+                .bikeRentalExternalId(entity.getBikeRentalExternalId())
                 .amount(entity.getAmount())
+                .dateCreated(entity.getDateCreated())
+                .lastDateModified(entity.getLastDateModified())
+                .createdBy(entity.getCreatedBy())
+                .lastModifiedBy(entity.getLastModifiedBy())
                 .build();
     }
 
@@ -36,7 +40,7 @@ public class B2BRevenueSharePayoutItemMapper {
         return B2BRevenueSharePayoutItem.builder()
                 .id(dto.getId())
                 .externalId(dto.getExternalId())
-                .bikeRentalId(dto.getBikeRentalId())
+                .bikeRentalExternalId(dto.getBikeRentalExternalId())
                 .amount(dto.getAmount())
                 .build();
     }
@@ -51,3 +55,7 @@ public class B2BRevenueSharePayoutItemMapper {
                 .collect(Collectors.toList());
     }
 }
+
+
+
+

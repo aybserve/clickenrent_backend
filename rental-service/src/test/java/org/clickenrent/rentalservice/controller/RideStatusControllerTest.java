@@ -64,3 +64,11 @@ class RideStatusControllerTest {
                 .andExpect(jsonPath("$.name").value("Active"));
     }
 }
+
+
+
+
+
+
+
+

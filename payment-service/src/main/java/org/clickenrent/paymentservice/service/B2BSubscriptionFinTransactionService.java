@@ -1,7 +1,7 @@
 package org.clickenrent.paymentservice.service;
 
 import lombok.RequiredArgsConstructor;
-import org.clickenrent.paymentservice.client.RentalServiceClient;
+import lombok.extern.slf4j.Slf4j;
 import org.clickenrent.paymentservice.dto.B2BSubscriptionFinTransactionDTO;
 import org.clickenrent.paymentservice.entity.B2BSubscriptionFinTransaction;
 import org.clickenrent.paymentservice.exception.ResourceNotFoundException;
@@ -12,11 +12,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.UUID;
 
 /**
  * Service for B2B Subscription FinancialTransaction management
  */
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class B2BSubscriptionFinTransactionService {
@@ -24,7 +24,6 @@ public class B2BSubscriptionFinTransactionService {
     private final B2BSubscriptionFinTransactionRepository b2bSubscriptionFinTransactionRepository;
     private final B2BSubscriptionFinTransactionMapper b2bSubscriptionFinTransactionMapper;
     private final SecurityService securityService;
-    private final RentalServiceClient rentalServiceClient;
 
     @Transactional(readOnly = true)
     public List<B2BSubscriptionFinTransactionDTO> findAll() {
@@ -47,7 +46,7 @@ public class B2BSubscriptionFinTransactionService {
     }
 
     @Transactional(readOnly = true)
-    public B2BSubscriptionFinTransactionDTO findByExternalId(UUID externalId) {
+    public B2BSubscriptionFinTransactionDTO findByExternalId(String externalId) {
         if (!securityService.isAdmin() && !securityService.isB2B()) {
             throw new UnauthorizedException("You don't have permission to view B2B subscription transactions");
         }
@@ -60,10 +59,11 @@ public class B2BSubscriptionFinTransactionService {
 
     @Transactional
     public B2BSubscriptionFinTransactionDTO create(B2BSubscriptionFinTransactionDTO dto) {
-        // Validate B2B subscription exists
-        rentalServiceClient.checkB2BSubscriptionExists(dto.getB2bSubscriptionId());
+        // External ID is provided directly in the DTO
+        log.debug("Creating B2B subscription transaction with b2bSubscriptionExternalId: {}", dto.getB2bSubscriptionExternalId());
         
         B2BSubscriptionFinTransaction transaction = b2bSubscriptionFinTransactionMapper.toEntity(dto);
+        transaction.sanitizeForCreate();
         B2BSubscriptionFinTransaction savedTransaction = b2bSubscriptionFinTransactionRepository.save(transaction);
         return b2bSubscriptionFinTransactionMapper.toDTO(savedTransaction);
     }
@@ -77,7 +77,7 @@ public class B2BSubscriptionFinTransactionService {
         B2BSubscriptionFinTransaction existingTransaction = b2bSubscriptionFinTransactionRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("B2BSubscriptionFinTransaction", "id", id));
         
-        existingTransaction.setB2bSubscriptionId(dto.getB2bSubscriptionId());
+        existingTransaction.setB2bSubscriptionExternalId(dto.getB2bSubscriptionExternalId());
         
         B2BSubscriptionFinTransaction updatedTransaction = b2bSubscriptionFinTransactionRepository.save(existingTransaction);
         return b2bSubscriptionFinTransactionMapper.toDTO(updatedTransaction);
@@ -95,3 +95,7 @@ public class B2BSubscriptionFinTransactionService {
         b2bSubscriptionFinTransactionRepository.deleteById(id);
     }
 }
+
+
+
+

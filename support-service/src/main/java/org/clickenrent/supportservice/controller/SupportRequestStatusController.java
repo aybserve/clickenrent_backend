@@ -18,7 +18,7 @@ import java.util.List;
  * REST controller for managing SupportRequestStatus entities.
  */
 @RestController
-@RequestMapping("/api/support-request-statuses")
+@RequestMapping("/api/v1/support-request-statuses")
 @RequiredArgsConstructor
 @Tag(name = "Support Request Status", description = "Support request status management")
 @SecurityRequirement(name = "bearerAuth")
@@ -38,6 +38,13 @@ public class SupportRequestStatusController {
     @Operation(summary = "Get support request status by ID")
     public ResponseEntity<SupportRequestStatusDTO> getById(@PathVariable Long id) {
         return ResponseEntity.ok(supportRequestStatusService.getById(id));
+    }
+
+    @GetMapping("/external/{externalId}")
+    @PreAuthorize("isAuthenticated()")
+    @Operation(summary = "Get support request status by external ID")
+    public ResponseEntity<SupportRequestStatusDTO> getByExternalId(@PathVariable String externalId) {
+        return ResponseEntity.ok(supportRequestStatusService.getByExternalId(externalId));
     }
 
     @GetMapping("/name/{name}")
@@ -69,3 +76,11 @@ public class SupportRequestStatusController {
         return ResponseEntity.noContent().build();
     }
 }
+
+
+
+
+
+
+
+

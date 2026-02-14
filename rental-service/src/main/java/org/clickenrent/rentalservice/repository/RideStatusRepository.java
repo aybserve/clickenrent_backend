@@ -12,4 +12,13 @@ import java.util.Optional;
 @Repository
 public interface RideStatusRepository extends JpaRepository<RideStatus, Long> {
     Optional<RideStatus> findByName(String name);
+    Optional<RideStatus> findByExternalId(String externalId);
 }
+
+
+
+
+
+
+
+

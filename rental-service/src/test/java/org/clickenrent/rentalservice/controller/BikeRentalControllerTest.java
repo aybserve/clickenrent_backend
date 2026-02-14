@@ -62,7 +62,7 @@ class BikeRentalControllerTest {
     void getAllBikeRentals_WithSuperadminRole_ReturnsOk() throws Exception {
         // Given
         Page<BikeRentalDTO> page = new PageImpl<>(Collections.singletonList(bikeRentalDTO));
-        when(bikeRentalService.getAllBikeRentals(any())).thenReturn(page);
+        when(bikeRentalService.getAllBikeRentals(any(), any(), any())).thenReturn(page);
 
         // When & Then
         mockMvc.perform(get("/api/bike-rentals")
@@ -73,7 +73,7 @@ class BikeRentalControllerTest {
                 .andExpect(jsonPath("$.content[0].id").value(1L))
                 .andExpect(jsonPath("$.content[0].externalId").value("BR001"));
 
-        verify(bikeRentalService, times(1)).getAllBikeRentals(any());
+        verify(bikeRentalService, times(1)).getAllBikeRentals(any(), any(), any());
     }
 
     @Test
@@ -81,14 +81,14 @@ class BikeRentalControllerTest {
     void getAllBikeRentals_WithAdminRole_ReturnsOk() throws Exception {
         // Given
         Page<BikeRentalDTO> page = new PageImpl<>(Collections.singletonList(bikeRentalDTO));
-        when(bikeRentalService.getAllBikeRentals(any())).thenReturn(page);
+        when(bikeRentalService.getAllBikeRentals(any(), any(), any())).thenReturn(page);
 
         // When & Then
         mockMvc.perform(get("/api/bike-rentals")
                         .with(csrf()))
                 .andExpect(status().isOk());
 
-        verify(bikeRentalService, times(1)).getAllBikeRentals(any());
+        verify(bikeRentalService, times(1)).getAllBikeRentals(any(), any(), any());
     }
 
     @Test
@@ -96,14 +96,14 @@ class BikeRentalControllerTest {
     void getAllBikeRentals_WithCustomerRole_ReturnsOk() throws Exception {
         // Given - Customer sees their rentals
         Page<BikeRentalDTO> page = new PageImpl<>(Collections.singletonList(bikeRentalDTO));
-        when(bikeRentalService.getAllBikeRentals(any())).thenReturn(page);
+        when(bikeRentalService.getAllBikeRentals(any(), any(), any())).thenReturn(page);
 
         // When & Then
         mockMvc.perform(get("/api/bike-rentals")
                         .with(csrf()))
                 .andExpect(status().isOk());
 
-        verify(bikeRentalService, times(1)).getAllBikeRentals(any());
+        verify(bikeRentalService, times(1)).getAllBikeRentals(any(), any(), any());
     }
 
     @Test

@@ -13,3 +13,11 @@ import java.util.Optional;
 public interface BikeModelRepository extends JpaRepository<BikeModel, Long> {
     Optional<BikeModel> findByExternalId(String externalId);
 }
+
+
+
+
+
+
+
+

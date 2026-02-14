@@ -47,18 +47,18 @@ class UserLocationServiceTest {
     void setUp() {
         testLocation = Location.builder()
         .id(1L)
-        .companyId(1L)
+        .companyExternalId("company-ext-001")
         .build();
 
         testUserLocation = UserLocation.builder()
         .id(1L)
-        .userId(1L)
+        .userExternalId("usr-ext-00001")
         .location(testLocation)
         .build();
 
         testUserLocationDTO = UserLocationDTO.builder()
         .id(1L)
-        .userId(1L)
+        .userExternalId("usr-ext-00001")
         .locationId(1L)
         .locationRoleId(1L)
         .build();
@@ -68,15 +68,15 @@ class UserLocationServiceTest {
     @Test
     void getUserLocationsByUser_Success() {
         when(securityService.isAdmin()).thenReturn(true);
-        when(userLocationRepository.findByUserId(1L)).thenReturn(Collections.singletonList(testUserLocation));
+        when(userLocationRepository.findByUserExternalId("usr-ext-00001")).thenReturn(Collections.singletonList(testUserLocation));
         when(userLocationMapper.toDto(testUserLocation)).thenReturn(testUserLocationDTO);
 
-        List<UserLocationDTO> result = userLocationService.getUserLocationsByUser(1L);
+        List<UserLocationDTO> result = userLocationService.getUserLocationsByUserExternalId("usr-ext-00001");
 
         assertNotNull(result);
         assertEquals(1, result.size());
-        assertEquals(1L, result.get(0).getUserId());
-        verify(userLocationRepository, times(1)).findByUserId(1L);
+        assertEquals("usr-ext-00001", result.get(0).getUserExternalId());
+        verify(userLocationRepository, times(1)).findByUserExternalId("usr-ext-00001");
     }
 
     @Test
@@ -126,3 +126,7 @@ class UserLocationServiceTest {
         assertThrows(ResourceNotFoundException.class, () -> userLocationService.removeUserFromLocation(999L));
     }
 }
+
+
+
+

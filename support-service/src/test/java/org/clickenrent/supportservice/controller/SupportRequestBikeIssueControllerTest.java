@@ -40,6 +40,7 @@ class SupportRequestBikeIssueControllerTest {
     void setUp() {
         junctionDTO = SupportRequestBikeIssueDTO.builder()
                 .id(1L)
+                .externalId("junction-uuid-1")
                 .supportRequestId(1L)
                 .build();
     }
@@ -85,3 +86,11 @@ class SupportRequestBikeIssueControllerTest {
                 .andExpect(status().isNoContent());
     }
 }
+
+
+
+
+
+
+
+

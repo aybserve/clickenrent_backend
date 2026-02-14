@@ -43,6 +43,7 @@ public class ServiceProductService {
         }
 
         ServiceProduct serviceProduct = serviceProductMapper.toEntity(dto);
+        serviceProduct.sanitizeForCreate();
         serviceProduct = serviceProductRepository.save(serviceProduct);
         return serviceProductMapper.toDto(serviceProduct);
     }
@@ -57,4 +58,19 @@ public class ServiceProductService {
                 .orElseThrow(() -> new ResourceNotFoundException("ServiceProduct", "id", id));
         serviceProductRepository.delete(serviceProduct);
     }
+
+    @Transactional(readOnly = true)
+    public ServiceProductDTO findByExternalId(String externalId) {
+        ServiceProduct serviceProduct = serviceProductRepository.findByExternalId(externalId)
+                .orElseThrow(() -> new ResourceNotFoundException("ServiceProduct", "externalId", externalId));
+        return serviceProductMapper.toDto(serviceProduct);
+    }
 }
+
+
+
+
+
+
+
+

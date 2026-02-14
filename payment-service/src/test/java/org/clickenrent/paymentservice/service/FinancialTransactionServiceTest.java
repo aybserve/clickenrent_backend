@@ -23,6 +23,7 @@ import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
@@ -55,11 +56,11 @@ class FinancialTransactionServiceTest {
     private Currency testCurrency;
     private PaymentMethod testPaymentMethod;
     private ServiceProvider testServiceProvider;
-    private UUID testExternalId;
+    private String testExternalId;
 
     @BeforeEach
     void setUp() {
-        testExternalId = UUID.randomUUID();
+        testExternalId = UUID.randomUUID().toString();
 
         testCurrency = Currency.builder()
                 .id(1L)
@@ -89,8 +90,8 @@ class FinancialTransactionServiceTest {
         testTransaction = FinancialTransaction.builder()
                 .id(1L)
                 .externalId(testExternalId)
-                .payerId(1L)
-                .recipientId(2L)
+                .payerExternalId("payer-ext-123")
+                .recipientExternalId("recipient-ext-456")
                 .amount(new BigDecimal("100.00"))
                 .currency(testCurrency)
                 .dateTime(LocalDateTime.now())
@@ -102,8 +103,8 @@ class FinancialTransactionServiceTest {
         testTransactionDTO = FinancialTransactionDTO.builder()
                 .id(1L)
                 .externalId(testExternalId)
-                .payerId(1L)
-                .recipientId(2L)
+                .payerExternalId("payer-ext-123")
+                .recipientExternalId("recipient-ext-456")
                 .amount(new BigDecimal("100.00"))
                 .currency(CurrencyDTO.builder().id(1L).code("USD").name("US Dollar").build())
                 .dateTime(LocalDateTime.now())
@@ -173,23 +174,22 @@ class FinancialTransactionServiceTest {
     }
 
     @Test
-    void findByPayerId_Success() {
-        when(financialTransactionRepository.findByPayerId(1L)).thenReturn(Arrays.asList(testTransaction));
+    void findByPayerExternalId_Success() {
+        when(financialTransactionRepository.findByPayerExternalId("payer-ext-123")).thenReturn(Arrays.asList(testTransaction));
         when(financialTransactionMapper.toDTOList(anyList())).thenReturn(Arrays.asList(testTransactionDTO));
 
-        List<FinancialTransactionDTO> result = financialTransactionService.findByPayerId(1L);
+        List<FinancialTransactionDTO> result = financialTransactionService.findByPayerExternalId("payer-ext-123");
 
         assertNotNull(result);
         assertEquals(1, result.size());
-        verify(financialTransactionRepository, times(1)).findByPayerId(1L);
+        verify(financialTransactionRepository, times(1)).findByPayerExternalId("payer-ext-123");
     }
 
     @Test
-    void findByPayerId_Unauthorized() {
+    void findByPayerExternalId_Unauthorized() {
         when(securityService.isAdmin()).thenReturn(false);
-        when(securityService.hasAccessToUser(1L)).thenReturn(false);
 
-        assertThrows(UnauthorizedException.class, () -> financialTransactionService.findByPayerId(1L));
+        assertThrows(UnauthorizedException.class, () -> financialTransactionService.findByPayerExternalId("payer-ext-123"));
     }
 
     @Test

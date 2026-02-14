@@ -5,7 +5,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
-import java.util.UUID;
 
 /**
  * Repository for Currency entity
@@ -15,5 +14,13 @@ public interface CurrencyRepository extends JpaRepository<Currency, Long> {
     
     Optional<Currency> findByCode(String code);
     
-    Optional<Currency> findByExternalId(UUID externalId);
+    Optional<Currency> findByExternalId(String externalId);
 }
+
+
+
+
+
+
+
+

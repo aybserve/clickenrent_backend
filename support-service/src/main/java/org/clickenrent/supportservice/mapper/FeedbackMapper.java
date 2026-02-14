@@ -18,10 +18,9 @@ public class FeedbackMapper {
         return FeedbackDTO.builder()
                 .id(entity.getId())
                 .externalId(entity.getExternalId())
-                .userId(entity.getUserId())
+                .userExternalId(entity.getUserExternalId())
                 .rate(entity.getRate())
                 .comment(entity.getComment())
-                .dateTime(entity.getDateTime())
                 .dateCreated(entity.getDateCreated())
                 .lastDateModified(entity.getLastDateModified())
                 .createdBy(entity.getCreatedBy())
@@ -37,10 +36,9 @@ public class FeedbackMapper {
         return Feedback.builder()
                 .id(dto.getId())
                 .externalId(dto.getExternalId())
-                .userId(dto.getUserId())
+                .userExternalId(dto.getUserExternalId())
                 .rate(dto.getRate())
                 .comment(dto.getComment())
-                .dateTime(dto.getDateTime())
                 .build();
     }
 
@@ -49,8 +47,8 @@ public class FeedbackMapper {
             return;
         }
 
-        if (dto.getUserId() != null) {
-            entity.setUserId(dto.getUserId());
+        if (dto.getUserExternalId() != null) {
+            entity.setUserExternalId(dto.getUserExternalId());
         }
         if (dto.getRate() != null) {
             entity.setRate(dto.getRate());
@@ -58,8 +56,13 @@ public class FeedbackMapper {
         if (dto.getComment() != null) {
             entity.setComment(dto.getComment());
         }
-        if (dto.getDateTime() != null) {
-            entity.setDateTime(dto.getDateTime());
-        }
     }
 }
+
+
+
+
+
+
+
+

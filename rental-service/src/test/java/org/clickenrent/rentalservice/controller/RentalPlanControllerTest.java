@@ -104,3 +104,11 @@ class RentalPlanControllerTest {
                 .andExpect(status().isNoContent());
     }
 }
+
+
+
+
+
+
+
+

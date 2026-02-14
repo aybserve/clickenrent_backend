@@ -18,7 +18,7 @@ import java.util.List;
  * REST controller for UserAddress management operations.
  */
 @RestController
-@RequestMapping("/api/user-addresses")
+@RequestMapping("/api/v1/user-addresses")
 @RequiredArgsConstructor
 @Tag(name = "User Address", description = "User address link management endpoints")
 @SecurityRequirement(name = "bearerAuth")
@@ -47,6 +47,18 @@ public class UserAddressController {
     @Operation(summary = "Get user-address link by ID", description = "Retrieve a specific user-address link by its ID")
     public ResponseEntity<UserAddressDTO> getUserAddressById(@PathVariable Long id) {
         UserAddressDTO userAddress = userAddressService.getUserAddressById(id);
+        return ResponseEntity.ok(userAddress);
+    }
+    
+    /**
+     * Get user-address link by external ID.
+     * GET /api/user-addresses/external/{externalId}
+     */
+    @GetMapping("/external/{externalId}")
+    @PreAuthorize("hasAnyRole('SUPERADMIN', 'ADMIN') or @resourceSecurity.canAccessUserAddress(#externalId)")
+    @Operation(summary = "Get user-address link by external ID", description = "Retrieve a user-address link by its external ID")
+    public ResponseEntity<UserAddressDTO> getUserAddressByExternalId(@PathVariable String externalId) {
+        UserAddressDTO userAddress = userAddressService.getUserAddressByExternalId(externalId);
         return ResponseEntity.ok(userAddress);
     }
     

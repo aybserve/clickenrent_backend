@@ -19,9 +19,9 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/bike-reservations")
+@RequestMapping("/api/v1/bike-reservations")
 @RequiredArgsConstructor
-@Tag(name = "BikeReservation", description = "Bike reservation management")
+@Tag(name = "Bike Reservation", description = "Bike reservation management")
 @SecurityRequirement(name = "bearerAuth")
 public class BikeReservationController {
 
@@ -35,11 +35,11 @@ public class BikeReservationController {
         return ResponseEntity.ok(bikeReservationService.getAllReservations(pageable));
     }
 
-    @GetMapping("/by-user/{userId}")
+    @GetMapping("/by-user/{userExternalId}")
     @PreAuthorize("isAuthenticated()")
-    @Operation(summary = "Get reservations by user")
-    public ResponseEntity<List<BikeReservationDTO>> getReservationsByUser(@PathVariable Long userId) {
-        return ResponseEntity.ok(bikeReservationService.getReservationsByUser(userId));
+    @Operation(summary = "Get reservations by user external ID")
+    public ResponseEntity<List<BikeReservationDTO>> getReservationsByUserExternalId(@PathVariable String userExternalId) {
+        return ResponseEntity.ok(bikeReservationService.getReservationsByUserExternalId(userExternalId));
     }
 
     @GetMapping("/{id}")
@@ -47,6 +47,30 @@ public class BikeReservationController {
     @Operation(summary = "Get reservation by ID")
     public ResponseEntity<BikeReservationDTO> getReservationById(@PathVariable Long id) {
         return ResponseEntity.ok(bikeReservationService.getReservationById(id));
+    }
+
+    @GetMapping("/external/{externalId}")
+    @PreAuthorize("isAuthenticated()")
+    @Operation(summary = "Get bike reservation by external ID", description = "Used for cross-service communication")
+    public ResponseEntity<BikeReservationDTO> getByExternalId(@PathVariable String externalId) {
+        return ResponseEntity.ok(bikeReservationService.findByExternalId(externalId));
+    }
+
+    @PutMapping("/external/{externalId}")
+    @PreAuthorize("isAuthenticated()")
+    @Operation(summary = "Update bike reservation by external ID", description = "Used for cross-service updates")
+    public ResponseEntity<BikeReservationDTO> updateByExternalId(
+            @PathVariable String externalId,
+            @Valid @RequestBody BikeReservationDTO dto) {
+        return ResponseEntity.ok(bikeReservationService.updateByExternalId(externalId, dto));
+    }
+
+    @DeleteMapping("/external/{externalId}")
+    @PreAuthorize("isAuthenticated()")
+    @Operation(summary = "Delete bike reservation by external ID", description = "Used for cross-service deletion")
+    public ResponseEntity<Void> deleteByExternalId(@PathVariable String externalId) {
+        bikeReservationService.deleteByExternalId(externalId);
+        return ResponseEntity.noContent().build();
     }
 
     @PostMapping
@@ -64,3 +88,7 @@ public class BikeReservationController {
         return ResponseEntity.noContent().build();
     }
 }
+
+
+
+

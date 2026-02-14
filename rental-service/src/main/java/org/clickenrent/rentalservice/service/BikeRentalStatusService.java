@@ -31,4 +31,19 @@ public class BikeRentalStatusService {
                 .orElseThrow(() -> new ResourceNotFoundException("BikeRentalStatus", "id", id));
         return bikeRentalStatusMapper.toDto(status);
     }
+
+    @Transactional(readOnly = true)
+    public BikeRentalStatusDTO findByExternalId(String externalId) {
+        BikeRentalStatus status = bikeRentalStatusRepository.findByExternalId(externalId)
+                .orElseThrow(() -> new ResourceNotFoundException("BikeRentalStatus", "externalId", externalId));
+        return bikeRentalStatusMapper.toDto(status);
+    }
 }
+
+
+
+
+
+
+
+

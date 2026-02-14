@@ -40,6 +40,7 @@ class BikeTypeControllerTest {
     void setUp() {
         typeDTO = BikeTypeDTO.builder()
                 .id(1L)
+                .externalId("bike-type-uuid-1")
                 .name("Electric bike")
                 .build();
     }
@@ -96,3 +97,11 @@ class BikeTypeControllerTest {
                 .andExpect(status().isNoContent());
     }
 }
+
+
+
+
+
+
+
+

@@ -29,6 +29,10 @@ public class B2BSubscriptionMapper {
                 .endDateTime(b2bSubscription.getEndDateTime())
                 .b2bSubscriptionStatusId(b2bSubscription.getB2bSubscriptionStatus() != null ? 
                         b2bSubscription.getB2bSubscriptionStatus().getId() : null)
+                .dateCreated(b2bSubscription.getDateCreated())
+                .lastDateModified(b2bSubscription.getLastDateModified())
+                .createdBy(b2bSubscription.getCreatedBy())
+                .lastModifiedBy(b2bSubscription.getLastModifiedBy())
                 .build();
     }
 
@@ -40,7 +44,11 @@ public class B2BSubscriptionMapper {
         var builder = B2BSubscription.builder()
                 .id(dto.getId())
                 .externalId(dto.getExternalId())
-                .endDateTime(dto.getEndDateTime());
+                .endDateTime(dto.getEndDateTime())
+                .dateCreated(dto.getDateCreated())
+                .lastDateModified(dto.getLastDateModified())
+                .createdBy(dto.getCreatedBy())
+                .lastModifiedBy(dto.getLastModifiedBy());
 
         if (dto.getLocationId() != null) {
             builder.location(locationRepository.findById(dto.getLocationId()).orElse(null));

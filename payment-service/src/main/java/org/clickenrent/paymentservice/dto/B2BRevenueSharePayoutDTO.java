@@ -1,5 +1,6 @@
 package org.clickenrent.paymentservice.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PositiveOrZero;
 import lombok.AllArgsConstructor;
@@ -9,9 +10,9 @@ import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 /**
  * DTO for B2BRevenueSharePayout entity
@@ -22,12 +23,15 @@ import java.util.UUID;
 @AllArgsConstructor
 public class B2BRevenueSharePayoutDTO {
     
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private Long id;
     
-    private UUID externalId;
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    private String externalId;
     
-    @NotNull(message = "Company ID is required")
-    private Long companyId;
+    // Cross-service externalId reference
+    @NotNull(message = "Company external ID is required")
+    private String companyExternalId;
     
     @NotNull(message = "Payment status is required")
     private PaymentStatusDTO paymentStatus;
@@ -49,4 +53,21 @@ public class B2BRevenueSharePayoutDTO {
     
     @Builder.Default
     private List<B2BRevenueSharePayoutItemDTO> payoutItems = new ArrayList<>();
+    
+    // Audit fields
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    private LocalDateTime dateCreated;
+    
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    private LocalDateTime lastDateModified;
+    
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    private String createdBy;
+    
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    private String lastModifiedBy;
 }
+
+
+
+

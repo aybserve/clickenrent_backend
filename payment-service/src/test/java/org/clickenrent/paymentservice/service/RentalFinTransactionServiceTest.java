@@ -48,11 +48,11 @@ class RentalFinTransactionServiceTest {
     private RentalFinTransaction testRentalFinTransaction;
     private RentalFinTransactionDTO testRentalFinTransactionDTO;
     private FinancialTransaction testFinancialTransaction;
-    private UUID testExternalId;
+    private String testExternalId;
 
     @BeforeEach
     void setUp() {
-        testExternalId = UUID.randomUUID();
+        testExternalId = UUID.randomUUID().toString();
 
         testFinancialTransaction = FinancialTransaction.builder()
                 .id(1L)
@@ -61,14 +61,14 @@ class RentalFinTransactionServiceTest {
         testRentalFinTransaction = RentalFinTransaction.builder()
                 .id(1L)
                 .externalId(testExternalId)
-                .rentalId(1L)
+                .rentalExternalId("rental-ext-123")
                 .financialTransaction(testFinancialTransaction)
                 .build();
 
         testRentalFinTransactionDTO = RentalFinTransactionDTO.builder()
                 .id(1L)
                 .externalId(testExternalId)
-                .rentalId(1L)
+                .rentalExternalId("rental-ext-123")
                 .financialTransaction(FinancialTransactionDTO.builder().id(1L).build())
                 .build();
 
@@ -102,7 +102,7 @@ class RentalFinTransactionServiceTest {
         RentalFinTransactionDTO result = rentalFinTransactionService.findById(1L);
 
         assertNotNull(result);
-        assertEquals(1L, result.getRentalId());
+        assertEquals("rental-ext-123", result.getRentalExternalId());
         verify(rentalFinTransactionRepository, times(1)).findById(1L);
     }
 
@@ -133,7 +133,7 @@ class RentalFinTransactionServiceTest {
 
     @Test
     void findByExternalId_NotFound() {
-        UUID randomId = UUID.randomUUID();
+        String randomId = UUID.randomUUID().toString();
         when(rentalFinTransactionRepository.findByExternalId(randomId)).thenReturn(Optional.empty());
 
         assertThrows(ResourceNotFoundException.class, () -> rentalFinTransactionService.findByExternalId(randomId));

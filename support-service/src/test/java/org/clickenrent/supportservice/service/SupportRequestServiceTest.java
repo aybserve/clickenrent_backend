@@ -51,8 +51,8 @@ class SupportRequestServiceTest {
         testRequest = SupportRequest.builder()
                 .id(1L)
                 .externalId("550e8400-e29b-41d4-a716-446655440401")
-                .userId(1L)
-                .bikeId(201L)
+                .userExternalId("user-uuid-1")
+                .bikeExternalId("bike-uuid-201")
                 .isNearLocation(true)
                 .photoUrl("https://example.com/photo.jpg")
                 .supportRequestStatus(testStatus)
@@ -61,8 +61,8 @@ class SupportRequestServiceTest {
         testRequestDTO = SupportRequestDTO.builder()
                 .id(1L)
                 .externalId("550e8400-e29b-41d4-a716-446655440401")
-                .userId(1L)
-                .bikeId(201L)
+                .userExternalId("user-uuid-1")
+                .bikeExternalId("bike-uuid-201")
                 .isNearLocation(true)
                 .photoUrl("https://example.com/photo.jpg")
                 .build();
@@ -85,14 +85,14 @@ class SupportRequestServiceTest {
     void getAll_AsNonAdmin_ReturnsUserRequests() {
         when(securityService.isAdmin()).thenReturn(false);
         when(securityService.getCurrentUserId()).thenReturn(1L);
-        when(supportRequestRepository.findByUserId(1L)).thenReturn(Arrays.asList(testRequest));
+        when(supportRequestRepository.findByUserExternalId("user-uuid-1")).thenReturn(Arrays.asList(testRequest));
         when(supportRequestMapper.toDto(testRequest)).thenReturn(testRequestDTO);
 
         List<SupportRequestDTO> result = supportRequestService.getAll();
 
         assertNotNull(result);
         assertEquals(1, result.size());
-        verify(supportRequestRepository, times(1)).findByUserId(1L);
+        verify(supportRequestRepository, times(1)).findByUserExternalId("user-uuid-1");
     }
 
     @Test
@@ -104,7 +104,7 @@ class SupportRequestServiceTest {
         SupportRequestDTO result = supportRequestService.getById(1L);
 
         assertNotNull(result);
-        assertEquals(1L, result.getUserId());
+        assertEquals("user-uuid-1", result.getUserExternalId());
         verify(supportRequestRepository, times(1)).findById(1L);
     }
 
@@ -118,7 +118,7 @@ class SupportRequestServiceTest {
     @Test
     void getById_Unauthorized() {
         when(securityService.isAdmin()).thenReturn(false);
-        when(securityService.hasAccessToUser(1L)).thenReturn(false);
+        when(securityService.getCurrentUserId()).thenReturn(2L);
         when(supportRequestRepository.findById(1L)).thenReturn(Optional.of(testRequest));
 
         assertThrows(UnauthorizedException.class, () -> supportRequestService.getById(1L));
@@ -147,22 +147,21 @@ class SupportRequestServiceTest {
     @Test
     void getByUserId_Success() {
         when(securityService.isAdmin()).thenReturn(true);
-        when(supportRequestRepository.findByUserId(1L)).thenReturn(Arrays.asList(testRequest));
+        when(supportRequestRepository.findByUserExternalId("user-uuid-1")).thenReturn(Arrays.asList(testRequest));
         when(supportRequestMapper.toDto(testRequest)).thenReturn(testRequestDTO);
 
-        List<SupportRequestDTO> result = supportRequestService.getByUserId(1L);
+        List<SupportRequestDTO> result = supportRequestService.getByUserExternalId("user-uuid-1");
 
         assertNotNull(result);
         assertEquals(1, result.size());
-        verify(supportRequestRepository, times(1)).findByUserId(1L);
+        verify(supportRequestRepository, times(1)).findByUserExternalId("user-uuid-1");
     }
 
     @Test
-    void getByUserId_Unauthorized() {
+    void getByUserExternalId_Unauthorized() {
         when(securityService.isAdmin()).thenReturn(false);
-        when(securityService.hasAccessToUser(2L)).thenReturn(false);
 
-        assertThrows(UnauthorizedException.class, () -> supportRequestService.getByUserId(2L));
+        assertThrows(UnauthorizedException.class, () -> supportRequestService.getByUserExternalId("user-uuid-2"));
     }
 
     @Test
@@ -179,9 +178,9 @@ class SupportRequestServiceTest {
     }
 
     @Test
-    void create_WithoutUserId_SetsCurrentUser() {
-        SupportRequestDTO dtoWithoutUserId = SupportRequestDTO.builder()
-                .bikeId(201L)
+    void create_WithoutUserExternalId_SetsCurrentUser() {
+        SupportRequestDTO dtoWithoutUserExternalId = SupportRequestDTO.builder()
+                .bikeExternalId("bike-uuid-201")
                 .isNearLocation(true)
                 .build();
         
@@ -190,17 +189,17 @@ class SupportRequestServiceTest {
         when(supportRequestRepository.save(any(SupportRequest.class))).thenReturn(testRequest);
         when(supportRequestMapper.toDto(testRequest)).thenReturn(testRequestDTO);
 
-        SupportRequestDTO result = supportRequestService.create(dtoWithoutUserId);
+        SupportRequestDTO result = supportRequestService.create(dtoWithoutUserExternalId);
 
         assertNotNull(result);
-        assertEquals(1L, dtoWithoutUserId.getUserId());
+        assertEquals("user-uuid-1", dtoWithoutUserExternalId.getUserExternalId());
     }
 
     @Test
     void create_Unauthorized() {
         when(securityService.isAdmin()).thenReturn(false);
         when(securityService.getCurrentUserId()).thenReturn(1L);
-        testRequestDTO.setUserId(2L);
+        testRequestDTO.setUserExternalId("user-uuid-2");
 
         assertThrows(UnauthorizedException.class, () -> supportRequestService.create(testRequestDTO));
     }
@@ -229,7 +228,7 @@ class SupportRequestServiceTest {
     @Test
     void update_Unauthorized() {
         when(securityService.isAdmin()).thenReturn(false);
-        when(securityService.hasAccessToUser(1L)).thenReturn(false);
+        when(securityService.getCurrentUserId()).thenReturn(2L);
         when(supportRequestRepository.findById(1L)).thenReturn(Optional.of(testRequest));
 
         assertThrows(UnauthorizedException.class, () -> supportRequestService.update(1L, testRequestDTO));
@@ -256,9 +255,13 @@ class SupportRequestServiceTest {
     @Test
     void delete_Unauthorized() {
         when(securityService.isAdmin()).thenReturn(false);
-        when(securityService.hasAccessToUser(1L)).thenReturn(false);
+        when(securityService.getCurrentUserId()).thenReturn(2L);
         when(supportRequestRepository.findById(1L)).thenReturn(Optional.of(testRequest));
 
         assertThrows(UnauthorizedException.class, () -> supportRequestService.delete(1L));
     }
 }
+
+
+
+

@@ -28,9 +28,12 @@ public class B2BSubscriptionOrderMapper {
                 .id(b2bSubscriptionOrder.getId())
                 .externalId(b2bSubscriptionOrder.getExternalId())
                 .locationId(b2bSubscriptionOrder.getLocation() != null ? b2bSubscriptionOrder.getLocation().getId() : null)
-                .dateTime(b2bSubscriptionOrder.getDateTime())
                 .b2bSubscriptionOrderStatusId(b2bSubscriptionOrder.getB2bSubscriptionOrderStatus() != null ? b2bSubscriptionOrder.getB2bSubscriptionOrderStatus().getId() : null)
                 .b2bSubscriptionId(b2bSubscriptionOrder.getB2bSubscription() != null ? b2bSubscriptionOrder.getB2bSubscription().getId() : null)
+                .dateCreated(b2bSubscriptionOrder.getDateCreated())
+                .lastDateModified(b2bSubscriptionOrder.getLastDateModified())
+                .createdBy(b2bSubscriptionOrder.getCreatedBy())
+                .lastModifiedBy(b2bSubscriptionOrder.getLastModifiedBy())
                 .build();
     }
 
@@ -42,7 +45,10 @@ public class B2BSubscriptionOrderMapper {
         var builder = B2BSubscriptionOrder.builder()
                 .id(dto.getId())
                 .externalId(dto.getExternalId())
-                .dateTime(dto.getDateTime());
+                .dateCreated(dto.getDateCreated())
+                .lastDateModified(dto.getLastDateModified())
+                .createdBy(dto.getCreatedBy())
+                .lastModifiedBy(dto.getLastModifiedBy());
 
         if (dto.getLocationId() != null) {
             builder.location(locationRepository.findById(dto.getLocationId()).orElse(null));
@@ -62,9 +68,6 @@ public class B2BSubscriptionOrderMapper {
             return;
         }
 
-        if (dto.getDateTime() != null) {
-            b2bSubscriptionOrder.setDateTime(dto.getDateTime());
-        }
         if (dto.getB2bSubscriptionOrderStatusId() != null) {
             b2bSubscriptionOrderStatusRepository.findById(dto.getB2bSubscriptionOrderStatusId())
                     .ifPresent(b2bSubscriptionOrder::setB2bSubscriptionOrderStatus);
@@ -75,3 +78,11 @@ public class B2BSubscriptionOrderMapper {
         }
     }
 }
+
+
+
+
+
+
+
+

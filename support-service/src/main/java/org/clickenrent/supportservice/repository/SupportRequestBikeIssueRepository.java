@@ -13,9 +13,19 @@ import java.util.Optional;
 @Repository
 public interface SupportRequestBikeIssueRepository extends JpaRepository<SupportRequestBikeIssue, Long> {
     
+    Optional<SupportRequestBikeIssue> findByExternalId(String externalId);
+    
     List<SupportRequestBikeIssue> findBySupportRequestId(Long supportRequestId);
     
     List<SupportRequestBikeIssue> findByBikeIssueId(Long bikeIssueId);
     
     Optional<SupportRequestBikeIssue> findBySupportRequestIdAndBikeIssueId(Long supportRequestId, Long bikeIssueId);
 }
+
+
+
+
+
+
+
+

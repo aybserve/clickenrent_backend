@@ -1,7 +1,7 @@
 package org.clickenrent.paymentservice.service;
 
 import lombok.RequiredArgsConstructor;
-import org.clickenrent.paymentservice.client.RentalServiceClient;
+import lombok.extern.slf4j.Slf4j;
 import org.clickenrent.paymentservice.dto.RentalFinTransactionDTO;
 import org.clickenrent.paymentservice.entity.RentalFinTransaction;
 import org.clickenrent.paymentservice.exception.ResourceNotFoundException;
@@ -12,11 +12,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.UUID;
 
 /**
  * Service for Rental FinancialTransaction management
  */
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class RentalFinTransactionService {
@@ -24,7 +24,6 @@ public class RentalFinTransactionService {
     private final RentalFinTransactionRepository rentalFinTransactionRepository;
     private final RentalFinTransactionMapper rentalFinTransactionMapper;
     private final SecurityService securityService;
-    private final RentalServiceClient rentalServiceClient;
 
     @Transactional(readOnly = true)
     public List<RentalFinTransactionDTO> findAll() {
@@ -47,7 +46,7 @@ public class RentalFinTransactionService {
     }
 
     @Transactional(readOnly = true)
-    public RentalFinTransactionDTO findByExternalId(UUID externalId) {
+    public RentalFinTransactionDTO findByExternalId(String externalId) {
         if (!securityService.isAdmin()) {
             throw new UnauthorizedException("Only admins can view rental transactions");
         }
@@ -60,10 +59,13 @@ public class RentalFinTransactionService {
 
     @Transactional
     public RentalFinTransactionDTO create(RentalFinTransactionDTO dto) {
-        // Validate rental exists
-        rentalServiceClient.checkRentalExists(dto.getRentalId());
-        
         RentalFinTransaction transaction = rentalFinTransactionMapper.toEntity(dto);
+        
+        // External IDs are provided directly in the DTO
+        log.debug("Creating rental transaction with rentalExternalId: {}", 
+                dto.getRentalExternalId());
+        
+        transaction.sanitizeForCreate();
         RentalFinTransaction savedTransaction = rentalFinTransactionRepository.save(transaction);
         return rentalFinTransactionMapper.toDTO(savedTransaction);
     }
@@ -77,7 +79,7 @@ public class RentalFinTransactionService {
         RentalFinTransaction existingTransaction = rentalFinTransactionRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("RentalFinTransaction", "id", id));
         
-        existingTransaction.setRentalId(dto.getRentalId());
+        existingTransaction.setRentalExternalId(dto.getRentalExternalId());
         
         RentalFinTransaction updatedTransaction = rentalFinTransactionRepository.save(existingTransaction);
         return rentalFinTransactionMapper.toDTO(updatedTransaction);
@@ -95,3 +97,7 @@ public class RentalFinTransactionService {
         rentalFinTransactionRepository.deleteById(id);
     }
 }
+
+
+
+

@@ -57,7 +57,7 @@ class LocationServiceTest {
         .externalId("LOC001")
         .name("Amsterdam Central")
         .address("Stationsplein 1, Amsterdam")
-        .companyId(1L)
+        .companyExternalId("company-ext-001")
         .isPublic(true)
         .build();
 
@@ -66,7 +66,7 @@ class LocationServiceTest {
         .externalId("LOC001")
         .name("Amsterdam Central")
         .address("Stationsplein 1, Amsterdam")
-        .companyId(1L)
+        .companyExternalId("company-ext-001")
         .isPublic(true)
         .build();
     }

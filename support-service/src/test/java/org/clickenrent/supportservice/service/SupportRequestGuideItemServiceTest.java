@@ -57,6 +57,7 @@ class SupportRequestGuideItemServiceTest {
 
         testGuideItem = SupportRequestGuideItem.builder()
                 .id(1L)
+                .externalId("guide-item-uuid-1")
                 .itemIndex(1)
                 .description("Check if battery is properly connected")
                 .bikeIssue(testBikeIssue)
@@ -65,6 +66,7 @@ class SupportRequestGuideItemServiceTest {
 
         testGuideItemDTO = SupportRequestGuideItemDTO.builder()
                 .id(1L)
+                .externalId("guide-item-uuid-1")
                 .itemIndex(1)
                 .description("Check if battery is properly connected")
                 .build();
@@ -206,3 +208,11 @@ class SupportRequestGuideItemServiceTest {
         assertThrows(UnauthorizedException.class, () -> supportRequestGuideItemService.delete(1L));
     }
 }
+
+
+
+
+
+
+
+

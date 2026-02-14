@@ -9,16 +9,37 @@ public class BikeStatusMapper {
 
     public BikeStatusDTO toDto(BikeStatus bikeStatus) {
         if (bikeStatus == null) return null;
-        return BikeStatusDTO.builder().id(bikeStatus.getId()).name(bikeStatus.getName()).build();
+        return BikeStatusDTO.builder()
+                .id(bikeStatus.getId())
+                .externalId(bikeStatus.getExternalId())
+                .name(bikeStatus.getName())
+                .dateCreated(bikeStatus.getDateCreated())
+                .lastDateModified(bikeStatus.getLastDateModified())
+                .createdBy(bikeStatus.getCreatedBy())
+                .lastModifiedBy(bikeStatus.getLastModifiedBy())
+                .build();
     }
 
     public BikeStatus toEntity(BikeStatusDTO dto) {
         if (dto == null) return null;
-        return BikeStatus.builder().id(dto.getId()).name(dto.getName()).build();
+        return BikeStatus.builder()
+                .id(dto.getId())
+                .externalId(dto.getExternalId())
+                .name(dto.getName())
+                .build();
     }
 
     public void updateEntityFromDto(BikeStatusDTO dto, BikeStatus bikeStatus) {
         if (dto == null || bikeStatus == null) return;
+        if (dto.getExternalId() != null) bikeStatus.setExternalId(dto.getExternalId());
         if (dto.getName() != null) bikeStatus.setName(dto.getName());
     }
 }
+
+
+
+
+
+
+
+

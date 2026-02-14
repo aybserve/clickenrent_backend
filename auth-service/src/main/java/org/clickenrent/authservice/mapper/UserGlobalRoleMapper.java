@@ -17,6 +17,7 @@ public class UserGlobalRoleMapper {
         
         return UserGlobalRoleDTO.builder()
                 .id(userGlobalRole.getId())
+                .externalId(userGlobalRole.getExternalId())
                 .userId(userGlobalRole.getUser() != null ? userGlobalRole.getUser().getId() : null)
                 .globalRoleId(userGlobalRole.getGlobalRole() != null ? userGlobalRole.getGlobalRole().getId() : null)
                 .dateCreated(userGlobalRole.getDateCreated())
@@ -39,6 +40,7 @@ public class UserGlobalRoleMapper {
         
         return UserGlobalRole.builder()
                 .id(dto.getId())
+                .externalId(dto.getExternalId())
                 // User and GlobalRole must be set by the service layer
                 .build();
     }

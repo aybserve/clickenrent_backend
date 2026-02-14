@@ -19,9 +19,9 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/part-brands")
+@RequestMapping("/api/v1/part-brands")
 @RequiredArgsConstructor
-@Tag(name = "PartBrand", description = "Part brand management")
+@Tag(name = "Part Brands", description = "Part brand management")
 @SecurityRequirement(name = "bearerAuth")
 public class PartBrandController {
 
@@ -35,11 +35,11 @@ public class PartBrandController {
         return ResponseEntity.ok(partBrandService.getAllBrands(pageable));
     }
 
-    @GetMapping("/by-company/{companyId}")
+    @GetMapping("/by-company/{companyExternalId}")
     @PreAuthorize("isAuthenticated()")
-    @Operation(summary = "Get brands by company")
-    public ResponseEntity<List<PartBrandDTO>> getBrandsByCompany(@PathVariable Long companyId) {
-        return ResponseEntity.ok(partBrandService.getBrandsByCompany(companyId));
+    @Operation(summary = "Get brands by company external ID")
+    public ResponseEntity<List<PartBrandDTO>> getBrandsByCompanyExternalId(@PathVariable String companyExternalId) {
+        return ResponseEntity.ok(partBrandService.getBrandsByCompanyExternalId(companyExternalId));
     }
 
     @GetMapping("/{id}")
@@ -70,4 +70,15 @@ public class PartBrandController {
         partBrandService.deleteBrand(id);
         return ResponseEntity.noContent().build();
     }
+
+    @GetMapping("/external/{externalId}")
+    @PreAuthorize("isAuthenticated()")
+    @Operation(summary = "Get part brand by external ID", description = "Retrieve part brand by external ID for cross-service communication")
+    public ResponseEntity<PartBrandDTO> getByExternalId(@PathVariable String externalId) {
+        return ResponseEntity.ok(partBrandService.getPartBrandByExternalId(externalId));
+    }
 }
+
+
+
+

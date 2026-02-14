@@ -1,9 +1,15 @@
 /**
- * JPA Entities for Payment Service.
+ * Entity package for payment-service.
  * 
- * This package contains JPA entity classes that represent database tables.
- * Entities should be annotated with @Entity and follow JPA best practices.
- * 
- * @author Vitaliy Shvetsov
+ * This package-info.java defines Hibernate filter definitions that are used across multiple entities.
+ * Filter definitions (@FilterDef) must be defined only once, but can be applied to multiple entities using @Filter.
  */
+@FilterDef(
+    name = "companyFilter",
+    parameters = @ParamDef(name = "companyExternalIds", type = String.class),
+    defaultCondition = "company_external_id IN (:companyExternalIds)"
+)
 package org.clickenrent.paymentservice.entity;
+
+import org.hibernate.annotations.FilterDef;
+import org.hibernate.annotations.ParamDef;

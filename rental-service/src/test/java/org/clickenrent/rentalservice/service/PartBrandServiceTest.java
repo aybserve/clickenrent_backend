@@ -47,13 +47,13 @@ class PartBrandServiceTest {
         testBrand = PartBrand.builder()
         .id(1L)
         .name("Samsung")
-        .companyId(1L)
+        .companyExternalId("company-ext-001")
         .build();
 
         testBrandDTO = PartBrandDTO.builder()
         .id(1L)
         .name("Samsung")
-        .companyId(1L)
+        .companyExternalId("company-ext-001")
         .build();
 
             }
@@ -75,15 +75,15 @@ class PartBrandServiceTest {
     @Test
     void getBrandsByCompany_Success() {
         when(securityService.isAdmin()).thenReturn(true);
-        when(partBrandRepository.findByCompanyId(1L)).thenReturn(Collections.singletonList(testBrand));
+        when(partBrandRepository.findByCompanyExternalId("company-ext-001")).thenReturn(Collections.singletonList(testBrand));
         when(partBrandMapper.toDto(testBrand)).thenReturn(testBrandDTO);
 
-        List<PartBrandDTO> result = partBrandService.getBrandsByCompany(1L);
+        List<PartBrandDTO> result = partBrandService.getBrandsByCompanyExternalId("company-ext-001");
 
         assertNotNull(result);
         assertEquals(1, result.size());
         assertEquals("Samsung", result.get(0).getName());
-        verify(partBrandRepository, times(1)).findByCompanyId(1L);
+        verify(partBrandRepository, times(1)).findByCompanyExternalId("company-ext-001");
     }
 
     @Test
@@ -152,3 +152,7 @@ class PartBrandServiceTest {
         assertThrows(ResourceNotFoundException.class, () -> partBrandService.deleteBrand(999L));
     }
 }
+
+
+
+

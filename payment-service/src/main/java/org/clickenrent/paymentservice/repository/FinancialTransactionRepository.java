@@ -2,26 +2,37 @@ package org.clickenrent.paymentservice.repository;
 
 import org.clickenrent.paymentservice.entity.FinancialTransaction;
 import org.clickenrent.paymentservice.entity.PaymentStatus;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
-
 /**
  * Repository for FinancialTransaction entity
  */
 @Repository
 public interface FinancialTransactionRepository extends JpaRepository<FinancialTransaction, Long> {
     
-    List<FinancialTransaction> findByPayerId(Long payerId);
+    List<FinancialTransaction> findByPayerExternalId(String payerExternalId);
     
-    List<FinancialTransaction> findByRecipientId(Long recipientId);
+    List<FinancialTransaction> findByRecipientExternalId(String recipientExternalId);
     
     Optional<FinancialTransaction> findByStripePaymentIntentId(String stripePaymentIntentId);
     
-    Optional<FinancialTransaction> findByExternalId(UUID externalId);
+    Optional<FinancialTransaction> findByMultiSafepayOrderId(String multiSafepayOrderId);
+    
+    Optional<FinancialTransaction> findByExternalId(String externalId);
     
     List<FinancialTransaction> findByPaymentStatus(PaymentStatus status);
+    
+    // Find transactions by payer with pagination
+    Page<FinancialTransaction> findByPayerExternalIdOrderByDateTimeDesc(
+        String payerExternalId, Pageable pageable
+    );
 }
+
+
+
+

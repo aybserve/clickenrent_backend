@@ -5,12 +5,15 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Repository for SupportRequestGuideItem entity.
  */
 @Repository
 public interface SupportRequestGuideItemRepository extends JpaRepository<SupportRequestGuideItem, Long> {
+    
+    Optional<SupportRequestGuideItem> findByExternalId(String externalId);
     
     List<SupportRequestGuideItem> findByBikeIssueId(Long bikeIssueId);
     
@@ -19,3 +22,11 @@ public interface SupportRequestGuideItemRepository extends JpaRepository<Support
     List<SupportRequestGuideItem> findByBikeIssueIdAndSupportRequestStatusIdOrderByItemIndexAsc(
         Long bikeIssueId, Long supportRequestStatusId);
 }
+
+
+
+
+
+
+
+

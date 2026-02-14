@@ -18,7 +18,7 @@ import java.util.List;
  * REST controller for managing ResponsiblePerson entities.
  */
 @RestController
-@RequestMapping("/api/responsible-persons")
+@RequestMapping("/api/v1/responsible-persons")
 @RequiredArgsConstructor
 @Tag(name = "Responsible Person", description = "Responsible person management")
 @SecurityRequirement(name = "bearerAuth")
@@ -38,6 +38,13 @@ public class ResponsiblePersonController {
     @Operation(summary = "Get responsible person by ID")
     public ResponseEntity<ResponsiblePersonDTO> getById(@PathVariable Long id) {
         return ResponseEntity.ok(responsiblePersonService.getById(id));
+    }
+
+    @GetMapping("/external/{externalId}")
+    @PreAuthorize("isAuthenticated()")
+    @Operation(summary = "Get responsible person by external ID")
+    public ResponseEntity<ResponsiblePersonDTO> getByExternalId(@PathVariable String externalId) {
+        return ResponseEntity.ok(responsiblePersonService.getByExternalId(externalId));
     }
 
     @PostMapping
@@ -62,3 +69,11 @@ public class ResponsiblePersonController {
         return ResponseEntity.noContent().build();
     }
 }
+
+
+
+
+
+
+
+

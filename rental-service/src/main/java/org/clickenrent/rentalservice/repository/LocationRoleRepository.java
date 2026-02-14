@@ -12,4 +12,13 @@ import java.util.Optional;
 @Repository
 public interface LocationRoleRepository extends JpaRepository<LocationRole, Long> {
     Optional<LocationRole> findByName(String name);
+    Optional<LocationRole> findByExternalId(String externalId);
 }
+
+
+
+
+
+
+
+

@@ -40,7 +40,6 @@ public class ChargingStation extends Product {
     @Column(name = "is_vat_include", nullable = true)
     private Boolean isVatInclude = false;
 
-//    @NotNull(message = "Charging station status is required")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "charging_station_status_id", nullable = true)
     private ChargingStationStatus chargingStationStatus;
@@ -60,7 +59,6 @@ public class ChargingStation extends Product {
     @Column(name = "in_service_date")
     private LocalDate inServiceDate;
 
-//    @NotNull(message = "Charging station model is required")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "charging_station_model_id", nullable = true)
     private ChargingStationModel chargingStationModel;

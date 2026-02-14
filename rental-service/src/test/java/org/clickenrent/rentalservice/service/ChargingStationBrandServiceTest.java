@@ -47,13 +47,13 @@ class ChargingStationBrandServiceTest {
         testBrand = ChargingStationBrand.builder()
         .id(1L)
         .name("Tesla")
-        .companyId(1L)
+        .companyExternalId("company-ext-001")
         .build();
 
         testBrandDTO = ChargingStationBrandDTO.builder()
         .id(1L)
         .name("Tesla")
-        .companyId(1L)
+        .companyExternalId("company-ext-001")
         .build();
 
             }
@@ -74,15 +74,15 @@ class ChargingStationBrandServiceTest {
     @Test
     void getBrandsByCompany_Success() {
         when(securityService.isAdmin()).thenReturn(true);
-        when(chargingStationBrandRepository.findByCompanyId(1L)).thenReturn(Collections.singletonList(testBrand));
+        when(chargingStationBrandRepository.findByCompanyExternalId("company-ext-001")).thenReturn(Collections.singletonList(testBrand));
         when(chargingStationBrandMapper.toDto(testBrand)).thenReturn(testBrandDTO);
 
-        List<ChargingStationBrandDTO> result = chargingStationBrandService.getBrandsByCompany(1L);
+        List<ChargingStationBrandDTO> result = chargingStationBrandService.getBrandsByCompanyExternalId("company-ext-001");
 
         assertNotNull(result);
         assertEquals(1, result.size());
         assertEquals("Tesla", result.get(0).getName());
-        verify(chargingStationBrandRepository, times(1)).findByCompanyId(1L);
+        verify(chargingStationBrandRepository, times(1)).findByCompanyExternalId("company-ext-001");
     }
 
     @Test
@@ -150,3 +150,7 @@ class ChargingStationBrandServiceTest {
         assertThrows(ResourceNotFoundException.class, () -> chargingStationBrandService.deleteBrand(999L));
     }
 }
+
+
+
+

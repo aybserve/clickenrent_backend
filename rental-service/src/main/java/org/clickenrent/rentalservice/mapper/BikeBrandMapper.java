@@ -19,7 +19,11 @@ public class BikeBrandMapper {
                 .id(bikeBrand.getId())
                 .externalId(bikeBrand.getExternalId())
                 .name(bikeBrand.getName())
-                .companyId(bikeBrand.getCompanyId())
+                .companyExternalId(bikeBrand.getCompanyExternalId())
+                .dateCreated(bikeBrand.getDateCreated())
+                .lastDateModified(bikeBrand.getLastDateModified())
+                .createdBy(bikeBrand.getCreatedBy())
+                .lastModifiedBy(bikeBrand.getLastModifiedBy())
                 .build();
     }
 
@@ -32,7 +36,7 @@ public class BikeBrandMapper {
                 .id(dto.getId())
                 .externalId(dto.getExternalId())
                 .name(dto.getName())
-                .companyId(dto.getCompanyId())
+                .companyExternalId(dto.getCompanyExternalId())
                 .build();
     }
 
@@ -46,3 +50,7 @@ public class BikeBrandMapper {
         }
     }
 }
+
+
+
+

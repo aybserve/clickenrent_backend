@@ -17,7 +17,7 @@ import java.util.List;
  * REST controller for GlobalRole management operations.
  */
 @RestController
-@RequestMapping("/api/global-roles")
+@RequestMapping("/api/v1/global-roles")
 @RequiredArgsConstructor
 @Tag(name = "Global Role", description = "Global role management endpoints")
 @SecurityRequirement(name = "bearerAuth")
@@ -44,6 +44,17 @@ public class GlobalRoleController {
     @PreAuthorize("hasAnyRole('SUPERADMIN', 'ADMIN')")
     public ResponseEntity<GlobalRoleDTO> getGlobalRoleById(@PathVariable Long id) {
         GlobalRoleDTO globalRole = globalRoleService.getGlobalRoleById(id);
+        return ResponseEntity.ok(globalRole);
+    }
+    
+    /**
+     * Get global role by external ID.
+     * GET /api/global-roles/external/{externalId}
+     */
+    @GetMapping("/external/{externalId}")
+    @PreAuthorize("hasAnyRole('SUPERADMIN', 'ADMIN')")
+    public ResponseEntity<GlobalRoleDTO> getGlobalRoleByExternalId(@PathVariable String externalId) {
+        GlobalRoleDTO globalRole = globalRoleService.getGlobalRoleByExternalId(externalId);
         return ResponseEntity.ok(globalRole);
     }
     
@@ -82,5 +93,13 @@ public class GlobalRoleController {
         return ResponseEntity.noContent().build();
     }
 }
+
+
+
+
+
+
+
+
 
 

@@ -2,8 +2,6 @@ package org.clickenrent.paymentservice.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.clickenrent.paymentservice.client.AuthServiceClient;
-import org.clickenrent.paymentservice.dto.UserDTO;
 import org.clickenrent.paymentservice.dto.UserPaymentProfileDTO;
 import org.clickenrent.paymentservice.entity.UserPaymentProfile;
 import org.clickenrent.paymentservice.exception.ResourceNotFoundException;
@@ -14,7 +12,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.UUID;
 
 /**
  * Service for UserPaymentProfile management with Stripe customer integration
@@ -27,8 +24,7 @@ public class UserPaymentProfileService {
     private final UserPaymentProfileRepository userPaymentProfileRepository;
     private final UserPaymentProfileMapper userPaymentProfileMapper;
     private final SecurityService securityService;
-    private final StripeService stripeService;
-    private final AuthServiceClient authServiceClient;
+    private final PaymentProviderService paymentProviderService;
 
     @Transactional(readOnly = true)
     public List<UserPaymentProfileDTO> findAll() {
@@ -49,7 +45,7 @@ public class UserPaymentProfileService {
     }
 
     @Transactional(readOnly = true)
-    public UserPaymentProfileDTO findByExternalId(UUID externalId) {
+    public UserPaymentProfileDTO findByExternalId(String externalId) {
         UserPaymentProfile profile = userPaymentProfileRepository.findByExternalId(externalId)
                 .orElseThrow(() -> new ResourceNotFoundException("UserPaymentProfile", "externalId", externalId));
         
@@ -59,46 +55,51 @@ public class UserPaymentProfileService {
     }
 
     @Transactional(readOnly = true)
-    public UserPaymentProfileDTO findByUserId(Long userId) {
-        if (!securityService.isAdmin() && !securityService.hasAccessToUser(userId)) {
+    public UserPaymentProfileDTO findByUserExternalId(String userExternalId) {
+        // Check permission - only admins for now
+        if (!securityService.isAdmin()) {
             throw new UnauthorizedException("You don't have permission to access this profile");
         }
         
-        UserPaymentProfile profile = userPaymentProfileRepository.findByUserId(userId)
-                .orElseThrow(() -> new ResourceNotFoundException("UserPaymentProfile", "userId", userId));
+        UserPaymentProfile profile = userPaymentProfileRepository.findByUserExternalId(userExternalId)
+                .orElseThrow(() -> new ResourceNotFoundException("UserPaymentProfile", "userExternalId", userExternalId));
         
         return userPaymentProfileMapper.toDTO(profile);
     }
 
     @Transactional
-    public UserPaymentProfileDTO createOrGetProfile(Long userId) {
-        // Check permission
-        if (!securityService.isAdmin() && !securityService.hasAccessToUser(userId)) {
+    public UserPaymentProfileDTO createOrGetProfile(String userExternalId, String userEmail) {
+        // Check permission - only admins for now
+        if (!securityService.isAdmin()) {
             throw new UnauthorizedException("You don't have permission to create this profile");
         }
         
         // Check if profile already exists
-        return userPaymentProfileRepository.findByUserId(userId)
+        return userPaymentProfileRepository.findByUserExternalId(userExternalId)
                 .map(userPaymentProfileMapper::toDTO)
                 .orElseGet(() -> {
-                    log.info("Creating payment profile for user: {}", userId);
+                    log.info("Creating payment profile for user with externalId: {}", userExternalId);
                     
-                    // Fetch user details from auth-service
-                    UserDTO user = authServiceClient.getUserById(userId);
+                    // Create customer in active payment provider
+                    String customerId = paymentProviderService.createCustomer(userExternalId, userEmail);
                     
-                    // Create Stripe customer
-                    String stripeCustomerId = stripeService.createCustomer(userId, user.getEmail());
+                    // Create profile with provider-specific customer ID
+                    UserPaymentProfile.UserPaymentProfileBuilder profileBuilder = UserPaymentProfile.builder()
+                            .userExternalId(userExternalId)
+                            .isActive(true);
                     
-                    // Create profile
-                    UserPaymentProfile profile = UserPaymentProfile.builder()
-                            .userId(userId)
-                            .stripeCustomerId(stripeCustomerId)
-                            .isActive(true)
-                            .build();
+                    // Set the appropriate customer ID based on active provider
+                    if (paymentProviderService.isStripeActive()) {
+                        profileBuilder.stripeCustomerId(customerId);
+                    } else if (paymentProviderService.isMultiSafepayActive()) {
+                        profileBuilder.multiSafepayCustomerId(customerId);
+                    }
                     
+                    UserPaymentProfile profile = profileBuilder.build();
                     UserPaymentProfile savedProfile = userPaymentProfileRepository.save(profile);
-                    log.info("Created payment profile: {} with Stripe customer: {}", 
-                            savedProfile.getId(), stripeCustomerId);
+                    
+                    log.info("Created payment profile: {} with {} customer: {}", 
+                            savedProfile.getId(), paymentProviderService.getActiveProvider(), customerId);
                     
                     return userPaymentProfileMapper.toDTO(savedProfile);
                 });
@@ -106,10 +107,16 @@ public class UserPaymentProfileService {
 
     @Transactional
     public UserPaymentProfileDTO create(UserPaymentProfileDTO dto) {
-        // Validate user exists
-        authServiceClient.getUserById(dto.getUserId());
-        
         UserPaymentProfile profile = userPaymentProfileMapper.toEntity(dto);
+        
+        // External ID is provided directly in the DTO
+        log.debug("Creating payment profile with userExternalId: {}", dto.getUserExternalId());
+        
+        if (dto.getUserExternalId() == null) {
+            throw new IllegalArgumentException("User external ID is required");
+        }
+        
+        profile.sanitizeForCreate();
         UserPaymentProfile savedProfile = userPaymentProfileRepository.save(profile);
         return userPaymentProfileMapper.toDTO(savedProfile);
     }
@@ -140,8 +147,13 @@ public class UserPaymentProfileService {
     }
 
     private void checkProfileAccess(UserPaymentProfile profile) {
-        if (!securityService.isAdmin() && !securityService.hasAccessToUser(profile.getUserId())) {
+        // Only admins can access profiles for now (since we're using externalIds)
+        if (!securityService.isAdmin()) {
             throw new UnauthorizedException("You don't have permission to access this profile");
         }
     }
 }
+
+
+
+

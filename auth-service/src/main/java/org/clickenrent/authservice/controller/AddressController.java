@@ -18,7 +18,7 @@ import java.util.List;
  * REST controller for Address management operations.
  */
 @RestController
-@RequestMapping("/api/addresses")
+@RequestMapping("/api/v1/addresses")
 @RequiredArgsConstructor
 @Tag(name = "Address", description = "Address management endpoints")
 @SecurityRequirement(name = "bearerAuth")
@@ -52,15 +52,16 @@ public class AddressController {
     }
     
     /**
-     * Get addresses by city ID.
-     * GET /api/addresses/by-city/{cityId}
+     * Get address by external ID.
+     * GET /api/addresses/external/{externalId}
+     * Access: SUPERADMIN/ADMIN can see all, B2B/CUSTOMER can see only their own addresses
      */
-    @GetMapping("/by-city/{cityId}")
-    @PreAuthorize("hasAnyRole('SUPERADMIN', 'ADMIN')")
-    @Operation(summary = "Get addresses by city", description = "Retrieve all addresses in a specific city")
-    public ResponseEntity<List<AddressDTO>> getAddressesByCityId(@PathVariable Long cityId) {
-        List<AddressDTO> addresses = addressService.getAddressesByCityId(cityId);
-        return ResponseEntity.ok(addresses);
+    @GetMapping("/external/{externalId}")
+    @PreAuthorize("hasAnyRole('SUPERADMIN', 'ADMIN', 'B2B', 'CUSTOMER')")
+    @Operation(summary = "Get address by external ID", description = "Retrieve a specific address by its external ID")
+    public ResponseEntity<AddressDTO> getAddressByExternalId(@PathVariable String externalId) {
+        AddressDTO address = addressService.getAddressByExternalId(externalId);
+        return ResponseEntity.ok(address);
     }
     
     /**

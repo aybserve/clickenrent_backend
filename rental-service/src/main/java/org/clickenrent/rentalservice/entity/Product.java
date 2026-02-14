@@ -6,10 +6,12 @@ import lombok.experimental.SuperBuilder;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
 
+import java.util.UUID;
+
 /**
  * Abstract base class for all product types.
- * Uses SINGLE_TABLE inheritance strategy for best performance.
- * Subclasses: Bike, ChargingStation, Part, ServiceProduct
+ * Uses JOINED inheritance strategy for clean separation of concerns.
+ * Subclasses: BikeModel, ChargingStationModel, Part, ServiceProduct, Bike, ChargingStation
  */
 @Entity
 @Table(
@@ -19,7 +21,7 @@ import org.hibernate.annotations.Where;
         @Index(name = "idx_product_type", columnList = "product_type")
     }
 )
-@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+@Inheritance(strategy = InheritanceType.JOINED)
 @DiscriminatorColumn(name = "product_type", discriminatorType = DiscriminatorType.STRING)
 @SQLDelete(sql = "UPDATE product SET is_deleted = true WHERE id = ?")
 @Where(clause = "is_deleted = false")
@@ -42,5 +44,15 @@ public abstract class Product extends BaseAuditEntity {
     @Builder.Default
     @Column(name = "is_b2b_rentable", nullable = false)
     private Boolean isB2BRentable = false;
+
+    @PrePersist
+    public void prePersist() {
+        if (externalId == null || externalId.isEmpty()) {
+            externalId = UUID.randomUUID().toString();
+        }
+        if (getIsDeleted() == null) {
+            setIsDeleted(false);
+        }
+    }
 }
 

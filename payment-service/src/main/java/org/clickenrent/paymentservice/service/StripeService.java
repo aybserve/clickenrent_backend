@@ -36,22 +36,22 @@ public class StripeService {
     /**
      * Create a Stripe customer
      * 
-     * @param userId User ID for metadata
+     * @param userExternalId User external ID for metadata
      * @param email Customer email
      * @return Stripe customer ID
      */
-    public String createCustomer(Long userId, String email) {
+    public String createCustomer(String userExternalId, String email) {
         try {
             CustomerCreateParams params = CustomerCreateParams.builder()
                     .setEmail(email)
-                    .putMetadata("userId", userId.toString())
+                    .putMetadata("userExternalId", userExternalId)
                     .build();
 
             Customer customer = Customer.create(params);
-            log.info("Created Stripe customer: {} for user: {}", customer.getId(), userId);
+            log.info("Created Stripe customer: {} for user: {}", customer.getId(), userExternalId);
             return customer.getId();
         } catch (StripeException e) {
-            log.error("Failed to create Stripe customer for user: {}", userId, e);
+            log.error("Failed to create Stripe customer for user: {}", userExternalId, e);
             throw new StripeIntegrationException("Failed to create Stripe customer: " + e.getMessage(), e);
         }
     }
@@ -220,3 +220,7 @@ public class StripeService {
         }
     }
 }
+
+
+
+

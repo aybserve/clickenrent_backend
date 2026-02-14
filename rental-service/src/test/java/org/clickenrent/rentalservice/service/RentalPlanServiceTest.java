@@ -63,7 +63,7 @@ class RentalPlanServiceTest {
 
         testLocation = Location.builder()
         .id(1L)
-        .companyId(1L)
+        .companyExternalId("company-ext-001")
         .build();
 
         testPlan = RentalPlan.builder()
@@ -158,3 +158,7 @@ class RentalPlanServiceTest {
         verify(rentalPlanRepository, times(1)).delete(testPlan);
     }
 }
+
+
+
+

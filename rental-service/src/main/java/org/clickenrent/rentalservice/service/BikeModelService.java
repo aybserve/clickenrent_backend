@@ -40,6 +40,7 @@ public class BikeModelService {
         }
 
         BikeModel bikeModel = bikeModelMapper.toEntity(dto);
+        bikeModel.sanitizeForCreate();
         bikeModel = bikeModelRepository.save(bikeModel);
         return bikeModelMapper.toDto(bikeModel);
     }
@@ -68,4 +69,19 @@ public class BikeModelService {
                 .orElseThrow(() -> new ResourceNotFoundException("BikeModel", "id", id));
         bikeModelRepository.delete(bikeModel);
     }
+
+    @Transactional(readOnly = true)
+    public BikeModelDTO findByExternalId(String externalId) {
+        BikeModel bikeModel = bikeModelRepository.findByExternalId(externalId)
+                .orElseThrow(() -> new ResourceNotFoundException("BikeModel", "externalId", externalId));
+        return bikeModelMapper.toDto(bikeModel);
+    }
 }
+
+
+
+
+
+
+
+

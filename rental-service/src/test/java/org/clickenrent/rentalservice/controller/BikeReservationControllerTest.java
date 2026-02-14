@@ -48,7 +48,7 @@ class BikeReservationControllerTest {
         reservationDTO = BikeReservationDTO.builder()
                 .id(1L)
                 .externalId("BRES001")
-                .userId(1L)
+                .userExternalId("usr-ext-00001")
                 .bikeId(1L)
                 .startDateTime(LocalDateTime.now().plusDays(1))
                 .endDateTime(LocalDateTime.now().plusDays(2))
@@ -92,7 +92,7 @@ class BikeReservationControllerTest {
     @WithMockUser(roles = "CUSTOMER")
     void getReservationsByUser_WithCustomerRole_ReturnsOk() throws Exception {
         // Given
-        when(bikeReservationService.getReservationsByUser(1L)).thenReturn(Arrays.asList(reservationDTO));
+        when(bikeReservationService.getReservationsByUserExternalId("usr-ext-00001")).thenReturn(Arrays.asList(reservationDTO));
 
         // When & Then
         mockMvc.perform(get("/api/bike-reservations/by-user/1")
@@ -100,21 +100,21 @@ class BikeReservationControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].id").value(1L));
 
-        verify(bikeReservationService, times(1)).getReservationsByUser(1L);
+        verify(bikeReservationService, times(1)).getReservationsByUserExternalId("usr-ext-00001");
     }
 
     @Test
     @WithMockUser(roles = "ADMIN")
     void getReservationsByUser_WithAdminRole_ReturnsOk() throws Exception {
         // Given
-        when(bikeReservationService.getReservationsByUser(1L)).thenReturn(Arrays.asList(reservationDTO));
+        when(bikeReservationService.getReservationsByUserExternalId("usr-ext-00001")).thenReturn(Arrays.asList(reservationDTO));
 
         // When & Then
         mockMvc.perform(get("/api/bike-reservations/by-user/1")
                         .with(csrf()))
                 .andExpect(status().isOk());
 
-        verify(bikeReservationService, times(1)).getReservationsByUser(1L);
+        verify(bikeReservationService, times(1)).getReservationsByUserExternalId("usr-ext-00001");
     }
 
     @Test
@@ -152,7 +152,7 @@ class BikeReservationControllerTest {
     void createReservation_WithCustomerRole_ReturnsCreated() throws Exception {
         // Given
         BikeReservationDTO newReservation = BikeReservationDTO.builder()
-                .userId(1L)
+                .userExternalId("usr-ext-00001")
                 .bikeId(2L)
                 .startDateTime(LocalDateTime.now().plusDays(1))
                 .endDateTime(LocalDateTime.now().plusDays(2))
@@ -161,7 +161,7 @@ class BikeReservationControllerTest {
         BikeReservationDTO createdReservation = BikeReservationDTO.builder()
                 .id(2L)
                 .externalId("BRES002")
-                .userId(1L)
+                .userExternalId("usr-ext-00001")
                 .bikeId(2L)
                 .startDateTime(LocalDateTime.now().plusDays(1))
                 .endDateTime(LocalDateTime.now().plusDays(2))
@@ -223,3 +223,7 @@ class BikeReservationControllerTest {
 
         verify(bikeReservationService, times(1)).deleteReservation(1L);}
 }
+
+
+
+

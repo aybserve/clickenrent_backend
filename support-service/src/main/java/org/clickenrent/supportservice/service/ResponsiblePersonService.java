@@ -38,6 +38,13 @@ public class ResponsiblePersonService {
         return responsiblePersonMapper.toDto(entity);
     }
 
+    @Transactional(readOnly = true)
+    public ResponsiblePersonDTO getByExternalId(String externalId) {
+        ResponsiblePerson entity = responsiblePersonRepository.findByExternalId(externalId)
+                .orElseThrow(() -> new ResourceNotFoundException("ResponsiblePerson", "externalId", externalId));
+        return responsiblePersonMapper.toDto(entity);
+    }
+
     @Transactional
     public ResponsiblePersonDTO create(ResponsiblePersonDTO dto) {
         if (!securityService.isAdmin()) {
@@ -45,6 +52,7 @@ public class ResponsiblePersonService {
         }
 
         ResponsiblePerson entity = responsiblePersonMapper.toEntity(dto);
+        entity.sanitizeForCreate();
         entity = responsiblePersonRepository.save(entity);
         return responsiblePersonMapper.toDto(entity);
     }
@@ -74,3 +82,11 @@ public class ResponsiblePersonService {
         responsiblePersonRepository.delete(entity);
     }
 }
+
+
+
+
+
+
+
+

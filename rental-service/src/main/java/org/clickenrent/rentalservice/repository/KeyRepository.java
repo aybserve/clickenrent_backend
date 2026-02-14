@@ -16,3 +16,11 @@ public interface KeyRepository extends JpaRepository<Key, Long> {
     Optional<Key> findByExternalId(String externalId);
     List<Key> findByLock(Lock lock);
 }
+
+
+
+
+
+
+
+

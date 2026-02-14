@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.clickenrent.supportservice.dto.BikeIssueDTO;
 import org.clickenrent.supportservice.entity.BikeIssue;
 import org.clickenrent.supportservice.repository.BikeIssueRepository;
+import org.clickenrent.supportservice.repository.BikeUnitRepository;
 import org.clickenrent.supportservice.repository.ResponsiblePersonRepository;
 import org.springframework.stereotype.Component;
 
@@ -16,6 +17,7 @@ public class BikeIssueMapper {
 
     private final BikeIssueRepository bikeIssueRepository;
     private final ResponsiblePersonRepository responsiblePersonRepository;
+    private final BikeUnitRepository bikeUnitRepository;
 
     public BikeIssueDTO toDto(BikeIssue entity) {
         if (entity == null) {
@@ -25,12 +27,15 @@ public class BikeIssueMapper {
         return BikeIssueDTO.builder()
                 .id(entity.getId())
                 .externalId(entity.getExternalId())
+                .erpExternalId(entity.getErpExternalId())
                 .name(entity.getName())
                 .description(entity.getDescription())
                 .parentBikeIssueId(entity.getParentBikeIssue() != null ? entity.getParentBikeIssue().getId() : null)
                 .isFixableByClient(entity.getIsFixableByClient())
                 .responsiblePersonId(entity.getResponsiblePerson() != null ? entity.getResponsiblePerson().getId() : null)
                 .responsiblePersonName(entity.getResponsiblePerson() != null ? entity.getResponsiblePerson().getName() : null)
+                .bikeUnitId(entity.getBikeUnit() != null ? entity.getBikeUnit().getId() : null)
+                .bikeUnitName(entity.getBikeUnit() != null ? entity.getBikeUnit().getName() : null)
                 .dateCreated(entity.getDateCreated())
                 .lastDateModified(entity.getLastDateModified())
                 .createdBy(entity.getCreatedBy())
@@ -46,6 +51,7 @@ public class BikeIssueMapper {
         BikeIssue.BikeIssueBuilder<?, ?> builder = BikeIssue.builder()
                 .id(dto.getId())
                 .externalId(dto.getExternalId())
+                .erpExternalId(dto.getErpExternalId())
                 .name(dto.getName())
                 .description(dto.getDescription())
                 .isFixableByClient(dto.getIsFixableByClient());
@@ -56,6 +62,9 @@ public class BikeIssueMapper {
         if (dto.getResponsiblePersonId() != null) {
             builder.responsiblePerson(responsiblePersonRepository.findById(dto.getResponsiblePersonId()).orElse(null));
         }
+        if (dto.getBikeUnitId() != null) {
+            builder.bikeUnit(bikeUnitRepository.findById(dto.getBikeUnitId()).orElse(null));
+        }
 
         return builder.build();
     }
@@ -65,6 +74,9 @@ public class BikeIssueMapper {
             return;
         }
 
+        if (dto.getErpExternalId() != null) {
+            entity.setErpExternalId(dto.getErpExternalId());
+        }
         if (dto.getName() != null) {
             entity.setName(dto.getName());
         }
@@ -80,5 +92,16 @@ public class BikeIssueMapper {
         if (dto.getResponsiblePersonId() != null) {
             responsiblePersonRepository.findById(dto.getResponsiblePersonId()).ifPresent(entity::setResponsiblePerson);
         }
+        if (dto.getBikeUnitId() != null) {
+            bikeUnitRepository.findById(dto.getBikeUnitId()).ifPresent(entity::setBikeUnit);
+        }
     }
 }
+
+
+
+
+
+
+
+

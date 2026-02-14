@@ -17,9 +17,9 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/bike-models")
+@RequestMapping("/api/v1/bike-models")
 @RequiredArgsConstructor
-@Tag(name = "BikeModel", description = "Bike model management")
+@Tag(name = "Bike Models", description = "Bike model management")
 @SecurityRequirement(name = "bearerAuth")
 public class BikeModelController {
 
@@ -61,4 +61,19 @@ public class BikeModelController {
         bikeModelService.deleteBikeModel(id);
         return ResponseEntity.noContent().build();
     }
+
+    @GetMapping("/external/{externalId}")
+    @PreAuthorize("isAuthenticated()")
+    @Operation(summary = "Get bike model by external ID", description = "Retrieve bike model by external ID for cross-service communication")
+    public ResponseEntity<BikeModelDTO> getByExternalId(@PathVariable String externalId) {
+        return ResponseEntity.ok(bikeModelService.findByExternalId(externalId));
+    }
 }
+
+
+
+
+
+
+
+

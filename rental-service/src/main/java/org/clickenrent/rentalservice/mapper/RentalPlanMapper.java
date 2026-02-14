@@ -24,12 +24,17 @@ public class RentalPlanMapper {
 
         return RentalPlanDTO.builder()
                 .id(rentalPlan.getId())
+                .externalId(rentalPlan.getExternalId())
                 .name(rentalPlan.getName())
                 .rentalUnitId(rentalPlan.getRentalUnit() != null ? rentalPlan.getRentalUnit().getId() : null)
                 .minUnit(rentalPlan.getMinUnit())
                 .maxUnit(rentalPlan.getMaxUnit())
                 .locationId(rentalPlan.getLocation() != null ? rentalPlan.getLocation().getId() : null)
                 .defaultPrice(rentalPlan.getDefaultPrice())
+                .dateCreated(rentalPlan.getDateCreated())
+                .lastDateModified(rentalPlan.getLastDateModified())
+                .createdBy(rentalPlan.getCreatedBy())
+                .lastModifiedBy(rentalPlan.getLastModifiedBy())
                 .build();
     }
 
@@ -40,6 +45,7 @@ public class RentalPlanMapper {
 
         RentalPlan.RentalPlanBuilder builder = RentalPlan.builder()
                 .id(dto.getId())
+                .externalId(dto.getExternalId())
                 .name(dto.getName())
                 .minUnit(dto.getMinUnit())
                 .maxUnit(dto.getMaxUnit())
@@ -60,6 +66,9 @@ public class RentalPlanMapper {
             return;
         }
 
+        if (dto.getExternalId() != null) {
+            rentalPlan.setExternalId(dto.getExternalId());
+        }
         if (dto.getName() != null) {
             rentalPlan.setName(dto.getName());
         }

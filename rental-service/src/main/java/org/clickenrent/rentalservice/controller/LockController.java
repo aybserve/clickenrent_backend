@@ -6,6 +6,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.clickenrent.rentalservice.dto.LockDTO;
+import org.clickenrent.rentalservice.dto.LockStatusResponseDTO;
 import org.clickenrent.rentalservice.service.LockService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -17,7 +18,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/locks")
+@RequestMapping("/api/v1/locks")
 @RequiredArgsConstructor
 @Tag(name = "Lock", description = "Bike lock management (Admin only)")
 @SecurityRequirement(name = "bearerAuth")
@@ -60,5 +61,23 @@ public class LockController {
     public ResponseEntity<Void> deleteLock(@PathVariable Long id) {
         lockService.deleteLock(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/{lockId}/status")
+    @PreAuthorize("isAuthenticated()")
+    @Operation(
+            summary = "Get lock status",
+            description = "Returns current lock status including battery level and last seen timestamp"
+    )
+    public ResponseEntity<LockStatusResponseDTO> getLockStatus(@PathVariable Long lockId) {
+        LockStatusResponseDTO response = lockService.getLockStatus(lockId);
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/external/{externalId}")
+    @PreAuthorize("isAuthenticated()")
+    @Operation(summary = "Get lock by external ID", description = "Retrieve lock by external ID for cross-service communication")
+    public ResponseEntity<LockDTO> getByExternalId(@PathVariable String externalId) {
+        return ResponseEntity.ok(lockService.findByExternalId(externalId));
     }
 }

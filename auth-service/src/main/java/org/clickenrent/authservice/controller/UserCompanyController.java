@@ -25,9 +25,9 @@ import java.util.List;
  * - CUSTOMER: Can only view their own company associations
  */
 @RestController
-@RequestMapping("/api/user-companies")
+@RequestMapping("/api/v1/user-companies")
 @RequiredArgsConstructor
-@Tag(name = "User-Company", description = "User-Company management endpoints")
+@Tag(name = "User Company", description = "User Company management endpoints")
 @SecurityRequirement(name = "bearerAuth")
 public class UserCompanyController {
     
@@ -48,6 +48,18 @@ public class UserCompanyController {
                 request.getCompanyRoleId()
         );
         return new ResponseEntity<>(userCompany, HttpStatus.CREATED);
+    }
+    
+    /**
+     * Get user-company link by external ID.
+     * GET /api/user-companies/external/{externalId}
+     * Requires: Authentication
+     */
+    @GetMapping("/external/{externalId}")
+    @PreAuthorize("hasAnyRole('SUPERADMIN', 'ADMIN', 'B2B')")
+    public ResponseEntity<UserCompanyDTO> getUserCompanyByExternalId(@PathVariable String externalId) {
+        UserCompanyDTO userCompany = userCompanyService.getUserCompanyByExternalId(externalId);
+        return ResponseEntity.ok(userCompany);
     }
     
     /**

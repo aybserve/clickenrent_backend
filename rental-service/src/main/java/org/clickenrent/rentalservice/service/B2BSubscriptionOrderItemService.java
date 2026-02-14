@@ -59,6 +59,7 @@ public class B2BSubscriptionOrderItemService {
         }
 
         B2BSubscriptionOrderItem item = b2bSubscriptionOrderItemMapper.toEntity(dto);
+        item.sanitizeForCreate();
         item = b2bSubscriptionOrderItemRepository.save(item);
         return b2bSubscriptionOrderItemMapper.toDto(item);
     }
@@ -87,4 +88,19 @@ public class B2BSubscriptionOrderItemService {
                 .orElseThrow(() -> new ResourceNotFoundException("B2BSubscriptionOrderItem", "id", id));
         b2bSubscriptionOrderItemRepository.delete(item);
     }
+
+    @Transactional(readOnly = true)
+    public B2BSubscriptionOrderItemDTO findByExternalId(String externalId) {
+        B2BSubscriptionOrderItem item = b2bSubscriptionOrderItemRepository.findByExternalId(externalId)
+                .orElseThrow(() -> new ResourceNotFoundException("B2BSubscriptionOrderItem", "externalId", externalId));
+        return b2bSubscriptionOrderItemMapper.toDto(item);
+    }
 }
+
+
+
+
+
+
+
+

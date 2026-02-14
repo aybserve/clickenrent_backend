@@ -7,6 +7,7 @@ import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.info.License;
 import io.swagger.v3.oas.models.security.SecurityRequirement;
 import io.swagger.v3.oas.models.security.SecurityScheme;
+import io.swagger.v3.oas.models.servers.Server;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -22,6 +23,9 @@ public class OpenApiConfig {
     @Bean
     public OpenAPI authServiceOpenAPI() {
         return new OpenAPI()
+                .addServersItem(new Server()
+                        .url("/")
+                        .description("Current Server"))
                 .info(new Info()
                         .title("Click & Rent Auth Service API")
                         .description("Authentication and Authorization Service for Click & Rent Platform. " +
@@ -46,5 +50,9 @@ public class OpenApiConfig {
                         .addList(SECURITY_SCHEME_NAME));
     }
 }
+
+
+
+
 
 

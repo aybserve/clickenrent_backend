@@ -18,7 +18,7 @@ import java.util.List;
  * REST controller for managing SupportRequestBikeIssue junction entities.
  */
 @RestController
-@RequestMapping("/api/support-request-bike-issues")
+@RequestMapping("/api/v1/support-request-bike-issues")
 @RequiredArgsConstructor
 @Tag(name = "Support Request Bike Issue", description = "Support request bike issue link management")
 @SecurityRequirement(name = "bearerAuth")
@@ -38,6 +38,13 @@ public class SupportRequestBikeIssueController {
     @Operation(summary = "Get support request bike issue link by ID")
     public ResponseEntity<SupportRequestBikeIssueDTO> getById(@PathVariable Long id) {
         return ResponseEntity.ok(supportRequestBikeIssueService.getById(id));
+    }
+
+    @GetMapping("/external/{externalId}")
+    @PreAuthorize("isAuthenticated()")
+    @Operation(summary = "Get support request bike issue link by external ID")
+    public ResponseEntity<SupportRequestBikeIssueDTO> getByExternalId(@PathVariable String externalId) {
+        return ResponseEntity.ok(supportRequestBikeIssueService.getByExternalId(externalId));
     }
 
     @GetMapping("/support-request/{supportRequestId}")
@@ -69,3 +76,11 @@ public class SupportRequestBikeIssueController {
         return ResponseEntity.noContent().build();
     }
 }
+
+
+
+
+
+
+
+

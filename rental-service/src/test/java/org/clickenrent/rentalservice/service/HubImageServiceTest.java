@@ -47,7 +47,7 @@ class HubImageServiceTest {
 
     @BeforeEach
     void setUp() {
-        Location testLocation = Location.builder().id(1L).companyId(1L).build();
+        Location testLocation = Location.builder().id(1L).companyExternalId("company-ext-001").build();
         testHub = Hub.builder().id(1L).location(testLocation).build();
         
         testImage = HubImage.builder()
@@ -153,3 +153,7 @@ class HubImageServiceTest {
         assertThrows(ResourceNotFoundException.class, () -> hubImageService.deleteImage(999L));
     }
 }
+
+
+
+

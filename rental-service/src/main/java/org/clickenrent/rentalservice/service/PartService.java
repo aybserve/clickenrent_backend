@@ -40,6 +40,7 @@ public class PartService {
         }
 
         Part part = partMapper.toEntity(dto);
+        part.sanitizeForCreate();
         part = partRepository.save(part);
         return partMapper.toDto(part);
     }
@@ -68,4 +69,19 @@ public class PartService {
                 .orElseThrow(() -> new ResourceNotFoundException("Part", "id", id));
         partRepository.delete(part);
     }
+
+    @Transactional(readOnly = true)
+    public PartDTO findByExternalId(String externalId) {
+        Part part = partRepository.findByExternalId(externalId)
+                .orElseThrow(() -> new ResourceNotFoundException("Part", "externalId", externalId));
+        return partMapper.toDto(part);
+    }
 }
+
+
+
+
+
+
+
+

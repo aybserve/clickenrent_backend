@@ -25,8 +25,12 @@ public class B2BSaleFinTransactionMapper {
         return B2BSaleFinTransactionDTO.builder()
                 .id(entity.getId())
                 .externalId(entity.getExternalId())
-                .b2bSaleId(entity.getB2bSaleId())
+                .b2bSaleExternalId(entity.getB2bSaleExternalId())
                 .financialTransaction(financialTransactionMapper.toDTO(entity.getFinancialTransaction()))
+                .dateCreated(entity.getDateCreated())
+                .lastDateModified(entity.getLastDateModified())
+                .createdBy(entity.getCreatedBy())
+                .lastModifiedBy(entity.getLastModifiedBy())
                 .build();
     }
 
@@ -38,7 +42,7 @@ public class B2BSaleFinTransactionMapper {
         return B2BSaleFinTransaction.builder()
                 .id(dto.getId())
                 .externalId(dto.getExternalId())
-                .b2bSaleId(dto.getB2bSaleId())
+                .b2bSaleExternalId(dto.getB2bSaleExternalId())
                 .financialTransaction(financialTransactionMapper.toEntity(dto.getFinancialTransaction()))
                 .build();
     }
@@ -53,3 +57,7 @@ public class B2BSaleFinTransactionMapper {
                 .collect(Collectors.toList());
     }
 }
+
+
+
+

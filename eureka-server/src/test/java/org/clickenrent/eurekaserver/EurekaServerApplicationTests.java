@@ -12,3 +12,11 @@ class EurekaServerApplicationTests {
 }
 
 
+
+
+
+
+
+
+
+

@@ -42,6 +42,7 @@ public class ServiceService {
         }
 
         Service service = serviceMapper.toEntity(dto);
+        service.sanitizeForCreate();
         service = serviceRepository.save(service);
         return serviceMapper.toDto(service);
     }
@@ -70,4 +71,19 @@ public class ServiceService {
                 .orElseThrow(() -> new ResourceNotFoundException("Service", "id", id));
         serviceRepository.delete(service);
     }
+
+    @Transactional(readOnly = true)
+    public ServiceDTO findByExternalId(String externalId) {
+        Service service = serviceRepository.findByExternalId(externalId)
+                .orElseThrow(() -> new ResourceNotFoundException("Service", "externalId", externalId));
+        return serviceMapper.toDto(service);
+    }
 }
+
+
+
+
+
+
+
+

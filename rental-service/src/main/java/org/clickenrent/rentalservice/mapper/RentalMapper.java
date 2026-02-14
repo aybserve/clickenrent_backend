@@ -23,10 +23,10 @@ public class RentalMapper {
         return RentalDTO.builder()
                 .id(rental.getId())
                 .externalId(rental.getExternalId())
-                .userId(rental.getUserId())
-                .companyId(rental.getCompanyId())
                 .rentalStatusId(rental.getRentalStatus() != null ? rental.getRentalStatus().getId() : null)
                 .erpRentalOrderId(rental.getErpRentalOrderId())
+                .userExternalId(rental.getUserExternalId())
+                .companyExternalId(rental.getCompanyExternalId())
                 .dateCreated(rental.getDateCreated())
                 .lastDateModified(rental.getLastDateModified())
                 .createdBy(rental.getCreatedBy())
@@ -42,8 +42,8 @@ public class RentalMapper {
         Rental.RentalBuilder builder = Rental.builder()
                 .id(dto.getId())
                 .externalId(dto.getExternalId())
-                .userId(dto.getUserId())
-                .companyId(dto.getCompanyId())
+                .userExternalId(dto.getUserExternalId())
+                .companyExternalId(dto.getCompanyExternalId())
                 .erpRentalOrderId(dto.getErpRentalOrderId());
 
         if (dto.getRentalStatusId() != null) {
@@ -63,3 +63,7 @@ public class RentalMapper {
         }
     }
 }
+
+
+
+

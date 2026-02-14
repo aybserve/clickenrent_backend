@@ -19,9 +19,9 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/b2b-sales")
+@RequestMapping("/api/v1/b2b-sales")
 @RequiredArgsConstructor
-@Tag(name = "B2BSale", description = "B2B sales management")
+@Tag(name = "B2B Sale", description = "B2B sales management")
 @SecurityRequirement(name = "bearerAuth")
 public class B2BSaleController {
 
@@ -31,7 +31,7 @@ public class B2BSaleController {
     @PreAuthorize("hasAnyRole('SUPERADMIN', 'ADMIN')")
     @Operation(summary = "Get all B2B sales")
     public ResponseEntity<Page<B2BSaleDTO>> getAllSales(
-            @PageableDefault(size = 20, sort = "dateTime", direction = Sort.Direction.DESC) Pageable pageable) {
+            @PageableDefault(size = 20, sort = "dateCreated", direction = Sort.Direction.DESC) Pageable pageable) {
         return ResponseEntity.ok(b2bSaleService.getAllSales(pageable));
     }
 
@@ -47,6 +47,28 @@ public class B2BSaleController {
     @Operation(summary = "Get B2B sale by ID")
     public ResponseEntity<B2BSaleDTO> getSaleById(@PathVariable Long id) {
         return ResponseEntity.ok(b2bSaleService.getSaleById(id));
+    }
+
+    @GetMapping("/{id}/exists")
+    @PreAuthorize("isAuthenticated()")
+    @Operation(summary = "Check if B2B sale exists by ID")
+    public ResponseEntity<Boolean> checkSaleExists(@PathVariable Long id) {
+        boolean exists = b2bSaleService.getSaleById(id) != null;
+        return ResponseEntity.ok(exists);
+    }
+
+    @GetMapping("/external/{externalId}")
+    @PreAuthorize("hasAnyRole('SUPERADMIN', 'ADMIN', 'B2B')")
+    @Operation(summary = "Get B2B sale by external ID")
+    public ResponseEntity<B2BSaleDTO> getSaleByExternalId(@PathVariable String externalId) {
+        return ResponseEntity.ok(b2bSaleService.findByExternalId(externalId));
+    }
+
+    @GetMapping("/external/{externalId}/exists")
+    @PreAuthorize("isAuthenticated()")
+    @Operation(summary = "Check if B2B sale exists by external ID")
+    public ResponseEntity<Boolean> checkSaleExistsByExternalId(@PathVariable String externalId) {
+        return ResponseEntity.ok(b2bSaleService.existsByExternalId(externalId));
     }
 
     @PostMapping

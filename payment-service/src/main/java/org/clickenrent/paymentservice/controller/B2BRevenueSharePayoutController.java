@@ -9,14 +9,14 @@ import org.clickenrent.paymentservice.service.B2BRevenueSharePayoutService;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/b2b-revenue-share-payouts")
+@RequestMapping("/api/v1/b2b-revenue-share-payouts")
 @RequiredArgsConstructor
 @Tag(name = "B2B Revenue Share Payout", description = "B2B revenue share payout management API")
 public class B2BRevenueSharePayoutController {
@@ -30,21 +30,23 @@ public class B2BRevenueSharePayoutController {
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'SUPERADMIN')")
     @Operation(summary = "Get payout by ID")
     public ResponseEntity<B2BRevenueSharePayoutDTO> getById(@PathVariable Long id) {
         return ResponseEntity.ok(b2bRevenueSharePayoutService.findById(id));
     }
 
     @GetMapping("/external/{externalId}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'SUPERADMIN')")
     @Operation(summary = "Get payout by external ID")
-    public ResponseEntity<B2BRevenueSharePayoutDTO> getByExternalId(@PathVariable UUID externalId) {
+    public ResponseEntity<B2BRevenueSharePayoutDTO> getByExternalId(@PathVariable String externalId) {
         return ResponseEntity.ok(b2bRevenueSharePayoutService.findByExternalId(externalId));
     }
 
-    @GetMapping("/company/{companyId}")
-    @Operation(summary = "Get payouts by company ID")
-    public ResponseEntity<List<B2BRevenueSharePayoutDTO>> getByCompanyId(@PathVariable Long companyId) {
-        return ResponseEntity.ok(b2bRevenueSharePayoutService.findByCompanyId(companyId));
+    @GetMapping("/company/{companyExternalId}")
+    @Operation(summary = "Get payouts by company external ID")
+    public ResponseEntity<List<B2BRevenueSharePayoutDTO>> getByCompanyExternalId(@PathVariable String companyExternalId) {
+        return ResponseEntity.ok(b2bRevenueSharePayoutService.findByCompanyExternalId(companyExternalId));
     }
 
     @PostMapping
@@ -81,3 +83,7 @@ public class B2BRevenueSharePayoutController {
         return ResponseEntity.noContent().build();
     }
 }
+
+
+
+

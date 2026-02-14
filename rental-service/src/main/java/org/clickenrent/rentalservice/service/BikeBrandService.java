@@ -1,6 +1,7 @@
 package org.clickenrent.rentalservice.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.clickenrent.rentalservice.dto.BikeBrandDTO;
 import org.clickenrent.rentalservice.entity.BikeBrand;
 import org.clickenrent.rentalservice.exception.ResourceNotFoundException;
@@ -14,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class BikeBrandService {
@@ -29,12 +31,12 @@ public class BikeBrandService {
     }
 
     @Transactional(readOnly = true)
-    public List<BikeBrandDTO> getBikeBrandsByCompany(Long companyId) {
-        if (!securityService.isAdmin() && !securityService.hasAccessToCompany(companyId)) {
+    public List<BikeBrandDTO> getBikeBrandsByCompanyExternalId(String companyExternalId) {
+        if (!securityService.isAdmin() && !securityService.hasAccessToCompanyByExternalId(companyExternalId)) {
             throw new UnauthorizedException("You don't have permission to view brands for this company");
         }
 
-        return bikeBrandRepository.findByCompanyId(companyId).stream()
+        return bikeBrandRepository.findByCompanyExternalId(companyExternalId).stream()
                 .map(bikeBrandMapper::toDto)
                 .toList();
     }
@@ -48,11 +50,12 @@ public class BikeBrandService {
 
     @Transactional
     public BikeBrandDTO createBikeBrand(BikeBrandDTO dto) {
-        if (!securityService.isAdmin() && !securityService.hasAccessToCompany(dto.getCompanyId())) {
+        if (!securityService.isAdmin() && !securityService.hasAccessToCompanyByExternalId(dto.getCompanyExternalId())) {
             throw new UnauthorizedException("You don't have permission to create brands for this company");
         }
 
         BikeBrand bikeBrand = bikeBrandMapper.toEntity(dto);
+        bikeBrand.sanitizeForCreate();
         bikeBrand = bikeBrandRepository.save(bikeBrand);
         return bikeBrandMapper.toDto(bikeBrand);
     }
@@ -62,7 +65,7 @@ public class BikeBrandService {
         BikeBrand bikeBrand = bikeBrandRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("BikeBrand", "id", id));
 
-        if (!securityService.isAdmin() && !securityService.hasAccessToCompany(bikeBrand.getCompanyId())) {
+        if (!securityService.isAdmin() && !securityService.hasAccessToCompanyByExternalId(bikeBrand.getCompanyExternalId())) {
             throw new UnauthorizedException("You don't have permission to update this brand");
         }
 
@@ -82,4 +85,15 @@ public class BikeBrandService {
 
         bikeBrandRepository.delete(bikeBrand);
     }
+
+    @Transactional(readOnly = true)
+    public BikeBrandDTO getBikeBrandByExternalId(String externalId) {
+        BikeBrand bikeBrand = bikeBrandRepository.findByExternalId(externalId)
+                .orElseThrow(() -> new ResourceNotFoundException("BikeBrand", "externalId", externalId));
+        return bikeBrandMapper.toDto(bikeBrand);
+    }
 }
+
+
+
+

@@ -119,3 +119,11 @@ class RentalStatusServiceTest {
         verify(rentalStatusRepository, times(1)).delete(testStatus);
     }
 }
+
+
+
+
+
+
+
+

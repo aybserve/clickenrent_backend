@@ -76,6 +76,21 @@ public class JwtUtil {
     }
 
     /**
+     * Extract user external ID from token
+     */
+    public String extractUserExternalId(String token) {
+        return extractClaim(token, claims -> claims.get("userExternalId", String.class));
+    }
+
+    /**
+     * Extract company external IDs from token
+     */
+    @SuppressWarnings("unchecked")
+    public List<String> extractCompanyExternalIds(String token) {
+        return extractClaim(token, claims -> (List<String>) claims.get("companyExternalIds"));
+    }
+
+    /**
      * Extract expiration date from token
      */
     public Date extractExpiration(String token) {

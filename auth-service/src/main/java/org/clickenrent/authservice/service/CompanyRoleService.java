@@ -36,9 +36,19 @@ public class CompanyRoleService {
         return companyRoleMapper.toDto(companyRole);
     }
     
+    @Transactional(readOnly = true)
+    public CompanyRoleDTO getCompanyRoleByExternalId(String externalId) {
+        CompanyRole companyRole = companyRoleRepository.findByExternalId(externalId)
+                .orElseThrow(() -> new ResourceNotFoundException("CompanyRole", "externalId", externalId));
+        return companyRoleMapper.toDto(companyRole);
+    }
+    
     @Transactional
     public CompanyRoleDTO createCompanyRole(CompanyRoleDTO companyRoleDTO) {
         CompanyRole companyRole = companyRoleMapper.toEntity(companyRoleDTO);
+        // Sanitize server-managed fields
+        companyRole.setId(null);
+        companyRole.setExternalId(null);
         companyRole = companyRoleRepository.save(companyRole);
         return companyRoleMapper.toDto(companyRole);
     }
@@ -60,5 +70,13 @@ public class CompanyRoleService {
         companyRoleRepository.delete(companyRole);
     }
 }
+
+
+
+
+
+
+
+
 
 

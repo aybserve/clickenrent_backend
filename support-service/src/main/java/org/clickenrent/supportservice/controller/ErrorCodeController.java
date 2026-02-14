@@ -18,7 +18,7 @@ import java.util.List;
  * REST controller for managing ErrorCode entities.
  */
 @RestController
-@RequestMapping("/api/error-codes")
+@RequestMapping("/api/v1/error-codes")
 @RequiredArgsConstructor
 @Tag(name = "Error Code", description = "Error code management")
 @SecurityRequirement(name = "bearerAuth")
@@ -47,11 +47,11 @@ public class ErrorCodeController {
         return ResponseEntity.ok(errorCodeService.getByExternalId(externalId));
     }
 
-    @GetMapping("/bike-engine/{bikeEngineId}")
+    @GetMapping("/bike-engine/{bikeEngineExternalId}")
     @PreAuthorize("isAuthenticated()")
-    @Operation(summary = "Get error codes by bike engine ID")
-    public ResponseEntity<List<ErrorCodeDTO>> getByBikeEngineId(@PathVariable Long bikeEngineId) {
-        return ResponseEntity.ok(errorCodeService.getByBikeEngineId(bikeEngineId));
+    @Operation(summary = "Get error codes by bike engine external ID")
+    public ResponseEntity<List<ErrorCodeDTO>> getByBikeEngineExternalId(@PathVariable String bikeEngineExternalId) {
+        return ResponseEntity.ok(errorCodeService.getByBikeEngineExternalId(bikeEngineExternalId));
     }
 
     @PostMapping
@@ -76,3 +76,11 @@ public class ErrorCodeController {
         return ResponseEntity.noContent().build();
     }
 }
+
+
+
+
+
+
+
+

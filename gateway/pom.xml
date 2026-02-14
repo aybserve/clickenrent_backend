@@ -52,6 +52,24 @@
 			<scope>runtime</scope>
 		</dependency>
 
+	<!-- Spring Security for Reactive (WebFlux) -->
+	<dependency>
+		<groupId>org.springframework.boot</groupId>
+		<artifactId>spring-boot-starter-security</artifactId>
+	</dependency>
+
+	<!-- WebClient for HTTP calls to auth-service -->
+	<dependency>
+		<groupId>org.springframework.boot</groupId>
+		<artifactId>spring-boot-starter-webflux</artifactId>
+	</dependency>
+
+	<!-- Caffeine Cache for authentication caching -->
+	<dependency>
+		<groupId>com.github.ben-manes.caffeine</groupId>
+		<artifactId>caffeine</artifactId>
+	</dependency>
+
 	<!-- Utils -->
 	<dependency>
 		<groupId>org.projectlombok</groupId>
@@ -66,11 +84,45 @@
 		<version>2.3.0</version>
 	</dependency>
 
+	<!-- Redis for Rate Limiting -->
+	<dependency>
+		<groupId>org.springframework.boot</groupId>
+		<artifactId>spring-boot-starter-data-redis-reactive</artifactId>
+	</dependency>
+
+	<!-- Apache Commons Pool2 for Redis Connection Pooling -->
+	<dependency>
+		<groupId>org.apache.commons</groupId>
+		<artifactId>commons-pool2</artifactId>
+	</dependency>
+
+	<!-- Micrometer Prometheus for Metrics -->
+	<dependency>
+		<groupId>io.micrometer</groupId>
+		<artifactId>micrometer-registry-prometheus</artifactId>
+	</dependency>
+
 	<!-- Test -->
 	<dependency>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-test</artifactId>
 		<scope>test</scope>
+	</dependency>
+
+	<!-- Sentry for error tracking and performance monitoring -->
+	<dependency>
+		<groupId>io.sentry</groupId>
+		<artifactId>sentry-spring-boot-starter-jakarta</artifactId>
+	</dependency>
+	<dependency>
+		<groupId>io.sentry</groupId>
+		<artifactId>sentry-logback</artifactId>
+	</dependency>
+
+	<!-- dotenv-java for loading .env files -->
+	<dependency>
+		<groupId>io.github.cdimascio</groupId>
+		<artifactId>dotenv-java</artifactId>
 	</dependency>
 </dependencies>
 

@@ -18,7 +18,7 @@ import java.util.List;
  * REST controller for managing SupportRequest entities.
  */
 @RestController
-@RequestMapping("/api/support-requests")
+@RequestMapping("/api/v1/support-requests")
 @RequiredArgsConstructor
 @Tag(name = "Support Request", description = "Support request management")
 @SecurityRequirement(name = "bearerAuth")
@@ -47,11 +47,35 @@ public class SupportRequestController {
         return ResponseEntity.ok(supportRequestService.getByExternalId(externalId));
     }
 
-    @GetMapping("/user/{userId}")
+    @PutMapping("/external/{externalId}")
     @PreAuthorize("isAuthenticated()")
-    @Operation(summary = "Get support requests by user ID")
-    public ResponseEntity<List<SupportRequestDTO>> getByUserId(@PathVariable Long userId) {
-        return ResponseEntity.ok(supportRequestService.getByUserId(userId));
+    @Operation(summary = "Update support request by external ID")
+    public ResponseEntity<SupportRequestDTO> updateByExternalId(
+            @PathVariable String externalId,
+            @Valid @RequestBody SupportRequestDTO dto) {
+        return ResponseEntity.ok(supportRequestService.updateByExternalId(externalId, dto));
+    }
+
+    @DeleteMapping("/external/{externalId}")
+    @PreAuthorize("isAuthenticated()")
+    @Operation(summary = "Delete support request by external ID")
+    public ResponseEntity<Void> deleteByExternalId(@PathVariable String externalId) {
+        supportRequestService.deleteByExternalId(externalId);
+        return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/user/{userExternalId}")
+    @PreAuthorize("isAuthenticated()")
+    @Operation(summary = "Get support requests by user external ID")
+    public ResponseEntity<List<SupportRequestDTO>> getByUserExternalId(@PathVariable String userExternalId) {
+        return ResponseEntity.ok(supportRequestService.getByUserExternalId(userExternalId));
+    }
+
+    @GetMapping("/bike/{bikeExternalId}")
+    @PreAuthorize("isAuthenticated()")
+    @Operation(summary = "Get support requests by bike external ID")
+    public ResponseEntity<List<SupportRequestDTO>> getByBikeExternalId(@PathVariable String bikeExternalId) {
+        return ResponseEntity.ok(supportRequestService.getByBikeExternalId(bikeExternalId));
     }
 
     @PostMapping
@@ -76,3 +100,11 @@ public class SupportRequestController {
         return ResponseEntity.noContent().build();
     }
 }
+
+
+
+
+
+
+
+

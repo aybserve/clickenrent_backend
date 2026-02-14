@@ -75,10 +75,7 @@ public class StockMovementService {
                 .orElseThrow(() -> new ResourceNotFoundException("Hub", "id", dto.getToHubId()));
 
         StockMovement stockMovement = stockMovementMapper.toEntity(dto);
-        if (stockMovement.getDateTime() == null) {
-            stockMovement.setDateTime(LocalDateTime.now());
-        }
-        
+        stockMovement.sanitizeForCreate();
         stockMovement = stockMovementRepository.save(stockMovement);
         return stockMovementMapper.toDto(stockMovement);
     }
@@ -94,3 +91,11 @@ public class StockMovementService {
         stockMovementRepository.delete(stockMovement);
     }
 }
+
+
+
+
+
+
+
+

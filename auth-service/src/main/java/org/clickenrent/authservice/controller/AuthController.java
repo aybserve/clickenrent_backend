@@ -10,8 +10,11 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.clickenrent.authservice.dto.*;
 import org.clickenrent.authservice.service.AuthService;
+import org.clickenrent.authservice.service.EmailVerificationService;
+import org.clickenrent.authservice.service.PasswordResetService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -24,12 +27,15 @@ import org.springframework.web.bind.annotation.*;
  * Handles user registration, login, token refresh, and profile management.
  */
 @RestController
-@RequestMapping("/api/auth")
+@RequestMapping("/api/v1/auth")
 @RequiredArgsConstructor
+@Slf4j
 @Tag(name = "Authentication", description = "User authentication and registration endpoints")
 public class AuthController {
     
     private final AuthService authService;
+    private final EmailVerificationService emailVerificationService;
+    private final PasswordResetService passwordResetService;
     
     /**
      * Register a new user (Public endpoint).
@@ -139,6 +145,7 @@ public class AuthController {
      * Available to all roles: SUPERADMIN, ADMIN, B2B, CUSTOMER.
      */
     @GetMapping("/me")
+    @PreAuthorize("isAuthenticated()")
     @Operation(
             summary = "Get current user profile",
             description = "Returns the profile information of the currently authenticated user. Requires authentication."
@@ -164,6 +171,7 @@ public class AuthController {
      * Available to all roles: SUPERADMIN, ADMIN, B2B, CUSTOMER.
      */
     @PostMapping("/logout")
+    @PreAuthorize("isAuthenticated()")
     @Operation(
             summary = "Logout user",
             description = "Invalidates the current access token by blacklisting it. Requires authentication."
@@ -182,6 +190,154 @@ public class AuthController {
         }
         
         return ResponseEntity.noContent().build();
+    }
+    
+    /**
+     * Verify email address with 6-digit code.
+     * POST /api/auth/verify-email
+     * 
+     * Security: Public access - no authentication required.
+     * Returns new JWT tokens with updated user info (isEmailVerified=true).
+     */
+    @PostMapping("/verify-email")
+    @Operation(
+            summary = "Verify email address",
+            description = "Verifies user email with 6-digit code. Returns new tokens with updated user info. Public endpoint."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Email verified successfully",
+                    content = @Content(schema = @Schema(implementation = VerifyEmailResponse.class))),
+            @ApiResponse(responseCode = "400", description = "Invalid or expired code"),
+            @ApiResponse(responseCode = "404", description = "User not found")
+    })
+    @SecurityRequirement(name = "") // No authentication required
+    public ResponseEntity<VerifyEmailResponse> verifyEmail(@Valid @RequestBody VerifyEmailRequest request) {
+        System.out.println("===========================================");
+        System.out.println("=== AuthController.verifyEmail() CALLED");
+        System.out.println("=== Email: " + request.getEmail());
+        System.out.println("=== Code: " + request.getCode());
+        System.out.println("===========================================");
+        
+        VerifyEmailResponse response = authService.verifyEmailAndGenerateTokens(
+                request.getEmail(), 
+                request.getCode()
+        );
+        return ResponseEntity.ok(response);
+    }
+    
+    /**
+     * Send or resend verification code to user's email.
+     * POST /api/auth/send-verification-code
+     * 
+     * Security: Public access - no authentication required.
+     * Invalidates any existing unused codes and generates a new one.
+     */
+    @PostMapping("/send-verification-code")
+    @Operation(
+            summary = "Send/resend verification code",
+            description = "Sends a new 6-digit verification code to user's email. Invalidates previous unused codes. Public endpoint."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "Verification code sent successfully"),
+            @ApiResponse(responseCode = "400", description = "Email already verified"),
+            @ApiResponse(responseCode = "404", description = "User not found")
+    })
+    @SecurityRequirement(name = "") // No authentication required
+    public ResponseEntity<Void> sendVerificationCode(@Valid @RequestBody SendVerificationCodeRequest request) {
+        emailVerificationService.resendVerificationCode(request.getEmail());
+        return ResponseEntity.noContent().build();
+    }
+    
+    /**
+     * Initiate password reset by sending reset token to email.
+     * POST /api/auth/forgot-password
+     * 
+     * Security: Public access - no authentication required.
+     * Invalidates any existing unused reset tokens and generates a new one.
+     * For security, always returns success even if email doesn't exist.
+     */
+    @PostMapping("/forgot-password")
+    @Operation(
+            summary = "Initiate password reset",
+            description = "Sends a 6-digit reset token to user's email. Invalidates previous unused tokens. Public endpoint."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "204", description = "If email exists, reset token has been sent"),
+            @ApiResponse(responseCode = "400", description = "Invalid request")
+    })
+    @SecurityRequirement(name = "") // No authentication required
+    public ResponseEntity<Void> forgotPassword(
+            @Valid @RequestBody ForgotPasswordRequest request,
+            HttpServletRequest httpRequest) {
+        try {
+            passwordResetService.initiatePasswordReset(request.getEmail(), httpRequest);
+        } catch (Exception e) {
+            // For security, don't reveal if email exists or not
+            // Always return success to prevent email enumeration
+            log.warn("Password reset attempt for email: {}, error: {}", request.getEmail(), e.getMessage());
+        }
+        return ResponseEntity.noContent().build();
+    }
+    
+    /**
+     * Reset password using reset token.
+     * POST /api/auth/reset-password
+     * 
+     * Security: Public access - no authentication required (uses reset token for validation).
+     * Validates token, updates password, and sends confirmation email.
+     */
+    @PostMapping("/reset-password")
+    @Operation(
+            summary = "Reset password with token",
+            description = "Resets user password using the 6-digit reset token. Public endpoint."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Password reset successful",
+                    content = @Content(schema = @Schema(implementation = PasswordResetResponse.class))),
+            @ApiResponse(responseCode = "400", description = "Invalid or expired token"),
+            @ApiResponse(responseCode = "404", description = "User not found")
+    })
+    @SecurityRequirement(name = "") // No authentication required
+    public ResponseEntity<PasswordResetResponse> resetPassword(
+            @Valid @RequestBody ResetPasswordRequest request,
+            HttpServletRequest httpRequest) {
+        passwordResetService.resetPassword(
+                request.getEmail(), 
+                request.getToken(), 
+                request.getNewPassword(),
+                httpRequest
+        );
+        
+        PasswordResetResponse response = PasswordResetResponse.builder()
+                .success(true)
+                .message("Password has been reset successfully")
+                .build();
+        
+        return ResponseEntity.ok(response);
+    }
+
+    /**
+     * Validate password reset token.
+     * GET /api/auth/validate-reset-token
+     * 
+     * Security: Public access - no authentication required.
+     * Checks if a reset token is valid without consuming attempts.
+     */
+    @GetMapping("/validate-reset-token")
+    @Operation(
+            summary = "Validate password reset token",
+            description = "Checks if a reset token is valid and returns expiration info. Public endpoint."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Token validation result",
+                    content = @Content(schema = @Schema(implementation = TokenValidationResponse.class)))
+    })
+    @SecurityRequirement(name = "") // No authentication required
+    public ResponseEntity<TokenValidationResponse> validateResetToken(
+            @RequestParam String email,
+            @RequestParam(required = false) String token) {
+        TokenValidationResponse response = passwordResetService.validateToken(token, email);
+        return ResponseEntity.ok(response);
     }
 }
 

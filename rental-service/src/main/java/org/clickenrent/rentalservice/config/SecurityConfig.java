@@ -48,6 +48,10 @@ public class SecurityConfig {
                 .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
                 // Health check
                 .requestMatchers(HttpMethod.GET, "/health").permitAll()
+                // Service-to-service endpoints (for search-service indexing)
+                .requestMatchers("/api/v1/bikes/external/**").permitAll()
+                .requestMatchers("/api/v1/location/external/**").permitAll()
+                .requestMatchers("/api/v1/hubs/external/**").permitAll()
                 // All other endpoints require authentication
                 .anyRequest().authenticated()
             )

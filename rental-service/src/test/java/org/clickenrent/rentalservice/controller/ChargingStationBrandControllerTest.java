@@ -44,7 +44,7 @@ class ChargingStationBrandControllerTest {
         brandDTO = ChargingStationBrandDTO.builder()
                 .id(1L)
                 .name("Tesla")
-                .companyId(1L)
+                .companyExternalId("company-ext-001")
                 .build();
     }
 
@@ -62,7 +62,7 @@ class ChargingStationBrandControllerTest {
     @WithMockUser(roles = "ADMIN")
     void getBrandsByCompany_ReturnsOk() throws Exception {
         List<ChargingStationBrandDTO> brands = Collections.singletonList(brandDTO);
-        when(chargingStationBrandService.getBrandsByCompany(1L)).thenReturn(brands);
+        when(chargingStationBrandService.getBrandsByCompanyExternalId("company-ext-001")).thenReturn(brands);
 
         mockMvc.perform(get("/api/charging-station-brands/by-company/1").with(csrf()))
                 .andExpect(status().isOk())
@@ -111,3 +111,7 @@ class ChargingStationBrandControllerTest {
                 .andExpect(status().isNoContent());
     }
 }
+
+
+
+

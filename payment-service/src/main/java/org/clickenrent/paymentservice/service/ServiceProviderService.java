@@ -11,7 +11,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.UUID;
 
 /**
  * Service for ServiceProvider management
@@ -36,7 +35,7 @@ public class ServiceProviderService {
     }
 
     @Transactional(readOnly = true)
-    public ServiceProviderDTO findByExternalId(UUID externalId) {
+    public ServiceProviderDTO findByExternalId(String externalId) {
         ServiceProvider provider = serviceProviderRepository.findByExternalId(externalId)
                 .orElseThrow(() -> new ResourceNotFoundException("ServiceProvider", "externalId", externalId));
         return serviceProviderMapper.toDTO(provider);
@@ -56,6 +55,7 @@ public class ServiceProviderService {
         }
 
         ServiceProvider provider = serviceProviderMapper.toEntity(dto);
+        provider.sanitizeForCreate();
         ServiceProvider savedProvider = serviceProviderRepository.save(provider);
         return serviceProviderMapper.toDTO(savedProvider);
     }
@@ -86,3 +86,11 @@ public class ServiceProviderService {
         serviceProviderRepository.deleteById(id);
     }
 }
+
+
+
+
+
+
+
+

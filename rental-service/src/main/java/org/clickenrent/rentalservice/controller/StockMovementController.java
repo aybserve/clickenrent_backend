@@ -19,9 +19,9 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/stock-movements")
+@RequestMapping("/api/v1/stock-movements")
 @RequiredArgsConstructor
-@Tag(name = "StockMovement", description = "Stock movement tracking between hubs")
+@Tag(name = "Stock Movement", description = "Stock movement tracking between hubs")
 @SecurityRequirement(name = "bearerAuth")
 public class StockMovementController {
 
@@ -31,7 +31,7 @@ public class StockMovementController {
     @PreAuthorize("hasAnyRole('SUPERADMIN', 'ADMIN')")
     @Operation(summary = "Get all stock movements")
     public ResponseEntity<Page<StockMovementDTO>> getAllStockMovements(
-            @PageableDefault(size = 20, sort = "dateTime", direction = Sort.Direction.DESC) Pageable pageable) {
+            @PageableDefault(size = 20, sort = "dateCreated", direction = Sort.Direction.DESC) Pageable pageable) {
         return ResponseEntity.ok(stockMovementService.getAllStockMovements(pageable));
     }
 
@@ -64,3 +64,11 @@ public class StockMovementController {
         return ResponseEntity.noContent().build();
     }
 }
+
+
+
+
+
+
+
+

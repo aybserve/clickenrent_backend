@@ -1,7 +1,6 @@
 package org.clickenrent.paymentservice.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -9,13 +8,13 @@ import org.clickenrent.paymentservice.dto.PaymentStatusDTO;
 import org.clickenrent.paymentservice.service.PaymentStatusService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/payment-statuses")
+@RequestMapping("/api/v1/payment-statuses")
 @RequiredArgsConstructor
 @Tag(name = "Payment Status", description = "Payment status management API")
 public class PaymentStatusController {
@@ -29,14 +28,16 @@ public class PaymentStatusController {
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'SUPERADMIN')")
     @Operation(summary = "Get payment status by ID")
     public ResponseEntity<PaymentStatusDTO> getById(@PathVariable Long id) {
         return ResponseEntity.ok(paymentStatusService.findById(id));
     }
 
     @GetMapping("/external/{externalId}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'SUPERADMIN')")
     @Operation(summary = "Get payment status by external ID")
-    public ResponseEntity<PaymentStatusDTO> getByExternalId(@PathVariable UUID externalId) {
+    public ResponseEntity<PaymentStatusDTO> getByExternalId(@PathVariable String externalId) {
         return ResponseEntity.ok(paymentStatusService.findByExternalId(externalId));
     }
 
@@ -59,3 +60,7 @@ public class PaymentStatusController {
         return ResponseEntity.noContent().build();
     }
 }
+
+
+
+

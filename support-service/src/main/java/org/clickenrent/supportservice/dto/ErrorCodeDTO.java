@@ -1,11 +1,13 @@
 package org.clickenrent.supportservice.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 /**
  * Data Transfer Object for ErrorCode entity.
@@ -16,10 +18,12 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class ErrorCodeDTO {
 
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private Long id;
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private String externalId;
     private String name;
-    private Long bikeEngineId;
+    private List<String> bikeEngineExternalIds;
     private String description;
     private String commonCause;
     private String diagnosticSteps;
@@ -28,8 +32,20 @@ public class ErrorCodeDTO {
     private Boolean isFixableByClient;
 
     // Audit fields
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private LocalDateTime dateCreated;
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private LocalDateTime lastDateModified;
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private String createdBy;
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private String lastModifiedBy;
 }
+
+
+
+
+
+
+
+

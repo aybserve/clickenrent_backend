@@ -17,6 +17,7 @@ public class CountryMapper {
         
         return CountryDTO.builder()
                 .id(country.getId())
+                .externalId(country.getExternalId())
                 .name(country.getName())
                 .build();
     }
@@ -28,6 +29,7 @@ public class CountryMapper {
         
         return Country.builder()
                 .id(dto.getId())
+                .externalId(dto.getExternalId())
                 .name(dto.getName())
                 .build();
     }
@@ -37,9 +39,20 @@ public class CountryMapper {
             return;
         }
         
+        if (dto.getExternalId() != null) {
+            country.setExternalId(dto.getExternalId());
+        }
         if (dto.getName() != null) {
             country.setName(dto.getName());
         }
     }
 }
+
+
+
+
+
+
+
+
 

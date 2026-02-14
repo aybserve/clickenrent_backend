@@ -42,8 +42,8 @@ class SupportRequestControllerTest {
         requestDTO = SupportRequestDTO.builder()
                 .id(1L)
                 .externalId("550e8400-e29b-41d4-a716-446655440401")
-                .userId(1L)
-                .bikeId(201L)
+                .userExternalId("user-uuid-1")
+                .bikeExternalId("bike-uuid-201")
                 .isNearLocation(true)
                 .photoUrl("https://example.com/photo.jpg")
                 .build();
@@ -56,7 +56,7 @@ class SupportRequestControllerTest {
 
         mockMvc.perform(get("/api/support-requests").with(csrf()))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].userId").value(1));
+                .andExpect(jsonPath("$[0].userExternalId").value("user-uuid-1"));
     }
 
     @Test
@@ -66,7 +66,7 @@ class SupportRequestControllerTest {
 
         mockMvc.perform(get("/api/support-requests/1").with(csrf()))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.userId").value(1));
+                .andExpect(jsonPath("$.userExternalId").value("user-uuid-1"));
     }
 
     @Test
@@ -102,3 +102,11 @@ class SupportRequestControllerTest {
                 .andExpect(status().isNoContent());
     }
 }
+
+
+
+
+
+
+
+

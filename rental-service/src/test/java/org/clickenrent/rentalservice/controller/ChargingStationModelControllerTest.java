@@ -100,3 +100,11 @@ class ChargingStationModelControllerTest {
                 .andExpect(status().isNoContent());
     }
 }
+
+
+
+
+
+
+
+

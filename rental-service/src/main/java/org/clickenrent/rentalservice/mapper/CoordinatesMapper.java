@@ -17,8 +17,13 @@ public class CoordinatesMapper {
 
         return CoordinatesDTO.builder()
                 .id(coordinates.getId())
+                .externalId(coordinates.getExternalId())
                 .latitude(coordinates.getLatitude())
                 .longitude(coordinates.getLongitude())
+                .dateCreated(coordinates.getDateCreated())
+                .lastDateModified(coordinates.getLastDateModified())
+                .createdBy(coordinates.getCreatedBy())
+                .lastModifiedBy(coordinates.getLastModifiedBy())
                 .build();
     }
 
@@ -29,6 +34,7 @@ public class CoordinatesMapper {
 
         return Coordinates.builder()
                 .id(dto.getId())
+                .externalId(dto.getExternalId())
                 .latitude(dto.getLatitude())
                 .longitude(dto.getLongitude())
                 .build();
@@ -39,6 +45,9 @@ public class CoordinatesMapper {
             return;
         }
 
+        if (dto.getExternalId() != null) {
+            coordinates.setExternalId(dto.getExternalId());
+        }
         if (dto.getLatitude() != null) {
             coordinates.setLatitude(dto.getLatitude());
         }
@@ -47,3 +56,11 @@ public class CoordinatesMapper {
         }
     }
 }
+
+
+
+
+
+
+
+

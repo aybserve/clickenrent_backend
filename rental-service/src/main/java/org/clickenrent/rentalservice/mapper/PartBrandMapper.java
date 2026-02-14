@@ -17,8 +17,13 @@ public class PartBrandMapper {
 
         return PartBrandDTO.builder()
                 .id(partBrand.getId())
+                .externalId(partBrand.getExternalId())
                 .name(partBrand.getName())
-                .companyId(partBrand.getCompanyId())
+                .companyExternalId(partBrand.getCompanyExternalId())
+                .dateCreated(partBrand.getDateCreated())
+                .lastDateModified(partBrand.getLastDateModified())
+                .createdBy(partBrand.getCreatedBy())
+                .lastModifiedBy(partBrand.getLastModifiedBy())
                 .build();
     }
 
@@ -29,8 +34,9 @@ public class PartBrandMapper {
 
         return PartBrand.builder()
                 .id(dto.getId())
+                .externalId(dto.getExternalId())
                 .name(dto.getName())
-                .companyId(dto.getCompanyId())
+                .companyExternalId(dto.getCompanyExternalId())
                 .build();
     }
 
@@ -44,3 +50,7 @@ public class PartBrandMapper {
         }
     }
 }
+
+
+
+

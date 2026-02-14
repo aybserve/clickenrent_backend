@@ -18,7 +18,7 @@ import java.util.List;
  * REST controller for managing BikeIssue entities.
  */
 @RestController
-@RequestMapping("/api/bike-issues")
+@RequestMapping("/api/v1/bike-issues")
 @RequiredArgsConstructor
 @Tag(name = "Bike Issue", description = "Bike issue management")
 @SecurityRequirement(name = "bearerAuth")
@@ -61,6 +61,20 @@ public class BikeIssueController {
         return ResponseEntity.ok(bikeIssueService.getSubIssues(parentId));
     }
 
+    @GetMapping("/erp-external/{erpExternalId}")
+    @PreAuthorize("isAuthenticated()")
+    @Operation(summary = "Get bike issue by ERP external ID")
+    public ResponseEntity<BikeIssueDTO> getByErpExternalId(@PathVariable String erpExternalId) {
+        return ResponseEntity.ok(bikeIssueService.getByErpExternalId(erpExternalId));
+    }
+
+    @GetMapping("/bike-unit/{bikeUnitId}")
+    @PreAuthorize("isAuthenticated()")
+    @Operation(summary = "Get bike issues by bike unit ID")
+    public ResponseEntity<List<BikeIssueDTO>> getByBikeUnitId(@PathVariable Long bikeUnitId) {
+        return ResponseEntity.ok(bikeIssueService.getByBikeUnitId(bikeUnitId));
+    }
+
     @PostMapping
     @PreAuthorize("hasAnyRole('SUPERADMIN', 'ADMIN')")
     @Operation(summary = "Create bike issue")
@@ -83,3 +97,11 @@ public class BikeIssueController {
         return ResponseEntity.noContent().build();
     }
 }
+
+
+
+
+
+
+
+

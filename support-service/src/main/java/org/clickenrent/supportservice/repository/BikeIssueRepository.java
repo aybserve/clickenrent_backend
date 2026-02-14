@@ -15,9 +15,21 @@ public interface BikeIssueRepository extends JpaRepository<BikeIssue, Long> {
     
     Optional<BikeIssue> findByExternalId(String externalId);
     
+    Optional<BikeIssue> findByErpExternalId(String erpExternalId);
+    
     List<BikeIssue> findByParentBikeIssueId(Long parentBikeIssueId);
     
     List<BikeIssue> findByParentBikeIssueIsNull();
     
     List<BikeIssue> findByResponsiblePersonId(Long responsiblePersonId);
+    
+    List<BikeIssue> findByBikeUnitId(Long bikeUnitId);
 }
+
+
+
+
+
+
+
+

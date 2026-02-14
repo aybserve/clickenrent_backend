@@ -41,6 +41,7 @@ public class BikeStatusService {
         }
 
         BikeStatus bikeStatus = bikeStatusMapper.toEntity(dto);
+        bikeStatus.sanitizeForCreate();
         bikeStatus = bikeStatusRepository.save(bikeStatus);
         return bikeStatusMapper.toDto(bikeStatus);
     }
@@ -69,4 +70,19 @@ public class BikeStatusService {
                 .orElseThrow(() -> new ResourceNotFoundException("BikeStatus", "id", id));
         bikeStatusRepository.delete(bikeStatus);
     }
+
+    @Transactional(readOnly = true)
+    public BikeStatusDTO findByExternalId(String externalId) {
+        BikeStatus bikeStatus = bikeStatusRepository.findByExternalId(externalId)
+                .orElseThrow(() -> new ResourceNotFoundException("BikeStatus", "externalId", externalId));
+        return bikeStatusMapper.toDto(bikeStatus);
+    }
 }
+
+
+
+
+
+
+
+

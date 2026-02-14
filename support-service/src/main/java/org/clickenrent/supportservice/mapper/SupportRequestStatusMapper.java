@@ -17,6 +17,7 @@ public class SupportRequestStatusMapper {
 
         return SupportRequestStatusDTO.builder()
                 .id(entity.getId())
+                .externalId(entity.getExternalId())
                 .name(entity.getName())
                 .dateCreated(entity.getDateCreated())
                 .lastDateModified(entity.getLastDateModified())
@@ -32,6 +33,7 @@ public class SupportRequestStatusMapper {
 
         return SupportRequestStatus.builder()
                 .id(dto.getId())
+                .externalId(dto.getExternalId())
                 .name(dto.getName())
                 .build();
     }
@@ -41,8 +43,19 @@ public class SupportRequestStatusMapper {
             return;
         }
 
+        if (dto.getExternalId() != null) {
+            entity.setExternalId(dto.getExternalId());
+        }
         if (dto.getName() != null) {
             entity.setName(dto.getName());
         }
     }
 }
+
+
+
+
+
+
+
+

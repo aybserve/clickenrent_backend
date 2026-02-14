@@ -40,6 +40,7 @@ public class BikeEngineService {
         }
 
         BikeEngine bikeEngine = bikeEngineMapper.toEntity(dto);
+        bikeEngine.sanitizeForCreate();
         bikeEngine = bikeEngineRepository.save(bikeEngine);
         return bikeEngineMapper.toDto(bikeEngine);
     }
@@ -69,3 +70,11 @@ public class BikeEngineService {
         bikeEngineRepository.delete(bikeEngine);
     }
 }
+
+
+
+
+
+
+
+

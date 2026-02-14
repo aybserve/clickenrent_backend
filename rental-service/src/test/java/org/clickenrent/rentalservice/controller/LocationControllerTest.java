@@ -48,7 +48,7 @@ class LocationControllerTest {
                 .externalId("LOC001")
                 .name("Amsterdam Central")
                 .address("Stationsplein 1, Amsterdam")
-                .companyId(1L)
+                .companyExternalId("company-ext-001")
                 .isPublic(true)
                 .description("Main location in Amsterdam")
                 .build();
@@ -150,7 +150,7 @@ class LocationControllerTest {
         LocationDTO newLocation = LocationDTO.builder()
                 .name("Rotterdam Center")
                 .address("Central Station, Rotterdam")
-                .companyId(1L)
+                .companyExternalId("company-ext-001")
                 .isPublic(true)
                 .build();
 
@@ -158,7 +158,7 @@ class LocationControllerTest {
                 .id(2L)
                 .name("Rotterdam Center")
                 .address("Central Station, Rotterdam")
-                .companyId(1L)
+                .companyExternalId("company-ext-001")
                 .isPublic(true)
                 .build();
 
@@ -214,7 +214,7 @@ class LocationControllerTest {
                 .externalId("LOC001")
                 .name("Amsterdam Central Updated")
                 .address("Stationsplein 1, Amsterdam")
-                .companyId(1L)
+                .companyExternalId("company-ext-001")
                 .isPublic(true)
                 .build();
 
@@ -272,3 +272,7 @@ class LocationControllerTest {
         verify(locationService, times(1)).deleteLocation(1L);
 }
 }
+
+
+
+

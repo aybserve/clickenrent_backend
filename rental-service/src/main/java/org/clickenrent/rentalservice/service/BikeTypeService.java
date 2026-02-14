@@ -34,6 +34,13 @@ public class BikeTypeService {
         return bikeTypeMapper.toDto(bikeType);
     }
 
+    @Transactional(readOnly = true)
+    public BikeTypeDTO getBikeTypeByExternalId(String externalId) {
+        BikeType bikeType = bikeTypeRepository.findByExternalId(externalId)
+                .orElseThrow(() -> new ResourceNotFoundException("BikeType", "externalId", externalId));
+        return bikeTypeMapper.toDto(bikeType);
+    }
+
     @Transactional
     public BikeTypeDTO createBikeType(BikeTypeDTO dto) {
         if (!securityService.isAdmin()) {
@@ -41,6 +48,7 @@ public class BikeTypeService {
         }
 
         BikeType bikeType = bikeTypeMapper.toEntity(dto);
+        bikeType.sanitizeForCreate();
         bikeType = bikeTypeRepository.save(bikeType);
         return bikeTypeMapper.toDto(bikeType);
     }
@@ -70,3 +78,11 @@ public class BikeTypeService {
         bikeTypeRepository.delete(bikeType);
     }
 }
+
+
+
+
+
+
+
+

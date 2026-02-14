@@ -23,6 +23,10 @@ public class ServiceProviderMapper {
                 .externalId(entity.getExternalId())
                 .code(entity.getCode())
                 .name(entity.getName())
+                .dateCreated(entity.getDateCreated())
+                .lastDateModified(entity.getLastDateModified())
+                .createdBy(entity.getCreatedBy())
+                .lastModifiedBy(entity.getLastModifiedBy())
                 .build();
     }
 
@@ -49,3 +53,11 @@ public class ServiceProviderMapper {
                 .collect(Collectors.toList());
     }
 }
+
+
+
+
+
+
+
+

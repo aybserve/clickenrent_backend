@@ -18,7 +18,7 @@ import java.util.List;
  * REST controller for Country management operations.
  */
 @RestController
-@RequestMapping("/api/countries")
+@RequestMapping("/api/v1/countries")
 @RequiredArgsConstructor
 @Tag(name = "Country", description = "Country management endpoints")
 @SecurityRequirement(name = "bearerAuth")
@@ -59,6 +59,18 @@ public class CountryController {
     @Operation(summary = "Get country by name", description = "Retrieve a country by its name")
     public ResponseEntity<CountryDTO> getCountryByName(@RequestParam String name) {
         CountryDTO country = countryService.getCountryByName(name);
+        return ResponseEntity.ok(country);
+    }
+    
+    /**
+     * Get country by external ID.
+     * GET /api/countries/external/{externalId}
+     */
+    @GetMapping("/external/{externalId}")
+    @PreAuthorize("hasAnyRole('SUPERADMIN', 'ADMIN', 'B2B', 'CUSTOMER')")
+    @Operation(summary = "Get country by external ID", description = "Retrieve a country by its external ID")
+    public ResponseEntity<CountryDTO> getCountryByExternalId(@PathVariable String externalId) {
+        CountryDTO country = countryService.getCountryByExternalId(externalId);
         return ResponseEntity.ok(country);
     }
     

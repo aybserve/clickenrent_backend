@@ -17,7 +17,7 @@ import java.util.List;
  * REST controller for CompanyType management operations.
  */
 @RestController
-@RequestMapping("/api/company-types")
+@RequestMapping("/api/v1/company-types")
 @RequiredArgsConstructor
 @Tag(name = "Company Type", description = "Company type management endpoints")
 @SecurityRequirement(name = "bearerAuth")
@@ -44,6 +44,17 @@ public class CompanyTypeController {
     @PreAuthorize("hasAnyRole('SUPERADMIN', 'ADMIN')")
     public ResponseEntity<CompanyTypeDTO> getCompanyTypeById(@PathVariable Long id) {
         CompanyTypeDTO companyType = companyTypeService.getCompanyTypeById(id);
+        return ResponseEntity.ok(companyType);
+    }
+    
+    /**
+     * Get company type by external ID.
+     * GET /api/company-types/external/{externalId}
+     */
+    @GetMapping("/external/{externalId}")
+    @PreAuthorize("hasAnyRole('SUPERADMIN', 'ADMIN')")
+    public ResponseEntity<CompanyTypeDTO> getCompanyTypeByExternalId(@PathVariable String externalId) {
+        CompanyTypeDTO companyType = companyTypeService.getCompanyTypeByExternalId(externalId);
         return ResponseEntity.ok(companyType);
     }
     
@@ -82,5 +93,13 @@ public class CompanyTypeController {
         return ResponseEntity.noContent().build();
     }
 }
+
+
+
+
+
+
+
+
 
 

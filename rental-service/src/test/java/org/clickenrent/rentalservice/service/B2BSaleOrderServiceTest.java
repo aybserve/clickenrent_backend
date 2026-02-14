@@ -48,20 +48,18 @@ class B2BSaleOrderServiceTest {
         testOrder = B2BSaleOrder.builder()
         .id(1L)
         .externalId("B2BSO001")
-        .sellerCompanyId(1L)
-        .buyerCompanyId(2L)
-        .dateTime(LocalDateTime.now())
+        .sellerCompanyExternalId("company-ext-001")
+        .buyerCompanyExternalId("company-ext-002")
         .build();
 
         testOrderDTO = B2BSaleOrderDTO.builder()
         .id(1L)
         .externalId("B2BSO001")
-        .sellerCompanyId(1L)
-        .buyerCompanyId(2L)
+        .sellerCompanyExternalId("company-ext-001")
+        .buyerCompanyExternalId("company-ext-002")
         .b2bSaleOrderStatusId(2L)
         .locationId(1L)
         .b2bSaleId(1L)
-        .dateTime(LocalDateTime.now())
         .build();
     }
 
@@ -132,3 +130,7 @@ class B2BSaleOrderServiceTest {
         verify(b2bSaleOrderRepository, times(1)).delete(testOrder);
     }
 }
+
+
+
+

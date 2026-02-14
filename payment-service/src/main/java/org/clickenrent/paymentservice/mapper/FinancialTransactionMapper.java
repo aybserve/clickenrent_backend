@@ -28,8 +28,8 @@ public class FinancialTransactionMapper {
         return FinancialTransactionDTO.builder()
                 .id(entity.getId())
                 .externalId(entity.getExternalId())
-                .payerId(entity.getPayerId())
-                .recipientId(entity.getRecipientId())
+                .payerExternalId(entity.getPayerExternalId())
+                .recipientExternalId(entity.getRecipientExternalId())
                 .amount(entity.getAmount())
                 .currency(currencyMapper.toDTO(entity.getCurrency()))
                 .dateTime(entity.getDateTime())
@@ -39,7 +39,13 @@ public class FinancialTransactionMapper {
                 .stripePaymentIntentId(entity.getStripePaymentIntentId())
                 .stripeChargeId(entity.getStripeChargeId())
                 .stripeRefundId(entity.getStripeRefundId())
+                .multiSafepayOrderId(entity.getMultiSafepayOrderId())
+                .multiSafepayTransactionId(entity.getMultiSafepayTransactionId())
                 .originalTransactionId(entity.getOriginalTransactionId())
+                .dateCreated(entity.getDateCreated())
+                .lastDateModified(entity.getLastDateModified())
+                .createdBy(entity.getCreatedBy())
+                .lastModifiedBy(entity.getLastModifiedBy())
                 .build();
     }
 
@@ -51,8 +57,8 @@ public class FinancialTransactionMapper {
         return FinancialTransaction.builder()
                 .id(dto.getId())
                 .externalId(dto.getExternalId())
-                .payerId(dto.getPayerId())
-                .recipientId(dto.getRecipientId())
+                .payerExternalId(dto.getPayerExternalId())
+                .recipientExternalId(dto.getRecipientExternalId())
                 .amount(dto.getAmount())
                 .currency(currencyMapper.toEntity(dto.getCurrency()))
                 .dateTime(dto.getDateTime())
@@ -62,6 +68,8 @@ public class FinancialTransactionMapper {
                 .stripePaymentIntentId(dto.getStripePaymentIntentId())
                 .stripeChargeId(dto.getStripeChargeId())
                 .stripeRefundId(dto.getStripeRefundId())
+                .multiSafepayOrderId(dto.getMultiSafepayOrderId())
+                .multiSafepayTransactionId(dto.getMultiSafepayTransactionId())
                 .originalTransactionId(dto.getOriginalTransactionId())
                 .build();
     }
@@ -76,3 +84,7 @@ public class FinancialTransactionMapper {
                 .collect(Collectors.toList());
     }
 }
+
+
+
+

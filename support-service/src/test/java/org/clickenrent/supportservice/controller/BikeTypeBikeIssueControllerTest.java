@@ -40,7 +40,8 @@ class BikeTypeBikeIssueControllerTest {
     void setUp() {
         junctionDTO = BikeTypeBikeIssueDTO.builder()
                 .id(1L)
-                .bikeTypeId(1L)
+                .externalId("junction-uuid-1")
+                .bikeTypeExternalId("bike-type-uuid-1")
                 .build();
     }
 
@@ -51,7 +52,7 @@ class BikeTypeBikeIssueControllerTest {
 
         mockMvc.perform(get("/api/bike-type-bike-issues").with(csrf()))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].bikeTypeId").value(1));
+                .andExpect(jsonPath("$[0].bikeTypeExternalId").value("bike-type-uuid-1"));
     }
 
     @Test
@@ -61,7 +62,7 @@ class BikeTypeBikeIssueControllerTest {
 
         mockMvc.perform(get("/api/bike-type-bike-issues/1").with(csrf()))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.bikeTypeId").value(1));
+                .andExpect(jsonPath("$.bikeTypeExternalId").value("bike-type-uuid-1"));
     }
 
     @Test
@@ -85,3 +86,11 @@ class BikeTypeBikeIssueControllerTest {
                 .andExpect(status().isNoContent());
     }
 }
+
+
+
+
+
+
+
+

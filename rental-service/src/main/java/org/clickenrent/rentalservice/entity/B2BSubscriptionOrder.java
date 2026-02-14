@@ -7,8 +7,6 @@ import lombok.experimental.SuperBuilder;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
 
-import java.time.LocalDateTime;
-
 /**
  * Entity representing B2B subscription orders.
  */
@@ -41,10 +39,6 @@ public class B2BSubscriptionOrder extends BaseAuditEntity {
     @JoinColumn(name = "location_id", nullable = false)
     private Location location;
 
-    @NotNull(message = "Date time is required")
-    @Column(name = "date_time", nullable = false)
-    private LocalDateTime dateTime;
-
     @NotNull(message = "B2B subscription order status is required")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "b2b_subscription_order_status_id", nullable = false)
@@ -53,4 +47,32 @@ public class B2BSubscriptionOrder extends BaseAuditEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "b2b_subscription_id")
     private B2BSubscription b2bSubscription;
+
+    @Override
+    public Long getId() {
+        return id;
+    }
+
+    @Override
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    @Override
+    public String getExternalId() {
+        return externalId;
+    }
+
+    @Override
+    public void setExternalId(String externalId) {
+        this.externalId = externalId;
+    }
 }
+
+
+
+
+
+
+
+

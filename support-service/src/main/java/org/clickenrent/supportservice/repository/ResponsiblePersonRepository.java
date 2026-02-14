@@ -12,5 +12,15 @@ import java.util.Optional;
 @Repository
 public interface ResponsiblePersonRepository extends JpaRepository<ResponsiblePerson, Long> {
     
+    Optional<ResponsiblePerson> findByExternalId(String externalId);
+    
     Optional<ResponsiblePerson> findByName(String name);
 }
+
+
+
+
+
+
+
+

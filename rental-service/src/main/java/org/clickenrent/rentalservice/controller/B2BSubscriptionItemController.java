@@ -15,9 +15,9 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/b2b-subscription-items")
+@RequestMapping("/api/v1/b2b-subscription-items")
 @RequiredArgsConstructor
-@Tag(name = "B2BSubscriptionItem", description = "B2B subscription items management")
+@Tag(name = "B2B Subscription Item", description = "B2B subscription items management")
 @SecurityRequirement(name = "bearerAuth")
 public class B2BSubscriptionItemController {
 
@@ -58,4 +58,19 @@ public class B2BSubscriptionItemController {
         b2bSubscriptionItemService.deleteItem(id);
         return ResponseEntity.noContent().build();
     }
+
+    @GetMapping("/external/{externalId}")
+    @PreAuthorize("isAuthenticated()")
+    @Operation(summary = "Get B2B subscription item by external ID", description = "Retrieve item by external ID for cross-service communication")
+    public ResponseEntity<B2BSubscriptionItemDTO> getByExternalId(@PathVariable String externalId) {
+        return ResponseEntity.ok(b2bSubscriptionItemService.getB2BSubscriptionItemByExternalId(externalId));
+    }
 }
+
+
+
+
+
+
+
+

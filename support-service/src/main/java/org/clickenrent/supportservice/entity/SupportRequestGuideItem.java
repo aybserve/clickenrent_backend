@@ -34,6 +34,9 @@ public class SupportRequestGuideItem extends BaseAuditEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "external_id", length = 100, unique = true)
+    private String externalId;
+
     @NotNull(message = "Index is required")
     @Column(name = "item_index", nullable = false)
     private Integer itemIndex;
@@ -52,4 +55,32 @@ public class SupportRequestGuideItem extends BaseAuditEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "support_request_status_id", nullable = false)
     private SupportRequestStatus supportRequestStatus;
+
+    @Override
+    public Long getId() {
+        return id;
+    }
+
+    @Override
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    @Override
+    public String getExternalId() {
+        return externalId;
+    }
+
+    @Override
+    public void setExternalId(String externalId) {
+        this.externalId = externalId;
+    }
 }
+
+
+
+
+
+
+
+

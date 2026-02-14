@@ -83,3 +83,11 @@ class ChargingStationStatusServiceTest {
         assertThrows(ResourceNotFoundException.class, () -> chargingStationStatusService.getStatusById(999L));
     }
 }
+
+
+
+
+
+
+
+

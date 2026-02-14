@@ -29,6 +29,7 @@ public class CoordinatesService {
     @Transactional
     public CoordinatesDTO createCoordinates(CoordinatesDTO dto) {
         Coordinates coordinates = coordinatesMapper.toEntity(dto);
+        coordinates.sanitizeForCreate();
         coordinates = coordinatesRepository.save(coordinates);
         return coordinatesMapper.toDto(coordinates);
     }
@@ -48,5 +49,27 @@ public class CoordinatesService {
         Coordinates coordinates = coordinatesRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Coordinates", "id", id));
         coordinatesRepository.delete(coordinates);
+    }
+
+    @Transactional
+    public Coordinates createOrUpdateCoordinates(Coordinates existing, CoordinatesDTO dto) {
+        if (existing != null) {
+            // Update existing coordinates
+            existing.setLatitude(dto.getLatitude());
+            existing.setLongitude(dto.getLongitude());
+            return coordinatesRepository.save(existing);
+        } else {
+            // Create new coordinates
+            Coordinates newCoordinates = coordinatesMapper.toEntity(dto);
+            newCoordinates.sanitizeForCreate();
+            return coordinatesRepository.save(newCoordinates);
+        }
+    }
+
+    @Transactional(readOnly = true)
+    public CoordinatesDTO findByExternalId(String externalId) {
+        Coordinates coordinates = coordinatesRepository.findByExternalId(externalId)
+                .orElseThrow(() -> new ResourceNotFoundException("Coordinates", "externalId", externalId));
+        return coordinatesMapper.toDto(coordinates);
     }
 }

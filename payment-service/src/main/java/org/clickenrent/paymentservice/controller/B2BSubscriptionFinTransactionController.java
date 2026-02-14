@@ -8,13 +8,13 @@ import org.clickenrent.paymentservice.dto.B2BSubscriptionFinTransactionDTO;
 import org.clickenrent.paymentservice.service.B2BSubscriptionFinTransactionService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/b2b-subscription-fin-transactions")
+@RequestMapping("/api/v1/b2b-subscription-fin-transactions")
 @RequiredArgsConstructor
 @Tag(name = "B2B Subscription Financial Transaction", description = "B2B subscription financial transaction management API")
 public class B2BSubscriptionFinTransactionController {
@@ -28,14 +28,16 @@ public class B2BSubscriptionFinTransactionController {
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'SUPERADMIN')")
     @Operation(summary = "Get B2B subscription transaction by ID")
     public ResponseEntity<B2BSubscriptionFinTransactionDTO> getById(@PathVariable Long id) {
         return ResponseEntity.ok(b2bSubscriptionFinTransactionService.findById(id));
     }
 
     @GetMapping("/external/{externalId}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'SUPERADMIN')")
     @Operation(summary = "Get B2B subscription transaction by external ID")
-    public ResponseEntity<B2BSubscriptionFinTransactionDTO> getByExternalId(@PathVariable UUID externalId) {
+    public ResponseEntity<B2BSubscriptionFinTransactionDTO> getByExternalId(@PathVariable String externalId) {
         return ResponseEntity.ok(b2bSubscriptionFinTransactionService.findByExternalId(externalId));
     }
 
@@ -58,3 +60,11 @@ public class B2BSubscriptionFinTransactionController {
         return ResponseEntity.noContent().build();
     }
 }
+
+
+
+
+
+
+
+

@@ -25,8 +25,12 @@ public class RentalFinTransactionMapper {
         return RentalFinTransactionDTO.builder()
                 .id(entity.getId())
                 .externalId(entity.getExternalId())
-                .rentalId(entity.getRentalId())
+                .rentalExternalId(entity.getRentalExternalId())
                 .financialTransaction(financialTransactionMapper.toDTO(entity.getFinancialTransaction()))
+                .dateCreated(entity.getDateCreated())
+                .lastDateModified(entity.getLastDateModified())
+                .createdBy(entity.getCreatedBy())
+                .lastModifiedBy(entity.getLastModifiedBy())
                 .build();
     }
 
@@ -38,7 +42,7 @@ public class RentalFinTransactionMapper {
         return RentalFinTransaction.builder()
                 .id(dto.getId())
                 .externalId(dto.getExternalId())
-                .rentalId(dto.getRentalId())
+                .rentalExternalId(dto.getRentalExternalId())
                 .financialTransaction(financialTransactionMapper.toEntity(dto.getFinancialTransaction()))
                 .build();
     }
@@ -53,3 +57,7 @@ public class RentalFinTransactionMapper {
                 .collect(Collectors.toList());
     }
 }
+
+
+
+

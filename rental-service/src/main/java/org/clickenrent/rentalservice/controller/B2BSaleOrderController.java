@@ -19,9 +19,9 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/b2b-sale-orders")
+@RequestMapping("/api/v1/b2b-sale-orders")
 @RequiredArgsConstructor
-@Tag(name = "B2BSaleOrder", description = "B2B sale order management")
+@Tag(name = "B2B Sale Order", description = "B2B sale order management")
 @SecurityRequirement(name = "bearerAuth")
 public class B2BSaleOrderController {
 
@@ -31,22 +31,22 @@ public class B2BSaleOrderController {
     @PreAuthorize("hasAnyRole('SUPERADMIN', 'ADMIN')")
     @Operation(summary = "Get all B2B sale orders")
     public ResponseEntity<Page<B2BSaleOrderDTO>> getAllOrders(
-            @PageableDefault(size = 20, sort = "dateTime", direction = Sort.Direction.DESC) Pageable pageable) {
+            @PageableDefault(size = 20, sort = "dateCreated", direction = Sort.Direction.DESC) Pageable pageable) {
         return ResponseEntity.ok(b2bSaleOrderService.getAllOrders(pageable));
     }
 
-    @GetMapping("/by-seller/{sellerCompanyId}")
+    @GetMapping("/by-seller/{sellerCompanyExternalId}")
     @PreAuthorize("hasAnyRole('SUPERADMIN', 'ADMIN', 'B2B')")
-    @Operation(summary = "Get orders by seller company")
-    public ResponseEntity<List<B2BSaleOrderDTO>> getOrdersBySellerCompany(@PathVariable Long sellerCompanyId) {
-        return ResponseEntity.ok(b2bSaleOrderService.getOrdersBySellerCompany(sellerCompanyId));
+    @Operation(summary = "Get orders by seller company external ID")
+    public ResponseEntity<List<B2BSaleOrderDTO>> getOrdersBySellerCompanyExternalId(@PathVariable String sellerCompanyExternalId) {
+        return ResponseEntity.ok(b2bSaleOrderService.getOrdersBySellerCompanyExternalId(sellerCompanyExternalId));
     }
 
-    @GetMapping("/by-buyer/{buyerCompanyId}")
+    @GetMapping("/by-buyer/{buyerCompanyExternalId}")
     @PreAuthorize("hasAnyRole('SUPERADMIN', 'ADMIN', 'B2B')")
-    @Operation(summary = "Get orders by buyer company")
-    public ResponseEntity<List<B2BSaleOrderDTO>> getOrdersByBuyerCompany(@PathVariable Long buyerCompanyId) {
-        return ResponseEntity.ok(b2bSaleOrderService.getOrdersByBuyerCompany(buyerCompanyId));
+    @Operation(summary = "Get orders by buyer company external ID")
+    public ResponseEntity<List<B2BSaleOrderDTO>> getOrdersByBuyerCompanyExternalId(@PathVariable String buyerCompanyExternalId) {
+        return ResponseEntity.ok(b2bSaleOrderService.getOrdersByBuyerCompanyExternalId(buyerCompanyExternalId));
     }
 
     @GetMapping("/{id}")
@@ -77,4 +77,15 @@ public class B2BSaleOrderController {
         b2bSaleOrderService.deleteOrder(id);
         return ResponseEntity.noContent().build();
     }
+
+    @GetMapping("/external/{externalId}")
+    @PreAuthorize("isAuthenticated()")
+    @Operation(summary = "Get B2B sale order by external ID", description = "Retrieve order by external ID for cross-service communication")
+    public ResponseEntity<B2BSaleOrderDTO> getByExternalId(@PathVariable String externalId) {
+        return ResponseEntity.ok(b2bSaleOrderService.getB2BSaleOrderByExternalId(externalId));
+    }
 }
+
+
+
+

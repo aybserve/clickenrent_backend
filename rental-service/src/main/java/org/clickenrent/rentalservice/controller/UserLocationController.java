@@ -15,19 +15,19 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/user-locations")
+@RequestMapping("/api/v1/user-locations")
 @RequiredArgsConstructor
-@Tag(name = "UserLocation", description = "User-location assignment endpoints")
+@Tag(name = "User Location", description = "User location assignment endpoints")
 @SecurityRequirement(name = "bearerAuth")
 public class UserLocationController {
 
     private final UserLocationService userLocationService;
 
-    @GetMapping("/by-user/{userId}")
+    @GetMapping("/by-user/{userExternalId}")
     @PreAuthorize("isAuthenticated()")
     @Operation(summary = "Get locations for a user")
-    public ResponseEntity<List<UserLocationDTO>> getUserLocationsByUser(@PathVariable Long userId) {
-        return ResponseEntity.ok(userLocationService.getUserLocationsByUser(userId));
+    public ResponseEntity<List<UserLocationDTO>> getUserLocationsByUserExternalId(@PathVariable String userExternalId) {
+        return ResponseEntity.ok(userLocationService.getUserLocationsByUserExternalId(userExternalId));
     }
 
     @GetMapping("/by-location/{locationId}")
@@ -51,4 +51,15 @@ public class UserLocationController {
         userLocationService.removeUserFromLocation(id);
         return ResponseEntity.noContent().build();
     }
+
+    @GetMapping("/external/{externalId}")
+    @PreAuthorize("isAuthenticated()")
+    @Operation(summary = "Get user location by external ID", description = "Retrieve user location by external ID for cross-service communication")
+    public ResponseEntity<UserLocationDTO> getByExternalId(@PathVariable String externalId) {
+        return ResponseEntity.ok(userLocationService.getUserLocationByExternalId(externalId));
+    }
 }
+
+
+
+

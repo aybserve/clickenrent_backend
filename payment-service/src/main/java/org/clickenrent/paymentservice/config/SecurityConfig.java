@@ -48,8 +48,13 @@ public class SecurityConfig {
                 .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
                 // Health check
                 .requestMatchers(HttpMethod.GET, "/health").permitAll()
-                // Stripe webhooks (no authentication required for webhooks)
+                // Webhooks (no authentication required for webhooks)
                 .requestMatchers("/api/webhooks/**").permitAll()
+                .requestMatchers("/api/v1/webhooks/**").permitAll()
+                // Test endpoints (should be disabled in production)
+                .requestMatchers("/api/v1/multisafepay/test/**").permitAll()
+                .requestMatchers("/api/v1/payments/mobile/test/**").permitAll()
+                .requestMatchers("/api/v1/test/**").permitAll()
                 // All other endpoints require authentication
                 .anyRequest().authenticated()
             )
@@ -101,3 +106,11 @@ public class SecurityConfig {
         }
     }
 }
+
+
+
+
+
+
+
+

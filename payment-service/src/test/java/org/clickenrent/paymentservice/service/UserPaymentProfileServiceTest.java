@@ -1,7 +1,7 @@
 package org.clickenrent.paymentservice.service;
 
+import org.clickenrent.contracts.auth.UserDTO;
 import org.clickenrent.paymentservice.client.AuthServiceClient;
-import org.clickenrent.paymentservice.dto.UserDTO;
 import org.clickenrent.paymentservice.dto.UserPaymentProfileDTO;
 import org.clickenrent.paymentservice.entity.UserPaymentProfile;
 import org.clickenrent.paymentservice.exception.ResourceNotFoundException;
@@ -22,6 +22,7 @@ import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
@@ -50,16 +51,16 @@ class UserPaymentProfileServiceTest {
 
     private UserPaymentProfile testProfile;
     private UserPaymentProfileDTO testProfileDTO;
-    private UUID testExternalId;
+    private String testExternalId;
 
     @BeforeEach
     void setUp() {
-        testExternalId = UUID.randomUUID();
+        testExternalId = UUID.randomUUID().toString();
 
         testProfile = UserPaymentProfile.builder()
                 .id(1L)
                 .externalId(testExternalId)
-                .userId(1L)
+                .userExternalId("user-ext-123")
                 .stripeCustomerId("cus_test123")
                 .isActive(true)
                 .build();
@@ -67,7 +68,7 @@ class UserPaymentProfileServiceTest {
         testProfileDTO = UserPaymentProfileDTO.builder()
                 .id(1L)
                 .externalId(testExternalId)
-                .userId(1L)
+                .userExternalId("user-ext-123")
                 .stripeCustomerId("cus_test123")
                 .isActive(true)
                 .build();
@@ -116,48 +117,45 @@ class UserPaymentProfileServiceTest {
     }
 
     @Test
-    void findByUserId_Success() {
-        when(userPaymentProfileRepository.findByUserId(1L)).thenReturn(Optional.of(testProfile));
+    void findByUserExternalId_Success() {
+        when(userPaymentProfileRepository.findByUserExternalId("user-ext-123")).thenReturn(Optional.of(testProfile));
         when(userPaymentProfileMapper.toDTO(testProfile)).thenReturn(testProfileDTO);
 
-        UserPaymentProfileDTO result = userPaymentProfileService.findByUserId(1L);
+        UserPaymentProfileDTO result = userPaymentProfileService.findByUserExternalId("user-ext-123");
 
         assertNotNull(result);
-        verify(userPaymentProfileRepository, times(1)).findByUserId(1L);
+        verify(userPaymentProfileRepository, times(1)).findByUserExternalId("user-ext-123");
     }
 
     @Test
-    void findByUserId_NotFound() {
-        when(userPaymentProfileRepository.findByUserId(999L)).thenReturn(Optional.empty());
+    void findByUserExternalId_NotFound() {
+        when(userPaymentProfileRepository.findByUserExternalId("user-ext-999")).thenReturn(Optional.empty());
 
-        assertThrows(ResourceNotFoundException.class, () -> userPaymentProfileService.findByUserId(999L));
+        assertThrows(ResourceNotFoundException.class, () -> userPaymentProfileService.findByUserExternalId("user-ext-999"));
     }
 
     @Test
     void createOrGetProfile_ExistingProfile_ReturnsExisting() {
-        when(userPaymentProfileRepository.findByUserId(1L)).thenReturn(Optional.of(testProfile));
+        when(userPaymentProfileRepository.findByUserExternalId("user-ext-123")).thenReturn(Optional.of(testProfile));
         when(userPaymentProfileMapper.toDTO(testProfile)).thenReturn(testProfileDTO);
 
-        UserPaymentProfileDTO result = userPaymentProfileService.createOrGetProfile(1L);
+        UserPaymentProfileDTO result = userPaymentProfileService.createOrGetProfile("user-ext-123", "test@example.com");
 
         assertNotNull(result);
-        verify(stripeService, never()).createCustomer(anyLong(), anyString());
+        verify(stripeService, never()).createCustomer(anyString(), anyString());
     }
 
     @Test
     void createOrGetProfile_NewProfile_CreatesProfile() {
-        UserDTO userDTO = UserDTO.builder().id(1L).email("test@example.com").build();
-        
-        when(userPaymentProfileRepository.findByUserId(1L)).thenReturn(Optional.empty());
-        when(authServiceClient.getUserById(1L)).thenReturn(userDTO);
-        when(stripeService.createCustomer(1L, "test@example.com")).thenReturn("cus_new123");
+        when(userPaymentProfileRepository.findByUserExternalId("user-ext-123")).thenReturn(Optional.empty());
+        when(stripeService.createCustomer("user-ext-123", "test@example.com")).thenReturn("cus_new123");
         when(userPaymentProfileRepository.save(any(UserPaymentProfile.class))).thenReturn(testProfile);
         when(userPaymentProfileMapper.toDTO(testProfile)).thenReturn(testProfileDTO);
 
-        UserPaymentProfileDTO result = userPaymentProfileService.createOrGetProfile(1L);
+        UserPaymentProfileDTO result = userPaymentProfileService.createOrGetProfile("user-ext-123", "test@example.com");
 
         assertNotNull(result);
-        verify(stripeService, times(1)).createCustomer(1L, "test@example.com");
+        verify(stripeService, times(1)).createCustomer("user-ext-123", "test@example.com");
         verify(userPaymentProfileRepository, times(1)).save(any(UserPaymentProfile.class));
     }
 

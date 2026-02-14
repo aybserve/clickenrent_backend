@@ -43,7 +43,7 @@ class ErrorCodeControllerTest {
                 .id(1L)
                 .externalId("550e8400-e29b-41d4-a716-446655440201")
                 .name("E001")
-                .bikeEngineId(1L)
+                .bikeEngineExternalIds(Arrays.asList("bike-engine-uuid-1", "bike-engine-uuid-2"))
                 .description("Battery Low Voltage")
                 .isFixableByClient(false)
                 .build();
@@ -54,7 +54,7 @@ class ErrorCodeControllerTest {
     void getAll_ReturnsOk() throws Exception {
         when(errorCodeService.getAll()).thenReturn(Arrays.asList(errorCodeDTO));
 
-        mockMvc.perform(get("/api/error-codes").with(csrf()))
+        mockMvc.perform(get("/api/v1/error-codes").with(csrf()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].name").value("E001"));
     }
@@ -64,7 +64,7 @@ class ErrorCodeControllerTest {
     void getById_ReturnsOk() throws Exception {
         when(errorCodeService.getById(1L)).thenReturn(errorCodeDTO);
 
-        mockMvc.perform(get("/api/error-codes/1").with(csrf()))
+        mockMvc.perform(get("/api/v1/error-codes/1").with(csrf()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.name").value("E001"));
     }
@@ -74,7 +74,7 @@ class ErrorCodeControllerTest {
     void create_ReturnsCreated() throws Exception {
         when(errorCodeService.create(any())).thenReturn(errorCodeDTO);
 
-        mockMvc.perform(post("/api/error-codes")
+        mockMvc.perform(post("/api/v1/error-codes")
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(errorCodeDTO)))
@@ -86,7 +86,7 @@ class ErrorCodeControllerTest {
     void update_ReturnsOk() throws Exception {
         when(errorCodeService.update(eq(1L), any())).thenReturn(errorCodeDTO);
 
-        mockMvc.perform(put("/api/error-codes/1")
+        mockMvc.perform(put("/api/v1/error-codes/1")
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(errorCodeDTO)))
@@ -98,7 +98,15 @@ class ErrorCodeControllerTest {
     void delete_ReturnsNoContent() throws Exception {
         doNothing().when(errorCodeService).delete(1L);
 
-        mockMvc.perform(delete("/api/error-codes/1").with(csrf()))
+        mockMvc.perform(delete("/api/v1/error-codes/1").with(csrf()))
                 .andExpect(status().isNoContent());
     }
 }
+
+
+
+
+
+
+
+

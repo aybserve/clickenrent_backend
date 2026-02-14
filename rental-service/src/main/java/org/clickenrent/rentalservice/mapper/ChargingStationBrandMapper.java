@@ -17,8 +17,13 @@ public class ChargingStationBrandMapper {
 
         return ChargingStationBrandDTO.builder()
                 .id(brand.getId())
+                .externalId(brand.getExternalId())
                 .name(brand.getName())
-                .companyId(brand.getCompanyId())
+                .companyExternalId(brand.getCompanyExternalId())
+                .dateCreated(brand.getDateCreated())
+                .lastDateModified(brand.getLastDateModified())
+                .createdBy(brand.getCreatedBy())
+                .lastModifiedBy(brand.getLastModifiedBy())
                 .build();
     }
 
@@ -29,8 +34,9 @@ public class ChargingStationBrandMapper {
 
         return ChargingStationBrand.builder()
                 .id(dto.getId())
+                .externalId(dto.getExternalId())
                 .name(dto.getName())
-                .companyId(dto.getCompanyId())
+                .companyExternalId(dto.getCompanyExternalId())
                 .build();
     }
 
@@ -44,3 +50,7 @@ public class ChargingStationBrandMapper {
         }
     }
 }
+
+
+
+

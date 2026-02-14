@@ -11,7 +11,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.UUID;
 
 /**
  * Service for PaymentStatus management
@@ -36,7 +35,7 @@ public class PaymentStatusService {
     }
 
     @Transactional(readOnly = true)
-    public PaymentStatusDTO findByExternalId(UUID externalId) {
+    public PaymentStatusDTO findByExternalId(String externalId) {
         PaymentStatus status = paymentStatusRepository.findByExternalId(externalId)
                 .orElseThrow(() -> new ResourceNotFoundException("PaymentStatus", "externalId", externalId));
         return paymentStatusMapper.toDTO(status);
@@ -56,6 +55,7 @@ public class PaymentStatusService {
         }
 
         PaymentStatus status = paymentStatusMapper.toEntity(dto);
+        status.sanitizeForCreate();
         PaymentStatus savedStatus = paymentStatusRepository.save(status);
         return paymentStatusMapper.toDTO(savedStatus);
     }
@@ -86,3 +86,11 @@ public class PaymentStatusService {
         paymentStatusRepository.deleteById(id);
     }
 }
+
+
+
+
+
+
+
+

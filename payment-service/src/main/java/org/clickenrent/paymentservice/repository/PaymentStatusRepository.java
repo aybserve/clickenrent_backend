@@ -5,7 +5,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
-import java.util.UUID;
 
 /**
  * Repository for PaymentStatus entity
@@ -15,5 +14,13 @@ public interface PaymentStatusRepository extends JpaRepository<PaymentStatus, Lo
     
     Optional<PaymentStatus> findByCode(String code);
     
-    Optional<PaymentStatus> findByExternalId(UUID externalId);
+    Optional<PaymentStatus> findByExternalId(String externalId);
 }
+
+
+
+
+
+
+
+

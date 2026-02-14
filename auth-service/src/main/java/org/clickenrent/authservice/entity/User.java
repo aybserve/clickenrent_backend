@@ -9,6 +9,8 @@ import lombok.experimental.SuperBuilder;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
 
+import java.util.UUID;
+
 /**
  * Entity representing a user in the system.
  * Contains user profile information, credentials, and audit fields.
@@ -19,7 +21,8 @@ import org.hibernate.annotations.Where;
     indexes = {
         @Index(name = "idx_user_external_id", columnList = "external_id"),
         @Index(name = "idx_user_email", columnList = "email"),
-        @Index(name = "idx_user_username", columnList = "user_name")
+        @Index(name = "idx_user_username", columnList = "user_name"),
+        @Index(name = "idx_user_provider", columnList = "provider_id, provider_user_id")
     }
 )
 @SQLDelete(sql = "UPDATE users SET is_deleted = true WHERE id = ?")
@@ -44,9 +47,8 @@ public class User extends BaseAuditEntity {
     @Column(name = "user_name", nullable = false, unique = true, length = 100)
     private String userName;
 
-    @NotBlank(message = "Password is required")
     @Size(max = 255, message = "Password must not exceed 255 characters")
-    @Column(name = "password", nullable = false, length = 255)
+    @Column(name = "password", length = 255)
     private String password;
 
     @NotBlank(message = "Email is required")
@@ -66,18 +68,6 @@ public class User extends BaseAuditEntity {
     @Size(max = 20, message = "Phone must not exceed 20 characters")
     @Column(name = "phone", length = 20)
     private String phone;
-
-    @Size(max = 100, message = "City must not exceed 100 characters")
-    @Column(name = "city", length = 100)
-    private String city;
-
-    @Size(max = 255, message = "Address must not exceed 255 characters")
-    @Column(name = "address", length = 255)
-    private String address;
-
-    @Size(max = 20, message = "Zipcode must not exceed 20 characters")
-    @Column(name = "zipcode", length = 20)
-    private String zipcode;
 
     @Size(max = 500, message = "Image URL must not exceed 500 characters")
     @Column(name = "image_url", length = 500)
@@ -102,6 +92,24 @@ public class User extends BaseAuditEntity {
     @Builder.Default
     @Column(name = "is_accepted_privacy_policy")
     private Boolean isAcceptedPrivacyPolicy = false;
+
+    @Size(max = 50, message = "Provider ID must not exceed 50 characters")
+    @Column(name = "provider_id", length = 50)
+    private String providerId;
+
+    @Size(max = 255, message = "Provider user ID must not exceed 255 characters")
+    @Column(name = "provider_user_id", length = 255)
+    private String providerUserId;
+
+    @PrePersist
+    public void prePersist() {
+        if (externalId == null || externalId.isEmpty()) {
+            externalId = UUID.randomUUID().toString();
+        }
+        if (getIsDeleted() == null) {
+            setIsDeleted(false);
+        }
+    }
 }
 
 

@@ -28,6 +28,9 @@ public class BikeModelRentalPlan extends BaseAuditEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "external_id", unique = true, length = 100)
+    private String externalId;
+
     @NotNull(message = "Bike model is required")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "bike_model_id", nullable = false)
@@ -41,4 +44,24 @@ public class BikeModelRentalPlan extends BaseAuditEntity {
     @NotNull(message = "Price is required")
     @Column(name = "price", nullable = false, precision = 10, scale = 2)
     private BigDecimal price;
+
+    @Override
+    public Long getId() {
+        return id;
+    }
+
+    @Override
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    @Override
+    public String getExternalId() {
+        return externalId;
+    }
+
+    @Override
+    public void setExternalId(String externalId) {
+        this.externalId = externalId;
+    }
 }

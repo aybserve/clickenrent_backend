@@ -3,7 +3,9 @@ package org.clickenrent.rentalservice.mapper;
 import lombok.RequiredArgsConstructor;
 import org.clickenrent.rentalservice.dto.LocationDTO;
 import org.clickenrent.rentalservice.entity.Location;
+import org.clickenrent.rentalservice.entity.LocationImage;
 import org.clickenrent.rentalservice.repository.CoordinatesRepository;
+import org.clickenrent.rentalservice.repository.LocationImageRepository;
 import org.springframework.stereotype.Component;
 
 /**
@@ -14,11 +16,17 @@ import org.springframework.stereotype.Component;
 public class LocationMapper {
 
     private final CoordinatesRepository coordinatesRepository;
+    private final LocationImageRepository locationImageRepository;
 
     public LocationDTO toDto(Location location) {
         if (location == null) {
             return null;
         }
+
+        // Get thumbnail image URL
+        String thumbnailImageUrl = locationImageRepository.findByLocationAndIsThumbnailTrue(location)
+                .map(LocationImage::getImageUrl)
+                .orElse(null);
 
         return LocationDTO.builder()
                 .id(location.getId())
@@ -27,10 +35,12 @@ public class LocationMapper {
                 .name(location.getName())
                 .address(location.getAddress())
                 .description(location.getDescription())
-                .companyId(location.getCompanyId())
+                .companyExternalId(location.getCompanyExternalId())
                 .isPublic(location.getIsPublic())
+                .isActive(location.getIsActive())
                 .directions(location.getDirections())
                 .coordinatesId(location.getCoordinates() != null ? location.getCoordinates().getId() : null)
+                .thumbnailImageUrl(thumbnailImageUrl)
                 .dateCreated(location.getDateCreated())
                 .lastDateModified(location.getLastDateModified())
                 .createdBy(location.getCreatedBy())
@@ -50,8 +60,9 @@ public class LocationMapper {
                 .name(dto.getName())
                 .address(dto.getAddress())
                 .description(dto.getDescription())
-                .companyId(dto.getCompanyId())
+                .companyExternalId(dto.getCompanyExternalId())
                 .isPublic(dto.getIsPublic())
+                .isActive(dto.getIsActive())
                 .directions(dto.getDirections());
 
         if (dto.getCoordinatesId() != null) {
@@ -78,8 +89,15 @@ public class LocationMapper {
         if (dto.getIsPublic() != null) {
             location.setIsPublic(dto.getIsPublic());
         }
+        if (dto.getIsActive() != null) {
+            location.setIsActive(dto.getIsActive());
+        }
         if (dto.getDirections() != null) {
             location.setDirections(dto.getDirections());
         }
     }
 }
+
+
+
+

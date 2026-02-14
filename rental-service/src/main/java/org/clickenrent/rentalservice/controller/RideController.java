@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/rides")
+@RequestMapping("/api/v1/rides")
 @RequiredArgsConstructor
 @Tag(name = "Ride", description = "Ride tracking and management")
 @SecurityRequirement(name = "bearerAuth")
@@ -37,9 +37,16 @@ public class RideController {
 
     @GetMapping("/by-bike-rental/{bikeRentalId}")
     @PreAuthorize("isAuthenticated()")
-    @Operation(summary = "Get rides by bike rental")
+    @Operation(summary = "Get rides by bike rental ID")
     public ResponseEntity<List<RideDTO>> getRidesByBikeRental(@PathVariable Long bikeRentalId) {
         return ResponseEntity.ok(rideService.getRidesByBikeRental(bikeRentalId));
+    }
+
+    @GetMapping("/by-bike-rental/external/{bikeRentalExternalId}")
+    @PreAuthorize("isAuthenticated()")
+    @Operation(summary = "Get rides by bike rental external ID")
+    public ResponseEntity<List<RideDTO>> getRidesByBikeRentalExternalId(@PathVariable String bikeRentalExternalId) {
+        return ResponseEntity.ok(rideService.getRidesByBikeRentalExternalId(bikeRentalExternalId));
     }
 
     @GetMapping("/{id}")
@@ -70,4 +77,17 @@ public class RideController {
         rideService.deleteRide(id);
         return ResponseEntity.noContent().build();
     }
+
+    @GetMapping("/external/{externalId}")
+    @PreAuthorize("isAuthenticated()")
+    @Operation(summary = "Get ride by external ID", description = "Retrieve ride by external ID for cross-service communication")
+    public ResponseEntity<RideDTO> getByExternalId(@PathVariable String externalId) {
+        return ResponseEntity.ok(rideService.getRideByExternalId(externalId));
+    }
 }
+
+
+
+
+
+

@@ -19,6 +19,10 @@ public class BikeEngineMapper {
                 .id(bikeEngine.getId())
                 .externalId(bikeEngine.getExternalId())
                 .name(bikeEngine.getName())
+                .dateCreated(bikeEngine.getDateCreated())
+                .lastDateModified(bikeEngine.getLastDateModified())
+                .createdBy(bikeEngine.getCreatedBy())
+                .lastModifiedBy(bikeEngine.getLastModifiedBy())
                 .build();
     }
 
@@ -44,3 +48,11 @@ public class BikeEngineMapper {
         }
     }
 }
+
+
+
+
+
+
+
+

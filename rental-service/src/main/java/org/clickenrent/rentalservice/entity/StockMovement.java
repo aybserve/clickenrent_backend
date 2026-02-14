@@ -7,8 +7,6 @@ import lombok.experimental.SuperBuilder;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
 
-import java.time.LocalDateTime;
-
 /**
  * Entity representing stock movements between hubs.
  */
@@ -37,9 +35,10 @@ public class StockMovement extends BaseAuditEntity {
     @Column(name = "external_id", unique = true, length = 100)
     private String externalId;
 
-    @NotNull(message = "Product ID is required")
-    @Column(name = "product_id", nullable = false)
-    private Long productId;
+    @NotNull(message = "Product is required")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "product_id", nullable = false)
+    private Product product;
 
     @NotNull(message = "From hub is required")
     @ManyToOne(fetch = FetchType.LAZY)
@@ -51,7 +50,23 @@ public class StockMovement extends BaseAuditEntity {
     @JoinColumn(name = "to_hub_id", nullable = false)
     private Hub toHub;
 
-    @NotNull(message = "Date time is required")
-    @Column(name = "date_time", nullable = false)
-    private LocalDateTime dateTime;
+    @Override
+    public Long getId() {
+        return id;
+    }
+
+    @Override
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    @Override
+    public String getExternalId() {
+        return externalId;
+    }
+
+    @Override
+    public void setExternalId(String externalId) {
+        this.externalId = externalId;
+    }
 }

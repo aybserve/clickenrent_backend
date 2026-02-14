@@ -1,12 +1,16 @@
 package org.clickenrent.rentalservice.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
+
+import java.time.LocalDateTime;
 
 /**
  * Entity representing bike locks.
@@ -41,4 +45,44 @@ public class Lock extends BaseAuditEntity {
     @Size(max = 17, message = "MAC address must not exceed 17 characters")
     @Column(name = "mac_address", nullable = false, unique = true, length = 17)
     private String macAddress;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "lock_status_id")
+    private LockStatus lockStatus;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "lock_provider_id")
+    private LockProvider lockProvider;
+
+    @Min(value = 0, message = "Battery level must be between 0 and 100")
+    @Max(value = 100, message = "Battery level must be between 0 and 100")
+    @Column(name = "battery_level")
+    private Integer batteryLevel;
+
+    @Column(name = "last_seen_at")
+    private LocalDateTime lastSeenAt;
+
+    @Size(max = 50, message = "Firmware version must not exceed 50 characters")
+    @Column(name = "firmware_version", length = 50)
+    private String firmwareVersion;
+
+    @Override
+    public Long getId() {
+        return id;
+    }
+
+    @Override
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    @Override
+    public String getExternalId() {
+        return externalId;
+    }
+
+    @Override
+    public void setExternalId(String externalId) {
+        this.externalId = externalId;
+    }
 }

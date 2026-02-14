@@ -41,7 +41,7 @@ class RentalFinTransactionControllerTest {
     void setUp() {
         rentalFinTransactionDTO = RentalFinTransactionDTO.builder()
                 .id(1L)
-                .rentalId(1L)
+                .rentalExternalId("rental-ext-123")
                 .financialTransaction(FinancialTransactionDTO.builder().id(1L).build())
                 .build();
     }
@@ -67,3 +67,7 @@ class RentalFinTransactionControllerTest {
                 .andExpect(status().isCreated());
     }
 }
+
+
+
+

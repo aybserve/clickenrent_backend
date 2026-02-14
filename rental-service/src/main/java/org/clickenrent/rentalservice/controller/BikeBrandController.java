@@ -19,9 +19,9 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/bike-brands")
+@RequestMapping("/api/v1/bike-brands")
 @RequiredArgsConstructor
-@Tag(name = "BikeBrand", description = "Bike brand management")
+@Tag(name = "Bike Brands", description = "Bike brand management")
 @SecurityRequirement(name = "bearerAuth")
 public class BikeBrandController {
 
@@ -35,11 +35,11 @@ public class BikeBrandController {
         return ResponseEntity.ok(bikeBrandService.getAllBikeBrands(pageable));
     }
 
-    @GetMapping("/by-company/{companyId}")
+    @GetMapping("/by-company/{companyExternalId}")
     @PreAuthorize("isAuthenticated()")
-    @Operation(summary = "Get bike brands by company")
-    public ResponseEntity<List<BikeBrandDTO>> getBikeBrandsByCompany(@PathVariable Long companyId) {
-        return ResponseEntity.ok(bikeBrandService.getBikeBrandsByCompany(companyId));
+    @Operation(summary = "Get bike brands by company external ID")
+    public ResponseEntity<List<BikeBrandDTO>> getBikeBrandsByCompanyExternalId(@PathVariable String companyExternalId) {
+        return ResponseEntity.ok(bikeBrandService.getBikeBrandsByCompanyExternalId(companyExternalId));
     }
 
     @GetMapping("/{id}")
@@ -70,4 +70,15 @@ public class BikeBrandController {
         bikeBrandService.deleteBikeBrand(id);
         return ResponseEntity.noContent().build();
     }
+
+    @GetMapping("/external/{externalId}")
+    @PreAuthorize("isAuthenticated()")
+    @Operation(summary = "Get bike brand by external ID", description = "Retrieve bike brand by external ID for cross-service communication")
+    public ResponseEntity<BikeBrandDTO> getByExternalId(@PathVariable String externalId) {
+        return ResponseEntity.ok(bikeBrandService.getBikeBrandByExternalId(externalId));
+    }
 }
+
+
+
+

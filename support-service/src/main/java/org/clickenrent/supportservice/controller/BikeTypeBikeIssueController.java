@@ -18,7 +18,7 @@ import java.util.List;
  * REST controller for managing BikeTypeBikeIssue junction entities.
  */
 @RestController
-@RequestMapping("/api/bike-type-bike-issues")
+@RequestMapping("/api/v1/bike-type-bike-issues")
 @RequiredArgsConstructor
 @Tag(name = "Bike Type Bike Issue", description = "Bike type bike issue link management")
 @SecurityRequirement(name = "bearerAuth")
@@ -40,11 +40,18 @@ public class BikeTypeBikeIssueController {
         return ResponseEntity.ok(bikeTypeBikeIssueService.getById(id));
     }
 
-    @GetMapping("/bike-type/{bikeTypeId}")
+    @GetMapping("/external/{externalId}")
     @PreAuthorize("isAuthenticated()")
-    @Operation(summary = "Get bike issues by bike type ID")
-    public ResponseEntity<List<BikeTypeBikeIssueDTO>> getByBikeTypeId(@PathVariable Long bikeTypeId) {
-        return ResponseEntity.ok(bikeTypeBikeIssueService.getByBikeTypeId(bikeTypeId));
+    @Operation(summary = "Get bike type bike issue link by external ID")
+    public ResponseEntity<BikeTypeBikeIssueDTO> getByExternalId(@PathVariable String externalId) {
+        return ResponseEntity.ok(bikeTypeBikeIssueService.getByExternalId(externalId));
+    }
+
+    @GetMapping("/bike-type/{bikeTypeExternalId}")
+    @PreAuthorize("isAuthenticated()")
+    @Operation(summary = "Get bike issues by bike type external ID")
+    public ResponseEntity<List<BikeTypeBikeIssueDTO>> getByBikeTypeExternalId(@PathVariable String bikeTypeExternalId) {
+        return ResponseEntity.ok(bikeTypeBikeIssueService.getByBikeTypeExternalId(bikeTypeExternalId));
     }
 
     @GetMapping("/bike-issue/{bikeIssueId}")
@@ -76,3 +83,11 @@ public class BikeTypeBikeIssueController {
         return ResponseEntity.noContent().build();
     }
 }
+
+
+
+
+
+
+
+

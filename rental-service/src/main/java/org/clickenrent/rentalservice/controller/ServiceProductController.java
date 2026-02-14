@@ -17,9 +17,9 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/service-products")
+@RequestMapping("/api/v1/service-products")
 @RequiredArgsConstructor
-@Tag(name = "ServiceProduct", description = "Service product management")
+@Tag(name = "Service Products", description = "Service product management")
 @SecurityRequirement(name = "bearerAuth")
 public class ServiceProductController {
 
@@ -54,4 +54,19 @@ public class ServiceProductController {
         serviceProductService.deleteServiceProduct(id);
         return ResponseEntity.noContent().build();
     }
+
+    @GetMapping("/external/{externalId}")
+    @PreAuthorize("isAuthenticated()")
+    @Operation(summary = "Get service product by external ID", description = "Retrieve service product by external ID for cross-service communication")
+    public ResponseEntity<ServiceProductDTO> getByExternalId(@PathVariable String externalId) {
+        return ResponseEntity.ok(serviceProductService.findByExternalId(externalId));
+    }
 }
+
+
+
+
+
+
+
+

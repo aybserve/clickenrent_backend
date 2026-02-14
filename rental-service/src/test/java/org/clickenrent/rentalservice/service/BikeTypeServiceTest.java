@@ -42,11 +42,13 @@ class BikeTypeServiceTest {
     void setUp() {
         testType = BikeType.builder()
         .id(1L)
+        .externalId("bike-type-uuid-1")
         .name("Electric bike")
         .build();
 
         testTypeDTO = BikeTypeDTO.builder()
         .id(1L)
+        .externalId("bike-type-uuid-1")
         .name("Electric bike")
         .build();
     }
@@ -119,3 +121,11 @@ class BikeTypeServiceTest {
         verify(bikeTypeRepository, times(1)).delete(testType);
     }
 }
+
+
+
+
+
+
+
+

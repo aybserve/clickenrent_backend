@@ -1,6 +1,7 @@
 package org.clickenrent.rentalservice.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.clickenrent.rentalservice.dto.BikeReservationDTO;
 import org.clickenrent.rentalservice.entity.Bike;
 import org.clickenrent.rentalservice.entity.BikeReservation;
@@ -18,6 +19,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class BikeReservationService {
 
     private final BikeReservationRepository bikeReservationRepository;
@@ -36,12 +38,12 @@ public class BikeReservationService {
     }
 
     @Transactional(readOnly = true)
-    public List<BikeReservationDTO> getReservationsByUser(Long userId) {
-        if (!securityService.isAdmin() && !securityService.hasAccessToUser(userId)) {
+    public List<BikeReservationDTO> getReservationsByUserExternalId(String userExternalId) {
+        if (!securityService.isAdmin() && !securityService.hasAccessToUserByExternalId(userExternalId)) {
             throw new UnauthorizedException("You don't have permission to view these reservations");
         }
 
-        return bikeReservationRepository.findByUserId(userId).stream()
+        return bikeReservationRepository.findByUserExternalId(userExternalId).stream()
                 .map(bikeReservationMapper::toDto)
                 .toList();
     }
@@ -51,7 +53,19 @@ public class BikeReservationService {
         BikeReservation reservation = bikeReservationRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("BikeReservation", "id", id));
 
-        if (!securityService.isAdmin() && !securityService.hasAccessToUser(reservation.getUserId())) {
+        if (!securityService.isAdmin() && !securityService.hasAccessToUserByExternalId(reservation.getUserExternalId())) {
+            throw new UnauthorizedException("You don't have permission to view this reservation");
+        }
+
+        return bikeReservationMapper.toDto(reservation);
+    }
+
+    @Transactional(readOnly = true)
+    public BikeReservationDTO findByExternalId(String externalId) {
+        BikeReservation reservation = bikeReservationRepository.findByExternalId(externalId)
+                .orElseThrow(() -> new ResourceNotFoundException("BikeReservation", "externalId", externalId));
+
+        if (!securityService.isAdmin() && !securityService.hasAccessToUserByExternalId(reservation.getUserExternalId())) {
             throw new UnauthorizedException("You don't have permission to view this reservation");
         }
 
@@ -59,9 +73,44 @@ public class BikeReservationService {
     }
 
     @Transactional
+    public BikeReservationDTO updateByExternalId(String externalId, BikeReservationDTO dto) {
+        BikeReservation reservation = bikeReservationRepository.findByExternalId(externalId)
+                .orElseThrow(() -> new ResourceNotFoundException("BikeReservation", "externalId", externalId));
+
+        if (!securityService.isAdmin() && !securityService.hasAccessToUserByExternalId(reservation.getUserExternalId())) {
+            throw new UnauthorizedException("You don't have permission to update this reservation");
+        }
+
+        // Update fields
+        if (dto.getStartDateTime() != null) {
+            reservation.setStartDateTime(dto.getStartDateTime());
+        }
+        if (dto.getEndDateTime() != null) {
+            reservation.setEndDateTime(dto.getEndDateTime());
+        }
+        
+        reservation = bikeReservationRepository.save(reservation);
+        log.info("Updated bike reservation by externalId: {}", externalId);
+        return bikeReservationMapper.toDto(reservation);
+    }
+
+    @Transactional
+    public void deleteByExternalId(String externalId) {
+        BikeReservation reservation = bikeReservationRepository.findByExternalId(externalId)
+                .orElseThrow(() -> new ResourceNotFoundException("BikeReservation", "externalId", externalId));
+
+        if (!securityService.isAdmin() && !securityService.hasAccessToUserByExternalId(reservation.getUserExternalId())) {
+            throw new UnauthorizedException("You can only delete your own reservations");
+        }
+
+        bikeReservationRepository.delete(reservation);
+        log.info("Deleted bike reservation by externalId: {}", externalId);
+    }
+
+    @Transactional
     public BikeReservationDTO createReservation(BikeReservationDTO dto) {
         // Users can only create reservations for themselves (unless admin)
-        if (!securityService.isAdmin() && !securityService.hasAccessToUser(dto.getUserId())) {
+        if (!securityService.isAdmin() && !securityService.hasAccessToUserByExternalId(dto.getUserExternalId())) {
             throw new UnauthorizedException("You can only create reservations for yourself");
         }
 
@@ -70,8 +119,9 @@ public class BikeReservationService {
                 .orElseThrow(() -> new ResourceNotFoundException("Bike", "id", dto.getBikeId()));
 
         // TODO: Check for overlapping reservations
-        
+
         BikeReservation reservation = bikeReservationMapper.toEntity(dto);
+        reservation.sanitizeForCreate();
         reservation = bikeReservationRepository.save(reservation);
         return bikeReservationMapper.toDto(reservation);
     }
@@ -81,10 +131,19 @@ public class BikeReservationService {
         BikeReservation reservation = bikeReservationRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("BikeReservation", "id", id));
 
-        if (!securityService.isAdmin() && !securityService.hasAccessToUser(reservation.getUserId())) {
+        if (!securityService.isAdmin() && !securityService.hasAccessToUserByExternalId(reservation.getUserExternalId())) {
             throw new UnauthorizedException("You can only delete your own reservations");
         }
 
         bikeReservationRepository.delete(reservation);
     }
+
+    @Transactional(readOnly = true)
+    public boolean existsByExternalId(String externalId) {
+        return bikeReservationRepository.existsByExternalId(externalId);
+    }
 }
+
+
+
+

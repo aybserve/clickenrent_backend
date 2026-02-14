@@ -6,7 +6,6 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.clickenrent.paymentservice.entity.FinancialTransaction;
 import org.clickenrent.paymentservice.entity.PaymentStatus;
 import org.clickenrent.paymentservice.repository.FinancialTransactionRepository;
 import org.clickenrent.paymentservice.repository.PaymentStatusRepository;
@@ -18,7 +17,7 @@ import org.springframework.web.bind.annotation.*;
  * Controller for handling Stripe webhook events
  */
 @RestController
-@RequestMapping("/api/webhooks/stripe")
+@RequestMapping("/api/v1/webhooks/stripe")
 @RequiredArgsConstructor
 @Slf4j
 @Tag(name = "Stripe Webhook", description = "Stripe webhook event handling")
@@ -155,3 +154,7 @@ public class StripeWebhookController {
         }
     }
 }
+
+
+
+

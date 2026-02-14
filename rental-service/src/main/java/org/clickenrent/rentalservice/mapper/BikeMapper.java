@@ -14,7 +14,6 @@ import org.springframework.stereotype.Component;
 public class BikeMapper {
 
     private final BikeStatusRepository bikeStatusRepository;
-    private final BatteryChargeStatusRepository batteryChargeStatusRepository;
     private final LockRepository lockRepository;
     private final HubRepository hubRepository;
     private final CoordinatesRepository coordinatesRepository;
@@ -33,16 +32,17 @@ public class BikeMapper {
                 .qrCodeUrl(bike.getQrCodeUrl())
                 .frameNumber(bike.getFrameNumber())
                 .bikeStatusId(bike.getBikeStatus() != null ? bike.getBikeStatus().getId() : null)
-                .batteryChargeStatusId(bike.getBatteryChargeStatus() != null ? bike.getBatteryChargeStatus().getId() : null)
+                .batteryLevel(bike.getBatteryLevel())
                 .lockId(bike.getLock() != null ? bike.getLock().getId() : null)
                 .vat(bike.getVat())
                 .isVatInclude(bike.getIsVatInclude())
                 .hubId(bike.getHub() != null ? bike.getHub().getId() : null)
                 .coordinatesId(bike.getCoordinates() != null ? bike.getCoordinates().getId() : null)
                 .bikeTypeId(bike.getBikeType() != null ? bike.getBikeType().getId() : null)
-                .currencyId(bike.getCurrencyId())
+                .currencyExternalId(bike.getCurrencyExternalId())
                 .inServiceDate(bike.getInServiceDate())
                 .bikeModelId(bike.getBikeModel() != null ? bike.getBikeModel().getId() : null)
+                .bikeModelImageUrl(bike.getBikeModel() != null ? bike.getBikeModel().getImageUrl() : null)
                 .isB2BRentable(bike.getIsB2BRentable())
                 .revenueSharePercent(bike.getRevenueSharePercent())
                 .dateCreated(bike.getDateCreated())
@@ -65,16 +65,14 @@ public class BikeMapper {
                 .frameNumber(dto.getFrameNumber())
                 .vat(dto.getVat())
                 .isVatInclude(dto.getIsVatInclude())
-                .currencyId(dto.getCurrencyId())
+                .currencyExternalId(dto.getCurrencyExternalId())
                 .inServiceDate(dto.getInServiceDate())
                 .isB2BRentable(dto.getIsB2BRentable())
-                .revenueSharePercent(dto.getRevenueSharePercent());
+                .revenueSharePercent(dto.getRevenueSharePercent())
+                .batteryLevel(dto.getBatteryLevel() != null ? dto.getBatteryLevel() : 0);
 
         if (dto.getBikeStatusId() != null) {
             builder.bikeStatus(bikeStatusRepository.findById(dto.getBikeStatusId()).orElse(null));
-        }
-        if (dto.getBatteryChargeStatusId() != null) {
-            builder.batteryChargeStatus(batteryChargeStatusRepository.findById(dto.getBatteryChargeStatusId()).orElse(null));
         }
         if (dto.getLockId() != null) {
             builder.lock(lockRepository.findById(dto.getLockId()).orElse(null));
@@ -120,6 +118,9 @@ public class BikeMapper {
         }
         if (dto.getRevenueSharePercent() != null) {
             bike.setRevenueSharePercent(dto.getRevenueSharePercent());
+        }
+        if (dto.getBatteryLevel() != null) {
+            bike.setBatteryLevel(dto.getBatteryLevel());
         }
     }
 }

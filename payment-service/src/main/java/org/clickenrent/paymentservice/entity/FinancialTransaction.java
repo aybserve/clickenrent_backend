@@ -2,41 +2,53 @@ package org.clickenrent.paymentservice.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.springframework.data.annotation.CreatedBy;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedBy;
-import org.springframework.data.annotation.LastModifiedDate;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+import lombok.experimental.SuperBuilder;
+import org.clickenrent.contracts.security.TenantScoped;
+import org.hibernate.annotations.Filter;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.SQLRestriction;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
 /**
- * Core financial transaction entity
+ * Core financial transaction entity.
+ * Implements TenantScoped for multi-tenant isolation.
+ * Transactions are scoped to the recipient company (typically the service provider).
  */
 @Entity
-@Table(name = "financial_transactions")
-@EntityListeners(AuditingEntityListener.class)
+@Table(
+    name = "financial_transactions",
+    indexes = {
+        @Index(name = "idx_financial_transaction_company", columnList = "company_external_id")
+    }
+)
+@Filter(name = "companyFilter", condition = "company_external_id IN (:companyExternalIds)")
+@SQLDelete(sql = "UPDATE financial_transactions SET is_deleted = true WHERE id = ?")
+@SQLRestriction("is_deleted = false")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
-public class FinancialTransaction {
+@SuperBuilder
+public class FinancialTransaction extends BaseAuditEntity implements TenantScoped {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(unique = true, nullable = false, updatable = false)
-    private UUID externalId;
+    @Column(name = "external_id", unique = true, length = 100)
+    private String externalId;
 
-    @Column(nullable = false)
-    private Long payerId; // References user in auth-service
+    @Column(name = "payer_external_id", length = 100)
+    private String payerExternalId;
 
-    @Column(nullable = false)
-    private Long recipientId; // References user/company
+    @Column(name = "recipient_external_id", length = 100)
+    private String recipientExternalId;
+    
+    @Column(name = "company_external_id", length = 100)
+    private String companyExternalId;
 
     @Column(nullable = false, precision = 19, scale = 2)
     private BigDecimal amount;
@@ -69,28 +81,39 @@ public class FinancialTransaction {
     @Column(length = 255)
     private String stripeRefundId;
 
+    @Column(length = 255)
+    private String multiSafepayOrderId;
+
+    @Column(length = 255)
+    private String multiSafepayTransactionId;
+
     @Column
     private Long originalTransactionId; // Self-reference for refunds
 
-    @CreatedDate
-    @Column(nullable = false, updatable = false)
-    private LocalDateTime createdAt;
+    @Override
+    public Long getId() {
+        return id;
+    }
 
-    @LastModifiedDate
-    @Column(nullable = false)
-    private LocalDateTime updatedAt;
+    @Override
+    public void setId(Long id) {
+        this.id = id;
+    }
 
-    @CreatedBy
-    @Column(updatable = false)
-    private String createdBy;
+    @Override
+    public String getExternalId() {
+        return externalId;
+    }
 
-    @LastModifiedBy
-    private String lastModifiedBy;
+    @Override
+    public void setExternalId(String externalId) {
+        this.externalId = externalId;
+    }
 
     @PrePersist
     public void prePersist() {
-        if (externalId == null) {
-            externalId = UUID.randomUUID();
+        if (externalId == null || externalId.isEmpty()) {
+            externalId = UUID.randomUUID().toString();
         }
         if (dateTime == null) {
             dateTime = LocalDateTime.now();
@@ -109,4 +132,13 @@ public class FinancialTransaction {
     public int hashCode() {
         return getClass().hashCode();
     }
+    
+    @Override
+    public String getCompanyExternalId() {
+        return this.companyExternalId;
+    }
 }
+
+
+
+

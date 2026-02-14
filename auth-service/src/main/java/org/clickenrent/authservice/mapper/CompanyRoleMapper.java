@@ -17,6 +17,7 @@ public class CompanyRoleMapper {
         
         return CompanyRoleDTO.builder()
                 .id(companyRole.getId())
+                .externalId(companyRole.getExternalId())
                 .name(companyRole.getName())
                 .build();
     }
@@ -28,6 +29,7 @@ public class CompanyRoleMapper {
         
         return CompanyRole.builder()
                 .id(dto.getId())
+                .externalId(dto.getExternalId())
                 .name(dto.getName())
                 .build();
     }
@@ -37,10 +39,21 @@ public class CompanyRoleMapper {
             return;
         }
         
+        if (dto.getExternalId() != null) {
+            companyRole.setExternalId(dto.getExternalId());
+        }
         if (dto.getName() != null) {
             companyRole.setName(dto.getName());
         }
     }
 }
+
+
+
+
+
+
+
+
 
 

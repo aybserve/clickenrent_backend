@@ -100,3 +100,11 @@ class HubImageControllerTest {
                 .andExpect(status().isNoContent());
     }
 }
+
+
+
+
+
+
+
+

@@ -51,7 +51,8 @@ class RideControllerTest {
                 .endDateTime(null)
                 .startLocationId(1L)
                 .endLocationId(2L)
-                .coordinatesId(1L)
+                .startCoordinatesId(1L)
+                .endCoordinatesId(2L)
                 .rideStatusId(1L)
                 .build();
     }
@@ -120,3 +121,9 @@ class RideControllerTest {
                 .andExpect(status().isNoContent());
     }
 }
+
+
+
+
+
+

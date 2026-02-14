@@ -24,6 +24,10 @@ public class KeyMapper {
                 .id(key.getId())
                 .externalId(key.getExternalId())
                 .lockId(key.getLock() != null ? key.getLock().getId() : null)
+                .dateCreated(key.getDateCreated())
+                .lastDateModified(key.getLastDateModified())
+                .createdBy(key.getCreatedBy())
+                .lastModifiedBy(key.getLastModifiedBy())
                 .build();
     }
 
@@ -34,7 +38,11 @@ public class KeyMapper {
 
         Key.KeyBuilder builder = Key.builder()
                 .id(dto.getId())
-                .externalId(dto.getExternalId());
+                .externalId(dto.getExternalId())
+                .dateCreated(dto.getDateCreated())
+                .lastDateModified(dto.getLastDateModified())
+                .createdBy(dto.getCreatedBy())
+                .lastModifiedBy(dto.getLastModifiedBy());
 
         if (dto.getLockId() != null) {
             builder.lock(lockRepository.findById(dto.getLockId()).orElse(null));
@@ -43,3 +51,11 @@ public class KeyMapper {
         return builder.build();
     }
 }
+
+
+
+
+
+
+
+

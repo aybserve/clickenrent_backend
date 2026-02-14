@@ -46,8 +46,8 @@ class FinancialTransactionControllerTest {
     void setUp() {
         transactionDTO = FinancialTransactionDTO.builder()
                 .id(1L)
-                .payerId(1L)
-                .recipientId(2L)
+                .payerExternalId("payer-ext-123")
+                .recipientExternalId("recipient-ext-456")
                 .amount(new BigDecimal("100.00"))
                 .currency(CurrencyDTO.builder().code("USD").build())
                 .paymentMethod(PaymentMethodDTO.builder().code("CREDIT_CARD").build())

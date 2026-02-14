@@ -13,9 +13,9 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/b2b-sale-order-statuses")
+@RequestMapping("/api/v1/b2b-sale-order-statuses")
 @RequiredArgsConstructor
-@Tag(name = "B2BSaleOrderStatus", description = "B2B sale order status management")
+@Tag(name = "B2B Sale Order Status", description = "B2B sale order status management")
 @SecurityRequirement(name = "bearerAuth")
 public class B2BSaleOrderStatusController {
 
@@ -34,4 +34,19 @@ public class B2BSaleOrderStatusController {
     public ResponseEntity<B2BSaleOrderStatusDTO> getStatusById(@PathVariable Long id) {
         return ResponseEntity.ok(b2bSaleOrderStatusService.getStatusById(id));
     }
+
+    @GetMapping("/external/{externalId}")
+    @PreAuthorize("isAuthenticated()")
+    @Operation(summary = "Get B2B sale order status by external ID", description = "Retrieve status by external ID for cross-service communication")
+    public ResponseEntity<B2BSaleOrderStatusDTO> getByExternalId(@PathVariable String externalId) {
+        return ResponseEntity.ok(b2bSaleOrderStatusService.findByExternalId(externalId));
+    }
 }
+
+
+
+
+
+
+
+

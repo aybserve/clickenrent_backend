@@ -12,10 +12,9 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/user-payment-profiles")
+@RequestMapping("/api/v1/user-payment-profiles")
 @RequiredArgsConstructor
 @Tag(name = "User Payment Profile", description = "User payment profile management API")
 public class UserPaymentProfileController {
@@ -23,28 +22,30 @@ public class UserPaymentProfileController {
     private final UserPaymentProfileService userPaymentProfileService;
 
     @GetMapping
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('SUPERADMIN', 'ADMIN')")
     @Operation(summary = "Get all user payment profiles")
     public ResponseEntity<List<UserPaymentProfileDTO>> getAll() {
         return ResponseEntity.ok(userPaymentProfileService.findAll());
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasAnyRole('SUPERADMIN', 'ADMIN')")
     @Operation(summary = "Get payment profile by ID")
     public ResponseEntity<UserPaymentProfileDTO> getById(@PathVariable Long id) {
         return ResponseEntity.ok(userPaymentProfileService.findById(id));
     }
 
     @GetMapping("/external/{externalId}")
+    @PreAuthorize("hasAnyRole('SUPERADMIN', 'ADMIN')")
     @Operation(summary = "Get payment profile by external ID")
-    public ResponseEntity<UserPaymentProfileDTO> getByExternalId(@PathVariable UUID externalId) {
+    public ResponseEntity<UserPaymentProfileDTO> getByExternalId(@PathVariable String externalId) {
         return ResponseEntity.ok(userPaymentProfileService.findByExternalId(externalId));
     }
 
-    @GetMapping("/user/{userId}")
-    @Operation(summary = "Get payment profile by user ID")
-    public ResponseEntity<UserPaymentProfileDTO> getByUserId(@PathVariable Long userId) {
-        return ResponseEntity.ok(userPaymentProfileService.findByUserId(userId));
+    @GetMapping("/user/{userExternalId}")
+    @Operation(summary = "Get payment profile by user external ID")
+    public ResponseEntity<UserPaymentProfileDTO> getByUserExternalId(@PathVariable String userExternalId) {
+        return ResponseEntity.ok(userPaymentProfileService.findByUserExternalId(userExternalId));
     }
 
     @PostMapping
@@ -53,10 +54,12 @@ public class UserPaymentProfileController {
         return ResponseEntity.status(HttpStatus.CREATED).body(userPaymentProfileService.create(dto));
     }
 
-    @PostMapping("/create-or-get/{userId}")
+    @PostMapping("/create-or-get")
     @Operation(summary = "Create or get payment profile for user")
-    public ResponseEntity<UserPaymentProfileDTO> createOrGetProfile(@PathVariable Long userId) {
-        return ResponseEntity.ok(userPaymentProfileService.createOrGetProfile(userId));
+    public ResponseEntity<UserPaymentProfileDTO> createOrGetProfile(
+            @RequestParam String userExternalId,
+            @RequestParam String userEmail) {
+        return ResponseEntity.ok(userPaymentProfileService.createOrGetProfile(userExternalId, userEmail));
     }
 
     @PutMapping("/{id}")

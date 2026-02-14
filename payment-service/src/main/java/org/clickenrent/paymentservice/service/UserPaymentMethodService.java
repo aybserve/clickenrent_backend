@@ -14,7 +14,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.UUID;
 
 /**
  * Service for UserPaymentMethod management
@@ -28,7 +27,7 @@ public class UserPaymentMethodService {
     private final UserPaymentProfileRepository userPaymentProfileRepository;
     private final UserPaymentMethodMapper userPaymentMethodMapper;
     private final SecurityService securityService;
-    private final StripeService stripeService;
+    private final PaymentProviderService paymentProviderService;
 
     @Transactional(readOnly = true)
     public List<UserPaymentMethodDTO> findAll() {
@@ -49,7 +48,7 @@ public class UserPaymentMethodService {
     }
 
     @Transactional(readOnly = true)
-    public UserPaymentMethodDTO findByExternalId(UUID externalId) {
+    public UserPaymentMethodDTO findByExternalId(String externalId) {
         UserPaymentMethod method = userPaymentMethodRepository.findByExternalId(externalId)
                 .orElseThrow(() -> new ResourceNotFoundException("UserPaymentMethod", "externalId", externalId));
         
@@ -59,13 +58,14 @@ public class UserPaymentMethodService {
     }
 
     @Transactional(readOnly = true)
-    public List<UserPaymentMethodDTO> findByUserId(Long userId) {
-        if (!securityService.isAdmin() && !securityService.hasAccessToUser(userId)) {
+    public List<UserPaymentMethodDTO> findByUserExternalId(String userExternalId) {
+        // Only admins can access payment methods for now
+        if (!securityService.isAdmin()) {
             throw new UnauthorizedException("You don't have permission to access these payment methods");
         }
         
-        UserPaymentProfile profile = userPaymentProfileRepository.findByUserId(userId)
-                .orElseThrow(() -> new ResourceNotFoundException("UserPaymentProfile", "userId", userId));
+        UserPaymentProfile profile = userPaymentProfileRepository.findByUserExternalId(userExternalId)
+                .orElseThrow(() -> new ResourceNotFoundException("UserPaymentProfile", "userExternalId", userExternalId));
         
         List<UserPaymentMethod> methods = userPaymentMethodRepository.findByUserPaymentProfileId(profile.getId());
         return userPaymentMethodMapper.toDTOList(methods);
@@ -76,22 +76,35 @@ public class UserPaymentMethodService {
         UserPaymentProfile profile = userPaymentProfileRepository.findById(profileId)
                 .orElseThrow(() -> new ResourceNotFoundException("UserPaymentProfile", "id", profileId));
         
-        if (!securityService.isAdmin() && !securityService.hasAccessToUser(profile.getUserId())) {
+        // Only admins can attach payment methods for now
+        if (!securityService.isAdmin()) {
             throw new UnauthorizedException("You don't have permission to attach payment methods to this profile");
         }
         
         log.info("Attaching payment method: {} to profile: {}", stripePaymentMethodId, profileId);
         
-        // Attach payment method to Stripe customer
-        stripeService.attachPaymentMethod(stripePaymentMethodId, profile.getStripeCustomerId());
+        // Get customer ID based on active provider
+        String customerId = paymentProviderService.isStripeActive() 
+                ? profile.getStripeCustomerId() 
+                : profile.getMultiSafepayCustomerId();
         
-        // Create payment method record (simplified - you'd typically get more details from Stripe)
-        UserPaymentMethod method = UserPaymentMethod.builder()
+        // Attach payment method to customer
+        paymentProviderService.attachPaymentMethod(stripePaymentMethodId, customerId);
+        
+        // Create payment method record
+        UserPaymentMethod.UserPaymentMethodBuilder methodBuilder = UserPaymentMethod.builder()
                 .userPaymentProfile(profile)
-                .stripePaymentMethodId(stripePaymentMethodId)
                 .isDefault(false)
-                .isActive(true)
-                .build();
+                .isActive(true);
+        
+        // Set provider-specific payment method ID
+        if (paymentProviderService.isStripeActive()) {
+            methodBuilder.stripePaymentMethodId(stripePaymentMethodId);
+        } else if (paymentProviderService.isMultiSafepayActive()) {
+            methodBuilder.multiSafepayTokenId(stripePaymentMethodId);
+        }
+        
+        UserPaymentMethod method = methodBuilder.build();
         
         UserPaymentMethod savedMethod = userPaymentMethodRepository.save(method);
         log.info("Payment method attached successfully: {}", savedMethod.getId());
@@ -129,6 +142,7 @@ public class UserPaymentMethodService {
     @Transactional
     public UserPaymentMethodDTO create(UserPaymentMethodDTO dto) {
         UserPaymentMethod method = userPaymentMethodMapper.toEntity(dto);
+        method.sanitizeForCreate();
         UserPaymentMethod savedMethod = userPaymentMethodRepository.save(method);
         return userPaymentMethodMapper.toDTO(savedMethod);
     }
@@ -157,9 +171,13 @@ public class UserPaymentMethodService {
     }
 
     private void checkMethodAccess(UserPaymentMethod method) {
-        Long userId = method.getUserPaymentProfile().getUserId();
-        if (!securityService.isAdmin() && !securityService.hasAccessToUser(userId)) {
+        // Only admins can access payment methods for now
+        if (!securityService.isAdmin()) {
             throw new UnauthorizedException("You don't have permission to access this payment method");
         }
     }
 }
+
+
+
+

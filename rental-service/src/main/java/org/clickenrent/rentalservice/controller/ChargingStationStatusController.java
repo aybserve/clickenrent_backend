@@ -13,9 +13,9 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/charging-station-statuses")
+@RequestMapping("/api/v1/charging-station-statuses")
 @RequiredArgsConstructor
-@Tag(name = "ChargingStationStatus", description = "Charging station status management")
+@Tag(name = "Charging Station Status", description = "Charging station status management")
 @SecurityRequirement(name = "bearerAuth")
 public class ChargingStationStatusController {
 
@@ -34,4 +34,19 @@ public class ChargingStationStatusController {
     public ResponseEntity<ChargingStationStatusDTO> getStatusById(@PathVariable Long id) {
         return ResponseEntity.ok(chargingStationStatusService.getStatusById(id));
     }
+
+    @GetMapping("/external/{externalId}")
+    @PreAuthorize("isAuthenticated()")
+    @Operation(summary = "Get charging station status by external ID", description = "Retrieve status by external ID for cross-service communication")
+    public ResponseEntity<ChargingStationStatusDTO> getByExternalId(@PathVariable String externalId) {
+        return ResponseEntity.ok(chargingStationStatusService.findByExternalId(externalId));
+    }
 }
+
+
+
+
+
+
+
+

@@ -17,6 +17,7 @@ public class LanguageMapper {
         
         return LanguageDTO.builder()
                 .id(language.getId())
+                .externalId(language.getExternalId())
                 .name(language.getName())
                 .build();
     }
@@ -28,6 +29,7 @@ public class LanguageMapper {
         
         return Language.builder()
                 .id(dto.getId())
+                .externalId(dto.getExternalId())
                 .name(dto.getName())
                 .build();
     }
@@ -37,10 +39,21 @@ public class LanguageMapper {
             return;
         }
         
+        if (dto.getExternalId() != null) {
+            language.setExternalId(dto.getExternalId());
+        }
         if (dto.getName() != null) {
             language.setName(dto.getName());
         }
     }
 }
+
+
+
+
+
+
+
+
 
 

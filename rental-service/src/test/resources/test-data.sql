@@ -280,12 +280,12 @@ VALUES (2, 'B2BS002', 'Hotel Partnership Sale', 'Bikes for hotel guests', 2, 4, 
 INSERT INTO b2b_sale_order (id, external_id, b2b_sale_id, b2b_sale_order_status_id, total_amount, date_created, last_date_modified, created_by, last_modified_by, is_deleted)
 VALUES (1, 'B2BSO001', 1, 2, 25000.00, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false);
 
--- B2B Sale Products
-INSERT INTO b2b_sale_product (id, b2b_sale_id, product_id, quantity, unit_price, is_deleted)
-VALUES (1, 1, 2, 5, 2500.00, false);
+-- B2B Sale Items
+INSERT INTO b2b_sale_item (id, b2b_sale_id, product_id, quantity, price, total_price, is_deleted)
+VALUES (1, 1, 2, 5, 500.00, 2500.00, false);
 
-INSERT INTO b2b_sale_product (id, b2b_sale_id, product_id, quantity, unit_price, is_deleted)
-VALUES (2, 1, 4, 5, 2500.00, false);
+INSERT INTO b2b_sale_item (id, b2b_sale_id, product_id, quantity, price, total_price, is_deleted)
+VALUES (2, 1, 4, 5, 500.00, 2500.00, false);
 
 -- B2B Subscriptions
 INSERT INTO b2b_subscription (id, external_id, name, description, company_id, b2b_subscription_status_id, start_date, end_date, date_created, last_date_modified, created_by, last_modified_by, is_deleted)

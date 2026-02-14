@@ -36,9 +36,19 @@ public class GlobalRoleService {
         return globalRoleMapper.toDto(globalRole);
     }
     
+    @Transactional(readOnly = true)
+    public GlobalRoleDTO getGlobalRoleByExternalId(String externalId) {
+        GlobalRole globalRole = globalRoleRepository.findByExternalId(externalId)
+                .orElseThrow(() -> new ResourceNotFoundException("GlobalRole", "externalId", externalId));
+        return globalRoleMapper.toDto(globalRole);
+    }
+    
     @Transactional
     public GlobalRoleDTO createGlobalRole(GlobalRoleDTO globalRoleDTO) {
         GlobalRole globalRole = globalRoleMapper.toEntity(globalRoleDTO);
+        // Sanitize server-managed fields
+        globalRole.setId(null);
+        globalRole.setExternalId(null);
         globalRole = globalRoleRepository.save(globalRole);
         return globalRoleMapper.toDto(globalRole);
     }
@@ -60,5 +70,13 @@ public class GlobalRoleService {
         globalRoleRepository.delete(globalRole);
     }
 }
+
+
+
+
+
+
+
+
 
 

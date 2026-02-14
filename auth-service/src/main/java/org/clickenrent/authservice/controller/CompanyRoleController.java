@@ -17,7 +17,7 @@ import java.util.List;
  * REST controller for CompanyRole management operations.
  */
 @RestController
-@RequestMapping("/api/company-roles")
+@RequestMapping("/api/v1/company-roles")
 @RequiredArgsConstructor
 @Tag(name = "Company Role", description = "Company role management endpoints")
 @SecurityRequirement(name = "bearerAuth")
@@ -44,6 +44,17 @@ public class CompanyRoleController {
     @PreAuthorize("hasAnyRole('SUPERADMIN', 'ADMIN', 'B2B')")
     public ResponseEntity<CompanyRoleDTO> getCompanyRoleById(@PathVariable Long id) {
         CompanyRoleDTO companyRole = companyRoleService.getCompanyRoleById(id);
+        return ResponseEntity.ok(companyRole);
+    }
+    
+    /**
+     * Get company role by external ID.
+     * GET /api/company-roles/external/{externalId}
+     */
+    @GetMapping("/external/{externalId}")
+    @PreAuthorize("hasAnyRole('SUPERADMIN', 'ADMIN', 'B2B')")
+    public ResponseEntity<CompanyRoleDTO> getCompanyRoleByExternalId(@PathVariable String externalId) {
+        CompanyRoleDTO companyRole = companyRoleService.getCompanyRoleByExternalId(externalId);
         return ResponseEntity.ok(companyRole);
     }
     

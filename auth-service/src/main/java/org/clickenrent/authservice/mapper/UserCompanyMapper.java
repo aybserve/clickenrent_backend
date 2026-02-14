@@ -27,6 +27,7 @@ public class UserCompanyMapper {
         
         return UserCompanyDTO.builder()
                 .id(userCompany.getId())
+                .externalId(userCompany.getExternalId())
                 .userId(userCompany.getUser() != null ? userCompany.getUser().getId() : null)
                 .companyId(userCompany.getCompany() != null ? userCompany.getCompany().getId() : null)
                 .companyRoleId(userCompany.getCompanyRole() != null ? userCompany.getCompanyRole().getId() : null)
@@ -60,6 +61,7 @@ public class UserCompanyMapper {
         
         return UserCompany.builder()
                 .id(dto.getId())
+                .externalId(dto.getExternalId())
                 .build();
     }
 }

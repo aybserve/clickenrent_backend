@@ -10,6 +10,7 @@ import org.hibernate.annotations.Where;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 /**
  * Entity representing a bike rental
@@ -73,10 +74,6 @@ public class BikeRental extends BaseAuditEntity {
     @Column(name = "is_revenue_share_paid", nullable = false)
     private Boolean isRevenueSharePaid = false;
 
-    @Builder.Default
-    @Column(name = "is_b2b_rentable", nullable = false)
-    private Boolean isB2BRentable = false;
-
     @Size(max = 500, message = "Photo URL must not exceed 500 characters")
     @Column(name = "photo_url", length = 500)
     private String photoUrl;
@@ -87,5 +84,12 @@ public class BikeRental extends BaseAuditEntity {
     @NotNull(message = "Total price is required")
     @Column(name = "total_price", nullable = false, precision = 10, scale = 2)
     private BigDecimal totalPrice;
+
+    @PrePersist
+    public void prePersist() {
+        if (externalId == null || externalId.isEmpty()) {
+            externalId = UUID.randomUUID().toString();
+        }
+    }
 }
 

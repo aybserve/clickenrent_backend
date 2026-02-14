@@ -100,3 +100,11 @@ class LocationImageControllerTest {
                 .andExpect(status().isNoContent());
     }
 }
+
+
+
+
+
+
+
+

@@ -19,9 +19,9 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/b2b-subscriptions")
+@RequestMapping("/api/v1/b2b-subscriptions")
 @RequiredArgsConstructor
-@Tag(name = "B2BSubscription", description = "B2B subscription management")
+@Tag(name = "B2B Subscription", description = "B2B subscription management")
 @SecurityRequirement(name = "bearerAuth")
 public class B2BSubscriptionController {
 
@@ -47,6 +47,28 @@ public class B2BSubscriptionController {
     @Operation(summary = "Get subscription by ID")
     public ResponseEntity<B2BSubscriptionDTO> getSubscriptionById(@PathVariable Long id) {
         return ResponseEntity.ok(b2bSubscriptionService.getSubscriptionById(id));
+    }
+
+    @GetMapping("/{id}/exists")
+    @PreAuthorize("isAuthenticated()")
+    @Operation(summary = "Check if B2B subscription exists by ID")
+    public ResponseEntity<Boolean> checkSubscriptionExists(@PathVariable Long id) {
+        boolean exists = b2bSubscriptionService.getSubscriptionById(id) != null;
+        return ResponseEntity.ok(exists);
+    }
+
+    @GetMapping("/external/{externalId}")
+    @PreAuthorize("hasAnyRole('SUPERADMIN', 'ADMIN', 'B2B')")
+    @Operation(summary = "Get subscription by external ID")
+    public ResponseEntity<B2BSubscriptionDTO> getSubscriptionByExternalId(@PathVariable String externalId) {
+        return ResponseEntity.ok(b2bSubscriptionService.findByExternalId(externalId));
+    }
+
+    @GetMapping("/external/{externalId}/exists")
+    @PreAuthorize("isAuthenticated()")
+    @Operation(summary = "Check if B2B subscription exists by external ID")
+    public ResponseEntity<Boolean> checkSubscriptionExistsByExternalId(@PathVariable String externalId) {
+        return ResponseEntity.ok(b2bSubscriptionService.existsByExternalId(externalId));
     }
 
     @PostMapping

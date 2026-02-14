@@ -5,26 +5,36 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.*;
+import lombok.experimental.SuperBuilder;
+import org.clickenrent.contracts.security.TenantScoped;
+import org.hibernate.annotations.Filter;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.SQLRestriction;
+
+import java.util.UUID;
 
 /**
  * Entity representing bike brands.
+ * Implements TenantScoped for multi-tenant isolation.
  */
 @Entity
 @Table(
     name = "bike_brand",
     indexes = {
         @Index(name = "idx_bike_brand_external_id", columnList = "external_id"),
-        @Index(name = "idx_bike_brand_company_id", columnList = "company_id")
+        @Index(name = "idx_bike_brand_company_external_id", columnList = "company_external_id")
     }
 )
+@Filter(name = "companyFilter", condition = "company_external_id IN (:companyExternalIds)")
+@SQLDelete(sql = "UPDATE bike_brand SET is_deleted = true WHERE id = ?")
+@SQLRestriction("is_deleted = false")
 @Getter
 @Setter
 @NoArgsConstructor
-@AllArgsConstructor
-@Builder
-@ToString
-@EqualsAndHashCode(of = "id")
-public class BikeBrand {
+@SuperBuilder
+@ToString(callSuper = true)
+@EqualsAndHashCode(of = "id", callSuper = false)
+public class BikeBrand extends BaseAuditEntity implements TenantScoped {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -38,7 +48,23 @@ public class BikeBrand {
     @Column(name = "name", nullable = false, length = 100)
     private String name;
 
-    @NotNull(message = "Company ID is required")
-    @Column(name = "company_id", nullable = false)
-    private Long companyId;
+    @NotNull(message = "Company external ID is required")
+    @Column(name = "company_external_id", nullable = false, length = 100)
+    private String companyExternalId;
+
+    @PrePersist
+    public void prePersist() {
+        if (externalId == null || externalId.isEmpty()) {
+            externalId = UUID.randomUUID().toString();
+        }
+    }
+    
+    @Override
+    public String getCompanyExternalId() {
+        return this.companyExternalId;
+    }
 }
+
+
+
+

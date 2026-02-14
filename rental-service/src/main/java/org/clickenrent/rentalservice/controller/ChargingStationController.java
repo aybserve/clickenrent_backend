@@ -17,9 +17,9 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/charging-stations")
+@RequestMapping("/api/v1/charging-stations")
 @RequiredArgsConstructor
-@Tag(name = "ChargingStation", description = "Charging station management")
+@Tag(name = "Charging Station", description = "Charging station management")
 @SecurityRequirement(name = "bearerAuth")
 public class ChargingStationController {
 
@@ -61,4 +61,19 @@ public class ChargingStationController {
         chargingStationService.deleteChargingStation(id);
         return ResponseEntity.noContent().build();
     }
+
+    @GetMapping("/external/{externalId}")
+    @PreAuthorize("isAuthenticated()")
+    @Operation(summary = "Get charging station by external ID", description = "Retrieve charging station by external ID for cross-service communication")
+    public ResponseEntity<ChargingStationDTO> getByExternalId(@PathVariable String externalId) {
+        return ResponseEntity.ok(chargingStationService.findByExternalId(externalId));
+    }
 }
+
+
+
+
+
+
+
+

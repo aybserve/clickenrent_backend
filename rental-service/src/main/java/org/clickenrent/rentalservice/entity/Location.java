@@ -6,22 +6,28 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
+import org.clickenrent.contracts.security.TenantScoped;
+import org.hibernate.annotations.Filter;
 import org.hibernate.annotations.SQLDelete;
 import org.hibernate.annotations.Where;
+
+import java.util.UUID;
 
 /**
  * Entity representing a rental location.
  * Auto-creates "Default" location when a company is created.
+ * Implements TenantScoped for multi-tenant isolation.
  */
 @Entity
 @Table(
     name = "location",
     indexes = {
         @Index(name = "idx_location_external_id", columnList = "external_id"),
-        @Index(name = "idx_location_company_id", columnList = "company_id"),
+        @Index(name = "idx_location_company_external_id", columnList = "company_external_id"),
         @Index(name = "idx_location_erp_partner_id", columnList = "erp_partner_id")
     }
 )
+@Filter(name = "companyFilter", condition = "company_external_id IN (:companyExternalIds)")
 @SQLDelete(sql = "UPDATE location SET is_deleted = true WHERE id = ?")
 @Where(clause = "is_deleted = false")
 @Getter
@@ -31,7 +37,7 @@ import org.hibernate.annotations.Where;
 @SuperBuilder
 @ToString(callSuper = true)
 @EqualsAndHashCode(of = "id", callSuper = false)
-public class Location extends BaseAuditEntity {
+public class Location extends BaseAuditEntity implements TenantScoped {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -57,13 +63,17 @@ public class Location extends BaseAuditEntity {
     @Column(name = "description", length = 1000)
     private String description;
 
-    @NotNull(message = "Company ID is required")
-    @Column(name = "company_id", nullable = false)
-    private Long companyId;
+    @NotNull(message = "Company external ID is required")
+    @Column(name = "company_external_id", nullable = false, length = 100)
+    private String companyExternalId;
 
     @Builder.Default
     @Column(name = "is_public", nullable = false)
     private Boolean isPublic = true;
+
+    @Builder.Default
+    @Column(name = "is_active", nullable = false)
+    private Boolean isActive = true;
 
     @Size(max = 1000, message = "Directions must not exceed 1000 characters")
     @Column(name = "directions", length = 1000)
@@ -72,4 +82,19 @@ public class Location extends BaseAuditEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "coordinates_id")
     private Coordinates coordinates;
+
+    @PrePersist
+    public void prePersist() {
+        if (externalId == null || externalId.isEmpty()) {
+            externalId = UUID.randomUUID().toString();
+        }
+        if (getIsDeleted() == null) {
+            setIsDeleted(false);
+        }
+    }
+    
+    @Override
+    public String getCompanyExternalId() {
+        return this.companyExternalId;
+    }
 }

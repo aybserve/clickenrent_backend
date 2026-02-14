@@ -24,6 +24,7 @@
     <maven.compiler.source>${java.version}</maven.compiler.source>
     <maven.compiler.target>${java.version}</maven.compiler.target>
     <spring-cloud.version>2023.0.1</spring-cloud.version>
+    <sentry.version>7.17.0</sentry.version>
   </properties>
 
   <!-- ✔ BOM только Spring Cloud (Spring Boot уже в parent) -->
@@ -36,16 +37,43 @@
         <type>pom</type>
         <scope>import</scope>
       </dependency>
+      
+      <!-- Sentry BOM for version consistency -->
+      <dependency>
+        <groupId>io.sentry</groupId>
+        <artifactId>sentry-bom</artifactId>
+        <version>${sentry.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+      
+      <!-- Shared contracts module -->
+      <dependency>
+        <groupId>org.clickenrent</groupId>
+        <artifactId>shared-contracts</artifactId>
+        <version>2.3.0</version>
+      </dependency>
+      
+      <!-- dotenv-java for loading .env files -->
+      <dependency>
+        <groupId>io.github.cdimascio</groupId>
+        <artifactId>dotenv-java</artifactId>
+        <version>3.0.0</version>
+      </dependency>
     </dependencies>
   </dependencyManagement>
 
   <modules>
+    <module>shared-contracts</module>
     <module>eureka-server</module>
     <module>auth-service</module>
     <module>rental-service</module>
     <module>support-service</module>
     <module>payment-service</module>
     <module>gateway</module>
+    <module>notification-service</module>
+    <module>search-service</module>
+    <module>analytics-service</module>
   </modules>
 
   <build>

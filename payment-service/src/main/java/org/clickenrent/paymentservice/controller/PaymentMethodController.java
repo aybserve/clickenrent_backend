@@ -12,10 +12,9 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/payment-methods")
+@RequestMapping("/api/v1/payment-methods")
 @RequiredArgsConstructor
 @Tag(name = "Payment Method", description = "Payment method management API")
 public class PaymentMethodController {
@@ -35,19 +34,21 @@ public class PaymentMethodController {
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'SUPERADMIN')")
     @Operation(summary = "Get payment method by ID")
     public ResponseEntity<PaymentMethodDTO> getById(@PathVariable Long id) {
         return ResponseEntity.ok(paymentMethodService.findById(id));
     }
 
     @GetMapping("/external/{externalId}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'SUPERADMIN')")
     @Operation(summary = "Get payment method by external ID")
-    public ResponseEntity<PaymentMethodDTO> getByExternalId(@PathVariable UUID externalId) {
+    public ResponseEntity<PaymentMethodDTO> getByExternalId(@PathVariable String externalId) {
         return ResponseEntity.ok(paymentMethodService.findByExternalId(externalId));
     }
 
     @PostMapping
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'SUPERADMIN')")
     @Operation(summary = "Create new payment method")
     public ResponseEntity<PaymentMethodDTO> create(@Valid @RequestBody PaymentMethodDTO dto) {
         return ResponseEntity.status(HttpStatus.CREATED).body(paymentMethodService.create(dto));

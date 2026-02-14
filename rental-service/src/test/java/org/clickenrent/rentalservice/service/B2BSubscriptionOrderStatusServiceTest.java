@@ -82,3 +82,11 @@ class B2BSubscriptionOrderStatusServiceTest {
         assertThrows(ResourceNotFoundException.class, () -> b2bSubscriptionOrderStatusService.getStatusById(999L));
     }
 }
+
+
+
+
+
+
+
+

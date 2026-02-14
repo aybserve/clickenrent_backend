@@ -1,6 +1,6 @@
 package org.clickenrent.supportservice.mapper;
 
-import org.clickenrent.supportservice.dto.BikeRentalFeedbackDTO;
+import org.clickenrent.contracts.support.BikeRentalFeedbackDTO;
 import org.clickenrent.supportservice.entity.BikeRentalFeedback;
 import org.springframework.stereotype.Component;
 
@@ -17,11 +17,11 @@ public class BikeRentalFeedbackMapper {
 
         return BikeRentalFeedbackDTO.builder()
                 .id(entity.getId())
-                .userId(entity.getUserId())
-                .bikeRentalId(entity.getBikeRentalId())
+                .externalId(entity.getExternalId())
+                .userExternalId(entity.getUserExternalId())
+                .bikeRentalExternalId(entity.getBikeRentalExternalId())
                 .rate(entity.getRate())
                 .comment(entity.getComment())
-                .dateTime(entity.getDateTime())
                 .dateCreated(entity.getDateCreated())
                 .lastDateModified(entity.getLastDateModified())
                 .createdBy(entity.getCreatedBy())
@@ -36,11 +36,11 @@ public class BikeRentalFeedbackMapper {
 
         return BikeRentalFeedback.builder()
                 .id(dto.getId())
-                .userId(dto.getUserId())
-                .bikeRentalId(dto.getBikeRentalId())
+                .externalId(dto.getExternalId())
+                .userExternalId(dto.getUserExternalId())
+                .bikeRentalExternalId(dto.getBikeRentalExternalId())
                 .rate(dto.getRate())
                 .comment(dto.getComment())
-                .dateTime(dto.getDateTime())
                 .build();
     }
 
@@ -49,11 +49,11 @@ public class BikeRentalFeedbackMapper {
             return;
         }
 
-        if (dto.getUserId() != null) {
-            entity.setUserId(dto.getUserId());
+        if (dto.getUserExternalId() != null) {
+            entity.setUserExternalId(dto.getUserExternalId());
         }
-        if (dto.getBikeRentalId() != null) {
-            entity.setBikeRentalId(dto.getBikeRentalId());
+        if (dto.getBikeRentalExternalId() != null) {
+            entity.setBikeRentalExternalId(dto.getBikeRentalExternalId());
         }
         if (dto.getRate() != null) {
             entity.setRate(dto.getRate());
@@ -61,8 +61,13 @@ public class BikeRentalFeedbackMapper {
         if (dto.getComment() != null) {
             entity.setComment(dto.getComment());
         }
-        if (dto.getDateTime() != null) {
-            entity.setDateTime(dto.getDateTime());
-        }
     }
 }
+
+
+
+
+
+
+
+

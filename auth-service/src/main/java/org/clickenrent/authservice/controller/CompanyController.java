@@ -30,7 +30,7 @@ import org.springframework.web.bind.annotation.*;
  * - CUSTOMER: No access to companies
  */
 @RestController
-@RequestMapping("/api/companies")
+@RequestMapping("/api/v1/companies")
 @RequiredArgsConstructor
 @Tag(name = "Company", description = "Company management endpoints")
 @SecurityRequirement(name = "bearerAuth")
@@ -79,6 +79,17 @@ public class CompanyController {
     public ResponseEntity<CompanyDTO> getCompanyById(
             @Parameter(description = "Company ID", required = true) @PathVariable Long id) {
         CompanyDTO company = companyService.getCompanyById(id);
+        return ResponseEntity.ok(company);
+    }
+    
+    /**
+     * Get company by external ID.
+     * GET /api/companies/external/{externalId}
+     */
+    @GetMapping("/external/{externalId}")
+    @Operation(summary = "Get company by external ID", description = "Retrieve company details by external ID for cross-service communication (public for service-to-service calls)")
+    public ResponseEntity<CompanyDTO> getCompanyByExternalId(@PathVariable String externalId) {
+        CompanyDTO company = companyService.findByExternalId(externalId);
         return ResponseEntity.ok(company);
     }
     

@@ -1,8 +1,11 @@
 package org.clickenrent.supportservice.mapper;
 
 import org.clickenrent.supportservice.dto.ErrorCodeDTO;
+import org.clickenrent.supportservice.entity.BikeEngineErrorCode;
 import org.clickenrent.supportservice.entity.ErrorCode;
 import org.springframework.stereotype.Component;
+
+import java.util.stream.Collectors;
 
 /**
  * Mapper for converting between ErrorCode entity and ErrorCodeDTO.
@@ -19,7 +22,11 @@ public class ErrorCodeMapper {
                 .id(entity.getId())
                 .externalId(entity.getExternalId())
                 .name(entity.getName())
-                .bikeEngineId(entity.getBikeEngineId())
+                .bikeEngineExternalIds(entity.getBikeEngineLinks() != null 
+                    ? entity.getBikeEngineLinks().stream()
+                        .map(BikeEngineErrorCode::getBikeEngineExternalId)
+                        .collect(Collectors.toList())
+                    : null)
                 .description(entity.getDescription())
                 .commonCause(entity.getCommonCause())
                 .diagnosticSteps(entity.getDiagnosticSteps())
@@ -42,7 +49,6 @@ public class ErrorCodeMapper {
                 .id(dto.getId())
                 .externalId(dto.getExternalId())
                 .name(dto.getName())
-                .bikeEngineId(dto.getBikeEngineId())
                 .description(dto.getDescription())
                 .commonCause(dto.getCommonCause())
                 .diagnosticSteps(dto.getDiagnosticSteps())
@@ -59,9 +65,6 @@ public class ErrorCodeMapper {
 
         if (dto.getName() != null) {
             entity.setName(dto.getName());
-        }
-        if (dto.getBikeEngineId() != null) {
-            entity.setBikeEngineId(dto.getBikeEngineId());
         }
         if (dto.getDescription() != null) {
             entity.setDescription(dto.getDescription());
@@ -83,3 +86,11 @@ public class ErrorCodeMapper {
         }
     }
 }
+
+
+
+
+
+
+
+

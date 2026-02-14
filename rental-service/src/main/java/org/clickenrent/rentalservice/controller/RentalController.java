@@ -21,11 +21,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 /**
  * REST controller for Rental management operations.
  */
 @RestController
-@RequestMapping("/api/rentals")
+@RequestMapping("/api/v1/rentals")
 @RequiredArgsConstructor
 @Tag(name = "Rental", description = "Rental management endpoints")
 @SecurityRequirement(name = "bearerAuth")
@@ -75,6 +77,55 @@ public class RentalController {
             @Parameter(description = "Rental ID", required = true) @PathVariable Long id) {
         RentalDTO rental = rentalService.getRentalById(id);
         return ResponseEntity.ok(rental);
+    }
+
+    /**
+     * Get rental by external ID.
+     * GET /api/rentals/external/{externalId}
+     */
+    @GetMapping("/external/{externalId}")
+    @PreAuthorize("isAuthenticated()")
+    @Operation(summary = "Get rental by external ID", description = "Retrieve rental details by external ID for cross-service communication")
+    public ResponseEntity<RentalDTO> getByExternalId(@PathVariable String externalId) {
+        RentalDTO rental = rentalService.findByExternalId(externalId);
+        return ResponseEntity.ok(rental);
+    }
+
+    /**
+     * Check if rental exists by external ID.
+     * GET /api/rentals/external/{externalId}/exists
+     */
+    @GetMapping("/external/{externalId}/exists")
+    @PreAuthorize("isAuthenticated()")
+    @Operation(summary = "Check if rental exists by external ID", description = "Check if rental exists by external ID for cross-service validation")
+    public ResponseEntity<Boolean> checkExistsByExternalId(@PathVariable String externalId) {
+        Boolean exists = rentalService.existsByExternalId(externalId);
+        return ResponseEntity.ok(exists);
+    }
+
+    /**
+     * Update rental by external ID.
+     * PUT /api/rentals/external/{externalId}
+     */
+    @PutMapping("/external/{externalId}")
+    @PreAuthorize("isAuthenticated()")
+    @Operation(summary = "Update rental by external ID")
+    public ResponseEntity<RentalDTO> updateByExternalId(
+            @PathVariable String externalId,
+            @Valid @RequestBody RentalDTO dto) {
+        return ResponseEntity.ok(rentalService.updateByExternalId(externalId, dto));
+    }
+
+    /**
+     * Delete rental by external ID.
+     * DELETE /api/rentals/external/{externalId}
+     */
+    @DeleteMapping("/external/{externalId}")
+    @PreAuthorize("hasAnyRole('SUPERADMIN', 'ADMIN')")
+    @Operation(summary = "Delete rental by external ID")
+    public ResponseEntity<Void> deleteByExternalId(@PathVariable String externalId) {
+        rentalService.deleteByExternalId(externalId);
+        return ResponseEntity.noContent().build();
     }
 
     /**
@@ -145,4 +196,22 @@ public class RentalController {
         rentalService.deleteRental(id);
         return ResponseEntity.noContent().build();
     }
+
+    /**
+     * Get rentals by user external ID.
+     * GET /api/rentals/user/{userExternalId}
+     */
+    @GetMapping("/user/{userExternalId}")
+    @PreAuthorize("isAuthenticated()")
+    @Operation(summary = "Get rentals by user external ID", description = "Retrieve all rentals for a specific user by external ID")
+    public ResponseEntity<List<RentalDTO>> getRentalsByUserExternalId(@PathVariable String userExternalId) {
+        List<RentalDTO> rentals = rentalService.getRentalsByUserExternalId(userExternalId);
+        return ResponseEntity.ok(rentals);
+    }
 }
+
+
+
+
+
+

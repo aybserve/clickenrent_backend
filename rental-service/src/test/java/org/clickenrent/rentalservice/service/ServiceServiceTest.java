@@ -15,7 +15,6 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
-import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.Optional;
 
@@ -47,13 +46,11 @@ class ServiceServiceTest {
         testService = org.clickenrent.rentalservice.entity.Service.builder()
         .id(1L)
         .name("Maintenance")
-        .b2bSubscriptionPrice(new BigDecimal("50.00"))
         .build();
 
         testServiceDTO = ServiceDTO.builder()
         .id(1L)
         .name("Maintenance")
-        .b2bSubscriptionPrice(new BigDecimal("50.00"))
         .build();
     }
 

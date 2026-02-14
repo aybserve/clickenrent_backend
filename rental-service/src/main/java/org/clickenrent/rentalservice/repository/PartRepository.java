@@ -13,3 +13,11 @@ import java.util.Optional;
 public interface PartRepository extends JpaRepository<Part, Long> {
     Optional<Part> findByExternalId(String externalId);
 }
+
+
+
+
+
+
+
+

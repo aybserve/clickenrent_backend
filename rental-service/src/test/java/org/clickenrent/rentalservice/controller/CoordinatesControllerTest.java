@@ -87,3 +87,11 @@ class CoordinatesControllerTest {
                 .andExpect(status().isNoContent());
     }
 }
+
+
+
+
+
+
+
+

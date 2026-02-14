@@ -41,6 +41,7 @@ class SupportRequestGuideItemControllerTest {
     void setUp() {
         guideItemDTO = SupportRequestGuideItemDTO.builder()
                 .id(1L)
+                .externalId("guide-item-uuid-1")
                 .itemIndex(1)
                 .description("Check if battery is properly connected")
                 .build();
@@ -99,3 +100,11 @@ class SupportRequestGuideItemControllerTest {
                 .andExpect(status().isNoContent());
     }
 }
+
+
+
+
+
+
+
+

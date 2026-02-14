@@ -1,6 +1,9 @@
 package org.clickenrent.supportservice.exception;
 
+import io.sentry.Sentry;
+import io.sentry.SentryLevel;
 import jakarta.validation.ConstraintViolationException;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,9 +20,24 @@ import java.util.stream.Collectors;
 /**
  * Global exception handler for all REST controllers.
  * Provides consistent error responses across the application.
+ * Integrates with Sentry for error tracking and monitoring.
  */
+@Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+    
+    private void captureExceptionToSentry(Exception ex, WebRequest request, HttpStatus status) {
+        try {
+            Sentry.withScope(scope -> {
+                scope.setTag("http_status", String.valueOf(status.value()));
+                scope.setTag("request_path", request.getDescription(false).replace("uri=", ""));
+                scope.setLevel(status.is5xxServerError() ? SentryLevel.ERROR : SentryLevel.WARNING);
+                Sentry.captureException(ex);
+            });
+        } catch (Exception sentryEx) {
+            log.warn("Failed to capture exception to Sentry: {}", sentryEx.getMessage());
+        }
+    }
 
     @ExceptionHandler(ResourceNotFoundException.class)
     public ResponseEntity<ErrorResponse> handleResourceNotFoundException(
@@ -148,6 +166,9 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleGlobalException(
             Exception ex, WebRequest request) {
         
+        // Capture to Sentry
+        captureExceptionToSentry(ex, request, HttpStatus.INTERNAL_SERVER_ERROR);
+        
         ErrorResponse errorResponse = ErrorResponse.builder()
                 .timestamp(LocalDateTime.now())
                 .status(HttpStatus.INTERNAL_SERVER_ERROR.value())
@@ -159,3 +180,11 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }
+
+
+
+
+
+
+
+

@@ -1,7 +1,7 @@
 package org.clickenrent.paymentservice.service;
 
 import lombok.RequiredArgsConstructor;
-import org.clickenrent.paymentservice.client.RentalServiceClient;
+import lombok.extern.slf4j.Slf4j;
 import org.clickenrent.paymentservice.dto.B2BSaleFinTransactionDTO;
 import org.clickenrent.paymentservice.entity.B2BSaleFinTransaction;
 import org.clickenrent.paymentservice.exception.ResourceNotFoundException;
@@ -12,11 +12,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.UUID;
 
 /**
  * Service for B2B Sale FinancialTransaction management
  */
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class B2BSaleFinTransactionService {
@@ -24,7 +24,6 @@ public class B2BSaleFinTransactionService {
     private final B2BSaleFinTransactionRepository b2bSaleFinTransactionRepository;
     private final B2BSaleFinTransactionMapper b2bSaleFinTransactionMapper;
     private final SecurityService securityService;
-    private final RentalServiceClient rentalServiceClient;
 
     @Transactional(readOnly = true)
     public List<B2BSaleFinTransactionDTO> findAll() {
@@ -47,7 +46,7 @@ public class B2BSaleFinTransactionService {
     }
 
     @Transactional(readOnly = true)
-    public B2BSaleFinTransactionDTO findByExternalId(UUID externalId) {
+    public B2BSaleFinTransactionDTO findByExternalId(String externalId) {
         if (!securityService.isAdmin() && !securityService.isB2B()) {
             throw new UnauthorizedException("You don't have permission to view B2B sale transactions");
         }
@@ -60,10 +59,11 @@ public class B2BSaleFinTransactionService {
 
     @Transactional
     public B2BSaleFinTransactionDTO create(B2BSaleFinTransactionDTO dto) {
-        // Validate B2B sale exists
-        rentalServiceClient.checkB2BSaleExists(dto.getB2bSaleId());
+        // External ID is provided directly in the DTO
+        log.debug("Creating B2B sale transaction with b2bSaleExternalId: {}", dto.getB2bSaleExternalId());
         
         B2BSaleFinTransaction transaction = b2bSaleFinTransactionMapper.toEntity(dto);
+        transaction.sanitizeForCreate();
         B2BSaleFinTransaction savedTransaction = b2bSaleFinTransactionRepository.save(transaction);
         return b2bSaleFinTransactionMapper.toDTO(savedTransaction);
     }
@@ -77,7 +77,7 @@ public class B2BSaleFinTransactionService {
         B2BSaleFinTransaction existingTransaction = b2bSaleFinTransactionRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("B2BSaleFinTransaction", "id", id));
         
-        existingTransaction.setB2bSaleId(dto.getB2bSaleId());
+        existingTransaction.setB2bSaleExternalId(dto.getB2bSaleExternalId());
         
         B2BSaleFinTransaction updatedTransaction = b2bSaleFinTransactionRepository.save(existingTransaction);
         return b2bSaleFinTransactionMapper.toDTO(updatedTransaction);
@@ -95,3 +95,7 @@ public class B2BSaleFinTransactionService {
         b2bSaleFinTransactionRepository.deleteById(id);
     }
 }
+
+
+
+

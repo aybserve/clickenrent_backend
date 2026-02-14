@@ -17,7 +17,10 @@ public class AddressMapper {
         
         return AddressDTO.builder()
                 .id(address.getId())
-                .cityId(address.getCity() != null ? address.getCity().getId() : null)
+                .externalId(address.getExternalId())
+                .city(address.getCity())
+                .countryId(address.getCountry() != null ? address.getCountry().getId() : null)
+                .countryName(address.getCountry() != null ? address.getCountry().getName() : null)
                 .street(address.getStreet())
                 .postcode(address.getPostcode())
                 .dateCreated(address.getDateCreated())
@@ -34,6 +37,8 @@ public class AddressMapper {
         
         return Address.builder()
                 .id(dto.getId())
+                .externalId(dto.getExternalId())
+                .city(dto.getCity())
                 .street(dto.getStreet())
                 .postcode(dto.getPostcode())
                 .build();
@@ -44,6 +49,12 @@ public class AddressMapper {
             return;
         }
         
+        if (dto.getExternalId() != null) {
+            address.setExternalId(dto.getExternalId());
+        }
+        if (dto.getCity() != null) {
+            address.setCity(dto.getCity());
+        }
         if (dto.getStreet() != null) {
             address.setStreet(dto.getStreet());
         }
@@ -52,4 +63,8 @@ public class AddressMapper {
         }
     }
 }
+
+
+
+
 

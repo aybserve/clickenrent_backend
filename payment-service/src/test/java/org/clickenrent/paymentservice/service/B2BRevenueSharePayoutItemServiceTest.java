@@ -14,8 +14,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.mockito.junit.jupiter.MockitoSettings;
-import org.mockito.quality.Strictness;
 
 import java.math.BigDecimal;
 import java.util.Arrays;
@@ -25,7 +23,7 @@ import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -49,11 +47,11 @@ class B2BRevenueSharePayoutItemServiceTest {
     private B2BRevenueSharePayoutItem testPayoutItem;
     private B2BRevenueSharePayoutItemDTO testPayoutItemDTO;
     private B2BRevenueSharePayout testPayout;
-    private UUID testExternalId;
+    private String testExternalId;
 
     @BeforeEach
     void setUp() {
-        testExternalId = UUID.randomUUID();
+        testExternalId = UUID.randomUUID().toString();
 
         testPayout = B2BRevenueSharePayout.builder()
                 .id(1L)
@@ -63,7 +61,7 @@ class B2BRevenueSharePayoutItemServiceTest {
                 .id(1L)
                 .externalId(testExternalId)
                 .b2bRevenueSharePayout(testPayout)
-                .bikeRentalId(1L)
+                .bikeRentalExternalId("bike-rental-ext-123")
                 .amount(new BigDecimal("50.00"))
                 .build();
 
@@ -71,7 +69,7 @@ class B2BRevenueSharePayoutItemServiceTest {
                 .id(1L)
                 .externalId(testExternalId)
                 .b2bRevenueSharePayoutId(1L)
-                .bikeRentalId(1L)
+                .bikeRentalExternalId("bike-rental-ext-123")
                 .amount(new BigDecimal("50.00"))
                 .build();
 
@@ -151,7 +149,7 @@ class B2BRevenueSharePayoutItemServiceTest {
 
     @Test
     void findByExternalId_NotFound() {
-        UUID randomId = UUID.randomUUID();
+        String randomId = UUID.randomUUID().toString();
         when(payoutItemRepository.findByExternalId(randomId)).thenReturn(Optional.empty());
 
         assertThrows(ResourceNotFoundException.class, () -> payoutItemService.findByExternalId(randomId));

@@ -12,10 +12,9 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/user-payment-methods")
+@RequestMapping("/api/v1/user-payment-methods")
 @RequiredArgsConstructor
 @Tag(name = "User Payment Method", description = "User payment method management API")
 public class UserPaymentMethodController {
@@ -23,28 +22,30 @@ public class UserPaymentMethodController {
     private final UserPaymentMethodService userPaymentMethodService;
 
     @GetMapping
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasAnyRole('SUPERADMIN', 'ADMIN')")
     @Operation(summary = "Get all user payment methods")
     public ResponseEntity<List<UserPaymentMethodDTO>> getAll() {
         return ResponseEntity.ok(userPaymentMethodService.findAll());
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasAnyRole('SUPERADMIN', 'ADMIN')")
     @Operation(summary = "Get payment method by ID")
     public ResponseEntity<UserPaymentMethodDTO> getById(@PathVariable Long id) {
         return ResponseEntity.ok(userPaymentMethodService.findById(id));
     }
 
     @GetMapping("/external/{externalId}")
+    @PreAuthorize("hasAnyRole('SUPERADMIN', 'ADMIN')")
     @Operation(summary = "Get payment method by external ID")
-    public ResponseEntity<UserPaymentMethodDTO> getByExternalId(@PathVariable UUID externalId) {
+    public ResponseEntity<UserPaymentMethodDTO> getByExternalId(@PathVariable String externalId) {
         return ResponseEntity.ok(userPaymentMethodService.findByExternalId(externalId));
     }
 
-    @GetMapping("/user/{userId}")
-    @Operation(summary = "Get payment methods by user ID")
-    public ResponseEntity<List<UserPaymentMethodDTO>> getByUserId(@PathVariable Long userId) {
-        return ResponseEntity.ok(userPaymentMethodService.findByUserId(userId));
+    @GetMapping("/user/{userExternalId}")
+    @Operation(summary = "Get payment methods by user external ID")
+    public ResponseEntity<List<UserPaymentMethodDTO>> getByUserExternalId(@PathVariable String userExternalId) {
+        return ResponseEntity.ok(userPaymentMethodService.findByUserExternalId(userExternalId));
     }
 
     @PostMapping

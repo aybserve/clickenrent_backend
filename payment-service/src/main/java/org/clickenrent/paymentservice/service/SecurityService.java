@@ -72,6 +72,29 @@ public class SecurityService {
     }
 
     /**
+     * Get current user's company external IDs from JWT token
+     */
+    public List<String> getCurrentUserCompanyExternalIds() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return List.of();
+        }
+        
+        if (authentication.getPrincipal() instanceof Jwt jwt) {
+            List<?> companyExternalIds = jwt.getClaim("companyExternalIds");
+            if (companyExternalIds != null) {
+                return companyExternalIds.stream()
+                        .filter(id -> id instanceof String)
+                        .map(id -> (String) id)
+                        .collect(Collectors.toList());
+            }
+        }
+        
+        return List.of();
+    }
+
+    /**
      * Get current user's roles
      */
     public List<String> getCurrentUserRoles() {
@@ -136,3 +159,11 @@ public class SecurityService {
         return currentUserId != null && currentUserId.equals(userId);
     }
 }
+
+
+
+
+
+
+
+

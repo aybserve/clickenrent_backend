@@ -29,8 +29,13 @@ public class UserPaymentMethodMapper {
                 .userPaymentProfile(userPaymentProfileMapper.toDTO(entity.getUserPaymentProfile()))
                 .paymentMethod(paymentMethodMapper.toDTO(entity.getPaymentMethod()))
                 .stripePaymentMethodId(entity.getStripePaymentMethodId())
+                .multiSafepayTokenId(entity.getMultiSafepayTokenId())
                 .isDefault(entity.getIsDefault())
                 .isActive(entity.getIsActive())
+                .dateCreated(entity.getDateCreated())
+                .lastDateModified(entity.getLastDateModified())
+                .createdBy(entity.getCreatedBy())
+                .lastModifiedBy(entity.getLastModifiedBy())
                 .build();
     }
 
@@ -45,6 +50,7 @@ public class UserPaymentMethodMapper {
                 .userPaymentProfile(userPaymentProfileMapper.toEntity(dto.getUserPaymentProfile()))
                 .paymentMethod(paymentMethodMapper.toEntity(dto.getPaymentMethod()))
                 .stripePaymentMethodId(dto.getStripePaymentMethodId())
+                .multiSafepayTokenId(dto.getMultiSafepayTokenId())
                 .isDefault(dto.getIsDefault())
                 .isActive(dto.getIsActive())
                 .build();
@@ -60,3 +66,11 @@ public class UserPaymentMethodMapper {
                 .collect(Collectors.toList());
     }
 }
+
+
+
+
+
+
+
+

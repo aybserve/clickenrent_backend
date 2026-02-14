@@ -9,12 +9,24 @@ public class BikeTypeMapper {
 
     public BikeTypeDTO toDto(BikeType bikeType) {
         if (bikeType == null) return null;
-        return BikeTypeDTO.builder().id(bikeType.getId()).name(bikeType.getName()).build();
+        return BikeTypeDTO.builder()
+                .id(bikeType.getId())
+                .externalId(bikeType.getExternalId())
+                .name(bikeType.getName())
+                .dateCreated(bikeType.getDateCreated())
+                .lastDateModified(bikeType.getLastDateModified())
+                .createdBy(bikeType.getCreatedBy())
+                .lastModifiedBy(bikeType.getLastModifiedBy())
+                .build();
     }
 
     public BikeType toEntity(BikeTypeDTO dto) {
         if (dto == null) return null;
-        return BikeType.builder().id(dto.getId()).name(dto.getName()).build();
+        return BikeType.builder()
+                .id(dto.getId())
+                .externalId(dto.getExternalId())
+                .name(dto.getName())
+                .build();
     }
 
     public void updateEntityFromDto(BikeTypeDTO dto, BikeType bikeType) {
@@ -22,3 +34,11 @@ public class BikeTypeMapper {
         if (dto.getName() != null) bikeType.setName(dto.getName());
     }
 }
+
+
+
+
+
+
+
+

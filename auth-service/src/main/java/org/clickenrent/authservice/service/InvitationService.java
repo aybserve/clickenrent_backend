@@ -51,6 +51,34 @@ public class InvitationService {
     private static final int INVITATION_EXPIRATION_DAYS = 7;
     
     /**
+     * Build JWT claims with user information including company associations.
+     * 
+     * @param user The user entity
+     * @param userDetails The Spring Security UserDetails
+     * @return Map of JWT claims
+     */
+    private Map<String, Object> buildJwtClaims(User user, UserDetails userDetails) {
+        Map<String, Object> claims = new HashMap<>();
+        claims.put("userId", user.getId());
+        claims.put("email", user.getEmail());
+        claims.put("userExternalId", user.getExternalId());
+        claims.put("roles", userDetails.getAuthorities().stream()
+                .map(GrantedAuthority::getAuthority)
+                .collect(Collectors.toList()));
+        
+        // Get user's companies
+        List<UserCompany> userCompanies = userCompanyRepository.findByUserId(user.getId());
+        claims.put("companyIds", userCompanies.stream()
+                .map(uc -> uc.getCompany().getId())
+                .collect(Collectors.toList()));
+        claims.put("companyExternalIds", userCompanies.stream()
+                .map(uc -> uc.getCompany().getExternalId())
+                .collect(Collectors.toList()));
+        
+        return claims;
+    }
+    
+    /**
      * Create a new invitation to join a company.
      * @param request The invitation request with email and company ID
      * @return InvitationDTO with invitation details and shareable link
@@ -166,6 +194,7 @@ public class InvitationService {
                 .lastName(request.getLastName())
                 .phone(request.getPhone())
                 .isActive(true)
+                .isEmailVerified(true)  // Email verified via invitation token
                 .build();
         
         // Set language if provided
@@ -203,15 +232,10 @@ public class InvitationService {
         invitation.setAcceptedAt(LocalDateTime.now());
         invitationRepository.save(invitation);
         
-        // Generate JWT tokens
+        // Generate JWT tokens (including company data)
         UserDetails userDetails = userDetailsService.loadUserByUsername(user.getUserName());
         
-        Map<String, Object> claims = new HashMap<>();
-        claims.put("userId", user.getId());
-        claims.put("email", user.getEmail());
-        claims.put("roles", userDetails.getAuthorities().stream()
-                .map(GrantedAuthority::getAuthority)
-                .collect(Collectors.toList()));
+        Map<String, Object> claims = buildJwtClaims(user, userDetails);
         
         String accessToken = jwtService.generateToken(claims, userDetails);
         String refreshToken = jwtService.generateRefreshToken(userDetails);

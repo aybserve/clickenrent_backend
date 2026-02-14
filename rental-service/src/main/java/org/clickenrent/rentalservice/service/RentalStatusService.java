@@ -41,6 +41,7 @@ public class RentalStatusService {
         }
 
         RentalStatus status = rentalStatusMapper.toEntity(dto);
+        status.sanitizeForCreate();
         status = rentalStatusRepository.save(status);
         return rentalStatusMapper.toDto(status);
     }
@@ -69,4 +70,19 @@ public class RentalStatusService {
                 .orElseThrow(() -> new ResourceNotFoundException("RentalStatus", "id", id));
         rentalStatusRepository.delete(status);
     }
+
+    @Transactional(readOnly = true)
+    public RentalStatusDTO findByExternalId(String externalId) {
+        RentalStatus status = rentalStatusRepository.findByExternalId(externalId)
+                .orElseThrow(() -> new ResourceNotFoundException("RentalStatus", "externalId", externalId));
+        return rentalStatusMapper.toDto(status);
+    }
 }
+
+
+
+
+
+
+
+

@@ -11,7 +11,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.UUID;
 
 /**
  * Service for Currency management
@@ -36,7 +35,7 @@ public class CurrencyService {
     }
 
     @Transactional(readOnly = true)
-    public CurrencyDTO findByExternalId(UUID externalId) {
+    public CurrencyDTO findByExternalId(String externalId) {
         Currency currency = currencyRepository.findByExternalId(externalId)
                 .orElseThrow(() -> new ResourceNotFoundException("Currency", "externalId", externalId));
         return currencyMapper.toDTO(currency);
@@ -57,6 +56,7 @@ public class CurrencyService {
         }
 
         Currency currency = currencyMapper.toEntity(dto);
+        currency.sanitizeForCreate();
         Currency savedCurrency = currencyRepository.save(currency);
         return currencyMapper.toDTO(savedCurrency);
     }
@@ -88,3 +88,11 @@ public class CurrencyService {
         currencyRepository.deleteById(id);
     }
 }
+
+
+
+
+
+
+
+

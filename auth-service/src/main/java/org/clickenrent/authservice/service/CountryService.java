@@ -43,9 +43,19 @@ public class CountryService {
         return countryMapper.toDto(country);
     }
     
+    @Transactional(readOnly = true)
+    public CountryDTO getCountryByExternalId(String externalId) {
+        Country country = countryRepository.findByExternalId(externalId)
+                .orElseThrow(() -> new ResourceNotFoundException("Country", "externalId", externalId));
+        return countryMapper.toDto(country);
+    }
+    
     @Transactional
     public CountryDTO createCountry(CountryDTO countryDTO) {
         Country country = countryMapper.toEntity(countryDTO);
+        // Sanitize server-managed fields
+        country.setId(null);
+        country.setExternalId(null);
         country = countryRepository.save(country);
         return countryMapper.toDto(country);
     }
@@ -67,4 +77,12 @@ public class CountryService {
         countryRepository.delete(country);
     }
 }
+
+
+
+
+
+
+
+
 

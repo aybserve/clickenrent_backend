@@ -28,6 +28,10 @@ public class PayoutFinTransactionMapper {
                 .externalId(entity.getExternalId())
                 .b2bRevenueSharePayout(b2bRevenueSharePayoutMapper.toDTO(entity.getB2bRevenueSharePayout()))
                 .financialTransaction(financialTransactionMapper.toDTO(entity.getFinancialTransaction()))
+                .dateCreated(entity.getDateCreated())
+                .lastDateModified(entity.getLastDateModified())
+                .createdBy(entity.getCreatedBy())
+                .lastModifiedBy(entity.getLastModifiedBy())
                 .build();
     }
 
@@ -54,3 +58,11 @@ public class PayoutFinTransactionMapper {
                 .collect(Collectors.toList());
     }
 }
+
+
+
+
+
+
+
+

@@ -10,8 +10,9 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.clickenrent.rentalservice.dto.HubDTO;
+import org.clickenrent.rentalservice.dto.*;
 import org.clickenrent.rentalservice.service.HubService;
+import org.clickenrent.rentalservice.service.MapboxService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -27,13 +28,14 @@ import java.util.List;
  * REST controller for Hub management operations.
  */
 @RestController
-@RequestMapping("/api/hubs")
+@RequestMapping("/api/v1/hubs")
 @RequiredArgsConstructor
 @Tag(name = "Hub", description = "Hub management endpoints")
 @SecurityRequirement(name = "bearerAuth")
 public class HubController {
 
     private final HubService hubService;
+    private final MapboxService mapboxService;
 
     @GetMapping
     @PreAuthorize("isAuthenticated()")
@@ -119,4 +121,87 @@ public class HubController {
         hubService.deleteHub(id);
         return ResponseEntity.noContent().build();
     }
+
+    @GetMapping("/external/{externalId}")
+    @Operation(summary = "Get hub by external ID", description = "Retrieve hub by external ID for cross-service communication (public for service-to-service calls)")
+    public ResponseEntity<HubDTO> getByExternalId(@PathVariable String externalId) {
+        return ResponseEntity.ok(hubService.getHubByExternalId(externalId));
+    }
+
+    /**
+     * Geocode an address to coordinates.
+     * POST /api/v1/hubs/geocode
+     */
+    @PostMapping("/geocode")
+    @PreAuthorize("isAuthenticated()")
+    @Operation(
+            summary = "Geocode address",
+            description = "Convert an address to geographic coordinates using Mapbox Geocoding API"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Geocoding successful",
+                    content = @Content(schema = @Schema(implementation = GeocodingResponseDTO.class))),
+            @ApiResponse(responseCode = "400", description = "Invalid request"),
+            @ApiResponse(responseCode = "401", description = "Not authenticated"),
+            @ApiResponse(responseCode = "500", description = "Geocoding service error")
+    })
+    public ResponseEntity<GeocodingResponseDTO> geocode(
+            @Valid @RequestBody GeocodingRequestDTO request) {
+        GeocodingResponseDTO response = mapboxService.geocode(request);
+        return ResponseEntity.ok(response);
+    }
+
+    /**
+     * Reverse geocode coordinates to address.
+     * POST /api/v1/hubs/reverse-geocode
+     */
+    @PostMapping("/reverse-geocode")
+    @PreAuthorize("isAuthenticated()")
+    @Operation(
+            summary = "Reverse geocode coordinates",
+            description = "Convert geographic coordinates to an address using Mapbox Geocoding API"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Reverse geocoding successful",
+                    content = @Content(schema = @Schema(implementation = GeocodingResponseDTO.class))),
+            @ApiResponse(responseCode = "400", description = "Invalid coordinates"),
+            @ApiResponse(responseCode = "401", description = "Not authenticated"),
+            @ApiResponse(responseCode = "500", description = "Geocoding service error")
+    })
+    public ResponseEntity<GeocodingResponseDTO> reverseGeocode(
+            @Valid @RequestBody ReverseGeocodingRequestDTO request) {
+        GeocodingResponseDTO response = mapboxService.reverseGeocode(request);
+        return ResponseEntity.ok(response);
+    }
+
+    /**
+     * Get directions between two points.
+     * POST /api/v1/hubs/directions
+     */
+    @PostMapping("/directions")
+    @PreAuthorize("isAuthenticated()")
+    @Operation(
+            summary = "Get directions",
+            description = "Get route directions between two points using Mapbox Directions API"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Directions retrieved successfully",
+                    content = @Content(schema = @Schema(implementation = DirectionsResponseDTO.class))),
+            @ApiResponse(responseCode = "400", description = "Invalid coordinates"),
+            @ApiResponse(responseCode = "401", description = "Not authenticated"),
+            @ApiResponse(responseCode = "500", description = "Directions service error")
+    })
+    public ResponseEntity<DirectionsResponseDTO> getDirections(
+            @Valid @RequestBody DirectionsRequestDTO request) {
+        DirectionsResponseDTO response = mapboxService.getDirections(request);
+        return ResponseEntity.ok(response);
+    }
 }
+
+
+
+
+
+
+
+

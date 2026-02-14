@@ -1,10 +1,12 @@
 package org.clickenrent.authservice.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.clickenrent.authservice.dto.*;
 import org.clickenrent.authservice.entity.GlobalRole;
 import org.clickenrent.authservice.entity.Language;
 import org.clickenrent.authservice.entity.User;
+import org.clickenrent.authservice.entity.UserCompany;
 import org.clickenrent.authservice.entity.UserGlobalRole;
 import org.clickenrent.authservice.exception.DuplicateResourceException;
 import org.clickenrent.authservice.exception.InvalidTokenException;
@@ -13,6 +15,7 @@ import org.clickenrent.authservice.exception.UnauthorizedException;
 import org.clickenrent.authservice.mapper.UserMapper;
 import org.clickenrent.authservice.repository.GlobalRoleRepository;
 import org.clickenrent.authservice.repository.LanguageRepository;
+import org.clickenrent.authservice.repository.UserCompanyRepository;
 import org.clickenrent.authservice.repository.UserGlobalRoleRepository;
 import org.clickenrent.authservice.repository.UserRepository;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -26,6 +29,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -34,6 +38,7 @@ import java.util.stream.Collectors;
  * Service for handling authentication operations.
  * Includes registration, login, token refresh, and logout.
  */
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class AuthService {
@@ -42,12 +47,44 @@ public class AuthService {
     private final LanguageRepository languageRepository;
     private final GlobalRoleRepository globalRoleRepository;
     private final UserGlobalRoleRepository userGlobalRoleRepository;
+    private final UserCompanyRepository userCompanyRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final CustomUserDetailsService userDetailsService;
     private final AuthenticationManager authenticationManager;
     private final UserMapper userMapper;
     private final TokenBlacklistService tokenBlacklistService;
+    private final EmailVerificationService emailVerificationService;
+    private final UserPreferenceService userPreferenceService;
+    
+    /**
+     * Build JWT claims with user information including company associations.
+     * This method centralizes claim building to ensure consistency across all token generation points.
+     * 
+     * @param user The user entity
+     * @param userDetails The Spring Security UserDetails
+     * @return Map of JWT claims
+     */
+    private Map<String, Object> buildJwtClaims(User user, UserDetails userDetails) {
+        Map<String, Object> claims = new HashMap<>();
+        claims.put("userId", user.getId());
+        claims.put("email", user.getEmail());
+        claims.put("userExternalId", user.getExternalId());
+        claims.put("roles", userDetails.getAuthorities().stream()
+                .map(GrantedAuthority::getAuthority)
+                .collect(Collectors.toList()));
+        
+        // Get user's companies
+        List<UserCompany> userCompanies = userCompanyRepository.findByUserId(user.getId());
+        claims.put("companyIds", userCompanies.stream()
+                .map(uc -> uc.getCompany().getId())
+                .collect(Collectors.toList()));
+        claims.put("companyExternalIds", userCompanies.stream()
+                .map(uc -> uc.getCompany().getExternalId())
+                .collect(Collectors.toList()));
+        
+        return claims;
+    }
     
     /**
      * Register a new user in the system.
@@ -95,6 +132,13 @@ public class AuthService {
                     .build();
             userGlobalRoleRepository.save(userGlobalRole);
         });
+        
+        // Create default preferences for the new user
+        userPreferenceService.createDefaultPreferences(savedUser);
+        log.info("Created default preferences for new user: {}", savedUser.getUserName());
+        
+        // Generate and send email verification code
+        emailVerificationService.generateAndSendCode(savedUser);
         
         // Generate tokens with custom claims
         UserDetails userDetails = userDetailsService.loadUserByUsername(savedUser.getUserName());
@@ -178,6 +222,10 @@ public class AuthService {
             userGlobalRoleRepository.save(userGlobalRole);
         }
         
+        // Create default preferences for the new admin user
+        userPreferenceService.createDefaultPreferences(user);
+        log.info("Created default preferences for new admin user: {}", user.getUserName());
+        
         return userMapper.toDto(user);
     }
     
@@ -202,13 +250,8 @@ public class AuthService {
         User user = userDetailsService.loadUserEntityByUsername(request.getUsernameOrEmail());
         UserDetails userDetails = userDetailsService.loadUserByUsername(request.getUsernameOrEmail());
         
-        // Generate tokens with custom claims
-        Map<String, Object> claims = new HashMap<>();
-        claims.put("userId", user.getId());
-        claims.put("email", user.getEmail());
-        claims.put("roles", userDetails.getAuthorities().stream()
-                .map(GrantedAuthority::getAuthority)
-                .collect(Collectors.toList()));
+        // Generate tokens with custom claims (including company data)
+        Map<String, Object> claims = buildJwtClaims(user, userDetails);
         
         String accessToken = jwtService.generateToken(claims, userDetails);
         String refreshToken = jwtService.generateRefreshToken(userDetails);
@@ -236,13 +279,8 @@ public class AuthService {
             
             User user = userDetailsService.loadUserEntityByUsername(username);
             
-            // Generate new access token with custom claims
-            Map<String, Object> claims = new HashMap<>();
-            claims.put("userId", user.getId());
-            claims.put("email", user.getEmail());
-            claims.put("roles", userDetails.getAuthorities().stream()
-                    .map(GrantedAuthority::getAuthority)
-                    .collect(Collectors.toList()));
+            // Generate new access token with custom claims (including company data)
+            Map<String, Object> claims = buildJwtClaims(user, userDetails);
             
             String accessToken = jwtService.generateToken(claims, userDetails);
             
@@ -277,6 +315,65 @@ public class AuthService {
         } catch (Exception e) {
             // If token is invalid, we don't need to blacklist it
             // Just log the attempt
+        }
+    }
+    
+    /**
+     * Verify email and generate new tokens with updated user info.
+     * 
+     * @param email User's email address
+     * @param code Verification code
+     * @return VerifyEmailResponse with new tokens and updated user
+     */
+    @Transactional
+    public VerifyEmailResponse verifyEmailAndGenerateTokens(String email, String code) {
+        System.out.println("===========================================");
+        System.out.println("=== AuthService.verifyEmailAndGenerateTokens() CALLED");
+        System.out.println("=== Email: " + email);
+        System.out.println("=== Code: " + code);
+        System.out.println("===========================================");
+        
+        try {
+            // Delegate to EmailVerificationService for verification
+            System.out.println("=== About to call emailVerificationService.verifyEmail()");
+            User user = emailVerificationService.verifyEmail(email, code);
+            System.out.println("=== emailVerificationService.verifyEmail() returned successfully");
+            log.debug("Email verified successfully for user ID: {}, username: {}", user.getId(), user.getUserName());
+            
+            // Generate new tokens with updated user info
+            log.debug("Loading user details for username: {}", user.getUserName());
+            UserDetails userDetails = userDetailsService.loadUserByUsername(user.getUserName());
+            log.debug("User details loaded successfully, authorities count: {}", 
+                    userDetails.getAuthorities() != null ? userDetails.getAuthorities().size() : 0);
+            
+            log.debug("Building JWT claims (including company data)");
+            Map<String, Object> claims = buildJwtClaims(user, userDetails);
+            log.debug("JWT claims built: userId={}, email={}, roles={}, companies={}", 
+                    user.getId(), user.getEmail(), claims.get("roles"), claims.get("companyExternalIds"));
+            
+            log.debug("Generating access token");
+            String accessToken = jwtService.generateToken(claims, userDetails);
+            log.debug("Access token generated successfully");
+            
+            log.debug("Generating refresh token");
+            String refreshToken = jwtService.generateRefreshToken(userDetails);
+            log.debug("Refresh token generated successfully");
+            
+            log.debug("Mapping user to DTO");
+            UserDTO userDto = userMapper.toDto(user);
+            log.debug("User mapped to DTO successfully");
+            
+            log.info("Email verification completed successfully for user: {} ({})", user.getUserName(), user.getEmail());
+            
+            return VerifyEmailResponse.builder()
+                    .verified(true)
+                    .accessToken(accessToken)
+                    .refreshToken(refreshToken)
+                    .user(userDto)
+                    .build();
+        } catch (Exception e) {
+            log.error("Error during email verification for email: {}", email, e);
+            throw e;
         }
     }
 }
