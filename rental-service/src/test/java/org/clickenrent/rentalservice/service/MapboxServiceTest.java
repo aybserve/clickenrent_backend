@@ -59,15 +59,15 @@ class MapboxServiceTest {
                 .build();
 
         ReverseGeocodingRequestDTO request = ReverseGeocodingRequestDTO.builder()
-                .location(location)
+                .coordinates(location)
                 .language("en")
                 .build();
 
         // Assert
         assertNotNull(request);
-        assertNotNull(request.getLocation());
-        assertEquals(new BigDecimal("52.374"), request.getLocation().getLatitude());
-        assertEquals(new BigDecimal("4.9"), request.getLocation().getLongitude());
+        assertNotNull(request.getCoordinates());
+        assertEquals(new BigDecimal("52.374"), request.getCoordinates().getLatitude());
+        assertEquals(new BigDecimal("4.9"), request.getCoordinates().getLongitude());
     }
 
     @Test

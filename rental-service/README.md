@@ -282,7 +282,7 @@ Convert coordinates to addresses.
 **Request Body**:
 ```json
 {
-  "location": {
+  "coordinates": {
     "latitude": 52.374,
     "longitude": 4.9
   },

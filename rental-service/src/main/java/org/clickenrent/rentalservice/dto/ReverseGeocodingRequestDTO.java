@@ -16,9 +16,9 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class ReverseGeocodingRequestDTO {
 
-    @NotNull(message = "Location is required")
+    @NotNull(message = "Coordinates are required")
     @Valid
-    private GeoPointDTO location;
+    private GeoPointDTO coordinates;
 
     private String language;
 }

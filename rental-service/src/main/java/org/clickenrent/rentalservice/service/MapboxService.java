@@ -104,7 +104,7 @@ public class MapboxService {
      */
     public GeocodingResponseDTO reverseGeocode(ReverseGeocodingRequestDTO request) {
         try {
-            GeoPointDTO location = request.getLocation();
+            GeoPointDTO location = request.getCoordinates();
             log.info("Reverse geocoding coordinates: {}, {}", location.getLatitude(), location.getLongitude());
 
             double lon = location.getLongitude().doubleValue();
