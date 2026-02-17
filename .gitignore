@@ -71,5 +71,3 @@ Desktop.ini
 
 # Docker volumes
 postgres-data/
-
-.cursor
