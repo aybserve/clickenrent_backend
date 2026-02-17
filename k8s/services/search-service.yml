@@ -1,0 +1,95 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: search-service
+  namespace: clickenrent
+  labels:
+    app: search-service
+spec:
+  type: ClusterIP
+  ports:
+    - port: 8086
+      targetPort: 8086
+      protocol: TCP
+      name: http
+  selector:
+    app: search-service
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: search-service
+  namespace: clickenrent
+  labels:
+    app: search-service
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: search-service
+  template:
+    metadata:
+      labels:
+        app: search-service
+    spec:
+      containers:
+      - name: search-service
+        image: ghcr.io/yourusername/backend/search-service:latest
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8086
+          name: http
+        env:
+        - name: SPRING_PROFILES_ACTIVE
+          valueFrom:
+            configMapKeyRef:
+              name: app-config
+              key: SPRING_PROFILES_ACTIVE
+        - name: EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE
+          valueFrom:
+            configMapKeyRef:
+              name: app-config
+              key: EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE
+        - name: JWT_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: app-secrets
+              key: jwt-secret
+        - name: ES_URIS
+          valueFrom:
+            configMapKeyRef:
+              name: app-config
+              key: ES_URIS
+        - name: ES_USERNAME
+          valueFrom:
+            configMapKeyRef:
+              name: app-config
+              key: ES_USERNAME
+        - name: ES_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: app-secrets
+              key: es-password
+        resources:
+          requests:
+            memory: "512Mi"
+            cpu: "250m"
+          limits:
+            memory: "1Gi"
+            cpu: "500m"
+        livenessProbe:
+          httpGet:
+            path: /actuator/health
+            port: 8086
+          initialDelaySeconds: 120
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+        readinessProbe:
+          httpGet:
+            path: /actuator/health
+            port: 8086
+          initialDelaySeconds: 90
+          periodSeconds: 5
+          timeoutSeconds: 3
+          failureThreshold: 3
