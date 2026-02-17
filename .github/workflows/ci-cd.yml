@@ -213,15 +213,15 @@ jobs:
       
       - name: Wait for rollout
         run: |
-          kubectl rollout status deployment/eureka-server -n clickenrent --timeout=5m
-          kubectl rollout status deployment/gateway -n clickenrent --timeout=5m
-          kubectl rollout status deployment/auth-service -n clickenrent --timeout=5m
-          kubectl rollout status deployment/rental-service -n clickenrent --timeout=5m
-          kubectl rollout status deployment/payment-service -n clickenrent --timeout=5m
-          kubectl rollout status deployment/support-service -n clickenrent --timeout=5m
-          kubectl rollout status deployment/notification-service -n clickenrent --timeout=5m
-          kubectl rollout status deployment/search-service -n clickenrent --timeout=5m
-          kubectl rollout status deployment/analytics-service -n clickenrent --timeout=5m
+          kubectl rollout status deployment/eureka-server -n clickenrent --timeout=10m
+          kubectl rollout status deployment/gateway -n clickenrent --timeout=10m
+          kubectl rollout status deployment/auth-service -n clickenrent --timeout=10m
+          kubectl rollout status deployment/rental-service -n clickenrent --timeout=10m
+          kubectl rollout status deployment/payment-service -n clickenrent --timeout=10m
+          kubectl rollout status deployment/support-service -n clickenrent --timeout=10m
+          kubectl rollout status deployment/notification-service -n clickenrent --timeout=10m
+          kubectl rollout status deployment/search-service -n clickenrent --timeout=10m
+          kubectl rollout status deployment/analytics-service -n clickenrent --timeout=10m
       
       - name: Display deployment status
         if: always()

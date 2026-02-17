@@ -50,8 +50,6 @@ spec:
             configMapKeyRef:
               name: app-config
               key: EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE
-        - name: DB_URL
-          value: "jdbc:postgresql://$(DB_HOST):$(DB_PORT)/clickenrent-notification"
         - name: DB_HOST
           valueFrom:
             configMapKeyRef:
@@ -62,6 +60,8 @@ spec:
             configMapKeyRef:
               name: app-config
               key: DB_PORT
+        - name: DB_URL
+          value: "jdbc:postgresql://$(DB_HOST):$(DB_PORT)/clickenrent-notification"
         - name: DB_USERNAME
           valueFrom:
             secretKeyRef:
