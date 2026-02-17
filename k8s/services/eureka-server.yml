@@ -34,7 +34,7 @@ spec:
     spec:
       containers:
       - name: eureka-server
-        image: ghcr.io/yourusername/backend/eureka-server:latest
+        image: ghcr.io/aybserve/clickenrent_backend/eureka-server:latest
         imagePullPolicy: Always
         ports:
         - containerPort: 8761

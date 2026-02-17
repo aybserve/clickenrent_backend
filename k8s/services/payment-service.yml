@@ -34,7 +34,7 @@ spec:
     spec:
       containers:
       - name: payment-service
-        image: ghcr.io/yourusername/backend/payment-service:latest
+        image: ghcr.io/aybserve/clickenrent_backend/payment-service:latest
         imagePullPolicy: Always
         ports:
         - containerPort: 8083

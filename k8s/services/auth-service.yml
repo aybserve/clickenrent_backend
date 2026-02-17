@@ -34,7 +34,7 @@ spec:
     spec:
       containers:
       - name: auth-service
-        image: ghcr.io/yourusername/backend/auth-service:latest
+        image: ghcr.io/aybserve/clickenrent_backend/auth-service:latest
         imagePullPolicy: Always
         ports:
         - containerPort: 8081

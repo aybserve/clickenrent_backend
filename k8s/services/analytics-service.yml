@@ -34,7 +34,7 @@ spec:
     spec:
       containers:
       - name: analytics-service
-        image: ghcr.io/yourusername/backend/analytics-service:latest
+        image: ghcr.io/aybserve/clickenrent_backend/analytics-service:latest
         imagePullPolicy: Always
         ports:
         - containerPort: 8087

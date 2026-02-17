@@ -34,7 +34,7 @@ spec:
     spec:
       containers:
       - name: search-service
-        image: ghcr.io/yourusername/backend/search-service:latest
+        image: ghcr.io/aybserve/clickenrent_backend/search-service:latest
         imagePullPolicy: Always
         ports:
         - containerPort: 8086

@@ -34,7 +34,7 @@ spec:
     spec:
       containers:
       - name: rental-service
-        image: ghcr.io/yourusername/backend/rental-service:latest
+        image: ghcr.io/aybserve/clickenrent_backend/rental-service:latest
         imagePullPolicy: Always
         ports:
         - containerPort: 8082

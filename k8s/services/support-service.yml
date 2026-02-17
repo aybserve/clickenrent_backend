@@ -34,7 +34,7 @@ spec:
     spec:
       containers:
       - name: support-service
-        image: ghcr.io/yourusername/backend/support-service:latest
+        image: ghcr.io/aybserve/clickenrent_backend/support-service:latest
         imagePullPolicy: Always
         ports:
         - containerPort: 8084
