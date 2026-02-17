@@ -24,13 +24,9 @@ metadata:
     nginx.ingress.kubernetes.io/proxy-send-timeout: "60"
     nginx.ingress.kubernetes.io/proxy-read-timeout: "60"
     
-    # SSL certificate (cert-manager)
-    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+    # SSL certificate (cert-manager) - uncomment when cert-manager is installed
+    # cert-manager.io/cluster-issuer: "letsencrypt-prod"
 spec:
-  tls:
-  - hosts:
-    - cnr.aybserve.com
-    secretName: clickenrent-tls
   rules:
   - host: cnr.aybserve.com
     http:
@@ -43,20 +39,3 @@ spec:
             name: gateway
             port:
               number: 8080
----
-# ClusterIssuer for Let's Encrypt (create this if cert-manager is installed)
-apiVersion: cert-manager.io/v1
-kind: ClusterIssuer
-metadata:
-  name: letsencrypt-prod
-spec:
-  acme:
-    # Production Let's Encrypt server
-    server: https://acme-v02.api.letsencrypt.org/directory
-    email: admin@cnr.aybserve.com  # Change this to your email
-    privateKeySecretRef:
-      name: letsencrypt-prod
-    solvers:
-    - http01:
-        ingress:
-          class: nginx

@@ -208,6 +208,9 @@ jobs:
           kubectl set image deployment/search-service search-service=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}/search-service:${{ steps.meta.outputs.sha_short }} -n clickenrent
           kubectl set image deployment/analytics-service analytics-service=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}/analytics-service:${{ steps.meta.outputs.sha_short }} -n clickenrent
       
+      - name: Force restart to pick up new images
+        run: kubectl rollout restart deployment -n clickenrent
+      
       - name: Wait for rollout
         run: |
           kubectl rollout status deployment/eureka-server -n clickenrent --timeout=5m
