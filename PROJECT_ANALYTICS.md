@@ -256,3 +256,4 @@ Null-safe implementations; no logic in DTOs.
 
 The Click & Rent backend exemplifies **professional, maintainable microservices development**. Strong emphasis on **clean code**, **DRY principles**, **security**, and **operational readiness** makes it suitable for production deployment. The shared-contracts approach and consistent architectural patterns across services reduce cognitive load and ease onboarding.
 
+
