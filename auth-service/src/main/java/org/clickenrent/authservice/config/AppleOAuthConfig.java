@@ -70,11 +70,12 @@ public class AppleOAuthConfig {
      */
     @Bean
     public ECPrivateKey applePrivateKey() {
-        // Check if this is a placeholder/default value - skip initialization
-        if (privateKeyString == null || 
+        // Check if this is a placeholder/default value or missing - skip initialization
+        if (privateKeyString == null ||
+            privateKeyString.isBlank() ||
             privateKeyString.contains("YOUR_PRIVATE_KEY_CONTENT") ||
             privateKeyString.equals("-----BEGIN PRIVATE KEY-----\\nYOUR_PRIVATE_KEY_CONTENT\\n-----END PRIVATE KEY-----")) {
-            log.warn("Apple private key not configured - using placeholder value. Apple OAuth will not work until a valid key is provided.");
+            log.warn("Apple private key not configured - Apple OAuth will be disabled. Provide a valid key to enable Apple Sign In.");
             return null;
         }
         
@@ -82,7 +83,14 @@ public class AppleOAuthConfig {
             // Remove any whitespace or newline characters that might have been escaped
             String cleanedKey = privateKeyString
                     .replace("\\n", "\n")
+                    .replace("\\\\n", "\n")
                     .trim();
+            
+            // If key doesn't look like a valid PEM, return null gracefully
+            if (!cleanedKey.contains("-----BEGIN") || !cleanedKey.contains("-----END")) {
+                log.warn("Apple private key does not appear to be in valid PEM format - Apple OAuth will be disabled.");
+                return null;
+            }
             
             // Parse PEM format
             PemReader pemReader = new PemReader(new StringReader(cleanedKey));
@@ -90,7 +98,8 @@ public class AppleOAuthConfig {
             pemReader.close();
             
             if (pemObject == null) {
-                throw new RuntimeException("Failed to parse PEM object from private key");
+                log.warn("Failed to parse Apple PEM object - Apple OAuth will be disabled.");
+                return null;
             }
             
             byte[] keyBytes = pemObject.getContent();
@@ -102,14 +111,17 @@ public class AppleOAuthConfig {
             return (ECPrivateKey) privateKey;
             
         } catch (IOException e) {
-            log.error("Failed to read Apple private key", e);
-            throw new RuntimeException("Failed to initialize Apple OAuth configuration: invalid private key format", e);
+            log.warn("Failed to read Apple private key - Apple OAuth will be disabled: {}", e.getMessage());
+            return null;
         } catch (NoSuchAlgorithmException e) {
-            log.error("EC algorithm not available", e);
-            throw new RuntimeException("Failed to initialize Apple OAuth configuration: EC algorithm not available", e);
+            log.warn("EC algorithm not available - Apple OAuth will be disabled: {}", e.getMessage());
+            return null;
         } catch (InvalidKeySpecException e) {
-            log.error("Invalid key specification", e);
-            throw new RuntimeException("Failed to initialize Apple OAuth configuration: invalid key specification", e);
+            log.warn("Invalid Apple key specification - Apple OAuth will be disabled: {}", e.getMessage());
+            return null;
+        } catch (Exception e) {
+            log.warn("Unexpected error loading Apple private key - Apple OAuth will be disabled: {}", e.getMessage());
+            return null;
         }
     }
     
