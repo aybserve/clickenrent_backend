@@ -8,8 +8,8 @@ metadata:
 spec:
   type: ClusterIP
   ports:
-    - port: 8084
-      targetPort: 8084
+    - port: 8083
+      targetPort: 8083
       protocol: TCP
       name: http
   selector:
@@ -40,7 +40,7 @@ spec:
         image: ghcr.io/aybserve/clickenrent_backend/support-service:latest
         imagePullPolicy: Always
         ports:
-        - containerPort: 8084
+        - containerPort: 8083
           name: http
         env:
         - name: SPRING_PROFILES_ACTIVE
@@ -105,7 +105,7 @@ spec:
         startupProbe:
           httpGet:
             path: /actuator/health
-            port: 8084
+            port: 8083
           initialDelaySeconds: 30
           periodSeconds: 10
           timeoutSeconds: 5
@@ -113,7 +113,7 @@ spec:
         livenessProbe:
           httpGet:
             path: /actuator/health
-            port: 8084
+            port: 8083
           initialDelaySeconds: 0
           periodSeconds: 10
           timeoutSeconds: 5
@@ -121,7 +121,7 @@ spec:
         readinessProbe:
           httpGet:
             path: /actuator/health
-            port: 8084
+            port: 8083
           initialDelaySeconds: 0
           periodSeconds: 5
           timeoutSeconds: 3
