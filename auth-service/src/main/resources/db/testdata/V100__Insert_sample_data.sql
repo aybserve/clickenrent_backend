@@ -12,6 +12,16 @@
 -- =====================================================================================================================
 
 -- =====================================================================================================================
+-- DISABLE FORCE RLS TEMPORARILY FOR DATA INSERTION
+-- =====================================================================================================================
+-- The tables have FORCE ROW LEVEL SECURITY which blocks even BYPASSRLS users.
+-- We temporarily disable FORCE to allow test data insertion, then re-enable it.
+-- =====================================================================================================================
+
+ALTER TABLE company ENABLE ROW LEVEL SECURITY;  -- Change from FORCE to ENABLE
+ALTER TABLE user_company ENABLE ROW LEVEL SECURITY;  -- Change from FORCE to ENABLE
+
+-- =====================================================================================================================
 -- SECTION 1: USERS
 -- =====================================================================================================================
 
@@ -159,6 +169,15 @@ INSERT INTO user_preferences (id, external_id, user_id, navigation_order, theme,
 (13, 'upref-ext-00013', 13, '{"customer": ["rentals", "bikes", "profile", "payment-methods"]}'::jsonb, 'LIGHT', 1, 'America/Los_Angeles', 'MM/DD/YYYY', 'TWELVE_HOUR', '550e8400-e29b-41d4-a716-446655440021', false, false, false, 'WEEKLY', 20, '{}'::jsonb, '{}'::jsonb, '{}'::jsonb, NOW(), NOW(), 'system', 'system', false),
 (14, 'upref-ext-00014', 14, '{"system": ["status", "health", "metrics"]}'::jsonb, 'SYSTEM', 1, 'UTC', 'YYYY-MM-DD', 'TWENTY_FOUR_HOUR', '550e8400-e29b-41d4-a716-446655440021', false, false, false, 'IMMEDIATE', 20, '{}'::jsonb, '{}'::jsonb, '{}'::jsonb, NOW(), NOW(), 'system', 'system', false)
 ON CONFLICT (id) DO NOTHING;
+
+-- =====================================================================================================================
+-- RE-ENABLE FORCE RLS AFTER DATA INSERTION
+-- =====================================================================================================================
+-- Restore FORCE ROW LEVEL SECURITY to ensure policies are enforced for all users including superusers.
+-- =====================================================================================================================
+
+ALTER TABLE company FORCE ROW LEVEL SECURITY;
+ALTER TABLE user_company FORCE ROW LEVEL SECURITY;
 
 -- =====================================================================================================================
 -- END OF SAMPLE DATA
