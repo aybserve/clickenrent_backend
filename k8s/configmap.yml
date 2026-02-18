@@ -46,7 +46,7 @@ data:
   RATE_LIMIT_USER_BURST: "100"
   
   # Sentry Configuration
-  SENTRY_ENVIRONMENT: "production"
+  SENTRY_ENVIRONMENT: "staging"
   SENTRY_TRACES_SAMPLE_RATE: "0.1"
   
   # JPA Configuration
@@ -55,4 +55,4 @@ data:
   
   # Flyway Configuration
   FLYWAY_MIGRATE: "true"
-  FLYWAY_SKIP_TESTDATA: "true"
+  FLYWAY_SKIP_TESTDATA: "false"
