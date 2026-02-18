@@ -24,6 +24,7 @@ metadata:
     app: rental-service
 spec:
   replicas: 2
+  progressDeadlineSeconds: 1200
   selector:
     matchLabels:
       app: rental-service
@@ -121,11 +122,19 @@ spec:
           limits:
             memory: "1Gi"
             cpu: "500m"
+        startupProbe:
+          httpGet:
+            path: /actuator/health
+            port: 8082
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 30
         livenessProbe:
           httpGet:
             path: /actuator/health
             port: 8082
-          initialDelaySeconds: 300
+          initialDelaySeconds: 0
           periodSeconds: 10
           timeoutSeconds: 5
           failureThreshold: 3
@@ -133,7 +142,7 @@ spec:
           httpGet:
             path: /actuator/health
             port: 8082
-          initialDelaySeconds: 240
+          initialDelaySeconds: 0
           periodSeconds: 5
           timeoutSeconds: 3
           failureThreshold: 3

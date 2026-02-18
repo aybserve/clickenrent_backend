@@ -237,13 +237,41 @@ jobs:
         if: always()
         run: |
           echo "=== Pods Status ==="
-          kubectl get pods -n clickenrent
+          kubectl get pods -n clickenrent -o wide
           echo ""
           echo "=== Services ==="
           kubectl get svc -n clickenrent
           echo ""
           echo "=== Ingress ==="
           kubectl get ingress -n clickenrent
+      
+      - name: Debug failed pods
+        if: failure()
+        run: |
+          echo "=== Recent Events ==="
+          kubectl get events -n clickenrent --sort-by='.lastTimestamp' | tail -50
+          echo ""
+          for pod in $(kubectl get pods -n clickenrent --field-selector=status.phase!=Running -o jsonpath='{.items[*].metadata.name}' 2>/dev/null); do
+            echo "=== Describe pod: $pod ==="
+            kubectl describe pod "$pod" -n clickenrent | tail -30
+            echo ""
+            echo "=== Logs: $pod ==="
+            kubectl logs "$pod" -n clickenrent --tail=100 2>/dev/null || echo "No logs available"
+            echo ""
+          done
+          for deploy in eureka-server gateway auth-service rental-service payment-service support-service notification-service search-service analytics-service; do
+            STATUS=$(kubectl rollout status deployment/$deploy -n clickenrent --timeout=5s 2>&1 || true)
+            if echo "$STATUS" | grep -q "error\|exceeded"; then
+              echo "=== FAILED deployment: $deploy ==="
+              kubectl describe deployment/$deploy -n clickenrent | tail -20
+              echo ""
+              for pod in $(kubectl get pods -n clickenrent -l app=$deploy -o jsonpath='{.items[*].metadata.name}'); do
+                echo "--- Logs: $pod ---"
+                kubectl logs "$pod" -n clickenrent --tail=80 2>/dev/null || echo "No logs available"
+              done
+              echo ""
+            fi
+          done
       
       - name: Deployment summary
         run: |

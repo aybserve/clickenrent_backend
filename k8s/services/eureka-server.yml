@@ -24,6 +24,7 @@ metadata:
     app: eureka-server
 spec:
   replicas: 1
+  progressDeadlineSeconds: 1200
   selector:
     matchLabels:
       app: eureka-server
@@ -54,11 +55,19 @@ spec:
           limits:
             memory: "1Gi"
             cpu: "500m"
+        startupProbe:
+          httpGet:
+            path: /actuator/health
+            port: 8761
+          initialDelaySeconds: 20
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 24
         livenessProbe:
           httpGet:
             path: /actuator/health
             port: 8761
-          initialDelaySeconds: 90
+          initialDelaySeconds: 0
           periodSeconds: 10
           timeoutSeconds: 5
           failureThreshold: 3
@@ -66,7 +75,7 @@ spec:
           httpGet:
             path: /actuator/health
             port: 8761
-          initialDelaySeconds: 60
+          initialDelaySeconds: 0
           periodSeconds: 5
           timeoutSeconds: 3
           failureThreshold: 3

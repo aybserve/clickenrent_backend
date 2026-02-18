@@ -24,6 +24,7 @@ metadata:
     app: search-service
 spec:
   replicas: 2
+  progressDeadlineSeconds: 1200
   selector:
     matchLabels:
       app: search-service
@@ -79,11 +80,19 @@ spec:
           limits:
             memory: "1Gi"
             cpu: "500m"
+        startupProbe:
+          httpGet:
+            path: /actuator/health
+            port: 8086
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 24
         livenessProbe:
           httpGet:
             path: /actuator/health
             port: 8086
-          initialDelaySeconds: 120
+          initialDelaySeconds: 0
           periodSeconds: 10
           timeoutSeconds: 5
           failureThreshold: 3
@@ -91,7 +100,7 @@ spec:
           httpGet:
             path: /actuator/health
             port: 8086
-          initialDelaySeconds: 90
+          initialDelaySeconds: 0
           periodSeconds: 5
           timeoutSeconds: 3
           failureThreshold: 3
