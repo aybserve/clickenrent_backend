@@ -32,7 +32,7 @@ DECLARE
         'bike_inspection_item_bike_issue_id_seq:bike_inspection_item_bike_issue',
         'bike_inspection_item_bike_unit_id_seq:bike_inspection_item_bike_unit'
     ];
-    seq_info TEXT[];
+    seq_info TEXT;
     seq_name TEXT;
     table_name TEXT;
     max_id BIGINT;

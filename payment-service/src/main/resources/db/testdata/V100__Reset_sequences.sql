@@ -38,7 +38,7 @@ DECLARE
         'refund_reasons_id_seq:refund_reasons',
         'refunds_id_seq:refunds'
     ];
-    seq_info TEXT[];
+    seq_info TEXT;
     seq_name TEXT;
     table_name TEXT;
     max_id BIGINT;

@@ -58,7 +58,7 @@ DECLARE
         'stock_movement_id_seq:stock_movement',
         'bike_model_part_id_seq:bike_model_part'
     ];
-    seq_info TEXT[];
+    seq_info TEXT;
     seq_name TEXT;
     table_name TEXT;
     max_id BIGINT;
