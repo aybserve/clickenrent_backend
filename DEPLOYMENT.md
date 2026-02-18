@@ -56,6 +56,7 @@ Complete guide for deploying ClickEnRent to production using Kubernetes (K3s) on
 - kubectl (`brew install kubectl` or download from kubernetes.io)
 - (Optional) k9s for cluster monitoring (`brew install k9s`)
 
+
 ### Hetzner Server
 - Ubuntu 20.04+ or Debian 10+
 - Root access
