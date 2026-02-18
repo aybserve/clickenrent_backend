@@ -55,4 +55,4 @@ data:
   
   # Flyway Configuration
   FLYWAY_MIGRATE: "true"
-  FLYWAY_SKIP_TESTDATA: "false"
+  FLYWAY_SKIP_TESTDATA: "true"
