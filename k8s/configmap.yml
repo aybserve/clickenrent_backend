@@ -50,7 +50,7 @@ data:
   SENTRY_TRACES_SAMPLE_RATE: "0.1"
   
   # JPA Configuration
-  JPA_DDL_AUTO: "none"
+  JPA_DDL_AUTO: "update"
   JPA_SHOW_SQL: "false"
   
   # Flyway Configuration
