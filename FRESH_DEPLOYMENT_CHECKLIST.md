@@ -238,6 +238,7 @@ curl http://cnr.aybserve.com/swagger-ui.html
 
 ### If pods are CrashLoopBackOff:
 
+
 ```bash
 # Get logs
 kubectl logs -n clickenrent POD_NAME --previous
