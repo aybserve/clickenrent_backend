@@ -34,17 +34,17 @@ DECLARE
     ];
     seq_info TEXT;
     seq_name TEXT;
-    table_name TEXT;
+    tbl_name TEXT;
     max_id BIGINT;
 BEGIN
     FOREACH seq_info IN ARRAY sequences
     LOOP
         seq_name := split_part(seq_info, ':', 1);
-        table_name := split_part(seq_info, ':', 2);
+        tbl_name := split_part(seq_info, ':', 2);
         
         IF EXISTS (SELECT 1 FROM pg_class WHERE relkind = 'S' AND relname = seq_name)
-           AND EXISTS (SELECT 1 FROM information_schema.tables WHERE table_name = table_name) THEN
-            EXECUTE format('SELECT COALESCE(MAX(id), 0) FROM %I', table_name) INTO max_id;
+           AND EXISTS (SELECT 1 FROM information_schema.tables WHERE table_name = tbl_name) THEN
+            EXECUTE format('SELECT COALESCE(MAX(id), 0) FROM %I', tbl_name) INTO max_id;
             PERFORM setval(seq_name, GREATEST(max_id, 1));
         END IF;
     END LOOP;
