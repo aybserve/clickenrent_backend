@@ -32,6 +32,8 @@ spec:
       labels:
         app: analytics-service
     spec:
+      imagePullSecrets:
+      - name: ghcr-secret
       containers:
       - name: analytics-service
         image: ghcr.io/aybserve/clickenrent_backend/analytics-service:latest

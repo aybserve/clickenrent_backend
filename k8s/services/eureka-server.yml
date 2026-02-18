@@ -32,6 +32,8 @@ spec:
       labels:
         app: eureka-server
     spec:
+      imagePullSecrets:
+      - name: ghcr-secret
       containers:
       - name: eureka-server
         image: ghcr.io/aybserve/clickenrent_backend/eureka-server:latest

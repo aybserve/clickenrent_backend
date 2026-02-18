@@ -32,6 +32,8 @@ spec:
       labels:
         app: rental-service
     spec:
+      imagePullSecrets:
+      - name: ghcr-secret
       containers:
       - name: rental-service
         image: ghcr.io/aybserve/clickenrent_backend/rental-service:latest

@@ -32,6 +32,8 @@ spec:
       labels:
         app: support-service
     spec:
+      imagePullSecrets:
+      - name: ghcr-secret
       containers:
       - name: support-service
         image: ghcr.io/aybserve/clickenrent_backend/support-service:latest

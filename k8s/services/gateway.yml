@@ -32,6 +32,8 @@ spec:
       labels:
         app: gateway
     spec:
+      imagePullSecrets:
+      - name: ghcr-secret
       containers:
       - name: gateway
         image: ghcr.io/aybserve/clickenrent_backend/gateway:latest

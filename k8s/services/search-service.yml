@@ -32,6 +32,8 @@ spec:
       labels:
         app: search-service
     spec:
+      imagePullSecrets:
+      - name: ghcr-secret
       containers:
       - name: search-service
         image: ghcr.io/aybserve/clickenrent_backend/search-service:latest
