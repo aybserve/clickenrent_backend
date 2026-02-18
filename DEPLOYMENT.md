@@ -15,6 +15,7 @@ Complete guide for deploying ClickEnRent to production using Kubernetes (K3s) on
 
 ## Architecture Overview
 
+
 ```
 ┌─────────────────────────────────────────────────────────────┐
 │                      GitHub Actions                          │
