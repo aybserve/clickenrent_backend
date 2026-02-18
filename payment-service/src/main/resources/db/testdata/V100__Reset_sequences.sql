@@ -9,6 +9,14 @@
 -- Author: Vitaliy Shvetsov
 -- =====================================================================================================================
 
+-- =====================================================================================================================
+-- DISABLE FORCE RLS TEMPORARILY
+-- =====================================================================================================================
+ALTER TABLE b2b_revenue_share_payouts ENABLE ROW LEVEL SECURITY;
+ALTER TABLE financial_transactions ENABLE ROW LEVEL SECURITY;
+ALTER TABLE location_bank_accounts ENABLE ROW LEVEL SECURITY;
+ALTER TABLE refunds ENABLE ROW LEVEL SECURITY;
+
 DO $$
 DECLARE
     sequences TEXT[] := ARRAY[
@@ -47,6 +55,14 @@ BEGIN
         END IF;
     END LOOP;
 END $$;
+
+-- =====================================================================================================================
+-- RE-ENABLE FORCE RLS
+-- =====================================================================================================================
+ALTER TABLE b2b_revenue_share_payouts FORCE ROW LEVEL SECURITY;
+ALTER TABLE financial_transactions FORCE ROW LEVEL SECURITY;
+ALTER TABLE location_bank_accounts FORCE ROW LEVEL SECURITY;
+ALTER TABLE refunds FORCE ROW LEVEL SECURITY;
 
 -- =====================================================================================================================
 -- END OF SEQUENCE RESET

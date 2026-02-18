@@ -10,6 +10,18 @@
 -- =====================================================================================================================
 
 -- =====================================================================================================================
+-- DISABLE FORCE RLS TEMPORARILY FOR DATA INSERTION
+-- =====================================================================================================================
+ALTER TABLE rental ENABLE ROW LEVEL SECURITY;
+ALTER TABLE location ENABLE ROW LEVEL SECURITY;
+ALTER TABLE b2b_sale ENABLE ROW LEVEL SECURITY;
+ALTER TABLE b2b_subscription ENABLE ROW LEVEL SECURITY;
+ALTER TABLE b2b_sale_order ENABLE ROW LEVEL SECURITY;
+ALTER TABLE bike_brand ENABLE ROW LEVEL SECURITY;
+ALTER TABLE charging_station_brand ENABLE ROW LEVEL SECURITY;
+ALTER TABLE part_brand ENABLE ROW LEVEL SECURITY;
+
+-- =====================================================================================================================
 -- SECTION 1: BRANDS & MODELS
 -- =====================================================================================================================
 
@@ -310,6 +322,18 @@ INSERT INTO bike_model_part (id, external_id, bike_model_id, part_id, date_creat
 (2, '550e8400-e29b-41d4-a716-446655440732', 1002, 203, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
 (3, '550e8400-e29b-41d4-a716-446655440733', 1003, 202, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false)
 ON CONFLICT (id) DO NOTHING;
+
+-- =====================================================================================================================
+-- RE-ENABLE FORCE RLS AFTER DATA INSERTION
+-- =====================================================================================================================
+ALTER TABLE rental FORCE ROW LEVEL SECURITY;
+ALTER TABLE location FORCE ROW LEVEL SECURITY;
+ALTER TABLE b2b_sale FORCE ROW LEVEL SECURITY;
+ALTER TABLE b2b_subscription FORCE ROW LEVEL SECURITY;
+ALTER TABLE b2b_sale_order FORCE ROW LEVEL SECURITY;
+ALTER TABLE bike_brand FORCE ROW LEVEL SECURITY;
+ALTER TABLE charging_station_brand FORCE ROW LEVEL SECURITY;
+ALTER TABLE part_brand FORCE ROW LEVEL SECURITY;
 
 -- =====================================================================================================================
 -- END OF SAMPLE DATA
