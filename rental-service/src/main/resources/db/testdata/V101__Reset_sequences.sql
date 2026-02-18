@@ -4,55 +4,77 @@
 -- Module: rental-service
 -- Database: PostgreSQL
 -- Description: Reset sequences to correct values after inserting sample data.
+--              Safe version: checks if sequence and table exist before resetting.
 -- 
 -- Author: Vitaliy Shvetsov
 -- =====================================================================================================================
 
-SELECT setval('bike_type_id_seq', (SELECT COALESCE(MAX(id), 1) FROM bike_type));
-SELECT setval('bike_status_id_seq', (SELECT COALESCE(MAX(id), 1) FROM bike_status));
-SELECT setval('bike_rental_status_id_seq', (SELECT COALESCE(MAX(id), 1) FROM bike_rental_status));
-SELECT setval('rental_status_id_seq', (SELECT COALESCE(MAX(id), 1) FROM rental_status));
-SELECT setval('rental_unit_id_seq', (SELECT COALESCE(MAX(id), 1) FROM rental_unit));
-SELECT setval('ride_status_id_seq', (SELECT COALESCE(MAX(id), 1) FROM ride_status));
-SELECT setval('location_role_id_seq', (SELECT COALESCE(MAX(id), 1) FROM location_role));
-SELECT setval('b2b_sale_status_id_seq', (SELECT COALESCE(MAX(id), 1) FROM b2b_sale_status));
-SELECT setval('b2b_sale_order_status_id_seq', (SELECT COALESCE(MAX(id), 1) FROM b2b_sale_order_status));
-SELECT setval('b2b_subscription_status_id_seq', (SELECT COALESCE(MAX(id), 1) FROM b2b_subscription_status));
-SELECT setval('b2b_subscription_order_status_id_seq', (SELECT COALESCE(MAX(id), 1) FROM b2b_subscription_order_status));
-SELECT setval('charging_station_status_id_seq', (SELECT COALESCE(MAX(id), 1) FROM charging_station_status));
-SELECT setval('lock_status_id_seq', (SELECT COALESCE(MAX(id), 1) FROM lock_status));
-SELECT setval('lock_provider_id_seq', (SELECT COALESCE(MAX(id), 1) FROM lock_provider));
-SELECT setval('bike_brand_id_seq', (SELECT COALESCE(MAX(id), 1) FROM bike_brand));
-SELECT setval('bike_engine_id_seq', (SELECT COALESCE(MAX(id), 1) FROM bike_engine));
-SELECT setval('part_brand_id_seq', (SELECT COALESCE(MAX(id), 1) FROM part_brand));
-SELECT setval('part_category_id_seq', (SELECT COALESCE(MAX(id), 1) FROM part_category));
-SELECT setval('charging_station_brand_id_seq', (SELECT COALESCE(MAX(id), 1) FROM charging_station_brand));
-SELECT setval('coordinates_id_seq', (SELECT COALESCE(MAX(id), 1) FROM coordinates));
-SELECT setval('location_id_seq', (SELECT COALESCE(MAX(id), 1) FROM location));
-SELECT setval('location_image_id_seq', (SELECT COALESCE(MAX(id), 1) FROM location_image));
-SELECT setval('hub_id_seq', (SELECT COALESCE(MAX(id), 1) FROM hub));
-SELECT setval('hub_image_id_seq', (SELECT COALESCE(MAX(id), 1) FROM hub_image));
-SELECT setval('lock_entity_id_seq', (SELECT COALESCE(MAX(id), 1) FROM lock_entity));
-SELECT setval('key_entity_id_seq', (SELECT COALESCE(MAX(id), 1) FROM key_entity));
-SELECT setval('product_id_seq', (SELECT COALESCE(MAX(id), 1) FROM product));
-SELECT setval('service_id_seq', (SELECT COALESCE(MAX(id), 1) FROM service));
-SELECT setval('rental_plan_id_seq', (SELECT COALESCE(MAX(id), 1) FROM rental_plan));
-SELECT setval('bike_model_rental_plan_id_seq', (SELECT COALESCE(MAX(id), 1) FROM bike_model_rental_plan));
-SELECT setval('user_location_id_seq', (SELECT COALESCE(MAX(id), 1) FROM user_location));
-SELECT setval('b2b_sale_id_seq', (SELECT COALESCE(MAX(id), 1) FROM b2b_sale));
-SELECT setval('b2b_sale_order_id_seq', (SELECT COALESCE(MAX(id), 1) FROM b2b_sale_order));
-SELECT setval('b2b_sale_item_id_seq', (SELECT COALESCE(MAX(id), 1) FROM b2b_sale_item));
-SELECT setval('b2b_sale_order_item_id_seq', (SELECT COALESCE(MAX(id), 1) FROM b2b_sale_order_item));
-SELECT setval('b2b_subscription_id_seq', (SELECT COALESCE(MAX(id), 1) FROM b2b_subscription));
-SELECT setval('b2b_subscription_item_id_seq', (SELECT COALESCE(MAX(id), 1) FROM b2b_subscription_item));
-SELECT setval('b2b_subscription_order_id_seq', (SELECT COALESCE(MAX(id), 1) FROM b2b_subscription_order));
-SELECT setval('b2b_subscription_order_item_id_seq', (SELECT COALESCE(MAX(id), 1) FROM b2b_subscription_order_item));
-SELECT setval('rental_id_seq', (SELECT COALESCE(MAX(id), 1) FROM rental));
-SELECT setval('bike_rental_id_seq', (SELECT COALESCE(MAX(id), 1) FROM bike_rental));
-SELECT setval('bike_reservation_id_seq', (SELECT COALESCE(MAX(id), 1) FROM bike_reservation));
-SELECT setval('ride_id_seq', (SELECT COALESCE(MAX(id), 1) FROM ride));
-SELECT setval('stock_movement_id_seq', (SELECT COALESCE(MAX(id), 1) FROM stock_movement));
-SELECT setval('bike_model_part_id_seq', (SELECT COALESCE(MAX(id), 1) FROM bike_model_part));
+DO $$
+DECLARE
+    sequences TEXT[] := ARRAY[
+        'bike_type_id_seq:bike_type',
+        'bike_status_id_seq:bike_status',
+        'bike_rental_status_id_seq:bike_rental_status',
+        'rental_status_id_seq:rental_status',
+        'rental_unit_id_seq:rental_unit',
+        'ride_status_id_seq:ride_status',
+        'location_role_id_seq:location_role',
+        'b2b_sale_status_id_seq:b2b_sale_status',
+        'b2b_sale_order_status_id_seq:b2b_sale_order_status',
+        'b2b_subscription_status_id_seq:b2b_subscription_status',
+        'b2b_subscription_order_status_id_seq:b2b_subscription_order_status',
+        'charging_station_status_id_seq:charging_station_status',
+        'lock_status_id_seq:lock_status',
+        'lock_provider_id_seq:lock_provider',
+        'bike_brand_id_seq:bike_brand',
+        'bike_engine_id_seq:bike_engine',
+        'part_brand_id_seq:part_brand',
+        'part_category_id_seq:part_category',
+        'charging_station_brand_id_seq:charging_station_brand',
+        'coordinates_id_seq:coordinates',
+        'location_id_seq:location',
+        'location_image_id_seq:location_image',
+        'hub_id_seq:hub',
+        'hub_image_id_seq:hub_image',
+        'lock_entity_id_seq:lock_entity',
+        'key_entity_id_seq:key_entity',
+        'product_id_seq:product',
+        'service_id_seq:service',
+        'rental_plan_id_seq:rental_plan',
+        'bike_model_rental_plan_id_seq:bike_model_rental_plan',
+        'user_location_id_seq:user_location',
+        'b2b_sale_id_seq:b2b_sale',
+        'b2b_sale_order_id_seq:b2b_sale_order',
+        'b2b_sale_item_id_seq:b2b_sale_item',
+        'b2b_sale_order_item_id_seq:b2b_sale_order_item',
+        'b2b_subscription_id_seq:b2b_subscription',
+        'b2b_subscription_item_id_seq:b2b_subscription_item',
+        'b2b_subscription_order_id_seq:b2b_subscription_order',
+        'b2b_subscription_order_item_id_seq:b2b_subscription_order_item',
+        'rental_id_seq:rental',
+        'bike_rental_id_seq:bike_rental',
+        'bike_reservation_id_seq:bike_reservation',
+        'ride_id_seq:ride',
+        'stock_movement_id_seq:stock_movement',
+        'bike_model_part_id_seq:bike_model_part'
+    ];
+    seq_info TEXT[];
+    seq_name TEXT;
+    table_name TEXT;
+    max_id BIGINT;
+BEGIN
+    FOREACH seq_info IN ARRAY sequences
+    LOOP
+        seq_name := split_part(seq_info, ':', 1);
+        table_name := split_part(seq_info, ':', 2);
+        
+        IF EXISTS (SELECT 1 FROM pg_class WHERE relkind = 'S' AND relname = seq_name)
+           AND EXISTS (SELECT 1 FROM information_schema.tables WHERE table_name = table_name) THEN
+            EXECUTE format('SELECT COALESCE(MAX(id), 0) FROM %I', table_name) INTO max_id;
+            PERFORM setval(seq_name, GREATEST(max_id, 1));
+        END IF;
+    END LOOP;
+END $$;
 
 -- =====================================================================================================================
 -- END OF SEQUENCE RESET
