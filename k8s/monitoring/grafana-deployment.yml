@@ -19,18 +19,6 @@ data:
           timeInterval: 15s
 ---
 apiVersion: v1
-kind: Secret
-metadata:
-  name: grafana-secrets
-  namespace: clickenrent
-  labels:
-    app: grafana
-type: Opaque
-stringData:
-  admin-user: admin
-  admin-password: ${GRAFANA_ADMIN_PASSWORD}
----
-apiVersion: v1
 kind: Service
 metadata:
   name: grafana
