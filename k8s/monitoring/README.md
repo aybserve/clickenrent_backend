@@ -30,9 +30,11 @@ This directory contains the Prometheus and Grafana monitoring configuration for 
 - Separate Grafana admin login
 
 ### 5. Ingress
-- **File**: `ingress-monitoring.yml`
-- Routes for `/prometheus` and `/grafana`
-- Basic auth enabled
+- **Files**: `ingress-prometheus.yml`, `ingress-grafana.yml`
+- Separate ingress for each service with different routing rules
+- Prometheus: Uses path rewrite to strip `/prometheus` prefix
+- Grafana: Passes `/grafana` prefix through (no rewrite)
+- Basic auth enabled on both
 
 ## Required GitHub Secrets
 

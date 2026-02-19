@@ -225,7 +225,8 @@ jobs:
           kubectl apply -f k8s/monitoring/prometheus-deployment.yml
           kubectl apply -f k8s/monitoring/grafana-dashboards.yml
           kubectl apply -f k8s/monitoring/grafana-deployment.yml
-          kubectl apply -f k8s/monitoring/ingress-monitoring.yml
+          kubectl apply -f k8s/monitoring/ingress-prometheus.yml
+          kubectl apply -f k8s/monitoring/ingress-grafana.yml
           
           echo "Waiting for monitoring stack to be ready..."
           kubectl wait --for=condition=available --timeout=300s deployment/prometheus -n clickenrent || true

@@ -1,7 +1,7 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: monitoring-ingress
+  name: prometheus-ingress
   namespace: clickenrent
   annotations:
     nginx.ingress.kubernetes.io/ssl-redirect: "false"
@@ -10,24 +10,17 @@ metadata:
     nginx.ingress.kubernetes.io/auth-type: basic
     nginx.ingress.kubernetes.io/auth-secret: monitoring-basic-auth
     nginx.ingress.kubernetes.io/auth-realm: "Authentication Required - Monitoring"
+    
+    # Rewrite /prometheus/* to /*
+    nginx.ingress.kubernetes.io/rewrite-target: /$2
 spec:
   ingressClassName: nginx
   rules:
   - host: cnr.aybserve.com
     http:
       paths:
-      # Grafana - No rewrite, passes /grafana prefix to service
-      - path: /grafana
-        pathType: Prefix
-        backend:
-          service:
-            name: grafana
-            port:
-              number: 3000
-      
-      # Prometheus - No rewrite needed, works with subpath
-      - path: /prometheus
-        pathType: Prefix
+      - path: /prometheus(/|$)(.*)
+        pathType: ImplementationSpecific
         backend:
           service:
             name: prometheus
