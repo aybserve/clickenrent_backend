@@ -5,8 +5,6 @@ metadata:
   namespace: clickenrent
   annotations:
     nginx.ingress.kubernetes.io/ssl-redirect: "false"
-    
-    # Basic Authentication
     nginx.ingress.kubernetes.io/auth-type: basic
     nginx.ingress.kubernetes.io/auth-secret: monitoring-basic-auth
     nginx.ingress.kubernetes.io/auth-realm: "Authentication Required - Monitoring"
