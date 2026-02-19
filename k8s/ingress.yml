@@ -28,13 +28,53 @@ metadata:
     
     # SSL certificate (cert-manager) - uncomment when cert-manager is installed
     # cert-manager.io/cluster-issuer: "letsencrypt-prod"
+    
+    # Configuration for monitoring path authentication and rewrites
+    nginx.ingress.kubernetes.io/server-snippet: |
+      location ~ ^/prometheus(/|$)(.*) {
+        auth_basic "Authentication Required - Monitoring";
+        auth_basic_user_file /etc/nginx/secrets/default-clickenrent-monitoring-basic-auth;
+        rewrite ^/prometheus(/|$)(.*) /$2 break;
+        proxy_pass http://upstream_balancer;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+      }
+      
+      location /grafana {
+        auth_basic "Authentication Required - Monitoring";
+        auth_basic_user_file /etc/nginx/secrets/default-clickenrent-monitoring-basic-auth;
+        proxy_pass http://upstream_balancer;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+      }
 spec:
   rules:
   - host: cnr.aybserve.com
     http:
       paths:
-      # Route all traffic through Gateway
-      # (Monitoring routes handled by separate ingress)
+      # Monitoring: Prometheus (handled by server-snippet above)
+      - path: /prometheus
+        pathType: Prefix
+        backend:
+          service:
+            name: prometheus
+            port:
+              number: 9090
+      
+      # Monitoring: Grafana (handled by server-snippet above)
+      - path: /grafana
+        pathType: Prefix
+        backend:
+          service:
+            name: grafana
+            port:
+              number: 3000
+      
+      # Route all other traffic through Gateway (MUST be last)
       - path: /
         pathType: Prefix
         backend:
