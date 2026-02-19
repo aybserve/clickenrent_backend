@@ -217,6 +217,27 @@ jobs:
             --namespace clickenrent \
             --dry-run=client -o yaml | kubectl apply -f -
       
+      - name: Clean up old monitoring ingress
+        run: |
+          echo "Removing any old monitoring ingress resources..."
+          kubectl delete ingress -n clickenrent -l app=prometheus --ignore-not-found=true
+          kubectl delete ingress -n clickenrent -l app=grafana --ignore-not-found=true
+          kubectl delete ingress prometheus-ingress -n clickenrent --ignore-not-found=true
+          kubectl delete ingress grafana-ingress -n clickenrent --ignore-not-found=true
+          kubectl delete ingress monitoring-prometheus -n clickenrent --ignore-not-found=true
+          kubectl delete ingress monitoring-grafana -n clickenrent --ignore-not-found=true
+          kubectl delete ingress monitoring-ingress -n clickenrent --ignore-not-found=true
+          kubectl delete ingress monitoring-auth-ingress -n clickenrent --ignore-not-found=true
+          kubectl delete ingress monitoring-grafana-auth-ingress -n clickenrent --ignore-not-found=true
+          echo "Old monitoring ingress cleaned up."
+      
+      - name: Apply Kubernetes manifests
+        run: |
+          kubectl apply -f k8s/namespace.yml
+          kubectl apply -f k8s/configmap.yml
+          kubectl apply -f k8s/services/
+          kubectl apply -f k8s/ingress.yml
+      
       - name: Deploy monitoring stack
         run: |
           echo "Deploying Prometheus and Grafana monitoring..."
@@ -226,19 +247,9 @@ jobs:
           kubectl apply -f k8s/monitoring/grafana-dashboards.yml
           kubectl apply -f k8s/monitoring/grafana-deployment.yml
           
-          # Delete old separate monitoring ingress if exists
-          kubectl delete ingress prometheus-ingress grafana-ingress monitoring-prometheus monitoring-grafana -n clickenrent --ignore-not-found=true
-          
           echo "Waiting for monitoring stack to be ready..."
           kubectl wait --for=condition=available --timeout=300s deployment/prometheus -n clickenrent || true
           kubectl wait --for=condition=available --timeout=300s deployment/grafana -n clickenrent || true
-      
-      - name: Apply Kubernetes manifests
-        run: |
-          kubectl apply -f k8s/namespace.yml
-          kubectl apply -f k8s/configmap.yml
-          kubectl apply -f k8s/services/
-          kubectl apply -f k8s/ingress.yml
       
       - name: Update image tags
         run: |
