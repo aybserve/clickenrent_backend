@@ -33,7 +33,16 @@ spec:
   - host: cnr.aybserve.com
     http:
       paths:
-      # Route all traffic through Gateway
+      # Grafana - has its own login (username: admin, password: GRAFANA_ADMIN_PASSWORD)
+      - path: /grafana
+        pathType: Prefix
+        backend:
+          service:
+            name: grafana
+            port:
+              number: 3000
+      
+      # Route all other traffic through Gateway
       - path: /
         pathType: Prefix
         backend:
