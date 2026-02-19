@@ -10,27 +10,26 @@ metadata:
     nginx.ingress.kubernetes.io/auth-type: basic
     nginx.ingress.kubernetes.io/auth-secret: monitoring-basic-auth
     nginx.ingress.kubernetes.io/auth-realm: "Authentication Required - Monitoring"
-    
-    # Rewrite target for subpaths
-    nginx.ingress.kubernetes.io/rewrite-target: /$2
 spec:
   ingressClassName: nginx
   rules:
   - host: cnr.aybserve.com
     http:
       paths:
-      - path: /prometheus(/|$)(.*)
-        pathType: ImplementationSpecific
-        backend:
-          service:
-            name: prometheus
-            port:
-              number: 9090
-      
-      - path: /grafana(/|$)(.*)
-        pathType: ImplementationSpecific
+      # Grafana - No rewrite, passes /grafana prefix to service
+      - path: /grafana
+        pathType: Prefix
         backend:
           service:
             name: grafana
             port:
               number: 3000
+      
+      # Prometheus - No rewrite needed, works with subpath
+      - path: /prometheus
+        pathType: Prefix
+        backend:
+          service:
+            name: prometheus
+            port:
+              number: 9090
