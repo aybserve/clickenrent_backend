@@ -226,9 +226,11 @@ jobs:
           kubectl apply -f k8s/monitoring/grafana-dashboards.yml
           kubectl apply -f k8s/monitoring/grafana-deployment.yml
           
-          # Deploy monitoring ingress AFTER main application ingress
-          kubectl apply -f k8s/monitoring/ingress-prometheus.yml
-          kubectl apply -f k8s/monitoring/ingress-grafana.yml
+          # Delete old monitoring ingress if exists
+          kubectl delete ingress prometheus-ingress grafana-ingress -n clickenrent --ignore-not-found=true
+          
+          # Deploy monitoring auth overlay ingress with higher priority
+          kubectl apply -f k8s/monitoring/ingress-auth.yml
           
           echo "Waiting for monitoring stack to be ready..."
           kubectl wait --for=condition=available --timeout=300s deployment/prometheus -n clickenrent || true
