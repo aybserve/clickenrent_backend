@@ -225,6 +225,7 @@ jobs:
             --from-literal=lock-encryption-key="${{ secrets.LOCK_ENCRYPTION_KEY }}" \
             --from-literal=azure-storage-connection-string="${{ secrets.AZURE_STORAGE_CONNECTION_STRING }}" \
             --from-literal=mapbox-api-key="${{ secrets.MAPBOX_API_KEY }}" \
+            --from-literal=kafka-ui-password="${{ secrets.KAFKA_UI_PASSWORD }}" \
             --namespace clickenrent \
             --dry-run=client -o yaml | kubectl apply -f -
       
@@ -370,8 +371,9 @@ jobs:
           echo "📊 Monitoring URLs (requires basic auth):"
           echo "   • Prometheus: http://cnr.aybserve.com/prometheus"
           echo "   • Grafana: http://cnr.aybserve.com/grafana"
-          echo "   • Kafka UI: http://cnr.aybserve.com:30090"
+          echo "   • Kafka UI: http://cnr.aybserve.com:30090 (requires login)"
           echo ""
           echo "🔐 Monitoring Credentials:"
           echo "   • Basic Auth: Use MONITORING_AUTH_USERNAME/PASSWORD from secrets"
           echo "   • Grafana: admin / GRAFANA_ADMIN_PASSWORD from secrets"
+          echo "   • Kafka UI: admin / KAFKA_UI_PASSWORD from secrets"
