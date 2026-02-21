@@ -50,24 +50,3 @@ spec:
             name: gateway
             port:
               number: 8080
----
-apiVersion: networking.k8s.io/v1
-kind: Ingress
-metadata:
-  name: kafka-ui-ingress
-  namespace: clickenrent
-  annotations:
-    kubernetes.io/ingress.class: nginx
-    nginx.ingress.kubernetes.io/ssl-redirect: "false"
-spec:
-  rules:
-  - host: cnr.aybserve.com
-    http:
-      paths:
-      - path: /kafka-ui
-        pathType: Prefix
-        backend:
-          service:
-            name: kafka-ui
-            port:
-              number: 8080
