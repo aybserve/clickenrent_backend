@@ -177,10 +177,27 @@ jobs:
           kubectl apply -f k8s/kafka/kafka.yml
           
           echo "Waiting for Zookeeper to be ready..."
-          kubectl wait --for=condition=ready pod -l app=zookeeper -n clickenrent --timeout=300s || true
+          for i in {1..60}; do
+            if kubectl get pods -n clickenrent -l app=zookeeper -o jsonpath='{.items[0].status.phase}' 2>/dev/null | grep -q "Running"; then
+              echo "Zookeeper is running"
+              break
+            fi
+            echo "Waiting for Zookeeper... ($i/60)"
+            sleep 5
+          done
           
           echo "Waiting for Kafka to be ready..."
-          kubectl wait --for=condition=ready pod -l app=kafka -n clickenrent --timeout=300s || true
+          for i in {1..60}; do
+            if kubectl get pods -n clickenrent -l app=kafka -o jsonpath='{.items[0].status.phase}' 2>/dev/null | grep -q "Running"; then
+              echo "Kafka is running"
+              # Give Kafka extra time to fully initialize
+              echo "Giving Kafka 30 seconds to fully initialize..."
+              sleep 30
+              break
+            fi
+            echo "Waiting for Kafka... ($i/60)"
+            sleep 5
+          done
           
           echo "Kafka infrastructure deployed successfully."
       
