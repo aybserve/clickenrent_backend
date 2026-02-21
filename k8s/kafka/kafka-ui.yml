@@ -40,6 +40,8 @@ spec:
               value: "kafka:9092"
             - name: KAFKA_CLUSTERS_0_ZOOKEEPER
               value: "zookeeper:2181"
+            - name: SERVER_SERVLET_CONTEXT_PATH
+              value: "/kafka-ui"
           resources:
             requests:
               memory: "256Mi"
