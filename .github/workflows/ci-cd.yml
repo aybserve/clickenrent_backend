@@ -204,6 +204,9 @@ jobs:
       
       - name: Create/Update secrets
         run: |
+          # Create temporary file for multi-line secrets
+          echo "${{ secrets.APPLE_PRIVATE_KEY }}" > /tmp/apple-private-key.txt
+          
           kubectl create secret generic app-secrets \
             --from-literal=db-username="${{ secrets.DB_USERNAME }}" \
             --from-literal=db-password="${{ secrets.DB_PASSWORD }}" \
@@ -217,7 +220,7 @@ jobs:
             --from-literal=apple-team-id="${{ secrets.APPLE_TEAM_ID }}" \
             --from-literal=apple-client-id="${{ secrets.APPLE_CLIENT_ID }}" \
             --from-literal=apple-key-id="${{ secrets.APPLE_KEY_ID }}" \
-            --from-literal=apple-private-key="${{ secrets.APPLE_PRIVATE_KEY }}" \
+            --from-file=apple-private-key=/tmp/apple-private-key.txt \
             --from-literal=multisafepay-api-key="${{ secrets.MULTISAFEPAY_API_KEY }}" \
             --from-literal=multisafepay-webhook-secret="${{ secrets.MULTISAFEPAY_WEBHOOK_SECRET }}" \
             --from-literal=service-auth-username="${{ secrets.SERVICE_AUTH_USERNAME }}" \
@@ -228,6 +231,9 @@ jobs:
             --from-literal=kafka-ui-password="${{ secrets.KAFKA_UI_PASSWORD }}" \
             --namespace clickenrent \
             --dry-run=client -o yaml | kubectl apply -f -
+          
+          # Clean up temp file
+          rm -f /tmp/apple-private-key.txt
       
       - name: Create image pull secret for GitHub Container Registry
         run: |
