@@ -204,26 +204,32 @@ jobs:
       
       - name: Create/Update secrets
         run: |
-          kubectl create secret generic app-secrets \
-            --from-literal=db-username="${{ secrets.DB_USERNAME }}" \
-            --from-literal=db-password="${{ secrets.DB_PASSWORD }}" \
-            --from-literal=jwt-secret="${{ secrets.JWT_SECRET }}" \
-            --from-literal=jwt-expiration="${{ secrets.JWT_EXPIRATION }}" \
-            --from-literal=jwt-refresh-expiration="${{ secrets.JWT_REFRESH_EXPIRATION }}" \
-            --from-literal=redis-password="${{ secrets.REDIS_PASSWORD }}" \
-            --from-literal=es-password="${{ secrets.ES_PASSWORD }}" \
-            --from-literal=google-client-id="${{ secrets.GOOGLE_CLIENT_ID }}" \
-            --from-literal=google-client-secret="${{ secrets.GOOGLE_CLIENT_SECRET }}" \
-            --from-literal=multisafepay-api-key="${{ secrets.MULTISAFEPAY_API_KEY }}" \
-            --from-literal=multisafepay-webhook-secret="${{ secrets.MULTISAFEPAY_WEBHOOK_SECRET }}" \
-            --from-literal=service-auth-username="${{ secrets.SERVICE_AUTH_USERNAME }}" \
-            --from-literal=service-auth-password="${{ secrets.SERVICE_AUTH_PASSWORD }}" \
-            --from-literal=lock-encryption-key="${{ secrets.LOCK_ENCRYPTION_KEY }}" \
-            --from-literal=azure-storage-connection-string="${{ secrets.AZURE_STORAGE_CONNECTION_STRING }}" \
-            --from-literal=mapbox-api-key="${{ secrets.MAPBOX_API_KEY }}" \
-            --from-literal=kafka-ui-password="${{ secrets.KAFKA_UI_PASSWORD }}" \
-            --namespace clickenrent \
-            --dry-run=client -o yaml | kubectl apply -f -
+          cat <<EOF | kubectl apply -f -
+          apiVersion: v1
+          kind: Secret
+          metadata:
+            name: app-secrets
+            namespace: clickenrent
+          type: Opaque
+          stringData:
+            db-username: "${{ secrets.DB_USERNAME }}"
+            db-password: "${{ secrets.DB_PASSWORD }}"
+            jwt-secret: "${{ secrets.JWT_SECRET }}"
+            jwt-expiration: "${{ secrets.JWT_EXPIRATION }}"
+            jwt-refresh-expiration: "${{ secrets.JWT_REFRESH_EXPIRATION }}"
+            redis-password: "${{ secrets.REDIS_PASSWORD }}"
+            es-password: "${{ secrets.ES_PASSWORD }}"
+            google-client-id: "${{ secrets.GOOGLE_CLIENT_ID }}"
+            google-client-secret: "${{ secrets.GOOGLE_CLIENT_SECRET }}"
+            multisafepay-api-key: "${{ secrets.MULTISAFEPAY_API_KEY }}"
+            multisafepay-webhook-secret: "${{ secrets.MULTISAFEPAY_WEBHOOK_SECRET }}"
+            service-auth-username: "${{ secrets.SERVICE_AUTH_USERNAME }}"
+            service-auth-password: "${{ secrets.SERVICE_AUTH_PASSWORD }}"
+            lock-encryption-key: "${{ secrets.LOCK_ENCRYPTION_KEY }}"
+            azure-storage-connection-string: "${{ secrets.AZURE_STORAGE_CONNECTION_STRING }}"
+            mapbox-api-key: "${{ secrets.MAPBOX_API_KEY }}"
+            kafka-ui-password: "${{ secrets.KAFKA_UI_PASSWORD }}"
+          EOF
       
       - name: Create image pull secret for GitHub Container Registry
         run: |
