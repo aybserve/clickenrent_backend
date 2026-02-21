@@ -4,6 +4,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.clickenrent.contracts.notification.SendNotificationRequest;
 import org.clickenrent.rentalservice.client.NotificationClient;
+import org.clickenrent.rentalservice.event.NotificationEventPublisher;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.clickenrent.rentalservice.dto.RideDTO;
 import org.clickenrent.rentalservice.entity.BikeRental;
 import org.clickenrent.rentalservice.entity.Ride;
@@ -35,6 +37,9 @@ public class RideService {
     private final RideMapper rideMapper;
     private final SecurityService securityService;
     private final NotificationClient notificationClient;
+
+    @Autowired(required = false)
+    private NotificationEventPublisher notificationEventPublisher;
 
     @Transactional(readOnly = true)
     public Page<RideDTO> getAllRides(Pageable pageable) {
@@ -205,17 +210,30 @@ public class RideService {
         try {
             String userExternalId = bikeRental.getRental().getUserExternalId();
 
-            SendNotificationRequest request = SendNotificationRequest.builder()
-                    .userExternalId(userExternalId)
-                    .notificationType(notificationType)
-                    .title(title)
-                    .body(body)
-                    .data(data)
-                    .priority("high")
-                    .build();
-
-            notificationClient.sendNotification(request);
-            log.debug("Sent notification for user: {}, type: {}", userExternalId, notificationType);
+            if (notificationEventPublisher != null) {
+                // New: Kafka event-driven approach
+                notificationEventPublisher.publishNotificationEvent(
+                        userExternalId,
+                        notificationType,
+                        title,
+                        body,
+                        data,
+                        "high"
+                );
+                log.debug("Published notification event for user: {}, type: {}", userExternalId, notificationType);
+            } else {
+                // Fallback: Direct Feign call (for backward compatibility during migration)
+                SendNotificationRequest request = SendNotificationRequest.builder()
+                        .userExternalId(userExternalId)
+                        .notificationType(notificationType)
+                        .title(title)
+                        .body(body)
+                        .data(data)
+                        .priority("high")
+                        .build();
+                notificationClient.sendNotification(request);
+                log.debug("Sent notification via Feign for user: {}, type: {}", userExternalId, notificationType);
+            }
         } catch (Exception e) {
             // Don't fail the main operation if notification fails
             log.error("Failed to send notification for bike rental: {}", bikeRental.getId(), e);
