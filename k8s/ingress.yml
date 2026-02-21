@@ -42,6 +42,15 @@ spec:
             port:
               number: 3000
       
+      # Kafka UI - monitoring Kafka topics, consumers, and messages
+      - path: /kafka-ui
+        pathType: Prefix
+        backend:
+          service:
+            name: kafka-ui
+            port:
+              number: 8080
+      
       # Route all other traffic through Gateway
       - path: /
         pathType: Prefix

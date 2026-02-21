@@ -175,6 +175,7 @@ jobs:
           kubectl apply -f k8s/kafka/kafka-config.yml
           kubectl apply -f k8s/kafka/zookeeper.yml
           kubectl apply -f k8s/kafka/kafka.yml
+          kubectl apply -f k8s/kafka/kafka-ui.yml
           
           echo "Waiting for Zookeeper to be ready..."
           for i in {1..60}; do
@@ -369,6 +370,7 @@ jobs:
           echo "📊 Monitoring URLs (requires basic auth):"
           echo "   • Prometheus: http://cnr.aybserve.com/prometheus"
           echo "   • Grafana: http://cnr.aybserve.com/grafana"
+          echo "   • Kafka UI: http://cnr.aybserve.com/kafka-ui"
           echo ""
           echo "🔐 Monitoring Credentials:"
           echo "   • Basic Auth: Use MONITORING_AUTH_USERNAME/PASSWORD from secrets"
