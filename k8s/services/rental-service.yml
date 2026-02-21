@@ -119,6 +119,8 @@ spec:
             configMapKeyRef:
               name: app-config
               key: FLYWAY_SKIP_TESTDATA
+        - name: KAFKA_BOOTSTRAP_SERVERS
+          value: "kafka:9092"
         resources:
           requests:
             memory: "512Mi"

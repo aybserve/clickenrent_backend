@@ -33,6 +33,17 @@
 		<artifactId>spring-cloud-starter-openfeign</artifactId>
 	</dependency>
 
+	<!-- Kafka for event streaming -->
+	<dependency>
+		<groupId>org.springframework.kafka</groupId>
+		<artifactId>spring-kafka</artifactId>
+	</dependency>
+	<dependency>
+		<groupId>org.springframework.kafka</groupId>
+		<artifactId>spring-kafka-test</artifactId>
+		<scope>test</scope>
+	</dependency>
+
 	<!-- Actuator for health monitoring -->
 	<dependency>
 		<groupId>org.springframework.boot</groupId>

@@ -28,6 +28,12 @@ jobs:
           distribution: 'temurin'
           cache: 'maven'
       
+      - name: Build shared-contracts first
+        run: |
+          cd shared-contracts
+          mvn clean install -DskipTests -B
+          cd ..
+      
       - name: Build all services (skip tests)
         run: mvn clean package -DskipTests -B
       
@@ -162,6 +168,21 @@ jobs:
       
       - name: Create namespace if not exists
         run: kubectl create namespace clickenrent --dry-run=client -o yaml | kubectl apply -f -
+      
+      - name: Deploy Kafka infrastructure
+        run: |
+          echo "Deploying Kafka and Zookeeper..."
+          kubectl apply -f k8s/kafka/kafka-config.yml
+          kubectl apply -f k8s/kafka/zookeeper.yml
+          kubectl apply -f k8s/kafka/kafka.yml
+          
+          echo "Waiting for Zookeeper to be ready..."
+          kubectl wait --for=condition=ready pod -l app=zookeeper -n clickenrent --timeout=300s || true
+          
+          echo "Waiting for Kafka to be ready..."
+          kubectl wait --for=condition=ready pod -l app=kafka -n clickenrent --timeout=300s || true
+          
+          echo "Kafka infrastructure deployed successfully."
       
       - name: Create/Update secrets
         run: |
