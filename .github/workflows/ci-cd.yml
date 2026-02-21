@@ -203,12 +203,7 @@ jobs:
           echo "Kafka infrastructure deployed successfully."
       
       - name: Create/Update secrets
-        env:
-          APPLE_PRIVATE_KEY_CONTENT: ${{ secrets.APPLE_PRIVATE_KEY }}
         run: |
-          # Create temporary file for multi-line secrets using env var to avoid bash parsing
-          printf '%s' "$APPLE_PRIVATE_KEY_CONTENT" > /tmp/apple-private-key.txt
-          
           kubectl create secret generic app-secrets \
             --from-literal=db-username="${{ secrets.DB_USERNAME }}" \
             --from-literal=db-password="${{ secrets.DB_PASSWORD }}" \
@@ -219,10 +214,6 @@ jobs:
             --from-literal=es-password="${{ secrets.ES_PASSWORD }}" \
             --from-literal=google-client-id="${{ secrets.GOOGLE_CLIENT_ID }}" \
             --from-literal=google-client-secret="${{ secrets.GOOGLE_CLIENT_SECRET }}" \
-            --from-literal=apple-team-id="${{ secrets.APPLE_TEAM_ID }}" \
-            --from-literal=apple-client-id="${{ secrets.APPLE_CLIENT_ID }}" \
-            --from-literal=apple-key-id="${{ secrets.APPLE_KEY_ID }}" \
-            --from-file=apple-private-key=/tmp/apple-private-key.txt \
             --from-literal=multisafepay-api-key="${{ secrets.MULTISAFEPAY_API_KEY }}" \
             --from-literal=multisafepay-webhook-secret="${{ secrets.MULTISAFEPAY_WEBHOOK_SECRET }}" \
             --from-literal=service-auth-username="${{ secrets.SERVICE_AUTH_USERNAME }}" \
@@ -233,9 +224,6 @@ jobs:
             --from-literal=kafka-ui-password="${{ secrets.KAFKA_UI_PASSWORD }}" \
             --namespace clickenrent \
             --dry-run=client -o yaml | kubectl apply -f -
-          
-          # Clean up temp file
-          rm -f /tmp/apple-private-key.txt
       
       - name: Create image pull secret for GitHub Container Registry
         run: |

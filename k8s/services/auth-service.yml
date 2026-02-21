@@ -109,31 +109,6 @@ spec:
             configMapKeyRef:
               name: app-config
               key: GOOGLE_VERIFY_ID_TOKEN
-        - name: APPLE_TEAM_ID
-          valueFrom:
-            secretKeyRef:
-              name: app-secrets
-              key: apple-team-id
-        - name: APPLE_CLIENT_ID
-          valueFrom:
-            secretKeyRef:
-              name: app-secrets
-              key: apple-client-id
-        - name: APPLE_KEY_ID
-          valueFrom:
-            secretKeyRef:
-              name: app-secrets
-              key: apple-key-id
-        - name: APPLE_PRIVATE_KEY
-          valueFrom:
-            secretKeyRef:
-              name: app-secrets
-              key: apple-private-key
-        - name: APPLE_VERIFY_ID_TOKEN
-          valueFrom:
-            configMapKeyRef:
-              name: app-config
-              key: APPLE_VERIFY_ID_TOKEN
         - name: JPA_DDL_AUTO
           valueFrom:
             configMapKeyRef:
