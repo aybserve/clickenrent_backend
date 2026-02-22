@@ -4,9 +4,11 @@ import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
 import okhttp3.mockwebserver.MockResponse;
 import okhttp3.mockwebserver.MockWebServer;
 import okhttp3.mockwebserver.RecordedRequest;
+import org.clickenrent.authservice.client.SearchServiceClient;
 import org.clickenrent.authservice.dto.AuthResponse;
 import org.clickenrent.authservice.entity.GlobalRole;
 import org.clickenrent.authservice.entity.User;
+import org.clickenrent.authservice.event.IndexEventPublisher;
 import org.clickenrent.authservice.exception.UnauthorizedException;
 import org.clickenrent.authservice.metrics.OAuthMetrics;
 import org.clickenrent.authservice.repository.GlobalRoleRepository;
@@ -66,7 +68,13 @@ class GoogleOAuthIntegrationTest {
     
     @MockBean
     private OAuthMetrics oAuthMetrics;
-    
+
+    @MockBean
+    private IndexEventPublisher indexEventPublisher;
+
+    @MockBean
+    private SearchServiceClient searchServiceClient;
+
     private MockWebServer mockGoogleServer;
     
     private static final String TEST_CODE = "test-authorization-code";

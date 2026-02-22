@@ -13,6 +13,7 @@ import org.clickenrent.authservice.exception.UnauthorizedException;
 import org.clickenrent.authservice.mapper.UserMapper;
 import org.clickenrent.authservice.repository.GlobalRoleRepository;
 import org.clickenrent.authservice.repository.LanguageRepository;
+import org.clickenrent.authservice.repository.UserCompanyRepository;
 import org.clickenrent.authservice.repository.UserGlobalRoleRepository;
 import org.clickenrent.authservice.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -27,6 +28,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import java.util.Collections;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -50,6 +52,9 @@ class AuthServiceTest {
     private UserGlobalRoleRepository userGlobalRoleRepository;
 
     @Mock
+    private UserCompanyRepository userCompanyRepository;
+
+    @Mock
     private LanguageRepository languageRepository;
 
     @Mock
@@ -69,6 +74,12 @@ class AuthServiceTest {
 
     @Mock
     private TokenBlacklistService tokenBlacklistService;
+
+    @Mock
+    private EmailVerificationService emailVerificationService;
+
+    @Mock
+    private UserPreferenceService userPreferenceService;
 
     @InjectMocks
     private AuthService authService;
@@ -112,6 +123,12 @@ class AuthServiceTest {
                 .password("encodedPassword")
                 .roles("USER")
                 .build();
+
+        // Stub services used in register/registerAdmin flows
+        doNothing().when(userPreferenceService).createDefaultPreferences(any(User.class));
+        doNothing().when(emailVerificationService).generateAndSendCode(any(User.class));
+        // Stub userCompanyRepository used in login/buildJwtClaims
+        lenient().when(userCompanyRepository.findByUserId(anyLong())).thenReturn(Collections.emptyList());
     }
 
     @Test

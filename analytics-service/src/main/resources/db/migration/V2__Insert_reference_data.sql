@@ -9,7 +9,7 @@
 -- Note: Analytics service has no required reference/lookup data.
 --       All data is generated from ETL pipelines processing actual rental data.
 --       Sample/test data is loaded via db/testdata/ when staging or dev profile is active.
--- 
+--
 -- Author: Vitaliy Shvetsov
 -- =====================================================================================================================
 

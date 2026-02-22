@@ -4,8 +4,10 @@ import org.clickenrent.authservice.dto.UserDTO;
 import org.clickenrent.authservice.entity.Language;
 import org.clickenrent.authservice.entity.User;
 import org.clickenrent.authservice.exception.ResourceNotFoundException;
+import org.clickenrent.authservice.client.SearchServiceClient;
 import org.clickenrent.authservice.mapper.UserMapper;
 import org.clickenrent.authservice.repository.LanguageRepository;
+import org.clickenrent.authservice.repository.UserCompanyRepository;
 import org.clickenrent.authservice.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -26,8 +28,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
-
-import org.clickenrent.authservice.repository.UserCompanyRepository;
 
 /**
  * Unit tests for UserService.
@@ -52,6 +52,12 @@ class UserServiceTest {
 
     @Mock
     private UserCompanyRepository userCompanyRepository;
+
+    @Mock
+    private SearchServiceClient searchServiceClient;
+
+    @Mock
+    private UserPreferenceService userPreferenceService;
 
     @InjectMocks
     private UserService userService;
@@ -97,6 +103,8 @@ class UserServiceTest {
         // Mock security service behavior for all tests
         lenient().when(securityService.isAdmin()).thenReturn(true);
         lenient().when(securityService.hasAccessToUser(anyLong())).thenReturn(true);
+        // Stub UserPreferenceService used in createUser/updateUser flows
+        doNothing().when(userPreferenceService).createDefaultPreferences(any(User.class));
     }
 
     @Test

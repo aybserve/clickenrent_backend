@@ -1,10 +1,12 @@
 package org.clickenrent.authservice.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.clickenrent.authservice.client.SearchServiceClient;
 import org.clickenrent.authservice.dto.UserDTO;
 import org.clickenrent.authservice.entity.GlobalRole;
 import org.clickenrent.authservice.entity.User;
 import org.clickenrent.authservice.entity.UserGlobalRole;
+import org.clickenrent.authservice.event.IndexEventPublisher;
 import org.clickenrent.authservice.repository.GlobalRoleRepository;
 import org.clickenrent.authservice.repository.UserGlobalRoleRepository;
 import org.clickenrent.authservice.repository.UserRepository;
@@ -15,6 +17,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -57,6 +60,12 @@ class UserControllerIntegrationTest {
 
     @Autowired
     private JwtService jwtService;
+
+    @MockBean
+    private IndexEventPublisher indexEventPublisher;
+
+    @MockBean
+    private SearchServiceClient searchServiceClient;
 
     private User adminUser;
     private User regularUser;

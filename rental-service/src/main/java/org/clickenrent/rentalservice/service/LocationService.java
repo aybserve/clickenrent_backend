@@ -1,8 +1,11 @@
 package org.clickenrent.rentalservice.service;
 
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.clickenrent.contracts.search.IndexEventRequest;
+import org.clickenrent.contracts.security.AuditEvent;
+import org.clickenrent.contracts.security.AuditService;
 import org.clickenrent.rentalservice.client.SearchServiceClient;
 import org.clickenrent.rentalservice.event.IndexEventPublisher;
 import org.clickenrent.rentalservice.dto.LocationDTO;
@@ -18,6 +21,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 /**
  * Service for managing Location entities with automatic hub creation.
@@ -32,6 +37,7 @@ public class LocationService {
     private final LocationMapper locationMapper;
     private final SecurityService securityService;
     private final SearchServiceClient searchServiceClient;
+    private final AuditService auditService;
 
     @Autowired(required = false)
     private IndexEventPublisher indexEventPublisher;
@@ -70,10 +76,46 @@ public class LocationService {
 
         // Check if user has access to this location's company
         if (!securityService.isAdmin() && !securityService.hasAccessToCompanyByExternalId(location.getCompanyExternalId())) {
+            logLocationAccessDenied(id, location);
             throw new UnauthorizedException("You don't have permission to view this location");
         }
 
         return locationMapper.toDto(location);
+    }
+
+    /**
+     * Logs audit event when GET /api/v1/location/{id} is denied due to company access.
+     */
+    private void logLocationAccessDenied(Long locationId, Location location) {
+        try {
+            HttpServletRequest request = null;
+            if (RequestContextHolder.getRequestAttributes() instanceof ServletRequestAttributes) {
+                request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
+            }
+            String userExternalId = securityService.getCurrentUserExternalId();
+            String userCompanyIds = String.join(",", securityService.getCurrentUserCompanyExternalIds());
+
+            AuditEvent event = AuditEvent.builder()
+                    .eventType(AuditEvent.EventType.CROSS_TENANT_ACCESS_ATTEMPT)
+                    .userExternalId(userExternalId)
+                    .userCompanyIds(userCompanyIds)
+                    .attemptedCompanyId(location.getCompanyExternalId())
+                    .resourceType("Location")
+                    .resourceId(location.getExternalId() != null ? location.getExternalId() : String.valueOf(locationId))
+                    .endpoint(request != null ? request.getRequestURI() : "/api/v1/location/" + locationId)
+                    .httpMethod("GET")
+                    .clientIp(request != null ? request.getRemoteAddr() : null)
+                    .success(false)
+                    .allowed(false)
+                    .errorMessage("You don't have permission to view this location")
+                    .message(String.format("User (companies: %s) attempted to access Location id=%s from company %s",
+                            userCompanyIds.isEmpty() ? "none" : userCompanyIds, locationId, location.getCompanyExternalId()))
+                    .build();
+
+            auditService.logEvent(event);
+        } catch (Exception e) {
+            log.warn("Failed to log audit event for location access denied: {}", e.getMessage());
+        }
     }
 
     @Transactional(readOnly = true)

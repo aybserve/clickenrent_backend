@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.clickenrent.authservice.dto.*;
 import org.clickenrent.authservice.config.SecurityConfig;
 import org.clickenrent.authservice.service.AuthService;
-import org.clickenrent.authservice.config.SecurityConfig;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

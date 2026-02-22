@@ -1,37 +1,3 @@
--- =====================================================================================================================
--- NOTIFICATION SERVICE - DATABASE INITIALIZATION v2.0
--- =====================================================================================================================
--- Module: notification-service
--- Database: PostgreSQL
--- Version: 2.0 (Mobile App Integration)
--- Description: Production database initialization for the push notification service.
---              Contains optional default notification preferences and reference data.
--- 
--- Usage:
---   This file is automatically executed by Spring Boot on application startup when:
---   - spring.jpa.hibernate.ddl-auto is set to 'create', 'create-drop', or 'update'
---   - spring.sql.init.mode is set to 'always'
---
--- Note: For production deployment, this file can remain empty as:
---       - Push tokens are registered by mobile apps at runtime
---       - Notification preferences are created on-demand with defaults
---       - Notification logs are created when notifications are sent
---
--- Author: Vitaliy Shvetsov
--- =====================================================================================================================
-
--- =====================================================================================================================
--- SECTION 1: DEFAULT NOTIFICATION PREFERENCES (with v2.0 granular controls)
--- =====================================================================================================================
--- Pre-create notification preferences for existing users from auth-service.
--- These preferences will be used when notifications are sent to these users.
--- Users can later update their preferences through the mobile app.
---
--- v2.0 Changes:
--- - Added rental_start_enabled: Controls bike unlock and ride start notifications
--- - Added rental_end_reminders_enabled: Controls rental ending soon reminders
--- - Added rental_completion_enabled: Controls bike lock and ride end notifications
-
 INSERT INTO notification_preferences (
     id, user_external_id, 
     rental_updates_enabled, rental_start_enabled, rental_end_reminders_enabled, rental_completion_enabled,

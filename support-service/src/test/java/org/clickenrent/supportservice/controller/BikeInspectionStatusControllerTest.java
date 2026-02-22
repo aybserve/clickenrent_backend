@@ -1,0 +1,121 @@
+package org.clickenrent.supportservice.controller;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.clickenrent.supportservice.dto.BikeInspectionStatusDTO;
+import org.clickenrent.supportservice.service.BikeInspectionStatusService;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.web.servlet.MockMvc;
+
+import java.util.Arrays;
+
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.*;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+
+@WebMvcTest(BikeInspectionStatusController.class)
+@AutoConfigureMockMvc
+class BikeInspectionStatusControllerTest {
+
+    @Autowired
+    private MockMvc mockMvc;
+
+    @Autowired
+    private ObjectMapper objectMapper;
+
+    @MockBean
+    private BikeInspectionStatusService bikeInspectionStatusService;
+
+    private BikeInspectionStatusDTO statusDTO;
+
+    @BeforeEach
+    void setUp() {
+        statusDTO = BikeInspectionStatusDTO.builder()
+                .id(1L)
+                .externalId("status-uuid-1")
+                .name("PENDING")
+                .build();
+    }
+
+    @Test
+    @WithMockUser(roles = "ADMIN")
+    void getAll_ReturnsOk() throws Exception {
+        when(bikeInspectionStatusService.getAll()).thenReturn(Arrays.asList(statusDTO));
+
+        mockMvc.perform(get("/api/v1/bike-inspection-statuses").with(csrf()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].name").value("PENDING"));
+    }
+
+    @Test
+    @WithMockUser(roles = "ADMIN")
+    void getById_ReturnsOk() throws Exception {
+        when(bikeInspectionStatusService.getById(1L)).thenReturn(statusDTO);
+
+        mockMvc.perform(get("/api/v1/bike-inspection-statuses/1").with(csrf()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.name").value("PENDING"));
+    }
+
+    @Test
+    @WithMockUser(roles = "ADMIN")
+    void getByExternalId_ReturnsOk() throws Exception {
+        when(bikeInspectionStatusService.getByExternalId("status-uuid-1")).thenReturn(statusDTO);
+
+        mockMvc.perform(get("/api/v1/bike-inspection-statuses/external/status-uuid-1").with(csrf()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.externalId").value("status-uuid-1"));
+    }
+
+    @Test
+    @WithMockUser(roles = "ADMIN")
+    void getByName_ReturnsOk() throws Exception {
+        when(bikeInspectionStatusService.getByName("PENDING")).thenReturn(statusDTO);
+
+        mockMvc.perform(get("/api/v1/bike-inspection-statuses/name/PENDING").with(csrf()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.name").value("PENDING"));
+    }
+
+    @Test
+    @WithMockUser(roles = "ADMIN")
+    void create_ReturnsCreated() throws Exception {
+        when(bikeInspectionStatusService.create(any())).thenReturn(statusDTO);
+
+        mockMvc.perform(post("/api/v1/bike-inspection-statuses")
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(statusDTO)))
+                .andExpect(status().isCreated());
+    }
+
+    @Test
+    @WithMockUser(roles = "ADMIN")
+    void update_ReturnsOk() throws Exception {
+        when(bikeInspectionStatusService.update(eq(1L), any())).thenReturn(statusDTO);
+
+        mockMvc.perform(put("/api/v1/bike-inspection-statuses/1")
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(statusDTO)))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    @WithMockUser(roles = "ADMIN")
+    void delete_ReturnsNoContent() throws Exception {
+        doNothing().when(bikeInspectionStatusService).delete(1L);
+
+        mockMvc.perform(delete("/api/v1/bike-inspection-statuses/1").with(csrf()))
+                .andExpect(status().isNoContent());
+    }
+}

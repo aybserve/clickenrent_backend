@@ -1,10 +1,12 @@
 package org.clickenrent.authservice.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.clickenrent.authservice.client.SearchServiceClient;
 import org.clickenrent.authservice.dto.LoginRequest;
 import org.clickenrent.authservice.dto.RefreshTokenRequest;
 import org.clickenrent.authservice.dto.RegisterRequest;
 import org.clickenrent.authservice.entity.User;
+import org.clickenrent.authservice.event.IndexEventPublisher;
 import org.clickenrent.authservice.repository.UserRepository;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -12,6 +14,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.TestPropertySource;
@@ -42,6 +45,12 @@ class AuthControllerIntegrationTest {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
+
+    @MockBean
+    private IndexEventPublisher indexEventPublisher;
+
+    @MockBean
+    private SearchServiceClient searchServiceClient;
 
     private RegisterRequest registerRequest;
     private LoginRequest loginRequest;

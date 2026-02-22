@@ -1,92 +1,126 @@
 # ClickEnRent Backend - Microservices
 
-Spring Boot microservices architecture for bike rental platform.
+Spring Boot microservices architecture for the ClickEnRent bike rental platform.
 
 ## 🏗️ Architecture
 
 - **7 Microservices** + **1 Service Discovery** + **1 API Gateway**
-- **Spring Boot 3.3.2** + **Java 17**
-- **PostgreSQL** databases
+- **Spring Boot 3.3.2** + **Java 17** + **Spring Cloud 2023.0.1**
+- **PostgreSQL** for persistence (per-service databases)
+- **Elasticsearch** for full-text and global search
+- **Kafka** for async events (search indexing, notifications)
+- **Redis** for rate limiting and attack detection
 - **Eureka** for service discovery
-- **Spring Cloud Gateway** for API routing
-- **JWT** authentication
+- **Spring Cloud Gateway** for API routing and JWT validation
+- **JWT** authentication; **Google** and **Apple** OAuth
 
 ## 📦 Services
 
-| Service | Port | Database | Description |
-|---------|------|----------|-------------|
-| Gateway | 8080 | - | API Gateway (main entry point) |
+| Service | Port | Storage | Description |
+|---------|------|---------|-------------|
+| Gateway | 8080 | Redis | API Gateway (main entry point), rate limiting |
 | Eureka Server | 8761 | - | Service Discovery |
-| Auth Service | 8081 | clickenrent-auth | Authentication & Users |
-| Rental Service | 8082 | clickenrent-rental | Bikes & Rentals |
-| Support Service | 8083 | clickenrent-support | Customer Support |
-| Payment Service | 8084 | clickenrent-payment | Payments & Billing |
-| Notification Service | 8085 | clickenrent-notification | Push Notifications |
+| Auth Service | 8081 | clickenrent-auth | Authentication, users, companies, invitations |
+| Rental Service | 8082 | clickenrent-rental | Bikes, rentals, rides, locations, hubs, B2B |
+| Support Service | 8083 | clickenrent-support | Support requests, inspections, bike issues |
+| Payment Service | 8084 | clickenrent-payment | Payments (Stripe, MultiSafepay), payouts |
+| Notification Service | 8085 | clickenrent-notification | Push notifications (Expo), preferences |
+| Search Service | 8086 | Elasticsearch, Kafka | Global search, index sync via Kafka |
+| Analytics Service | 8087 | clickenrent-analytics | Dashboards, metrics, revenue & fleet analytics |
 
-## 🚀 Quick Start (Docker)
+**Repository layout:** `shared-contracts/` (shared DTOs), `eureka-server/`, `gateway/`, `*-service/` (auth, rental, support, payment, notification, search, analytics), `docker-services/` (Elasticsearch, Kafka, Kibana, Kafka UI), `k8s/` (Kubernetes manifests), `scripts/` (build, deploy, Flyway).
 
-### Simple 3-Step Deployment:
+## 🚀 Quick Start
+
+### Build
 
 ```bash
-# 1. Build JARs
+# Build all modules (including shared-contracts)
+mvn clean package
+
+# Skip tests
 mvn clean package -DskipTests
 
-# 2. Configure environment
-cp .env.example .env
-nano .env  # Edit POSTGRES_PASSWORD and JWT_SECRET
-
-# 3. Run with Docker
-chmod +x build-and-run.sh
-bash build-and-run.sh
+# Or use the project script
+./scripts/build-all.sh
+./scripts/build-all.sh --skip-tests
 ```
 
-**Or use the automated script:**
+### Configure environment
+
 ```bash
-bash build-and-run.sh
+cp .env.example .env
+# Edit .env: DB_PASSWORD, JWT_SECRET, and optional ES_PASSWORD, REDIS_PASSWORD, Kafka, OAuth, payments, etc.
 ```
 
-Access your API: http://46.224.148.235:8080
+### Run infrastructure (Docker)
+
+Search, auth, and notification services depend on **Elasticsearch**, **Kafka**, and **Redis**. Use the Docker Compose stack for local development:
+
+```bash
+cd docker-services
+cp .env.example .env
+# Set ELASTIC_PASSWORD and any overrides
+docker-compose up -d
+# Elasticsearch :9200, Kibana :5601, Kafka :9092, Kafka UI :8090
+```
+
+### Run services locally
+
+Start **Eureka** first, then **Gateway**, then the rest (each in its own terminal or via your IDE). Example:
+
+```bash
+cd eureka-server && mvn spring-boot:run
+cd gateway && mvn spring-boot:run
+cd auth-service && mvn spring-boot:run
+# ... rental-service, support-service, payment-service, notification-service, search-service, analytics-service
+```
+
+API entry point: **http://localhost:8080** (Gateway). Swagger UI: **http://localhost:8080/swagger-ui.html**
+
+### Kubernetes
+
+Manifests are in `k8s/` (namespace, configmap, secrets, ingress, and per-service deployments). Use `scripts/deploy.sh` or `scripts/fresh-deploy.sh` as referenced in the repo.
 
 ## 📚 Documentation
 
-- **Simple Deployment Guide**: [DEPLOYMENT-SIMPLE.md](DEPLOYMENT-SIMPLE.md) ⭐ **START HERE**
-- **Detailed Deployment Guide**: [DEPLOYMENT.md](DEPLOYMENT.md)
-- **API Documentation**: http://46.224.148.235:8080/swagger-ui.html
+- **API (Swagger)**: When running, open `http://localhost:8080/swagger-ui.html` (or your deployed Gateway URL).
+- **Sentry (errors & APM)**: [docs/SENTRY_SETUP.md](docs/SENTRY_SETUP.md) (cloud), [docs/SENTRY_SELF_HOSTED.md](docs/SENTRY_SELF_HOSTED.md) (self-hosted).
+- **OAuth**: [auth-service/docs/GOOGLE_OAUTH_SETUP.md](auth-service/docs/GOOGLE_OAUTH_SETUP.md), [auth-service/docs/APPLE_OAUTH_SETUP.md](auth-service/docs/APPLE_OAUTH_SETUP.md).
+- **Payments**: [payment-service/docs/IMPLEMENTATION_COMPLETE.md](payment-service/docs/IMPLEMENTATION_COMPLETE.md), [payment-service/README.md](payment-service/README.md).
 
 ## 🛠️ Development
 
-### Build locally:
-```bash
-mvn clean package
-```
-
-### Run single service:
-```bash
-cd auth-service
-mvn spring-boot:run
-```
-
-### Run all services with Docker:
-```bash
-docker-compose up -d
-```
+- **Build**: `mvn clean package` or `./scripts/build-all.sh` (optionally `--skip-tests`, `--docker`).
+- **Single service**: e.g. `cd auth-service && mvn spring-boot:run`. Start Eureka and Gateway first.
+- **Infrastructure**: `docker-services/docker-compose.yml` runs Elasticsearch, Kibana, Zookeeper, Kafka, and Kafka UI only. For full app deployment use the `k8s/` manifests and scripts in `scripts/`.
+- **Shared contracts**: The `shared-contracts` module (version 2.3.0) holds DTOs and contracts used by multiple services.
 
 ## 📋 Requirements
 
-- Java 17
-- Maven 3.6+
-- Docker & Docker Compose
-- PostgreSQL 15 (or use Docker)
+- **Java 17**
+- **Maven 3.6+**
+- **PostgreSQL 15** (per-service DBs: clickenrent-auth, clickenrent-rental, clickenrent-support, clickenrent-payment, clickenrent-notification, clickenrent-analytics)
+- **Redis** (rate limiting at Gateway)
+- **Elasticsearch 7.x** (search-service; use `docker-services` for local)
+- **Kafka** (search indexing, notification events; use `docker-services` for local)
+- **Docker** (optional, for infra and/or containerized deploy)
 
 ## 🔧 Configuration
 
-All configuration is done via environment variables in `.env` file:
+Configuration is driven by environment variables (e.g. root `.env` from `.env.example`). Main options:
 
-- `POSTGRES_PASSWORD` - Database password
-- `JWT_SECRET` - JWT secret key
-- `GOOGLE_CLIENT_ID` - Google OAuth (optional)
-- `STRIPE_API_KEY` - Stripe payments (optional)
-- `AZURE_STORAGE_CONNECTION_STRING` - Azure storage (optional)
+| Category | Variables |
+|----------|-----------|
+| **Database** | `DB_USERNAME`, `DB_PASSWORD`; per-service `DB_URL` override if needed |
+| **JWT** | `JWT_SECRET` (required), `JWT_EXPIRATION`, `JWT_REFRESH_EXPIRATION` |
+| **OAuth** | `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`; `APPLE_*` for Apple Sign-In |
+| **Payments** | `STRIPE_*`, `MULTISAFEPAY_*` (API key, webhook secret, URLs) |
+| **Rental** | `AZURE_STORAGE_*`, `MAPBOX_API_KEY`, `LOCK_ENCRYPTION_KEY` |
+| **Infra** | `REDIS_HOST`, `REDIS_PORT`, `REDIS_PASSWORD`; `ES_URIS`, `ES_USERNAME`, `ES_PASSWORD`; `KAFKA_BOOTSTRAP_SERVERS` |
+| **Service auth** | `SERVICE_AUTH_USERNAME`, `SERVICE_AUTH_PASSWORD` (inter-service) |
+| **Sentry** | `SENTRY_DSN_*` per service, `SENTRY_ENVIRONMENT`, `SENTRY_TRACES_SAMPLE_RATE` |
+| **Profile** | `SPRING_PROFILES_ACTIVE=staging` (or `prod`); Flyway: `FLYWAY_MIGRATE`, `FLYWAY_SKIP_TESTDATA` |
 
 ## 🛡️ Rate Limiting
 
@@ -128,14 +162,11 @@ RATE_LIMIT_BLOCK_DURATION=15
 ### Testing Rate Limits
 
 ```bash
-# Run load test script
-./load-test-rate-limiting.sh
-
 # Monitor Redis keys
 redis-cli KEYS '*'
 
-# Check rate limit violations in logs
-docker-compose logs -f gateway | grep "Rate limit"
+# Check rate limit violations in logs (e.g. when running via Docker/K8s)
+# logs -f gateway | grep "Rate limit"
 ```
 
 ### Response Headers
@@ -157,18 +188,14 @@ The system automatically:
 
 ## 📊 Monitoring
 
-ClickEnRent uses a comprehensive monitoring stack for production observability:
-
-### Application Monitoring
-- **Eureka Dashboard**: http://46.224.148.235:8761
-- **Health Checks**: http://46.224.148.235:8080/actuator/health
-- **Prometheus Metrics**: http://46.224.148.235:8080/actuator/prometheus
-- **Redis Health**: http://46.224.148.235:8080/actuator/health (includes Redis status)
-- **Logs**: `docker-compose logs -f`
+- **Eureka Dashboard**: `http://<host>:8761`
+- **Gateway health**: `http://<host>:8080/actuator/health` (includes Redis when configured)
+- **Prometheus metrics**: `http://<host>:8080/actuator/prometheus`
+- **K8s**: See `k8s/monitoring/` for Prometheus and Grafana manifests.
 
 ### Sentry Error Tracking & Performance Monitoring
 
-ClickEnRent integrates **Sentry** for real-time error tracking and performance monitoring across all 7 microservices:
+ClickEnRent integrates **Sentry** for real-time error tracking and performance monitoring across all services (Gateway + 7 microservices):
 
 **Features:**
 - Automatic error capture and grouping
@@ -191,6 +218,7 @@ SENTRY_DSN_PAYMENT=https://xxx@yyy.ingest.sentry.io/zzz
 SENTRY_DSN_NOTIFICATION=https://xxx@yyy.ingest.sentry.io/zzz
 SENTRY_DSN_SEARCH=https://xxx@yyy.ingest.sentry.io/zzz
 SENTRY_DSN_GATEWAY=https://xxx@yyy.ingest.sentry.io/zzz
+SENTRY_DSN_ANALYTICS=https://xxx@yyy.ingest.sentry.io/zzz
 
 # Environment and sampling
 SENTRY_ENVIRONMENT=production
@@ -208,27 +236,17 @@ Both options work identically with your application code - only the DSN URLs dif
 
 **What Gets Tracked:**
 
-1. **Errors**: All unhandled exceptions automatically captured
+1. **Errors**: Unhandled exceptions across all services
 2. **Performance**: Transaction traces for API requests
-3. **OAuth Flows**: Detailed performance monitoring for Google/Apple OAuth
-4. **Context**: Every error tagged with tenant/company information
-5. **Releases**: Errors grouped by service version (1.0-SNAPSHOT)
+3. **OAuth**: Spans for Google/Apple OAuth flows
+4. **Context**: Tenant/company tags on events
+5. **Releases**: Grouping by service version (e.g. 1.0-SNAPSHOT)
 
 ## 🐛 Troubleshooting
 
-```bash
-# Check service status
-docker-compose ps
-
-# View logs
-docker-compose logs -f service-name
-
-# Restart service
-docker-compose restart service-name
-
-# Stop everything
-docker-compose down
-```
+- **Infrastructure (docker-services)**: `docker-compose -f docker-services/docker-compose.yml ps | logs | restart <service> | down`
+- **Kubernetes**: `kubectl get pods -n clickenrent`, `kubectl logs -f <pod> -n clickenrent`
+- **Local**: Ensure Eureka and Gateway are up first; check `.env` and DB/Redis/ES/Kafka connectivity for each service.
 
 ## 🔐 Security
 
@@ -242,17 +260,15 @@ ClickEnRent implements **company-based multi-tenancy** with defense-in-depth sec
 - **Automatic Filtering:** Hibernate filters add WHERE clauses to all queries
 - **Audit Trail:** All security violations are logged
 
-**Security Coverage:**
-- ✅ gateway: JWT validation and header forwarding
-- ✅ auth-service: User authentication with company claims
-- ✅ rental-service: Full 5-layer security stack
-- ✅ payment-service: Full 5-layer security stack
-- ✅ support-service: Full 5-layer security stack
-- ✅ notification-service: Hybrid isolation (user + company scoped)
-
-**Documentation:**
-- 📖 [SECURITY_ARCHITECTURE.md](SECURITY_ARCHITECTURE.md) - Complete security guide
-- 📊 [IMPLEMENTATION_STATUS.md](IMPLEMENTATION_STATUS.md) - Implementation status
+**Security coverage:**
+- ✅ **Gateway**: JWT validation and header forwarding
+- ✅ **Auth service**: User authentication with company claims
+- ✅ **Rental service**: Full 5-layer security stack
+- ✅ **Payment service**: Full 5-layer security stack
+- ✅ **Support service**: Full 5-layer security stack
+- ✅ **Notification service**: Hybrid isolation (user + company scoped)
+- ✅ **Search service**: Tenant-aware search and indexing
+- ✅ **Analytics service**: Company-scoped analytics (Admin/B2B)
 
 ### Authentication & Authorization
 

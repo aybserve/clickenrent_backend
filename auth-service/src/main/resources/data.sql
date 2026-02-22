@@ -9,7 +9,7 @@
 --
 -- Note: This file contains ONLY INSERT statements. No DDL (DROP/CREATE).
 --       Schema is managed by Hibernate DDL (staging) or Flyway migrations (production).
--- 
+--
 -- Author: Vitaliy Shvetsov
 -- =====================================================================================================================
 

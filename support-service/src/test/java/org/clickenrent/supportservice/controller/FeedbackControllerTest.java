@@ -54,7 +54,7 @@ class FeedbackControllerTest {
     void getAll_ReturnsOk() throws Exception {
         when(feedbackService.getAll()).thenReturn(Arrays.asList(feedbackDTO));
 
-        mockMvc.perform(get("/api/feedbacks").with(csrf()))
+        mockMvc.perform(get("/api/v1/feedbacks").with(csrf()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].rate").value(5));
     }
@@ -64,7 +64,7 @@ class FeedbackControllerTest {
     void getById_ReturnsOk() throws Exception {
         when(feedbackService.getById(1L)).thenReturn(feedbackDTO);
 
-        mockMvc.perform(get("/api/feedbacks/1").with(csrf()))
+        mockMvc.perform(get("/api/v1/feedbacks/1").with(csrf()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.rate").value(5));
     }
@@ -74,7 +74,7 @@ class FeedbackControllerTest {
     void create_ReturnsCreated() throws Exception {
         when(feedbackService.create(any())).thenReturn(feedbackDTO);
 
-        mockMvc.perform(post("/api/feedbacks")
+        mockMvc.perform(post("/api/v1/feedbacks")
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(feedbackDTO)))
@@ -86,7 +86,7 @@ class FeedbackControllerTest {
     void update_ReturnsOk() throws Exception {
         when(feedbackService.update(eq(1L), any())).thenReturn(feedbackDTO);
 
-        mockMvc.perform(put("/api/feedbacks/1")
+        mockMvc.perform(put("/api/v1/feedbacks/1")
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(feedbackDTO)))
@@ -98,7 +98,7 @@ class FeedbackControllerTest {
     void delete_ReturnsNoContent() throws Exception {
         doNothing().when(feedbackService).delete(1L);
 
-        mockMvc.perform(delete("/api/feedbacks/1").with(csrf()))
+        mockMvc.perform(delete("/api/v1/feedbacks/1").with(csrf()))
                 .andExpect(status().isNoContent());
     }
 }

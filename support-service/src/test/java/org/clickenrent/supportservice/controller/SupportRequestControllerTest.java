@@ -54,7 +54,7 @@ class SupportRequestControllerTest {
     void getAll_ReturnsOk() throws Exception {
         when(supportRequestService.getAll()).thenReturn(Arrays.asList(requestDTO));
 
-        mockMvc.perform(get("/api/support-requests").with(csrf()))
+        mockMvc.perform(get("/api/v1/support-requests").with(csrf()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].userExternalId").value("user-uuid-1"));
     }
@@ -64,7 +64,7 @@ class SupportRequestControllerTest {
     void getById_ReturnsOk() throws Exception {
         when(supportRequestService.getById(1L)).thenReturn(requestDTO);
 
-        mockMvc.perform(get("/api/support-requests/1").with(csrf()))
+        mockMvc.perform(get("/api/v1/support-requests/1").with(csrf()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.userExternalId").value("user-uuid-1"));
     }
@@ -74,7 +74,7 @@ class SupportRequestControllerTest {
     void create_ReturnsCreated() throws Exception {
         when(supportRequestService.create(any())).thenReturn(requestDTO);
 
-        mockMvc.perform(post("/api/support-requests")
+        mockMvc.perform(post("/api/v1/support-requests")
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(requestDTO)))
@@ -86,7 +86,7 @@ class SupportRequestControllerTest {
     void update_ReturnsOk() throws Exception {
         when(supportRequestService.update(eq(1L), any())).thenReturn(requestDTO);
 
-        mockMvc.perform(put("/api/support-requests/1")
+        mockMvc.perform(put("/api/v1/support-requests/1")
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(requestDTO)))
@@ -98,7 +98,7 @@ class SupportRequestControllerTest {
     void delete_ReturnsNoContent() throws Exception {
         doNothing().when(supportRequestService).delete(1L);
 
-        mockMvc.perform(delete("/api/support-requests/1").with(csrf()))
+        mockMvc.perform(delete("/api/v1/support-requests/1").with(csrf()))
                 .andExpect(status().isNoContent());
     }
 }

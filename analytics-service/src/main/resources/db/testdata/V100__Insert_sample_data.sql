@@ -6,7 +6,7 @@
 -- Description: Insert sample analytics data for development and testing.
 --              All inserts use ON CONFLICT to ensure idempotency.
 --              Only loaded when 'staging' or 'dev' profile is active.
--- 
+--
 -- Author: Vitaliy Shvetsov
 -- =====================================================================================================================
 

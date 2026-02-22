@@ -50,7 +50,7 @@ class SupportRequestBikeIssueControllerTest {
     void getAll_ReturnsOk() throws Exception {
         when(supportRequestBikeIssueService.getAll()).thenReturn(Arrays.asList(junctionDTO));
 
-        mockMvc.perform(get("/api/support-request-bike-issues").with(csrf()))
+        mockMvc.perform(get("/api/v1/support-request-bike-issues").with(csrf()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].supportRequestId").value(1));
     }
@@ -60,7 +60,7 @@ class SupportRequestBikeIssueControllerTest {
     void getById_ReturnsOk() throws Exception {
         when(supportRequestBikeIssueService.getById(1L)).thenReturn(junctionDTO);
 
-        mockMvc.perform(get("/api/support-request-bike-issues/1").with(csrf()))
+        mockMvc.perform(get("/api/v1/support-request-bike-issues/1").with(csrf()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.supportRequestId").value(1));
     }
@@ -70,7 +70,7 @@ class SupportRequestBikeIssueControllerTest {
     void create_ReturnsCreated() throws Exception {
         when(supportRequestBikeIssueService.create(any())).thenReturn(junctionDTO);
 
-        mockMvc.perform(post("/api/support-request-bike-issues")
+        mockMvc.perform(post("/api/v1/support-request-bike-issues")
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(junctionDTO)))
@@ -82,7 +82,7 @@ class SupportRequestBikeIssueControllerTest {
     void delete_ReturnsNoContent() throws Exception {
         doNothing().when(supportRequestBikeIssueService).delete(1L);
 
-        mockMvc.perform(delete("/api/support-request-bike-issues/1").with(csrf()))
+        mockMvc.perform(delete("/api/v1/support-request-bike-issues/1").with(csrf()))
                 .andExpect(status().isNoContent());
     }
 }
