@@ -30,6 +30,7 @@ class SecurityServiceTest {
     @Test
     void getCurrentUserExternalId_whenJwtHasUserExternalIdClaim_returnsClaim() {
         Jwt jwt = Jwt.withTokenValue("token")
+                .header("alg", "HS256")
                 .claim("userExternalId", "ext-123")
                 .subject("sub")
                 .issuedAt(Instant.now())
@@ -45,6 +46,7 @@ class SecurityServiceTest {
     @Test
     void getCurrentUserExternalId_whenJwtHasNoUserExternalIdFallbackToSubject_returnsSubject() {
         Jwt jwt = Jwt.withTokenValue("token")
+                .header("alg", "HS256")
                 .subject("subject-id")
                 .issuedAt(Instant.now())
                 .expiresAt(Instant.now().plusSeconds(3600))
@@ -68,6 +70,7 @@ class SecurityServiceTest {
     @Test
     void getCurrentUsername_whenAuthenticated_returnsName() {
         Jwt jwt = Jwt.withTokenValue("token")
+                .header("alg", "HS256")
                 .subject("user@test.com")
                 .issuedAt(Instant.now())
                 .expiresAt(Instant.now().plusSeconds(3600))
@@ -91,6 +94,7 @@ class SecurityServiceTest {
     @Test
     void getCurrentUserCompanyExternalIds_whenJwtHasClaim_returnsList() {
         Jwt jwt = Jwt.withTokenValue("token")
+                .header("alg", "HS256")
                 .claim("companyExternalIds", List.of("co-1", "co-2"))
                 .subject("sub")
                 .issuedAt(Instant.now())
@@ -106,6 +110,7 @@ class SecurityServiceTest {
     @Test
     void getCurrentUserCompanyExternalIds_whenNoClaim_returnsEmptyList() {
         Jwt jwt = Jwt.withTokenValue("token")
+                .header("alg", "HS256")
                 .subject("sub")
                 .issuedAt(Instant.now())
                 .expiresAt(Instant.now().plusSeconds(3600))
@@ -120,6 +125,7 @@ class SecurityServiceTest {
     @Test
     void isAdmin_whenUserHasAdminRole_returnsTrue() {
         Jwt jwt = Jwt.withTokenValue("token")
+                .header("alg", "HS256")
                 .subject("admin")
                 .issuedAt(Instant.now())
                 .expiresAt(Instant.now().plusSeconds(3600))
@@ -134,6 +140,7 @@ class SecurityServiceTest {
     @Test
     void isAdmin_whenUserHasAdminAuthorityWithoutPrefix_returnsTrue() {
         Jwt jwt = Jwt.withTokenValue("token")
+                .header("alg", "HS256")
                 .subject("admin")
                 .issuedAt(Instant.now())
                 .expiresAt(Instant.now().plusSeconds(3600))
@@ -148,6 +155,7 @@ class SecurityServiceTest {
     @Test
     void isAdmin_whenUserHasNoAdminRole_returnsFalse() {
         Jwt jwt = Jwt.withTokenValue("token")
+                .header("alg", "HS256")
                 .subject("user")
                 .issuedAt(Instant.now())
                 .expiresAt(Instant.now().plusSeconds(3600))
@@ -162,6 +170,7 @@ class SecurityServiceTest {
     @Test
     void isB2B_whenUserHasB2BRole_returnsTrue() {
         Jwt jwt = Jwt.withTokenValue("token")
+                .header("alg", "HS256")
                 .subject("b2b")
                 .issuedAt(Instant.now())
                 .expiresAt(Instant.now().plusSeconds(3600))
@@ -176,6 +185,7 @@ class SecurityServiceTest {
     @Test
     void isB2B_whenUserHasNoB2BRole_returnsFalse() {
         Jwt jwt = Jwt.withTokenValue("token")
+                .header("alg", "HS256")
                 .subject("user")
                 .issuedAt(Instant.now())
                 .expiresAt(Instant.now().plusSeconds(3600))

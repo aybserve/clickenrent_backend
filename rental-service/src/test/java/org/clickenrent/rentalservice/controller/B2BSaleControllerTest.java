@@ -30,7 +30,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  */
 @WebMvcTest(B2BSaleController.class)
 @AutoConfigureMockMvc
-class B2BSaleControllerTest {
+class B2BSaleControllerTest extends BaseWebMvcTest {
 
     @Autowired
     private MockMvc mockMvc;

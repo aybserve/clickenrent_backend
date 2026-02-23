@@ -3,6 +3,7 @@ package org.clickenrent.paymentservice.controller;
 import org.clickenrent.paymentservice.dto.mobile.MobileBankDTO;
 import org.clickenrent.paymentservice.dto.mobile.MobilePaymentMethodDTO;
 import org.clickenrent.paymentservice.service.MobilePaymentService;
+import org.clickenrent.paymentservice.service.SecurityService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +18,8 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(MobilePaymentController.class)
+@org.springframework.context.annotation.Import(org.clickenrent.paymentservice.config.SecurityConfig.class)
+@org.springframework.test.context.TestPropertySource(properties = "jwt.secret=dGVzdC1zZWNyZXQtZm9yLWp3dC10b2tlbi12YWxpZGF0aW9uLW11c3QtYmUtbG9uZy1lbm91Z2g=")
 class MobilePaymentControllerTest {
 
     @Autowired
@@ -24,6 +27,9 @@ class MobilePaymentControllerTest {
 
     @MockBean
     private MobilePaymentService mobilePaymentService;
+
+    @MockBean
+    private SecurityService securityService;
 
     private MobilePaymentMethodDTO methodDTO;
     private MobileBankDTO bankDTO;

@@ -62,8 +62,8 @@ class B2BSaleItemServiceTest {
         .build();
 
         testProduct = mock(Product.class);
-        when(testProduct.getId()).thenReturn(1L);
-        when(testProduct.getExternalId()).thenReturn("PROD001");
+        lenient().when(testProduct.getId()).thenReturn(1L);
+        lenient().when(testProduct.getExternalId()).thenReturn("PROD001");
 
         testItem = B2BSaleItem.builder()
         .id(1L)

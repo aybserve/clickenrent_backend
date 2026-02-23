@@ -30,6 +30,15 @@ public class PhoneValidator {
         // Clean phone number (remove spaces, dashes, parentheses)
         String cleanPhone = clean(phone);
         
+        // Ensure minimum/maximum digits (before other checks)
+        String digitsOnly = cleanPhone.replaceAll("[^0-9]", "");
+        if (digitsOnly.length() < 7) {
+            throw new InvalidPhoneNumberException(phone, "Phone number must contain at least 7 digits");
+        }
+        if (digitsOnly.length() > 15) {
+            throw new InvalidPhoneNumberException(phone, "Phone number cannot exceed 15 digits");
+        }
+        
         // Check if it matches E.164 format
         if (E164_PATTERN.matcher(cleanPhone).matches()) {
             return true;
@@ -38,16 +47,6 @@ public class PhoneValidator {
         // Check relaxed format (for numbers without country code)
         if (!RELAXED_PATTERN.matcher(phone).matches()) {
             throw new InvalidPhoneNumberException(phone, "Invalid phone number format. Expected format: +[country code][number] or [7-15 digits]");
-        }
-        
-        // Ensure minimum digits
-        String digitsOnly = phone.replaceAll("[^0-9]", "");
-        if (digitsOnly.length() < 7) {
-            throw new InvalidPhoneNumberException(phone, "Phone number must contain at least 7 digits");
-        }
-        
-        if (digitsOnly.length() > 15) {
-            throw new InvalidPhoneNumberException(phone, "Phone number cannot exceed 15 digits");
         }
         
         return true;

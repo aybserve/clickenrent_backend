@@ -23,7 +23,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(LockProviderController.class)
-class LockProviderControllerTest {
+class LockProviderControllerTest extends BaseWebMvcTest {
 
     @Autowired
     private MockMvc mockMvc;

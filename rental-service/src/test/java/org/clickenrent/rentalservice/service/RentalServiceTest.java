@@ -91,7 +91,7 @@ class RentalServiceTest {
         Pageable pageable = PageRequest.of(0, 20);
         when(securityService.isAdmin()).thenReturn(false);
         when(securityService.isB2B()).thenReturn(true);
-        when(securityService.getCurrentUserCompanyIds()).thenReturn(Arrays.asList(1L));
+        when(securityService.getCurrentUserCompanyExternalIds()).thenReturn(Arrays.asList("company-ext-001"));
         when(rentalRepository.findAll()).thenReturn(Collections.singletonList(testRental));
         when(rentalMapper.toDto(testRental)).thenReturn(testRentalDTO);
 
@@ -162,14 +162,15 @@ class RentalServiceTest {
         // Arrange
         when(rentalRepository.findById(1L)).thenReturn(Optional.of(testRental));
         when(securityService.isAdmin()).thenReturn(false);
-        when(securityService.hasAccessToUser(1L)).thenReturn(false);
+        when(securityService.hasAccessToUserByExternalId("usr-ext-00001")).thenReturn(false);
+        when(securityService.hasAccessToCompanyByExternalId("company-ext-001")).thenReturn(false);
         // Act & Assert
         assertThrows(UnauthorizedException.class, () -> rentalService.getRentalById(1L));
     }
 
     @Test
     void createRental_Success() {
-        when(securityService.hasAccessToUser(anyLong())).thenReturn(true);
+        when(securityService.hasAccessToUserByExternalId("usr-ext-00001")).thenReturn(true);
         // Arrange
         when(rentalMapper.toEntity(testRentalDTO)).thenReturn(testRental);
         when(rentalRepository.save(any(Rental.class))).thenReturn(testRental);
@@ -215,7 +216,8 @@ class RentalServiceTest {
         // Arrange
         when(rentalRepository.findById(1L)).thenReturn(Optional.of(testRental));
         when(securityService.isAdmin()).thenReturn(false);
-        when(securityService.hasAccessToUser(1L)).thenReturn(false);
+        when(securityService.hasAccessToUserByExternalId("usr-ext-00001")).thenReturn(false);
+        when(securityService.hasAccessToCompanyByExternalId("company-ext-001")).thenReturn(false);
         // Act & Assert
         assertThrows(UnauthorizedException.class, () -> rentalService.updateRental(1L, testRentalDTO));
     }

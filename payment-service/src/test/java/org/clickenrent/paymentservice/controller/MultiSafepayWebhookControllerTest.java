@@ -4,6 +4,7 @@ import com.google.gson.JsonObject;
 import org.clickenrent.paymentservice.repository.FinancialTransactionRepository;
 import org.clickenrent.paymentservice.repository.PaymentStatusRepository;
 import org.clickenrent.paymentservice.service.MultiSafepayService;
+import org.clickenrent.paymentservice.service.SecurityService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -18,6 +19,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(MultiSafepayWebhookController.class)
+@org.springframework.context.annotation.Import(org.clickenrent.paymentservice.config.SecurityConfig.class)
+@org.springframework.test.context.TestPropertySource(properties = "jwt.secret=dGVzdC1zZWNyZXQtZm9yLWp3dC10b2tlbi12YWxpZGF0aW9uLW11c3QtYmUtbG9uZy1lbm91Z2g=")
 class MultiSafepayWebhookControllerTest {
 
     @Autowired
@@ -31,6 +34,9 @@ class MultiSafepayWebhookControllerTest {
 
     @MockBean
     private PaymentStatusRepository paymentStatusRepository;
+
+    @MockBean
+    private SecurityService securityService;
 
     private static JsonObject successOrderResponse(String orderId, String status) {
         JsonObject data = new JsonObject();

@@ -2,6 +2,8 @@ package org.clickenrent.searchservice.controller;
 
 import org.clickenrent.searchservice.dto.GlobalSearchResponse;
 import org.clickenrent.searchservice.dto.SearchSuggestion;
+import org.clickenrent.searchservice.exception.GlobalExceptionHandler;
+import org.clickenrent.searchservice.security.SecurityService;
 import org.clickenrent.searchservice.service.GlobalSearchService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,7 +29,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * @author Vitaliy Shvetsov
  */
 @WebMvcTest(SearchController.class)
-@Import(org.clickenrent.searchservice.config.SecurityConfig.class)
+@Import({org.clickenrent.searchservice.config.SecurityConfig.class, GlobalExceptionHandler.class})
 @TestPropertySource(properties = "jwt.secret=dGVzdC1zZWNyZXQta2V5LWZvci10ZXN0aW5nLW9ubHktMjU2LWJpdC1rZXk=")
 class SearchControllerTest {
 
@@ -36,6 +38,9 @@ class SearchControllerTest {
 
     @MockBean
     private GlobalSearchService searchService;
+
+    @MockBean
+    private SecurityService securityService;
 
     @Test
     @WithMockUser

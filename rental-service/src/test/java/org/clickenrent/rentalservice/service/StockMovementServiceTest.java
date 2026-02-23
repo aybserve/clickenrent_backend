@@ -65,7 +65,7 @@ class StockMovementServiceTest {
         // Note: Product is abstract, so in a real test you'd use a concrete subclass
         // For this test, we'll use a mock or assume a concrete implementation
         testProduct = mock(Product.class);
-        when(testProduct.getId()).thenReturn(1L);
+        lenient().when(testProduct.getId()).thenReturn(1L);
 
         testMovement = StockMovement.builder()
         .id(1L)

@@ -51,6 +51,12 @@ class UserAddressControllerTest {
     @MockBean
     private UserAddressService userAddressService;
 
+    @MockBean
+    private org.clickenrent.authservice.service.SecurityService securityService;
+
+    @MockBean(name = "resourceSecurity")
+    private org.clickenrent.authservice.security.ResourceSecurityExpression resourceSecurity;
+
     private UserAddressDTO userAddressDTO;
 
     @BeforeEach
@@ -68,7 +74,7 @@ class UserAddressControllerTest {
         List<UserAddressDTO> userAddresses = Arrays.asList(userAddressDTO);
         when(userAddressService.getAllUserAddresses()).thenReturn(userAddresses);
 
-        mockMvc.perform(get("/api/user-addresses").with(csrf()))
+        mockMvc.perform(get("/api/v1/user-addresses").with(csrf()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].id").value(1L))
                 .andExpect(jsonPath("$[0].userId").value(1L));
@@ -82,7 +88,7 @@ class UserAddressControllerTest {
         List<UserAddressDTO> userAddresses = Arrays.asList(userAddressDTO);
         when(userAddressService.getAllUserAddresses()).thenReturn(userAddresses);
 
-        mockMvc.perform(get("/api/user-addresses").with(csrf()))
+        mockMvc.perform(get("/api/v1/user-addresses").with(csrf()))
                 .andExpect(status().isOk());
 
         verify(userAddressService, times(1)).getAllUserAddresses();
@@ -91,7 +97,7 @@ class UserAddressControllerTest {
     @Test
     @WithMockUser(roles = "CUSTOMER")
     void getAllUserAddresses_WithCustomerRole_ReturnsForbidden() throws Exception {
-        mockMvc.perform(get("/api/user-addresses").with(csrf()))
+        mockMvc.perform(get("/api/v1/user-addresses").with(csrf()))
                 .andExpect(status().isForbidden());
 
         verify(userAddressService, never()).getAllUserAddresses();
@@ -102,7 +108,7 @@ class UserAddressControllerTest {
     void getUserAddressById_ReturnsOk() throws Exception {
         when(userAddressService.getUserAddressById(1L)).thenReturn(userAddressDTO);
 
-        mockMvc.perform(get("/api/user-addresses/1").with(csrf()))
+        mockMvc.perform(get("/api/v1/user-addresses/1").with(csrf()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(1L));
 
@@ -115,7 +121,7 @@ class UserAddressControllerTest {
         List<UserAddressDTO> userAddresses = Arrays.asList(userAddressDTO);
         when(userAddressService.getUserAddressesByUserId(1L)).thenReturn(userAddresses);
 
-        mockMvc.perform(get("/api/user-addresses/by-user/1").with(csrf()))
+        mockMvc.perform(get("/api/v1/user-addresses/by-user/1").with(csrf()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].userId").value(1L));
 
@@ -128,7 +134,7 @@ class UserAddressControllerTest {
         List<UserAddressDTO> userAddresses = Arrays.asList(userAddressDTO);
         when(userAddressService.getUserAddressesByAddressId(1L)).thenReturn(userAddresses);
 
-        mockMvc.perform(get("/api/user-addresses/by-address/1").with(csrf()))
+        mockMvc.perform(get("/api/v1/user-addresses/by-address/1").with(csrf()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].addressId").value(1L));
 
@@ -143,7 +149,7 @@ class UserAddressControllerTest {
 
         when(userAddressService.createUserAddress(any(UserAddressDTO.class))).thenReturn(createdUserAddress);
 
-        mockMvc.perform(post("/api/user-addresses")
+        mockMvc.perform(post("/api/v1/user-addresses")
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(newUserAddress)))
@@ -158,7 +164,7 @@ class UserAddressControllerTest {
     void createUserAddress_WithCustomerRole_ReturnsForbidden() throws Exception {
         UserAddressDTO newUserAddress = UserAddressDTO.builder().userId(1L).addressId(2L).build();
 
-        mockMvc.perform(post("/api/user-addresses")
+        mockMvc.perform(post("/api/v1/user-addresses")
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(newUserAddress)))
@@ -174,7 +180,7 @@ class UserAddressControllerTest {
 
         when(userAddressService.updateUserAddress(eq(1L), any(UserAddressDTO.class))).thenReturn(updated);
 
-        mockMvc.perform(put("/api/user-addresses/1")
+        mockMvc.perform(put("/api/v1/user-addresses/1")
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(userAddressDTO)))
@@ -189,7 +195,7 @@ class UserAddressControllerTest {
     void deleteUserAddress_ReturnsNoContent() throws Exception {
         doNothing().when(userAddressService).deleteUserAddress(1L);
 
-        mockMvc.perform(delete("/api/user-addresses/1").with(csrf()))
+        mockMvc.perform(delete("/api/v1/user-addresses/1").with(csrf()))
                 .andExpect(status().isNoContent());
 
         verify(userAddressService, times(1)).deleteUserAddress(1L);

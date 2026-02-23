@@ -27,7 +27,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @WebMvcTest(B2BSubscriptionOrderItemController.class)
 @AutoConfigureMockMvc
-class B2BSubscriptionOrderItemControllerTest {
+class B2BSubscriptionOrderItemControllerTest extends BaseWebMvcTest {
 
     @Autowired
     private MockMvc mockMvc;

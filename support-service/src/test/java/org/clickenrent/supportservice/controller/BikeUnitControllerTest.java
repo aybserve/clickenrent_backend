@@ -3,6 +3,7 @@ package org.clickenrent.supportservice.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.clickenrent.supportservice.dto.BikeUnitDTO;
 import org.clickenrent.supportservice.service.BikeUnitService;
+import org.clickenrent.supportservice.service.SecurityService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,6 +35,9 @@ class BikeUnitControllerTest {
 
     @MockBean
     private BikeUnitService bikeUnitService;
+
+    @MockBean
+    private SecurityService securityService;
 
     private BikeUnitDTO bikeUnitDTO;
 

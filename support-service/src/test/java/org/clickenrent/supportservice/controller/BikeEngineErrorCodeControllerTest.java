@@ -3,6 +3,7 @@ package org.clickenrent.supportservice.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.clickenrent.supportservice.dto.BikeEngineErrorCodeDTO;
 import org.clickenrent.supportservice.service.BikeEngineErrorCodeService;
+import org.clickenrent.supportservice.service.SecurityService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,6 +35,9 @@ class BikeEngineErrorCodeControllerTest {
 
     @MockBean
     private BikeEngineErrorCodeService bikeEngineErrorCodeService;
+
+    @MockBean
+    private SecurityService securityService;
 
     private BikeEngineErrorCodeDTO linkDTO;
 

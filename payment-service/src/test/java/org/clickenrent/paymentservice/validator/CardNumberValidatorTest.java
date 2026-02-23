@@ -132,10 +132,10 @@ class CardNumberValidatorTest {
 
     @Test
     void testExpiryValidation() {
-        // Valid future dates
-        assertDoesNotThrow(() -> CardNumberValidator.validateExpiry(12, 2025));
+        // Valid future dates (use years in the future to avoid expiry in current year)
+        assertDoesNotThrow(() -> CardNumberValidator.validateExpiry(12, 2027));
         assertDoesNotThrow(() -> CardNumberValidator.validateExpiry(12, 2030));
-        assertDoesNotThrow(() -> CardNumberValidator.validateExpiry(1, 2027));
+        assertDoesNotThrow(() -> CardNumberValidator.validateExpiry(1, 2028));
         
         // Invalid: expired
         assertThrows(InvalidCardException.class, () -> 

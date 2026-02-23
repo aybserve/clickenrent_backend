@@ -7,6 +7,7 @@ import org.clickenrent.authservice.dto.RefreshTokenRequest;
 import org.clickenrent.authservice.dto.RegisterRequest;
 import org.clickenrent.authservice.entity.User;
 import org.clickenrent.authservice.event.IndexEventPublisher;
+import org.clickenrent.authservice.repository.UserGlobalRoleRepository;
 import org.clickenrent.authservice.repository.UserRepository;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -44,6 +45,9 @@ class AuthControllerIntegrationTest {
     private UserRepository userRepository;
 
     @Autowired
+    private UserGlobalRoleRepository userGlobalRoleRepository;
+
+    @Autowired
     private PasswordEncoder passwordEncoder;
 
     @MockBean
@@ -57,7 +61,8 @@ class AuthControllerIntegrationTest {
 
     @BeforeEach
     void setUp() {
-        // Clean up database before each test
+        // Clean up database before each test (order matters for FK)
+        userGlobalRoleRepository.deleteAll();
         userRepository.deleteAll();
 
         registerRequest = RegisterRequest.builder()
@@ -77,12 +82,13 @@ class AuthControllerIntegrationTest {
 
     @AfterEach
     void tearDown() {
+        userGlobalRoleRepository.deleteAll();
         userRepository.deleteAll();
     }
 
     @Test
     void register_ValidRequest_ReturnsCreated() throws Exception {
-        mockMvc.perform(post("/api/auth/register")
+        mockMvc.perform(post("/api/v1/auth/register")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(registerRequest)))
                 .andExpect(status().isCreated())
@@ -109,7 +115,7 @@ class AuthControllerIntegrationTest {
                 .build();
         userRepository.save(user);
 
-        mockMvc.perform(post("/api/auth/register")
+        mockMvc.perform(post("/api/v1/auth/register")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(registerRequest)))
                 .andExpect(status().isConflict())
@@ -128,7 +134,7 @@ class AuthControllerIntegrationTest {
                 .build();
         userRepository.save(user);
 
-        mockMvc.perform(post("/api/auth/register")
+        mockMvc.perform(post("/api/v1/auth/register")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(registerRequest)))
                 .andExpect(status().isConflict())
@@ -143,7 +149,7 @@ class AuthControllerIntegrationTest {
                 .password("123") // Too short
                 .build();
 
-        mockMvc.perform(post("/api/auth/register")
+        mockMvc.perform(post("/api/v1/auth/register")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(invalidRequest)))
                 .andExpect(status().isBadRequest())
@@ -164,7 +170,7 @@ class AuthControllerIntegrationTest {
                 .build();
         userRepository.save(user);
 
-        mockMvc.perform(post("/api/auth/login")
+        mockMvc.perform(post("/api/v1/auth/login")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(loginRequest)))
                 .andExpect(status().isOk())
@@ -190,7 +196,7 @@ class AuthControllerIntegrationTest {
                 .password("password123")
                 .build();
 
-        mockMvc.perform(post("/api/auth/login")
+        mockMvc.perform(post("/api/v1/auth/login")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(emailLoginRequest)))
                 .andExpect(status().isOk())
@@ -214,7 +220,7 @@ class AuthControllerIntegrationTest {
                 .password("wrongpassword")
                 .build();
 
-        mockMvc.perform(post("/api/auth/login")
+        mockMvc.perform(post("/api/v1/auth/login")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(wrongPasswordRequest)))
                 .andExpect(status().isUnauthorized())
@@ -223,7 +229,7 @@ class AuthControllerIntegrationTest {
 
     @Test
     void login_UserNotFound_ReturnsUnauthorized() throws Exception {
-        mockMvc.perform(post("/api/auth/login")
+        mockMvc.perform(post("/api/v1/auth/login")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(loginRequest)))
                 .andExpect(status().isUnauthorized());
@@ -232,7 +238,7 @@ class AuthControllerIntegrationTest {
     @Test
     void refreshToken_ValidToken_ReturnsOk() throws Exception {
         // Register user and get tokens
-        MvcResult registerResult = mockMvc.perform(post("/api/auth/register")
+        MvcResult registerResult = mockMvc.perform(post("/api/v1/auth/register")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(registerRequest)))
                 .andExpect(status().isCreated())
@@ -243,7 +249,7 @@ class AuthControllerIntegrationTest {
 
         RefreshTokenRequest refreshRequest = new RefreshTokenRequest(refreshToken);
 
-        mockMvc.perform(post("/api/auth/refresh")
+        mockMvc.perform(post("/api/v1/auth/refresh")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(refreshRequest)))
                 .andExpect(status().isOk())
@@ -255,7 +261,7 @@ class AuthControllerIntegrationTest {
     void refreshToken_InvalidToken_ReturnsUnauthorized() throws Exception {
         RefreshTokenRequest refreshRequest = new RefreshTokenRequest("invalid.token.here");
 
-        mockMvc.perform(post("/api/auth/refresh")
+        mockMvc.perform(post("/api/v1/auth/refresh")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(refreshRequest)))
                 .andExpect(status().isUnauthorized())
@@ -265,7 +271,7 @@ class AuthControllerIntegrationTest {
     @Test
     void getCurrentUser_WithValidToken_ReturnsOk() throws Exception {
         // Register user and get token
-        MvcResult registerResult = mockMvc.perform(post("/api/auth/register")
+        MvcResult registerResult = mockMvc.perform(post("/api/v1/auth/register")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(registerRequest)))
                 .andExpect(status().isCreated())
@@ -274,7 +280,7 @@ class AuthControllerIntegrationTest {
         String registerResponse = registerResult.getResponse().getContentAsString();
         String accessToken = objectMapper.readTree(registerResponse).get("accessToken").asText();
 
-        mockMvc.perform(get("/api/auth/me")
+        mockMvc.perform(get("/api/v1/auth/me")
                         .header("Authorization", "Bearer " + accessToken))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.userName").value("testuser"))
@@ -283,27 +289,27 @@ class AuthControllerIntegrationTest {
 
     @Test
     void getCurrentUser_WithoutToken_ReturnsUnauthorized() throws Exception {
-        mockMvc.perform(get("/api/auth/me"))
+        mockMvc.perform(get("/api/v1/auth/me"))
                 .andExpect(status().isForbidden());
     }
 
     @Test
     void getCurrentUser_WithInvalidToken_ReturnsUnauthorized() throws Exception {
-        mockMvc.perform(get("/api/auth/me")
+        mockMvc.perform(get("/api/v1/auth/me")
                         .header("Authorization", "Bearer invalid.token.here"))
                 .andExpect(status().isForbidden());
     }
 
     @Test
     void logout_ReturnsNoContent() throws Exception {
-        mockMvc.perform(post("/api/auth/logout"))
+        mockMvc.perform(post("/api/v1/auth/logout"))
                 .andExpect(status().isNoContent());
     }
 
     @Test
     void fullAuthenticationFlow_Success() throws Exception {
         // 1. Register
-        MvcResult registerResult = mockMvc.perform(post("/api/auth/register")
+        MvcResult registerResult = mockMvc.perform(post("/api/v1/auth/register")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(registerRequest)))
                 .andExpect(status().isCreated())
@@ -314,14 +320,14 @@ class AuthControllerIntegrationTest {
         String refreshToken = objectMapper.readTree(registerResponse).get("refreshToken").asText();
 
         // 2. Get current user with access token
-        mockMvc.perform(get("/api/auth/me")
+        mockMvc.perform(get("/api/v1/auth/me")
                         .header("Authorization", "Bearer " + accessToken))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.userName").value("testuser"));
 
         // 3. Refresh token
         RefreshTokenRequest refreshRequest = new RefreshTokenRequest(refreshToken);
-        MvcResult refreshResult = mockMvc.perform(post("/api/auth/refresh")
+        MvcResult refreshResult = mockMvc.perform(post("/api/v1/auth/refresh")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(refreshRequest)))
                 .andExpect(status().isOk())
@@ -331,12 +337,12 @@ class AuthControllerIntegrationTest {
         String newAccessToken = objectMapper.readTree(refreshResponse).get("accessToken").asText();
 
         // 4. Use new access token
-        mockMvc.perform(get("/api/auth/me")
+        mockMvc.perform(get("/api/v1/auth/me")
                         .header("Authorization", "Bearer " + newAccessToken))
                 .andExpect(status().isOk());
 
         // 5. Logout
-        mockMvc.perform(post("/api/auth/logout"))
+        mockMvc.perform(post("/api/v1/auth/logout"))
                 .andExpect(status().isNoContent());
     }
 }

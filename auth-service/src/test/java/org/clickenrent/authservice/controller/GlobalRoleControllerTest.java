@@ -51,6 +51,12 @@ class GlobalRoleControllerTest {
     @MockBean
     private GlobalRoleService globalRoleService;
 
+    @MockBean
+    private org.clickenrent.authservice.service.SecurityService securityService;
+
+    @MockBean(name = "resourceSecurity")
+    private org.clickenrent.authservice.security.ResourceSecurityExpression resourceSecurity;
+
     private GlobalRoleDTO globalRoleDTO;
 
     @BeforeEach
@@ -67,7 +73,7 @@ class GlobalRoleControllerTest {
         List<GlobalRoleDTO> roles = Arrays.asList(globalRoleDTO);
         when(globalRoleService.getAllGlobalRoles()).thenReturn(roles);
 
-        mockMvc.perform(get("/api/global-roles").with(csrf()))
+        mockMvc.perform(get("/api/v1/global-roles").with(csrf()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].id").value(1L))
                 .andExpect(jsonPath("$[0].name").value("SUPERADMIN"));
@@ -81,7 +87,7 @@ class GlobalRoleControllerTest {
         List<GlobalRoleDTO> roles = Arrays.asList(globalRoleDTO);
         when(globalRoleService.getAllGlobalRoles()).thenReturn(roles);
 
-        mockMvc.perform(get("/api/global-roles").with(csrf()))
+        mockMvc.perform(get("/api/v1/global-roles").with(csrf()))
                 .andExpect(status().isOk());
 
         verify(globalRoleService, times(1)).getAllGlobalRoles();
@@ -90,7 +96,7 @@ class GlobalRoleControllerTest {
     @Test
     @WithMockUser(roles = "CUSTOMER")
     void getAllGlobalRoles_WithCustomerRole_ReturnsForbidden() throws Exception {
-        mockMvc.perform(get("/api/global-roles").with(csrf()))
+        mockMvc.perform(get("/api/v1/global-roles").with(csrf()))
                 .andExpect(status().isForbidden());
 
         verify(globalRoleService, never()).getAllGlobalRoles();
@@ -101,7 +107,7 @@ class GlobalRoleControllerTest {
     void getGlobalRoleById_ReturnsOk() throws Exception {
         when(globalRoleService.getGlobalRoleById(1L)).thenReturn(globalRoleDTO);
 
-        mockMvc.perform(get("/api/global-roles/1").with(csrf()))
+        mockMvc.perform(get("/api/v1/global-roles/1").with(csrf()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(1L))
                 .andExpect(jsonPath("$.name").value("SUPERADMIN"));
@@ -117,7 +123,7 @@ class GlobalRoleControllerTest {
 
         when(globalRoleService.createGlobalRole(any(GlobalRoleDTO.class))).thenReturn(createdRole);
 
-        mockMvc.perform(post("/api/global-roles")
+        mockMvc.perform(post("/api/v1/global-roles")
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(newRole)))
@@ -135,7 +141,7 @@ class GlobalRoleControllerTest {
 
         when(globalRoleService.updateGlobalRole(eq(1L), any(GlobalRoleDTO.class))).thenReturn(updated);
 
-        mockMvc.perform(put("/api/global-roles/1")
+        mockMvc.perform(put("/api/v1/global-roles/1")
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(globalRoleDTO)))
@@ -150,7 +156,7 @@ class GlobalRoleControllerTest {
     void deleteGlobalRole_ReturnsNoContent() throws Exception {
         doNothing().when(globalRoleService).deleteGlobalRole(1L);
 
-        mockMvc.perform(delete("/api/global-roles/1").with(csrf()))
+        mockMvc.perform(delete("/api/v1/global-roles/1").with(csrf()))
                 .andExpect(status().isNoContent());
 
         verify(globalRoleService, times(1)).deleteGlobalRole(1L);

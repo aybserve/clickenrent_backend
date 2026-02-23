@@ -24,7 +24,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @WebMvcTest(BikeModelRentalPlanController.class)
 @AutoConfigureMockMvc
-class BikeModelRentalPlanControllerTest {
+class BikeModelRentalPlanControllerTest extends BaseWebMvcTest {
 
     @Autowired
     private MockMvc mockMvc;

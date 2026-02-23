@@ -124,7 +124,7 @@ class NotificationPreferenceServiceTest {
         NotificationPreferenceDTO dto = preferenceService.updatePreferences(USER_ID, request);
 
         assertThat(dto.getPaymentUpdatesEnabled()).isFalse();
-        verify(preferenceRepository).save(any(NotificationPreference.class));
+        verify(preferenceRepository, org.mockito.Mockito.times(2)).save(any(NotificationPreference.class));
     }
 
     @Test

@@ -15,8 +15,7 @@ import java.util.List;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 /**
  * Unit tests for SecurityService.
@@ -171,28 +170,28 @@ class SecurityServiceTest {
 
     @Test
     void testIsB2B_WithB2BRole() {
-        setupSecurityContext(createMockJwt(Map.of()), List.of(new SimpleGrantedAuthority("B2B")));
+        setupSecurityContext(createMockJwt(Map.of("sub", "test")), List.of(new SimpleGrantedAuthority("B2B")));
 
         assertTrue(securityService.isB2B());
     }
 
     @Test
     void testIsB2B_WithoutB2BRole() {
-        setupSecurityContext(createMockJwt(Map.of()), List.of(new SimpleGrantedAuthority("CUSTOMER")));
+        setupSecurityContext(createMockJwt(Map.of("sub", "test")), List.of(new SimpleGrantedAuthority("CUSTOMER")));
 
         assertFalse(securityService.isB2B());
     }
 
     @Test
     void testIsCustomer_WithCustomerRole() {
-        setupSecurityContext(createMockJwt(Map.of()), List.of(new SimpleGrantedAuthority("CUSTOMER")));
+        setupSecurityContext(createMockJwt(Map.of("sub", "test")), List.of(new SimpleGrantedAuthority("CUSTOMER")));
 
         assertTrue(securityService.isCustomer());
     }
 
     @Test
     void testIsCustomer_WithoutCustomerRole() {
-        setupSecurityContext(createMockJwt(Map.of()), List.of(new SimpleGrantedAuthority("B2B")));
+        setupSecurityContext(createMockJwt(Map.of("sub", "test")), List.of(new SimpleGrantedAuthority("B2B")));
 
         assertFalse(securityService.isCustomer());
     }
@@ -237,9 +236,9 @@ class SecurityServiceTest {
 
     private void setupSecurityContext(Jwt jwt, List<SimpleGrantedAuthority> authorities) {
         Authentication authentication = mock(Authentication.class);
-        when(authentication.getPrincipal()).thenReturn(jwt);
-        when(authentication.isAuthenticated()).thenReturn(true);
-        when(authentication.getAuthorities()).thenReturn((List) authorities);
+        lenient().when(authentication.getPrincipal()).thenReturn(jwt);
+        lenient().when(authentication.isAuthenticated()).thenReturn(true);
+        lenient().when(authentication.getAuthorities()).thenReturn((List) authorities);
 
         SecurityContext securityContext = mock(SecurityContext.class);
         when(securityContext.getAuthentication()).thenReturn(authentication);

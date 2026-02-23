@@ -4,6 +4,7 @@ import com.stripe.model.Event;
 import org.clickenrent.paymentservice.repository.FinancialTransactionRepository;
 import org.clickenrent.paymentservice.repository.PaymentStatusRepository;
 import org.clickenrent.paymentservice.service.StripeService;
+import org.clickenrent.paymentservice.service.SecurityService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -39,6 +40,9 @@ class StripeWebhookControllerTest {
 
     @MockBean
     private PaymentStatusRepository paymentStatusRepository;
+
+    @MockBean
+    private SecurityService securityService;
 
     @Test
     void handleWebhook_ReturnsOk() throws Exception {

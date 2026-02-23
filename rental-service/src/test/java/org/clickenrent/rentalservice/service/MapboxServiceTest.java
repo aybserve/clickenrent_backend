@@ -12,6 +12,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 import java.math.BigDecimal;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.when;
 
 /**
@@ -31,7 +32,8 @@ class MapboxServiceTest {
 
     @BeforeEach
     void setUp() {
-        when(mapboxConfig.getKey()).thenReturn("test-api-key");
+        // Not used in all tests; lenient to avoid UnnecessaryStubbingException
+        lenient().when(mapboxConfig.getKey()).thenReturn("test-api-key");
     }
 
     @Test

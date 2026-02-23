@@ -19,8 +19,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 /**
  * Integration tests for multi-tenant isolation.
  * Verifies that Hibernate filters correctly isolate data by company.
+ * Require PostgreSQL with PostGIS (H2 does not support spatial types).
  */
 @SpringBootTest
+@org.springframework.test.context.ActiveProfiles("test")
 @Sql("/test-data-tenant-isolation.sql")
 @Transactional
 public class TenantIsolationIntegrationTest {

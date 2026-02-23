@@ -2,6 +2,7 @@ package org.clickenrent.paymentservice.controller;
 
 import org.clickenrent.paymentservice.dto.B2BRevenueSharePayoutItemDTO;
 import org.clickenrent.paymentservice.service.B2BRevenueSharePayoutItemService;
+import org.clickenrent.paymentservice.service.SecurityService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +22,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @WebMvcTest(B2BRevenueSharePayoutItemController.class)
 @AutoConfigureMockMvc
+@org.springframework.context.annotation.Import(org.clickenrent.paymentservice.config.SecurityConfig.class)
+@org.springframework.test.context.TestPropertySource(properties = "jwt.secret=dGVzdC1zZWNyZXQtZm9yLWp3dC10b2tlbi12YWxpZGF0aW9uLW11c3QtYmUtbG9uZy1lbm91Z2g=")
 class B2BRevenueSharePayoutItemControllerTest {
 
     @Autowired
@@ -28,6 +31,9 @@ class B2BRevenueSharePayoutItemControllerTest {
 
     @MockBean
     private B2BRevenueSharePayoutItemService payoutItemService;
+
+    @MockBean
+    private SecurityService securityService;
 
     private B2BRevenueSharePayoutItemDTO payoutItemDTO;
 

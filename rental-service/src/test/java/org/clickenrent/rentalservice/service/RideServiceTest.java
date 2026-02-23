@@ -10,6 +10,8 @@ import org.clickenrent.rentalservice.mapper.RideMapper;
 import org.clickenrent.rentalservice.repository.BikeRentalRepository;
 import org.clickenrent.rentalservice.repository.RideRepository;
 import org.clickenrent.rentalservice.repository.RideStatusRepository;
+import org.clickenrent.rentalservice.client.NotificationClient;
+import org.clickenrent.rentalservice.event.NotificationEventPublisher;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -47,6 +49,12 @@ class RideServiceTest {
 
     @Mock
     private SecurityService securityService;
+
+    @Mock
+    private NotificationClient notificationClient;
+
+    @Mock
+    private NotificationEventPublisher notificationEventPublisher;
 
     @InjectMocks
     private RideService rideService;
@@ -141,7 +149,9 @@ class RideServiceTest {
     @Test
     void startRide_Success() {
         when(securityService.isAdmin()).thenReturn(true);
+        when(notificationClient.sendNotification(any())).thenReturn(null);
         BikeRental bikeRental = new BikeRental();
+        bikeRental.setId(1L);
         Rental rental = new Rental();
         rental.setUserExternalId("usr-ext-00001");
         bikeRental.setRental(rental);
@@ -152,7 +162,12 @@ class RideServiceTest {
         when(bikeRentalRepository.findById(1L)).thenReturn(Optional.of(bikeRental));
         when(rideMapper.toEntity(testRideDTO)).thenReturn(testRide);
         when(rideStatusRepository.findByName("Active")).thenReturn(Optional.of(activeStatus));
-        when(rideRepository.save(any())).thenReturn(testRide);
+        when(rideRepository.save(any())).thenAnswer(inv -> {
+            Ride r = inv.getArgument(0);
+            if (r.getStartDateTime() == null) r.setStartDateTime(LocalDateTime.now());
+            if (r.getId() == null) r.setId(1L);
+            return r;
+        });
         when(rideMapper.toDto(testRide)).thenReturn(testRideDTO);
 
         RideDTO result = rideService.startRide(testRideDTO);
@@ -164,7 +179,9 @@ class RideServiceTest {
     @Test
     void endRide_Success() {
         when(securityService.isAdmin()).thenReturn(true);
+        when(notificationClient.sendNotification(any())).thenReturn(null);
         BikeRental bikeRental = new BikeRental();
+        bikeRental.setId(1L);
         Rental rental = new Rental();
         rental.setUserExternalId("usr-ext-00001");
         bikeRental.setRental(rental);

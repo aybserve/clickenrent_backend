@@ -3,6 +3,7 @@ package org.clickenrent.paymentservice.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.clickenrent.paymentservice.dto.UserPaymentProfileDTO;
 import org.clickenrent.paymentservice.service.UserPaymentProfileService;
+import org.clickenrent.paymentservice.service.SecurityService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,6 +34,9 @@ class UserPaymentProfileControllerTest {
 
     @MockBean
     private UserPaymentProfileService userPaymentProfileService;
+
+    @MockBean
+    private SecurityService securityService;
 
     private UserPaymentProfileDTO profileDTO;
 

@@ -51,6 +51,12 @@ class LanguageControllerTest {
     @MockBean
     private LanguageService languageService;
 
+    @MockBean
+    private org.clickenrent.authservice.service.SecurityService securityService;
+
+    @MockBean(name = "resourceSecurity")
+    private org.clickenrent.authservice.security.ResourceSecurityExpression resourceSecurity;
+
     private LanguageDTO languageDTO;
 
     @BeforeEach
@@ -67,7 +73,7 @@ class LanguageControllerTest {
         List<LanguageDTO> languages = Arrays.asList(languageDTO);
         when(languageService.getAllLanguages()).thenReturn(languages);
 
-        mockMvc.perform(get("/api/languages").with(csrf()))
+        mockMvc.perform(get("/api/v1/languages").with(csrf()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].id").value(1L))
                 .andExpect(jsonPath("$[0].name").value("English"));
@@ -81,7 +87,7 @@ class LanguageControllerTest {
         List<LanguageDTO> languages = Arrays.asList(languageDTO);
         when(languageService.getAllLanguages()).thenReturn(languages);
 
-        mockMvc.perform(get("/api/languages").with(csrf()))
+        mockMvc.perform(get("/api/v1/languages").with(csrf()))
                 .andExpect(status().isOk());
 
         verify(languageService, times(1)).getAllLanguages();
@@ -89,7 +95,7 @@ class LanguageControllerTest {
 
     @Test
     void getAllLanguages_WithoutAuthentication_ReturnsForbidden() throws Exception {
-        mockMvc.perform(get("/api/languages").with(csrf()))
+        mockMvc.perform(get("/api/v1/languages").with(csrf()))
                 .andExpect(status().isForbidden());
 
         verify(languageService, never()).getAllLanguages();
@@ -100,7 +106,7 @@ class LanguageControllerTest {
     void getLanguageById_ReturnsOk() throws Exception {
         when(languageService.getLanguageById(1L)).thenReturn(languageDTO);
 
-        mockMvc.perform(get("/api/languages/1").with(csrf()))
+        mockMvc.perform(get("/api/v1/languages/1").with(csrf()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(1L))
                 .andExpect(jsonPath("$.name").value("English"));
@@ -116,7 +122,7 @@ class LanguageControllerTest {
 
         when(languageService.createLanguage(any(LanguageDTO.class))).thenReturn(createdLanguage);
 
-        mockMvc.perform(post("/api/languages")
+        mockMvc.perform(post("/api/v1/languages")
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(newLanguage)))
@@ -132,7 +138,7 @@ class LanguageControllerTest {
     void createLanguage_WithCustomerRole_ReturnsForbidden() throws Exception {
         LanguageDTO newLanguage = LanguageDTO.builder().name("French").build();
 
-        mockMvc.perform(post("/api/languages")
+        mockMvc.perform(post("/api/v1/languages")
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(newLanguage)))
@@ -148,7 +154,7 @@ class LanguageControllerTest {
 
         when(languageService.updateLanguage(eq(1L), any(LanguageDTO.class))).thenReturn(updated);
 
-        mockMvc.perform(put("/api/languages/1")
+        mockMvc.perform(put("/api/v1/languages/1")
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(languageDTO)))
@@ -163,7 +169,7 @@ class LanguageControllerTest {
     void deleteLanguage_ReturnsNoContent() throws Exception {
         doNothing().when(languageService).deleteLanguage(1L);
 
-        mockMvc.perform(delete("/api/languages/1").with(csrf()))
+        mockMvc.perform(delete("/api/v1/languages/1").with(csrf()))
                 .andExpect(status().isNoContent());
 
         verify(languageService, times(1)).deleteLanguage(1L);

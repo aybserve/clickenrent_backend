@@ -97,7 +97,7 @@ class NotificationServiceTest {
     @Test
     void send_whenUserHasDisabledNotificationType_returnsSuccessFalse() {
         when(preferenceRepository.findByUserExternalId(USER_ID)).thenReturn(Optional.of(preferenceRentalDisabled));
-        when(tokenManagementService.getActiveTokensForUser(USER_ID)).thenReturn(List.of(pushToken));
+        // getActiveTokensForUser is not called when preference disables this notification type
 
         SendNotificationResponse response = notificationService.send(request);
 

@@ -147,11 +147,12 @@ class NotificationControllerTest {
     @Test
     @WithMockUser
     void deleteToken_returnsOk() throws Exception {
-        mockMvc.perform(delete("/api/v1/notifications/tokens/ExponentPushToken%5Babc%5D")
+        String token = "ExponentPushToken_abc123";
+        mockMvc.perform(delete("/api/v1/notifications/tokens/" + token)
                         .with(csrf()))
                 .andExpect(status().isOk());
 
-        verify(tokenManagementService).deleteToken(eq(USER_ID), anyString());
+        verify(tokenManagementService).deleteToken(eq(USER_ID), eq(token));
     }
 
     @Test

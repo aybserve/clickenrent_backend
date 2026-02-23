@@ -3,6 +3,7 @@ package org.clickenrent.supportservice.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.clickenrent.supportservice.dto.FeedbackDTO;
 import org.clickenrent.supportservice.service.FeedbackService;
+import org.clickenrent.supportservice.service.SecurityService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,6 +36,9 @@ class FeedbackControllerTest {
 
     @MockBean
     private FeedbackService feedbackService;
+
+    @MockBean
+    private SecurityService securityService;
 
     private FeedbackDTO feedbackDTO;
 

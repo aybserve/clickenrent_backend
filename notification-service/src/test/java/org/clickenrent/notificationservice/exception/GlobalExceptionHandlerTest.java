@@ -4,10 +4,12 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.core.MethodParameter;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 
+import java.lang.reflect.Method;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -49,11 +51,13 @@ class GlobalExceptionHandlerTest {
     }
 
     @Test
-    void handleValidationException_returnsBadRequestWithFieldErrors() {
+    void handleValidationException_returnsBadRequestWithFieldErrors() throws Exception {
         BeanPropertyBindingResult bindingResult = new BeanPropertyBindingResult(new Object(), "request");
         bindingResult.addError(new FieldError("request", "expoPushToken", "must not be blank"));
         bindingResult.addError(new FieldError("request", "platform", "must not be null"));
-        MethodArgumentNotValidException ex = new MethodArgumentNotValidException(null, bindingResult);
+        MethodParameter param = new MethodParameter(
+                GlobalExceptionHandler.class.getMethod("handleValidationException", MethodArgumentNotValidException.class), 0);
+        MethodArgumentNotValidException ex = new MethodArgumentNotValidException(param, bindingResult);
 
         ResponseEntity<Map<String, Object>> response = handler.handleValidationException(ex);
 

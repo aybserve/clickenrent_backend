@@ -116,7 +116,7 @@ class SupportRequestBikeIssueServiceTest {
     @Test
     void getById_Unauthorized() {
         when(securityService.isAdmin()).thenReturn(false);
-        when(securityService.hasAccessToUser(1L)).thenReturn(false);
+        when(securityService.hasAccessToUserByExternalId("user-ext-123")).thenReturn(false);
         when(supportRequestBikeIssueRepository.findById(1L)).thenReturn(Optional.of(testJunction));
 
         assertThrows(UnauthorizedException.class, () -> supportRequestBikeIssueService.getById(1L));
@@ -125,7 +125,7 @@ class SupportRequestBikeIssueServiceTest {
     @Test
     void getBySupportRequestId_Success() {
         when(securityService.isAdmin()).thenReturn(false);
-        when(securityService.hasAccessToUser(1L)).thenReturn(true);
+        when(securityService.hasAccessToUserByExternalId("user-ext-123")).thenReturn(true);
         when(supportRequestRepository.findById(1L)).thenReturn(Optional.of(testRequest));
         when(supportRequestBikeIssueRepository.findBySupportRequestId(1L)).thenReturn(Arrays.asList(testJunction));
         when(supportRequestBikeIssueMapper.toDto(testJunction)).thenReturn(testJunctionDTO);
@@ -140,7 +140,7 @@ class SupportRequestBikeIssueServiceTest {
     @Test
     void getBySupportRequestId_Unauthorized() {
         when(securityService.isAdmin()).thenReturn(false);
-        when(securityService.hasAccessToUser(1L)).thenReturn(false);
+        when(securityService.hasAccessToUserByExternalId("user-ext-123")).thenReturn(false);
         when(supportRequestRepository.findById(1L)).thenReturn(Optional.of(testRequest));
 
         assertThrows(UnauthorizedException.class, () -> supportRequestBikeIssueService.getBySupportRequestId(1L));
@@ -169,7 +169,7 @@ class SupportRequestBikeIssueServiceTest {
     @Test
     void create_Success() {
         when(securityService.isAdmin()).thenReturn(false);
-        when(securityService.hasAccessToUser(1L)).thenReturn(true);
+        when(securityService.hasAccessToUserByExternalId("user-ext-123")).thenReturn(true);
         when(supportRequestRepository.findById(1L)).thenReturn(Optional.of(testRequest));
         when(supportRequestBikeIssueMapper.toEntity(testJunctionDTO)).thenReturn(testJunction);
         when(supportRequestBikeIssueRepository.save(any(SupportRequestBikeIssue.class))).thenReturn(testJunction);
@@ -184,7 +184,7 @@ class SupportRequestBikeIssueServiceTest {
     @Test
     void create_Unauthorized() {
         when(securityService.isAdmin()).thenReturn(false);
-        when(securityService.hasAccessToUser(1L)).thenReturn(false);
+        when(securityService.hasAccessToUserByExternalId("user-ext-123")).thenReturn(false);
         when(supportRequestRepository.findById(1L)).thenReturn(Optional.of(testRequest));
 
         assertThrows(UnauthorizedException.class, () -> supportRequestBikeIssueService.create(testJunctionDTO));
@@ -211,7 +211,7 @@ class SupportRequestBikeIssueServiceTest {
     @Test
     void delete_Unauthorized() {
         when(securityService.isAdmin()).thenReturn(false);
-        when(securityService.hasAccessToUser(1L)).thenReturn(false);
+        when(securityService.hasAccessToUserByExternalId("user-ext-123")).thenReturn(false);
         when(supportRequestBikeIssueRepository.findById(1L)).thenReturn(Optional.of(testJunction));
 
         assertThrows(UnauthorizedException.class, () -> supportRequestBikeIssueService.delete(1L));

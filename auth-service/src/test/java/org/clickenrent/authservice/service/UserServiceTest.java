@@ -103,8 +103,8 @@ class UserServiceTest {
         // Mock security service behavior for all tests
         lenient().when(securityService.isAdmin()).thenReturn(true);
         lenient().when(securityService.hasAccessToUser(anyLong())).thenReturn(true);
-        // Stub UserPreferenceService used in createUser/updateUser flows
-        doNothing().when(userPreferenceService).createDefaultPreferences(any(User.class));
+        // Stub UserPreferenceService used in createUser/updateUser flows (lenient: only used in createUser tests)
+        lenient().when(userPreferenceService.createDefaultPreferences(any(User.class))).thenReturn(null);
     }
 
     @Test

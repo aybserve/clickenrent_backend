@@ -5,6 +5,7 @@ import org.clickenrent.contracts.search.IndexEventRequest;
 import org.clickenrent.contracts.search.IndexEventRequest.IndexOperation;
 import org.clickenrent.searchservice.dto.BulkSyncRequest;
 import org.clickenrent.searchservice.dto.BulkSyncResponse;
+import org.clickenrent.searchservice.security.SecurityService;
 import org.clickenrent.searchservice.service.IndexingService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,6 +45,9 @@ class IndexingControllerTest {
 
     @MockBean
     private IndexingService indexingService;
+
+    @MockBean
+    private SecurityService securityService;
 
     @Test
     @WithMockUser(roles = "ADMIN")

@@ -226,7 +226,7 @@ class UserPreferenceServiceTest {
     @Test
     void createDefaultPreferences_ShouldCreateWithDefaultValues() {
         // Arrange
-        when(languageRepository.findById(1L)).thenReturn(Optional.of(language));
+        lenient().when(languageRepository.findById(1L)).thenReturn(Optional.of(language));
         when(userPreferenceRepository.save(any(UserPreference.class))).thenReturn(userPreference);
 
         // Act

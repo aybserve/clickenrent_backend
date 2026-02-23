@@ -41,7 +41,7 @@ class UserPaymentProfileServiceTest {
     private SecurityService securityService;
 
     @Mock
-    private StripeService stripeService;
+    private PaymentProviderService paymentProviderService;
 
     @Mock
     private AuthServiceClient authServiceClient;
@@ -142,20 +142,22 @@ class UserPaymentProfileServiceTest {
         UserPaymentProfileDTO result = userPaymentProfileService.createOrGetProfile("user-ext-123", "test@example.com");
 
         assertNotNull(result);
-        verify(stripeService, never()).createCustomer(anyString(), anyString());
+        verify(paymentProviderService, never()).createCustomer(anyString(), anyString());
     }
 
     @Test
     void createOrGetProfile_NewProfile_CreatesProfile() {
         when(userPaymentProfileRepository.findByUserExternalId("user-ext-123")).thenReturn(Optional.empty());
-        when(stripeService.createCustomer("user-ext-123", "test@example.com")).thenReturn("cus_new123");
+        when(paymentProviderService.createCustomer("user-ext-123", "test@example.com")).thenReturn("cus_new123");
+        lenient().when(paymentProviderService.isStripeActive()).thenReturn(true);
+        lenient().when(paymentProviderService.isMultiSafepayActive()).thenReturn(false);
         when(userPaymentProfileRepository.save(any(UserPaymentProfile.class))).thenReturn(testProfile);
         when(userPaymentProfileMapper.toDTO(testProfile)).thenReturn(testProfileDTO);
 
         UserPaymentProfileDTO result = userPaymentProfileService.createOrGetProfile("user-ext-123", "test@example.com");
 
         assertNotNull(result);
-        verify(stripeService, times(1)).createCustomer("user-ext-123", "test@example.com");
+        verify(paymentProviderService, times(1)).createCustomer("user-ext-123", "test@example.com");
         verify(userPaymentProfileRepository, times(1)).save(any(UserPaymentProfile.class));
     }
 

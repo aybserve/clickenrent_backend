@@ -24,6 +24,10 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.transaction.annotation.Transactional;
+
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 
 import java.util.Collections;
 import java.util.UUID;
@@ -38,6 +42,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @AutoConfigureMockMvc
 @TestPropertySource(locations = "classpath:application-test.properties")
+@Transactional
 class SecurityIntegrationTest {
 
     @Autowired
@@ -67,6 +72,9 @@ class SecurityIntegrationTest {
     @MockBean
     private SearchServiceClient searchServiceClient;
 
+    @PersistenceContext
+    private EntityManager entityManager;
+
     private User adminUser;
     private User regularUser;
     private String adminToken;
@@ -74,10 +82,13 @@ class SecurityIntegrationTest {
 
     @BeforeEach
     void setUp() {
-        // Clean database
+        // Clean database: delete in FK-safe order (user_global_role references both user and global_role)
         userGlobalRoleRepository.deleteAll();
-        userRepository.deleteAll();
+        entityManager.flush();
+        entityManager.clear();
         globalRoleRepository.deleteAll();
+        entityManager.flush();
+        userRepository.deleteAll();
 
         // Create roles
         GlobalRole adminRole = GlobalRole.builder().name("ADMIN").build();
@@ -148,7 +159,7 @@ class SecurityIntegrationTest {
                 .build();
 
         // Register endpoint should be accessible without authentication
-        mockMvc.perform(post("/api/auth/register")
+        mockMvc.perform(post("/api/v1/auth/register")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(registerRequest)))
                 .andExpect(status().isCreated());
@@ -157,14 +168,14 @@ class SecurityIntegrationTest {
     @Test
     void protectedEndpoint_NoAuth_ReturnsForbidden() throws Exception {
         // Protected endpoint without token should return 403
-        mockMvc.perform(get("/api/auth/me"))
+        mockMvc.perform(get("/api/v1/auth/me"))
                 .andExpect(status().isForbidden());
     }
 
     @Test
     void protectedEndpoint_WithValidToken_Success() throws Exception {
         // Protected endpoint with valid token should succeed
-        mockMvc.perform(get("/api/auth/me")
+        mockMvc.perform(get("/api/v1/auth/me")
                         .header("Authorization", "Bearer " + userToken))
                 .andExpect(status().isOk());
     }
@@ -172,7 +183,7 @@ class SecurityIntegrationTest {
     @Test
     void protectedEndpoint_WithInvalidToken_ReturnsForbidden() throws Exception {
         // Protected endpoint with invalid token should return 403
-        mockMvc.perform(get("/api/auth/me")
+        mockMvc.perform(get("/api/v1/auth/me")
                         .header("Authorization", "Bearer invalid.token.here"))
                 .andExpect(status().isForbidden());
     }
@@ -181,7 +192,7 @@ class SecurityIntegrationTest {
     void protectedEndpoint_WithExpiredToken_ReturnsForbidden() throws Exception {
         // Create an expired token (this would require mocking or waiting)
         // For now, we'll use a malformed token to simulate expired behavior
-        mockMvc.perform(get("/api/auth/me")
+        mockMvc.perform(get("/api/v1/auth/me")
                         .header("Authorization", "Bearer expired.token"))
                 .andExpect(status().isForbidden());
     }
@@ -189,7 +200,7 @@ class SecurityIntegrationTest {
     @Test
     void adminEndpoint_AsAdmin_Success() throws Exception {
         // Admin endpoint with admin token should succeed
-        mockMvc.perform(get("/api/users")
+        mockMvc.perform(get("/api/v1/users")
                         .header("Authorization", "Bearer " + adminToken))
                 .andExpect(status().isOk());
     }
@@ -197,7 +208,7 @@ class SecurityIntegrationTest {
     @Test
     void adminEndpoint_AsRegularUser_ReturnsForbidden() throws Exception {
         // Admin endpoint with regular user token should return 403
-        mockMvc.perform(get("/api/users")
+        mockMvc.perform(get("/api/v1/users")
                         .header("Authorization", "Bearer " + userToken))
                 .andExpect(status().isForbidden());
     }
@@ -205,14 +216,14 @@ class SecurityIntegrationTest {
     @Test
     void adminEndpoint_NoAuth_ReturnsForbidden() throws Exception {
         // Admin endpoint without token should return 403
-        mockMvc.perform(get("/api/users"))
+        mockMvc.perform(get("/api/v1/users"))
                 .andExpect(status().isForbidden());
     }
 
     @Test
     void deleteEndpoint_AsAdmin_Success() throws Exception {
         // Delete user endpoint with admin token should succeed
-        mockMvc.perform(delete("/api/users/" + regularUser.getId())
+        mockMvc.perform(delete("/api/v1/users/" + regularUser.getId())
                         .header("Authorization", "Bearer " + adminToken))
                 .andExpect(status().isNoContent());
     }
@@ -220,7 +231,7 @@ class SecurityIntegrationTest {
     @Test
     void deleteEndpoint_AsRegularUser_ReturnsForbidden() throws Exception {
         // Delete user endpoint with regular user token should return 403
-        mockMvc.perform(delete("/api/users/" + adminUser.getId())
+        mockMvc.perform(delete("/api/v1/users/" + adminUser.getId())
                         .header("Authorization", "Bearer " + userToken))
                 .andExpect(status().isForbidden());
     }
@@ -228,7 +239,7 @@ class SecurityIntegrationTest {
     @Test
     void jwtAuthentication_WithoutBearerPrefix_ReturnsForbidden() throws Exception {
         // Token without "Bearer " prefix should fail
-        mockMvc.perform(get("/api/auth/me")
+        mockMvc.perform(get("/api/v1/auth/me")
                         .header("Authorization", userToken))
                 .andExpect(status().isForbidden());
     }
@@ -236,7 +247,7 @@ class SecurityIntegrationTest {
     @Test
     void jwtAuthentication_WithEmptyToken_ReturnsForbidden() throws Exception {
         // Empty token should fail
-        mockMvc.perform(get("/api/auth/me")
+        mockMvc.perform(get("/api/v1/auth/me")
                         .header("Authorization", "Bearer "))
                 .andExpect(status().isForbidden());
     }
@@ -244,14 +255,14 @@ class SecurityIntegrationTest {
     @Test
     void jwtAuthentication_WithoutAuthorizationHeader_ReturnsForbidden() throws Exception {
         // No Authorization header should fail
-        mockMvc.perform(get("/api/auth/me"))
+        mockMvc.perform(get("/api/v1/auth/me"))
                 .andExpect(status().isForbidden());
     }
 
     @Test
     void userEndpoint_SameUser_Success() throws Exception {
         // User should be able to access their own data
-        mockMvc.perform(get("/api/users/" + regularUser.getId())
+        mockMvc.perform(get("/api/v1/users/" + regularUser.getId())
                         .header("Authorization", "Bearer " + userToken))
                 .andExpect(status().isOk());
     }
@@ -259,7 +270,7 @@ class SecurityIntegrationTest {
     @Test
     void updateEndpoint_SameUser_Success() throws Exception {
         // User should be able to update their own data
-        mockMvc.perform(put("/api/users/" + regularUser.getId())
+        mockMvc.perform(put("/api/v1/users/" + regularUser.getId())
                         .header("Authorization", "Bearer " + userToken)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"userName\":\"user\",\"email\":\"user@example.com\",\"firstName\":\"Updated\",\"lastName\":\"User\",\"isActive\":true,\"isDeleted\":false}"))
@@ -269,14 +280,14 @@ class SecurityIntegrationTest {
     @Test
     void csrfProtection_Disabled_ForStatelessAPI() throws Exception {
         // CSRF should be disabled for stateless JWT authentication
-        mockMvc.perform(post("/api/auth/logout"))
+        mockMvc.perform(post("/api/v1/auth/logout"))
                 .andExpect(status().isNoContent());
     }
 
     @Test
     void sessionManagement_Stateless_NoSessionCreated() throws Exception {
         // Session should not be created (stateless)
-        mockMvc.perform(get("/api/auth/me")
+        mockMvc.perform(get("/api/v1/auth/me")
                         .header("Authorization", "Bearer " + userToken))
                 .andExpect(status().isOk());
         // In stateless mode, no session should be created
@@ -292,7 +303,7 @@ class SecurityIntegrationTest {
         // Attempt to use token of inactive user should fail
         // Note: The token might still be valid, but the user is inactive
         // This test verifies that inactive users are properly handled
-        mockMvc.perform(get("/api/auth/me")
+        mockMvc.perform(get("/api/v1/auth/me")
                         .header("Authorization", "Bearer " + userToken))
                 .andExpect(status().isForbidden());
     }
@@ -304,7 +315,7 @@ class SecurityIntegrationTest {
         userRepository.save(regularUser);
 
         // Attempt to use token of deleted user should fail
-        mockMvc.perform(get("/api/auth/me")
+        mockMvc.perform(get("/api/v1/auth/me")
                         .header("Authorization", "Bearer " + userToken))
                 .andExpect(status().isForbidden());
     }
@@ -334,7 +345,7 @@ class SecurityIntegrationTest {
         String multiRoleToken = jwtService.generateToken(multiRoleUser);
 
         // Should be able to access admin endpoints
-        mockMvc.perform(get("/api/users")
+        mockMvc.perform(get("/api/v1/users")
                         .header("Authorization", "Bearer " + multiRoleToken))
                 .andExpect(status().isOk());
     }

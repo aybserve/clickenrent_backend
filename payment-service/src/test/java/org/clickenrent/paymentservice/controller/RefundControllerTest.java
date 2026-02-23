@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.clickenrent.paymentservice.dto.CreateRefundRequestDTO;
 import org.clickenrent.paymentservice.dto.RefundDTO;
 import org.clickenrent.paymentservice.service.RefundService;
+import org.clickenrent.paymentservice.service.SecurityService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,6 +41,9 @@ class RefundControllerTest {
 
     @MockBean
     private RefundService refundService;
+
+    @MockBean
+    private SecurityService securityService;
 
     private RefundDTO refundDTO;
     private CreateRefundRequestDTO createRequest;

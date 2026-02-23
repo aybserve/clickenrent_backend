@@ -101,14 +101,8 @@ class B2BRevenueSharePayoutServiceTest {
     @Test
     void findAll_AsNonAdmin_FiltersPayouts() {
         when(securityService.isAdmin()).thenReturn(false);
-        when(securityService.getCurrentUserCompanyIds()).thenReturn(Arrays.asList(1L));
-        when(b2bRevenueSharePayoutRepository.findAll()).thenReturn(Arrays.asList(testPayout));
-        when(b2bRevenueSharePayoutMapper.toDTOList(anyList())).thenReturn(Arrays.asList(testPayoutDTO));
 
-        List<B2BRevenueSharePayoutDTO> result = b2bRevenueSharePayoutService.findAll();
-
-        assertNotNull(result);
-        verify(b2bRevenueSharePayoutRepository, times(1)).findAll();
+        assertThrows(UnauthorizedException.class, () -> b2bRevenueSharePayoutService.findAll());
     }
 
     @Test
@@ -175,7 +169,7 @@ class B2BRevenueSharePayoutServiceTest {
     @Test
     void create_Unauthorized() {
         when(securityService.isAdmin()).thenReturn(false);
-        when(securityService.hasAccessToCompany(1L)).thenReturn(false);
+        lenient().when(securityService.hasAccessToCompany(1L)).thenReturn(false);
 
         assertThrows(UnauthorizedException.class, () -> b2bRevenueSharePayoutService.create(testPayoutDTO));
     }

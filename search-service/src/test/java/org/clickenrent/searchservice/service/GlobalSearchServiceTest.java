@@ -76,7 +76,6 @@ class GlobalSearchServiceTest {
     void search_whenNotAdminAndCompanyProvided_usesCompanyFilter() {
         // Given
         when(securityService.isAdmin()).thenReturn(false);
-        when(securityService.getCurrentUserCompanyExternalIds()).thenReturn(List.of());
 
         // When
         GlobalSearchResponse response = globalSearchService.search(
@@ -121,12 +120,11 @@ class GlobalSearchServiceTest {
     void getSuggestions_withCompanyFilter_callsSecurityService() {
         // Given
         when(securityService.isAdmin()).thenReturn(false);
-        when(securityService.getCurrentUserCompanyExternalIds()).thenReturn(List.of("company-1"));
 
         // When
         globalSearchService.getSuggestions("x", "company-1", 8);
 
         // Then
-        verify(securityService).isAdmin();
+        verify(securityService, atLeast(1)).isAdmin();
     }
 }

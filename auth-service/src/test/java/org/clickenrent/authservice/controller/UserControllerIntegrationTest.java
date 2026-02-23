@@ -73,24 +73,27 @@ class UserControllerIntegrationTest {
     private String userToken;
     private GlobalRole adminRole;
     private GlobalRole userRole;
+    private String adminUserName;
+    private String regularUserName;
 
     @BeforeEach
     void setUp() {
-        // Clean up database
+        // Clean up only our test users and their role links (do not delete global_roles - seed data may be referenced)
         userGlobalRoleRepository.deleteAll();
         userRepository.deleteAll();
-        globalRoleRepository.deleteAll();
+        // Reuse or create ADMIN and USER roles (never delete them to avoid FK from other tests)
+        adminRole = globalRoleRepository.findByNameIgnoreCase("ADMIN")
+                .orElseGet(() -> globalRoleRepository.save(GlobalRole.builder().name("ADMIN").build()));
+        userRole = globalRoleRepository.findByNameIgnoreCase("USER")
+                .orElseGet(() -> globalRoleRepository.save(GlobalRole.builder().name("USER").build()));
 
-        // Create roles
-        adminRole = GlobalRole.builder().name("ADMIN").build();
-        userRole = GlobalRole.builder().name("USER").build();
-        globalRoleRepository.save(adminRole);
-        globalRoleRepository.save(userRole);
+        adminUserName = "admin_" + UUID.randomUUID().toString().substring(0, 8);
+        regularUserName = "user_" + UUID.randomUUID().toString().substring(0, 8);
 
         // Create admin user
         adminUser = User.builder()
                 .externalId(UUID.randomUUID().toString())
-                .userName("admin")
+                .userName(adminUserName)
                 .email("admin@example.com")
                 .password(passwordEncoder.encode("password"))
                 .firstName("Admin")
@@ -110,7 +113,7 @@ class UserControllerIntegrationTest {
         // Create regular user
         regularUser = User.builder()
                 .externalId(UUID.randomUUID().toString())
-                .userName("user")
+                .userName(regularUserName)
                 .email("user@example.com")
                 .password(passwordEncoder.encode("password"))
                 .firstName("Regular")
@@ -122,14 +125,14 @@ class UserControllerIntegrationTest {
 
         // Generate tokens
         UserDetails adminUserDetails = org.springframework.security.core.userdetails.User.builder()
-                .username("admin")
+                .username(adminUserName)
                 .password("password")
                 .authorities(Collections.singletonList(new SimpleGrantedAuthority("ROLE_ADMIN")))
                 .build();
         adminToken = jwtService.generateToken(adminUserDetails);
 
         UserDetails regularUserDetails = org.springframework.security.core.userdetails.User.builder()
-                .username("user")
+                .username(regularUserName)
                 .password("password")
                 .authorities(Collections.singletonList(new SimpleGrantedAuthority("ROLE_USER")))
                 .build();
@@ -140,12 +143,12 @@ class UserControllerIntegrationTest {
     void tearDown() {
         userGlobalRoleRepository.deleteAll();
         userRepository.deleteAll();
-        globalRoleRepository.deleteAll();
+        // Do not delete global_roles - they may be seed data or shared; next setUp will reuse them
     }
 
     @Test
     void getAllUsers_AsAdmin_ReturnsOk() throws Exception {
-        mockMvc.perform(get("/api/users")
+        mockMvc.perform(get("/api/v1/users")
                         .header("Authorization", "Bearer " + adminToken))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content", hasSize(2)))
@@ -154,39 +157,39 @@ class UserControllerIntegrationTest {
 
     @Test
     void getAllUsers_AsRegularUser_ReturnsForbidden() throws Exception {
-        mockMvc.perform(get("/api/users")
+        mockMvc.perform(get("/api/v1/users")
                         .header("Authorization", "Bearer " + userToken))
                 .andExpect(status().isForbidden());
     }
 
     @Test
     void getAllUsers_WithoutAuth_ReturnsForbidden() throws Exception {
-        mockMvc.perform(get("/api/users"))
+        mockMvc.perform(get("/api/v1/users"))
                 .andExpect(status().isForbidden());
     }
 
     @Test
     void getUserById_Authenticated_ReturnsOk() throws Exception {
-        mockMvc.perform(get("/api/users/" + regularUser.getId())
+        mockMvc.perform(get("/api/v1/users/" + regularUser.getId())
                         .header("Authorization", "Bearer " + userToken))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.userName").value("user"))
+                .andExpect(jsonPath("$.userName").value(regularUserName))
                 .andExpect(jsonPath("$.email").value("user@example.com"));
     }
 
     @Test
     void getUserById_NotFound_ReturnsNotFound() throws Exception {
-        mockMvc.perform(get("/api/users/99999")
+        mockMvc.perform(get("/api/v1/users/99999")
                         .header("Authorization", "Bearer " + adminToken))
                 .andExpect(status().isNotFound());
     }
 
     @Test
     void getUserByExternalId_Authenticated_ReturnsOk() throws Exception {
-        mockMvc.perform(get("/api/users/external/" + regularUser.getExternalId())
+        mockMvc.perform(get("/api/v1/users/external/" + regularUser.getExternalId())
                         .header("Authorization", "Bearer " + userToken))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.userName").value("user"));
+                .andExpect(jsonPath("$.userName").value(regularUserName));
     }
 
     @Test
@@ -200,7 +203,7 @@ class UserControllerIntegrationTest {
                 .isDeleted(false)
                 .build();
 
-        mockMvc.perform(post("/api/users")
+        mockMvc.perform(post("/api/v1/users")
                         .header("Authorization", "Bearer " + adminToken)
                         .param("password", "password123")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -219,7 +222,7 @@ class UserControllerIntegrationTest {
                 .lastName("User")
                 .build();
 
-        mockMvc.perform(post("/api/users")
+        mockMvc.perform(post("/api/v1/users")
                         .header("Authorization", "Bearer " + userToken)
                         .param("password", "password123")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -230,7 +233,7 @@ class UserControllerIntegrationTest {
     @Test
     void updateUser_Authenticated_ReturnsOk() throws Exception {
         UserDTO updateDTO = UserDTO.builder()
-                .userName("user")
+                .userName(regularUserName)
                 .email("user@example.com")
                 .firstName("Updated")
                 .lastName("Name")
@@ -238,7 +241,7 @@ class UserControllerIntegrationTest {
                 .isDeleted(false)
                 .build();
 
-        mockMvc.perform(put("/api/users/" + regularUser.getId())
+        mockMvc.perform(put("/api/v1/users/" + regularUser.getId())
                         .header("Authorization", "Bearer " + userToken)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(updateDTO)))
@@ -248,13 +251,13 @@ class UserControllerIntegrationTest {
     @Test
     void updateUser_NotFound_ReturnsNotFound() throws Exception {
         UserDTO updateDTO = UserDTO.builder()
-                .userName("user")
+                .userName(regularUserName)
                 .email("user@example.com")
                 .firstName("Updated")
                 .lastName("Name")
                 .build();
 
-        mockMvc.perform(put("/api/users/99999")
+        mockMvc.perform(put("/api/v1/users/99999")
                         .header("Authorization", "Bearer " + adminToken)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(updateDTO)))
@@ -263,7 +266,7 @@ class UserControllerIntegrationTest {
 
     @Test
     void deleteUser_AsAdmin_ReturnsNoContent() throws Exception {
-        mockMvc.perform(delete("/api/users/" + regularUser.getId())
+        mockMvc.perform(delete("/api/v1/users/" + regularUser.getId())
                         .header("Authorization", "Bearer " + adminToken))
                 .andExpect(status().isNoContent());
 
@@ -275,7 +278,7 @@ class UserControllerIntegrationTest {
 
     @Test
     void deleteUser_AsRegularUser_ReturnsForbidden() throws Exception {
-        mockMvc.perform(delete("/api/users/" + adminUser.getId())
+        mockMvc.perform(delete("/api/v1/users/" + adminUser.getId())
                         .header("Authorization", "Bearer " + userToken))
                 .andExpect(status().isForbidden());
     }
@@ -286,7 +289,7 @@ class UserControllerIntegrationTest {
         regularUser.setIsActive(false);
         userRepository.save(regularUser);
 
-        mockMvc.perform(put("/api/users/" + regularUser.getId() + "/activate")
+        mockMvc.perform(put("/api/v1/users/" + regularUser.getId() + "/activate")
                         .header("Authorization", "Bearer " + adminToken))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.isActive").value(true));
@@ -294,14 +297,14 @@ class UserControllerIntegrationTest {
 
     @Test
     void activateUser_AsRegularUser_ReturnsForbidden() throws Exception {
-        mockMvc.perform(put("/api/users/" + adminUser.getId() + "/activate")
+        mockMvc.perform(put("/api/v1/users/" + adminUser.getId() + "/activate")
                         .header("Authorization", "Bearer " + userToken))
                 .andExpect(status().isForbidden());
     }
 
     @Test
     void deactivateUser_AsAdmin_ReturnsOk() throws Exception {
-        mockMvc.perform(put("/api/users/" + regularUser.getId() + "/deactivate")
+        mockMvc.perform(put("/api/v1/users/" + regularUser.getId() + "/deactivate")
                         .header("Authorization", "Bearer " + adminToken))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.isActive").value(false));
@@ -309,7 +312,7 @@ class UserControllerIntegrationTest {
 
     @Test
     void deactivateUser_AsRegularUser_ReturnsForbidden() throws Exception {
-        mockMvc.perform(put("/api/users/" + adminUser.getId() + "/deactivate")
+        mockMvc.perform(put("/api/v1/users/" + adminUser.getId() + "/deactivate")
                         .header("Authorization", "Bearer " + userToken))
                 .andExpect(status().isForbidden());
     }
@@ -329,7 +332,7 @@ class UserControllerIntegrationTest {
             userRepository.save(user);
         }
 
-        mockMvc.perform(get("/api/users?page=0&size=3")
+        mockMvc.perform(get("/api/v1/users?page=0&size=3")
                         .header("Authorization", "Bearer " + adminToken))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content", hasSize(3)))

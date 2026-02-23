@@ -49,6 +49,12 @@ class AddressControllerTest {
     @MockBean
     private AddressService addressService;
 
+    @MockBean
+    private org.clickenrent.authservice.service.SecurityService securityService;
+
+    @MockBean(name = "resourceSecurity")
+    private org.clickenrent.authservice.security.ResourceSecurityExpression resourceSecurity;
+
     private AddressDTO addressDTO;
 
     @BeforeEach
@@ -68,7 +74,7 @@ class AddressControllerTest {
         List<AddressDTO> addresses = Arrays.asList(addressDTO);
         when(addressService.getAllAddresses()).thenReturn(addresses);
 
-        mockMvc.perform(get("/api/addresses").with(csrf()))
+        mockMvc.perform(get("/api/v1/addresses").with(csrf()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].id").value(1L))
                 .andExpect(jsonPath("$[0].street").value("Main Street 123"));
@@ -82,7 +88,7 @@ class AddressControllerTest {
         List<AddressDTO> addresses = Arrays.asList(addressDTO);
         when(addressService.getAllAddresses()).thenReturn(addresses);
 
-        mockMvc.perform(get("/api/addresses").with(csrf()))
+        mockMvc.perform(get("/api/v1/addresses").with(csrf()))
                 .andExpect(status().isOk());
 
         verify(addressService, times(1)).getAllAddresses();
@@ -91,7 +97,7 @@ class AddressControllerTest {
     @Test
     @WithMockUser(roles = "CUSTOMER")
     void getAllAddresses_WithCustomerRole_ReturnsForbidden() throws Exception {
-        mockMvc.perform(get("/api/addresses").with(csrf()))
+        mockMvc.perform(get("/api/v1/addresses").with(csrf()))
                 .andExpect(status().isForbidden());
 
         verify(addressService, never()).getAllAddresses();
@@ -102,7 +108,7 @@ class AddressControllerTest {
     void getAddressById_ReturnsOk() throws Exception {
         when(addressService.getAddressById(1L)).thenReturn(addressDTO);
 
-        mockMvc.perform(get("/api/addresses/1").with(csrf()))
+        mockMvc.perform(get("/api/v1/addresses/1").with(csrf()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(1L))
                 .andExpect(jsonPath("$.street").value("Main Street 123"));
@@ -118,7 +124,7 @@ class AddressControllerTest {
 
         when(addressService.createAddress(any(AddressDTO.class))).thenReturn(createdAddress);
 
-        mockMvc.perform(post("/api/addresses")
+        mockMvc.perform(post("/api/v1/addresses")
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(newAddress)))
@@ -136,7 +142,7 @@ class AddressControllerTest {
 
         when(addressService.createAddress(any(AddressDTO.class))).thenReturn(newAddress);
 
-        mockMvc.perform(post("/api/addresses")
+        mockMvc.perform(post("/api/v1/addresses")
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(newAddress)))
@@ -152,7 +158,7 @@ class AddressControllerTest {
 
         when(addressService.updateAddress(eq(1L), any(AddressDTO.class))).thenReturn(updated);
 
-        mockMvc.perform(put("/api/addresses/1")
+        mockMvc.perform(put("/api/v1/addresses/1")
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(addressDTO)))
@@ -167,7 +173,7 @@ class AddressControllerTest {
     void deleteAddress_ReturnsNoContent() throws Exception {
         doNothing().when(addressService).deleteAddress(1L);
 
-        mockMvc.perform(delete("/api/addresses/1").with(csrf()))
+        mockMvc.perform(delete("/api/v1/addresses/1").with(csrf()))
                 .andExpect(status().isNoContent());
 
         verify(addressService, times(1)).deleteAddress(1L);

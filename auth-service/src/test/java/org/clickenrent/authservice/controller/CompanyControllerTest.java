@@ -55,6 +55,12 @@ class CompanyControllerTest {
     @MockBean
     private CompanyService companyService;
 
+    @MockBean
+    private org.clickenrent.authservice.service.SecurityService securityService;
+
+    @MockBean(name = "resourceSecurity")
+    private org.clickenrent.authservice.security.ResourceSecurityExpression resourceSecurity;
+
     private CompanyDTO companyDTO;
 
     @BeforeEach
@@ -79,7 +85,7 @@ class CompanyControllerTest {
         when(companyService.getAllCompanies(any())).thenReturn(page);
 
         // When & Then
-        mockMvc.perform(get("/api/companies")
+        mockMvc.perform(get("/api/v1/companies")
                         .with(csrf())
                         .param("page", "0")
                         .param("size", "20"))
@@ -99,7 +105,7 @@ class CompanyControllerTest {
         when(companyService.getAllCompanies(any())).thenReturn(page);
 
         // When & Then
-        mockMvc.perform(get("/api/companies")
+        mockMvc.perform(get("/api/v1/companies")
                         .with(csrf()))
                 .andExpect(status().isOk());
 
@@ -110,7 +116,7 @@ class CompanyControllerTest {
     @WithMockUser(roles = "B2B")
     void getAllCompanies_WithB2BRole_ReturnsForbidden() throws Exception {
         // When & Then
-        mockMvc.perform(get("/api/companies")
+        mockMvc.perform(get("/api/v1/companies")
                         .with(csrf()))
                 .andExpect(status().isForbidden());
 
@@ -121,7 +127,7 @@ class CompanyControllerTest {
     @WithMockUser(roles = "CUSTOMER")
     void getAllCompanies_WithCustomerRole_ReturnsForbidden() throws Exception {
         // When & Then
-        mockMvc.perform(get("/api/companies")
+        mockMvc.perform(get("/api/v1/companies")
                         .with(csrf()))
                 .andExpect(status().isForbidden());
 
@@ -131,7 +137,7 @@ class CompanyControllerTest {
     @Test
     void getAllCompanies_WithoutAuthentication_ReturnsForbidden() throws Exception {
         // When & Then
-        mockMvc.perform(get("/api/companies")
+        mockMvc.perform(get("/api/v1/companies")
                         .with(csrf()))
                 .andExpect(status().isForbidden());
 
@@ -145,7 +151,7 @@ class CompanyControllerTest {
         when(companyService.getCompanyById(1L)).thenReturn(companyDTO);
 
         // When & Then
-        mockMvc.perform(get("/api/companies/1")
+        mockMvc.perform(get("/api/v1/companies/1")
                         .with(csrf()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(1L))
@@ -162,7 +168,7 @@ class CompanyControllerTest {
         when(companyService.getCompanyById(1L)).thenReturn(companyDTO);
 
         // When & Then
-        mockMvc.perform(get("/api/companies/1")
+        mockMvc.perform(get("/api/v1/companies/1")
                         .with(csrf()))
                 .andExpect(status().isOk());
 
@@ -172,7 +178,7 @@ class CompanyControllerTest {
     @Test
     void getCompanyById_WithoutAuthentication_ReturnsForbidden() throws Exception {
         // When & Then
-        mockMvc.perform(get("/api/companies/1")
+        mockMvc.perform(get("/api/v1/companies/1")
                         .with(csrf()))
                 .andExpect(status().isForbidden());
 
@@ -199,7 +205,7 @@ class CompanyControllerTest {
         when(companyService.createCompany(any(CompanyDTO.class))).thenReturn(createdCompany);
 
         // When & Then
-        mockMvc.perform(post("/api/companies")
+        mockMvc.perform(post("/api/v1/companies")
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(newCompany)))
@@ -222,7 +228,7 @@ class CompanyControllerTest {
         when(companyService.createCompany(any(CompanyDTO.class))).thenReturn(newCompany);
 
         // When & Then
-        mockMvc.perform(post("/api/companies")
+        mockMvc.perform(post("/api/v1/companies")
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(newCompany)))
@@ -241,7 +247,7 @@ class CompanyControllerTest {
                 .build();
 
         // When & Then
-        mockMvc.perform(post("/api/companies")
+        mockMvc.perform(post("/api/v1/companies")
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(newCompany)))
@@ -259,7 +265,7 @@ class CompanyControllerTest {
                 .build();
 
         // When & Then
-        mockMvc.perform(post("/api/companies")
+        mockMvc.perform(post("/api/v1/companies")
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(invalidCompany)))
@@ -282,7 +288,7 @@ class CompanyControllerTest {
         when(companyService.updateCompany(eq(1L), any(CompanyDTO.class))).thenReturn(updatedCompany);
 
         // When & Then
-        mockMvc.perform(put("/api/companies/1")
+        mockMvc.perform(put("/api/v1/companies/1")
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(companyDTO)))
@@ -300,7 +306,7 @@ class CompanyControllerTest {
         when(companyService.updateCompany(eq(1L), any(CompanyDTO.class))).thenReturn(companyDTO);
 
         // When & Then
-        mockMvc.perform(put("/api/companies/1")
+        mockMvc.perform(put("/api/v1/companies/1")
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(companyDTO)))
@@ -313,7 +319,7 @@ class CompanyControllerTest {
     @WithMockUser(roles = "CUSTOMER")
     void updateCompany_WithCustomerRole_ReturnsForbidden() throws Exception {
         // When & Then
-        mockMvc.perform(put("/api/companies/1")
+        mockMvc.perform(put("/api/v1/companies/1")
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(companyDTO)))
@@ -329,7 +335,7 @@ class CompanyControllerTest {
         doNothing().when(companyService).deleteCompany(1L);
 
         // When & Then
-        mockMvc.perform(delete("/api/companies/1")
+        mockMvc.perform(delete("/api/v1/companies/1")
                         .with(csrf()))
                 .andExpect(status().isNoContent());
 
@@ -343,7 +349,7 @@ class CompanyControllerTest {
         doNothing().when(companyService).deleteCompany(1L);
 
         // When & Then
-        mockMvc.perform(delete("/api/companies/1")
+        mockMvc.perform(delete("/api/v1/companies/1")
                         .with(csrf()))
                 .andExpect(status().isNoContent());
 
@@ -354,7 +360,7 @@ class CompanyControllerTest {
     @WithMockUser(roles = "B2B")
     void deleteCompany_WithB2BRole_ReturnsForbidden() throws Exception {
         // When & Then
-        mockMvc.perform(delete("/api/companies/1")
+        mockMvc.perform(delete("/api/v1/companies/1")
                         .with(csrf()))
                 .andExpect(status().isForbidden());
 
@@ -365,7 +371,7 @@ class CompanyControllerTest {
     @WithMockUser(roles = "CUSTOMER")
     void deleteCompany_WithCustomerRole_ReturnsForbidden() throws Exception {
         // When & Then
-        mockMvc.perform(delete("/api/companies/1")
+        mockMvc.perform(delete("/api/v1/companies/1")
                         .with(csrf()))
                 .andExpect(status().isForbidden());
 

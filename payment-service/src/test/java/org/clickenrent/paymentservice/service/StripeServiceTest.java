@@ -120,7 +120,6 @@ class StripeServiceTest {
     void confirmPaymentIntent_WhenNotSucceeded_ConfirmsAndReturnsChargeId() throws StripeException {
         PaymentIntent mockPi = mock(PaymentIntent.class);
         when(mockPi.getStatus()).thenReturn("requires_confirmation");
-        when(mockPi.getLatestCharge()).thenReturn("ch_after_confirm");
 
         PaymentIntent confirmedPi = mock(PaymentIntent.class);
         when(confirmedPi.getLatestCharge()).thenReturn("ch_after_confirm");
@@ -153,7 +152,7 @@ class StripeServiceTest {
 
         try (MockedStatic<PaymentMethod> mockPmStatic = mockStatic(PaymentMethod.class)) {
             mockPmStatic.when(() -> PaymentMethod.retrieve(anyString())).thenReturn(mockPm);
-            doNothing().when(mockPm).attach(any(PaymentMethodAttachParams.class));
+            when(mockPm.attach(any(PaymentMethodAttachParams.class))).thenReturn(mockPm);
 
             String result = stripeService.attachPaymentMethod("pm_test", "cus_test");
 

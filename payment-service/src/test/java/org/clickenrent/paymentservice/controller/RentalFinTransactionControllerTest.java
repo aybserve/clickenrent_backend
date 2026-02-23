@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.clickenrent.paymentservice.dto.FinancialTransactionDTO;
 import org.clickenrent.paymentservice.dto.RentalFinTransactionDTO;
 import org.clickenrent.paymentservice.service.RentalFinTransactionService;
+import org.clickenrent.paymentservice.service.SecurityService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +25,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @WebMvcTest(RentalFinTransactionController.class)
 @AutoConfigureMockMvc
+@org.springframework.context.annotation.Import(org.clickenrent.paymentservice.config.SecurityConfig.class)
+@org.springframework.test.context.TestPropertySource(properties = "jwt.secret=dGVzdC1zZWNyZXQtZm9yLWp3dC10b2tlbi12YWxpZGF0aW9uLW11c3QtYmUtbG9uZy1lbm91Z2g=")
 class RentalFinTransactionControllerTest {
 
     @Autowired
@@ -34,6 +37,9 @@ class RentalFinTransactionControllerTest {
 
     @MockBean
     private RentalFinTransactionService rentalFinTransactionService;
+
+    @MockBean
+    private SecurityService securityService;
 
     private RentalFinTransactionDTO rentalFinTransactionDTO;
 
