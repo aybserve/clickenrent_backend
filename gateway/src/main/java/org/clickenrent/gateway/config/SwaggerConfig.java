@@ -40,7 +40,7 @@ public class SwaggerConfig {
     
     /**
      * Customize OpenAPI to use dynamic server URL based on the request.
-     * This ensures Swagger UI uses the correct host (staging.api.clickenrent.nl)
+     * This ensures Swagger UI uses the correct host (cnr.aybserve.com)
      * instead of hardcoded localhost:8080.
      */
     @Bean

@@ -685,4 +685,4 @@ Copyright © 2024 Click & Rent. All rights reserved.
 
 ## Author
 
-Vitaliy Shvetsov - vitaliy@clickenrent.nl
+Vitaliy Shvetsov - aybserve@gmail.com

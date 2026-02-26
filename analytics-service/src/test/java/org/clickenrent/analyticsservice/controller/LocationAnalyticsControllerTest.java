@@ -1,5 +1,9 @@
 package org.clickenrent.analyticsservice.controller;
 
+import org.clickenrent.analyticsservice.client.AuthServiceClient;
+import org.clickenrent.analyticsservice.client.PaymentServiceClient;
+import org.clickenrent.analyticsservice.client.RentalServiceClient;
+import org.clickenrent.analyticsservice.client.SupportServiceClient;
 import org.clickenrent.analyticsservice.config.SecurityConfig;
 import org.clickenrent.analyticsservice.dto.LocationAnalyticsDTO;
 import org.clickenrent.analyticsservice.dto.LocationSummaryDTO;
@@ -11,6 +15,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -29,9 +34,13 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WebMvcTest(LocationAnalyticsController.class)
 @AutoConfigureMockMvc
 @Import(SecurityConfig.class)
+@ActiveProfiles("test")
 @TestPropertySource(properties = {
         "jwt.secret=dGVzdC1zZWNyZXQta2V5LWZvci10ZXN0aW5nLTI1Ni1iaXQ=",
-        "sentry.dsn="
+        "sentry.dsn=",
+        "eureka.client.enabled=false",
+        "eureka.client.register-with-eureka=false",
+        "eureka.client.fetch-registry=false"
 })
 class LocationAnalyticsControllerTest {
 
@@ -40,6 +49,18 @@ class LocationAnalyticsControllerTest {
 
     @MockBean
     private LocationAnalyticsService locationAnalyticsService;
+
+    @MockBean
+    private AuthServiceClient authServiceClient;
+
+    @MockBean
+    private RentalServiceClient rentalServiceClient;
+
+    @MockBean
+    private PaymentServiceClient paymentServiceClient;
+
+    @MockBean
+    private SupportServiceClient supportServiceClient;
 
     @Test
     @WithMockUser(roles = "ADMIN")

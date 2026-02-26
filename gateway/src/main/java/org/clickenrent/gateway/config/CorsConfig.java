@@ -41,7 +41,6 @@ public class CorsConfig {
         
         // Allow origin patterns for wildcard subdomain support
         corsConfig.setAllowedOriginPatterns(Arrays.asList(
-                "https://*.clickenrent.nl",
                 "https://*.aybserve.com",
                 "https://*.vercel.app",
                 "https://*.readme.io",
@@ -51,7 +50,7 @@ public class CorsConfig {
         ));
         
         log.info("CORS allowed origins: {}", origins);
-        log.info("CORS allowed origin patterns: https://*.clickenrent.nl, https://*.aybserve.com, http://*.aybserve.com, http://localhost:[*]");
+        log.info("CORS allowed origin patterns: https://*.aybserve.com, http://*.aybserve.com, http://localhost:[*]");
         
         // Parse allowed methods from environment variable
         List<String> methods = Arrays.asList(allowedMethods.split(","));
