@@ -51,11 +51,14 @@ class UserPreferenceControllerTest {
     @MockBean
     private org.clickenrent.authservice.service.TokenBlacklistService tokenBlacklistService;
 
-    @MockBean
+    @MockBean(name = "resourceSecurity")
     private org.clickenrent.authservice.security.ResourceSecurityExpression resourceSecurity;
 
     @MockBean
     private UserPreferenceService userPreferenceService;
+
+    @MockBean
+    private org.clickenrent.authservice.service.SecurityService securityService;
 
     private UserPreferenceDTO userPreferenceDTO;
     private UpdateUserPreferenceRequest updateRequest;

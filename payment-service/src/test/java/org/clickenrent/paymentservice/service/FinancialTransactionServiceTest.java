@@ -26,8 +26,8 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
-import static org.mockito.Mockito.lenient;
 
 @ExtendWith(MockitoExtension.class)
 class FinancialTransactionServiceTest {
@@ -46,6 +46,9 @@ class FinancialTransactionServiceTest {
 
     @Mock
     private StripeService stripeService;
+
+    @Mock
+    private PaymentProviderService paymentProviderService;
 
     @InjectMocks
     private FinancialTransactionService financialTransactionService;
@@ -133,14 +136,8 @@ class FinancialTransactionServiceTest {
     @Test
     void findAll_AsNonAdmin_FiltersTransactions() {
         when(securityService.isAdmin()).thenReturn(false);
-        when(securityService.getCurrentUserId()).thenReturn(1L);
-        when(financialTransactionRepository.findAll()).thenReturn(Arrays.asList(testTransaction));
-        when(financialTransactionMapper.toDTOList(anyList())).thenReturn(Arrays.asList(testTransactionDTO));
 
-        List<FinancialTransactionDTO> result = financialTransactionService.findAll();
-
-        assertNotNull(result);
-        verify(financialTransactionRepository, times(1)).findAll();
+        assertThrows(UnauthorizedException.class, () -> financialTransactionService.findAll());
     }
 
     @Test
@@ -206,9 +203,13 @@ class FinancialTransactionServiceTest {
 
     @Test
     void processPayment_Success() {
-        when(stripeService.createPaymentIntent(any(BigDecimal.class), anyString(), any())).thenReturn("pi_test");
-        when(stripeService.confirmPaymentIntent("pi_test")).thenReturn("ch_test");
+        when(paymentProviderService.createPayment(any(BigDecimal.class), anyString(), any(), anyString())).thenReturn("pi_test");
+        when(paymentProviderService.confirmPayment("pi_test")).thenReturn("ch_test");
+        lenient().when(paymentProviderService.isStripeActive()).thenReturn(true);
+        lenient().when(paymentProviderService.isMultiSafepayActive()).thenReturn(false);
+        lenient().when(paymentProviderService.getActiveProvider()).thenReturn("stripe");
         when(paymentStatusRepository.findByCode("SUCCEEDED")).thenReturn(Optional.of(testStatus));
+        lenient().when(paymentStatusRepository.findByCode("FAILED")).thenReturn(Optional.of(testStatus));
         when(financialTransactionMapper.toEntity(any())).thenReturn(testTransaction);
         when(financialTransactionRepository.save(any(FinancialTransaction.class))).thenReturn(testTransaction);
         when(financialTransactionMapper.toDTO(testTransaction)).thenReturn(testTransactionDTO);
@@ -216,7 +217,7 @@ class FinancialTransactionServiceTest {
         FinancialTransactionDTO result = financialTransactionService.processPayment(testTransactionDTO);
 
         assertNotNull(result);
-        verify(stripeService, times(1)).createPaymentIntent(any(BigDecimal.class), anyString(), any());
+        verify(paymentProviderService, times(1)).createPayment(any(BigDecimal.class), anyString(), any(), anyString());
         verify(financialTransactionRepository, times(1)).save(any(FinancialTransaction.class));
     }
 
@@ -225,7 +226,7 @@ class FinancialTransactionServiceTest {
         testTransaction.setStripeChargeId("ch_test");
         
         when(financialTransactionRepository.findById(1L)).thenReturn(Optional.of(testTransaction));
-        when(stripeService.createRefund("ch_test", new BigDecimal("50.00"))).thenReturn("re_test");
+        when(paymentProviderService.createRefund(anyString(), any(BigDecimal.class), anyString(), anyString())).thenReturn("re_test");
         when(paymentStatusRepository.findByCode("PARTIALLY_REFUNDED")).thenReturn(Optional.of(testStatus));
         when(financialTransactionRepository.save(any(FinancialTransaction.class))).thenReturn(testTransaction);
         when(financialTransactionMapper.toDTO(any(FinancialTransaction.class))).thenReturn(testTransactionDTO);
@@ -233,7 +234,7 @@ class FinancialTransactionServiceTest {
         FinancialTransactionDTO result = financialTransactionService.refundTransaction(1L, new BigDecimal("50.00"));
 
         assertNotNull(result);
-        verify(stripeService, times(1)).createRefund("ch_test", new BigDecimal("50.00"));
+        verify(paymentProviderService, times(1)).createRefund(eq("ch_test"), eq(new BigDecimal("50.00")), anyString(), anyString());
         verify(financialTransactionRepository, times(2)).save(any(FinancialTransaction.class));
     }
 

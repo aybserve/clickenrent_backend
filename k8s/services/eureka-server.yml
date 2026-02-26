@@ -1,0 +1,85 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: eureka-server
+  namespace: clickenrent
+  labels:
+    app: eureka-server
+spec:
+  type: ClusterIP
+  ports:
+    - port: 8761
+      targetPort: 8761
+      protocol: TCP
+      name: http
+  selector:
+    app: eureka-server
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: eureka-server
+  namespace: clickenrent
+  labels:
+    app: eureka-server
+spec:
+  replicas: 1
+  progressDeadlineSeconds: 1200
+  selector:
+    matchLabels:
+      app: eureka-server
+  template:
+    metadata:
+      labels:
+        app: eureka-server
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/path: "/actuator/prometheus"
+        prometheus.io/port: "8761"
+    spec:
+      imagePullSecrets:
+      - name: ghcr-secret
+      containers:
+      - name: eureka-server
+        image: ghcr.io/aybserve/clickenrent_backend/eureka-server:latest
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8761
+          name: http
+        env:
+        - name: SPRING_PROFILES_ACTIVE
+          valueFrom:
+            configMapKeyRef:
+              name: app-config
+              key: SPRING_PROFILES_ACTIVE
+        resources:
+          requests:
+            memory: "512Mi"
+            cpu: "250m"
+          limits:
+            memory: "1Gi"
+            cpu: "500m"
+        startupProbe:
+          httpGet:
+            path: /actuator/health
+            port: 8761
+          initialDelaySeconds: 20
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 24
+        livenessProbe:
+          httpGet:
+            path: /actuator/health
+            port: 8761
+          initialDelaySeconds: 0
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+        readinessProbe:
+          httpGet:
+            path: /actuator/health
+            port: 8761
+          initialDelaySeconds: 0
+          periodSeconds: 5
+          timeoutSeconds: 3
+          failureThreshold: 3

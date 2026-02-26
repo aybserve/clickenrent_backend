@@ -105,9 +105,9 @@ ON CONFLICT (id) DO NOTHING;
 
 -- Lock Status
 INSERT INTO lock_status (id, external_id, name, date_created, last_date_modified, created_by, last_modified_by, is_deleted) VALUES
-(1, '550e8400-e29b-41d4-a716-446655440121', 'Locked', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
-(2, '550e8400-e29b-41d4-a716-446655440122', 'Unlocked', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
-(3, '550e8400-e29b-41d4-a716-446655440123', 'Unknown', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false)
+(1, '550e8400-e29b-41d4-a716-446655440121', 'locked', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(2, '550e8400-e29b-41d4-a716-446655440122', 'unlocked', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
+(3, '550e8400-e29b-41d4-a716-446655440123', 'unknown', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false)
 ON CONFLICT (id) DO NOTHING;
 
 -- Lock Provider

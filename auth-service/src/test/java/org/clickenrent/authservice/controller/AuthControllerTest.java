@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.clickenrent.authservice.dto.*;
 import org.clickenrent.authservice.config.SecurityConfig;
 import org.clickenrent.authservice.service.AuthService;
-import org.clickenrent.authservice.config.SecurityConfig;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,6 +52,15 @@ class AuthControllerTest {
 
     @MockBean
     private AuthService authService;
+
+    @MockBean
+    private org.clickenrent.authservice.service.EmailVerificationService emailVerificationService;
+
+    @MockBean
+    private org.clickenrent.authservice.service.PasswordResetService passwordResetService;
+
+    @MockBean
+    private org.clickenrent.authservice.service.SecurityService securityService;
 
     private RegisterRequest registerRequest;
     private AdminRegisterRequest adminRegisterRequest;
@@ -112,7 +120,7 @@ class AuthControllerTest {
         when(authService.register(any(RegisterRequest.class))).thenReturn(authResponse);
 
         // When & Then
-        mockMvc.perform(post("/api/auth/register")
+        mockMvc.perform(post("/api/v1/auth/register")
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(registerRequest)))
@@ -136,7 +144,7 @@ class AuthControllerTest {
                 .build();
 
         // When & Then
-        mockMvc.perform(post("/api/auth/register")
+        mockMvc.perform(post("/api/v1/auth/register")
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(invalidRequest)))
@@ -152,7 +160,7 @@ class AuthControllerTest {
         when(authService.registerAdmin(any(AdminRegisterRequest.class))).thenReturn(userDTO);
 
         // When & Then
-        mockMvc.perform(post("/api/auth/register-admin")
+        mockMvc.perform(post("/api/v1/auth/register-admin")
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(adminRegisterRequest)))
@@ -168,7 +176,7 @@ class AuthControllerTest {
     @WithMockUser(roles = "ADMIN")
     void registerAdmin_WithAdminRole_ReturnsForbidden() throws Exception {
         // When & Then
-        mockMvc.perform(post("/api/auth/register-admin")
+        mockMvc.perform(post("/api/v1/auth/register-admin")
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(adminRegisterRequest)))
@@ -180,7 +188,7 @@ class AuthControllerTest {
     @Test
     void registerAdmin_WithoutAuthentication_ReturnsForbidden() throws Exception {
         // When & Then
-        mockMvc.perform(post("/api/auth/register-admin")
+        mockMvc.perform(post("/api/v1/auth/register-admin")
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(adminRegisterRequest)))
@@ -195,7 +203,7 @@ class AuthControllerTest {
         when(authService.login(any(LoginRequest.class))).thenReturn(authResponse);
 
         // When & Then
-        mockMvc.perform(post("/api/auth/login")
+        mockMvc.perform(post("/api/v1/auth/login")
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(loginRequest)))
@@ -215,7 +223,7 @@ class AuthControllerTest {
                 .build();
 
         // When & Then
-        mockMvc.perform(post("/api/auth/login")
+        mockMvc.perform(post("/api/v1/auth/login")
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(invalidRequest)))
@@ -230,7 +238,7 @@ class AuthControllerTest {
         when(authService.refreshToken(any(RefreshTokenRequest.class))).thenReturn(authResponse);
 
         // When & Then
-        mockMvc.perform(post("/api/auth/refresh")
+        mockMvc.perform(post("/api/v1/auth/refresh")
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(refreshTokenRequest)))
@@ -247,7 +255,7 @@ class AuthControllerTest {
         RefreshTokenRequest invalidRequest = new RefreshTokenRequest(null);
 
         // When & Then
-        mockMvc.perform(post("/api/auth/refresh")
+        mockMvc.perform(post("/api/v1/auth/refresh")
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(invalidRequest)))
@@ -263,7 +271,7 @@ class AuthControllerTest {
         when(authService.getCurrentUser(anyString())).thenReturn(userDTO);
 
         // When & Then
-        mockMvc.perform(get("/api/auth/me")
+        mockMvc.perform(get("/api/v1/auth/me")
                         .with(csrf()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.userName").value("testuser"))
@@ -275,7 +283,7 @@ class AuthControllerTest {
     @Test
     void getCurrentUser_WithoutAuthentication_ReturnsForbidden() throws Exception {
         // When & Then
-        mockMvc.perform(get("/api/auth/me")
+        mockMvc.perform(get("/api/v1/auth/me")
                         .with(csrf()))
                 .andExpect(status().isForbidden());
 
@@ -289,7 +297,7 @@ class AuthControllerTest {
         doNothing().when(authService).logout(anyString());
 
         // When & Then
-        mockMvc.perform(post("/api/auth/logout")
+        mockMvc.perform(post("/api/v1/auth/logout")
                         .with(csrf())
                         .header("Authorization", "Bearer testAccessToken"))
                 .andExpect(status().isNoContent());
@@ -301,7 +309,7 @@ class AuthControllerTest {
     @WithMockUser(username = "testuser")
     void logout_WithoutAuthorizationHeader_ReturnsNoContent() throws Exception {
         // When & Then
-        mockMvc.perform(post("/api/auth/logout")
+        mockMvc.perform(post("/api/v1/auth/logout")
                         .with(csrf()))
                 .andExpect(status().isNoContent());
 
@@ -311,7 +319,7 @@ class AuthControllerTest {
     @Test
     void logout_WithoutAuthentication_ReturnsForbidden() throws Exception {
         // When & Then
-        mockMvc.perform(post("/api/auth/logout")
+        mockMvc.perform(post("/api/v1/auth/logout")
                         .with(csrf()))
                 .andExpect(status().isForbidden());
 

@@ -51,6 +51,12 @@ class InvitationControllerTest {
     @MockBean
     private InvitationService invitationService;
 
+    @MockBean
+    private org.clickenrent.authservice.service.SecurityService securityService;
+
+    @MockBean(name = "resourceSecurity")
+    private org.clickenrent.authservice.security.ResourceSecurityExpression resourceSecurity;
+
     private InvitationDTO invitationDTO;
     private CreateInvitationRequest createRequest;
     private CompleteInvitationRequest completeRequest;
@@ -98,7 +104,7 @@ class InvitationControllerTest {
     void createInvitation_WithSuperadminRole_ReturnsCreated() throws Exception {
         when(invitationService.createInvitation(any(CreateInvitationRequest.class))).thenReturn(invitationDTO);
 
-        mockMvc.perform(post("/api/invitations")
+        mockMvc.perform(post("/api/v1/invitations")
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(createRequest)))
@@ -114,7 +120,7 @@ class InvitationControllerTest {
     void createInvitation_WithB2BRole_ReturnsCreated() throws Exception {
         when(invitationService.createInvitation(any(CreateInvitationRequest.class))).thenReturn(invitationDTO);
 
-        mockMvc.perform(post("/api/invitations")
+        mockMvc.perform(post("/api/v1/invitations")
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(createRequest)))
@@ -126,7 +132,7 @@ class InvitationControllerTest {
     @Test
     @WithMockUser(roles = "CUSTOMER")
     void createInvitation_WithCustomerRole_ReturnsForbidden() throws Exception {
-        mockMvc.perform(post("/api/invitations")
+        mockMvc.perform(post("/api/v1/invitations")
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(createRequest)))
@@ -139,7 +145,7 @@ class InvitationControllerTest {
     void validateToken_WithValidToken_ReturnsOk() throws Exception {
         when(invitationService.validateToken("invitation-token-123")).thenReturn(invitationDTO);
 
-        mockMvc.perform(get("/api/invitations/validate/invitation-token-123")
+        mockMvc.perform(get("/api/v1/invitations/validate/invitation-token-123")
                         .with(csrf()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.token").value("invitation-token-123"))
@@ -153,7 +159,7 @@ class InvitationControllerTest {
         when(invitationService.validateToken(anyString())).thenReturn(invitationDTO);
 
         // Should work without authentication
-        mockMvc.perform(get("/api/invitations/validate/some-token")
+        mockMvc.perform(get("/api/v1/invitations/validate/some-token")
                         .with(csrf()))
                 .andExpect(status().isOk());
 
@@ -164,7 +170,7 @@ class InvitationControllerTest {
     void completeInvitation_WithValidRequest_ReturnsCreated() throws Exception {
         when(invitationService.completeInvitation(any(CompleteInvitationRequest.class))).thenReturn(authResponse);
 
-        mockMvc.perform(post("/api/invitations/complete")
+        mockMvc.perform(post("/api/v1/invitations/complete")
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(completeRequest)))
@@ -180,7 +186,7 @@ class InvitationControllerTest {
         when(invitationService.completeInvitation(any(CompleteInvitationRequest.class))).thenReturn(authResponse);
 
         // Should work without authentication
-        mockMvc.perform(post("/api/invitations/complete")
+        mockMvc.perform(post("/api/v1/invitations/complete")
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(completeRequest)))
@@ -195,7 +201,7 @@ class InvitationControllerTest {
         List<InvitationDTO> invitations = Arrays.asList(invitationDTO);
         when(invitationService.getAllInvitations()).thenReturn(invitations);
 
-        mockMvc.perform(get("/api/invitations")
+        mockMvc.perform(get("/api/v1/invitations")
                         .with(csrf()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].id").value(1L))
@@ -210,7 +216,7 @@ class InvitationControllerTest {
         List<InvitationDTO> invitations = Arrays.asList(invitationDTO);
         when(invitationService.getAllInvitations()).thenReturn(invitations);
 
-        mockMvc.perform(get("/api/invitations")
+        mockMvc.perform(get("/api/v1/invitations")
                         .with(csrf()))
                 .andExpect(status().isOk());
 
@@ -220,7 +226,7 @@ class InvitationControllerTest {
     @Test
     @WithMockUser(roles = "CUSTOMER")
     void getAllInvitations_WithCustomerRole_ReturnsForbidden() throws Exception {
-        mockMvc.perform(get("/api/invitations")
+        mockMvc.perform(get("/api/v1/invitations")
                         .with(csrf()))
                 .andExpect(status().isForbidden());
 
@@ -232,7 +238,7 @@ class InvitationControllerTest {
     void cancelInvitation_WithSuperadminRole_ReturnsNoContent() throws Exception {
         doNothing().when(invitationService).cancelInvitation(1L);
 
-        mockMvc.perform(delete("/api/invitations/1")
+        mockMvc.perform(delete("/api/v1/invitations/1")
                         .with(csrf()))
                 .andExpect(status().isNoContent());
 
@@ -244,7 +250,7 @@ class InvitationControllerTest {
     void cancelInvitation_WithB2BRole_ReturnsNoContent() throws Exception {
         doNothing().when(invitationService).cancelInvitation(1L);
 
-        mockMvc.perform(delete("/api/invitations/1")
+        mockMvc.perform(delete("/api/v1/invitations/1")
                         .with(csrf()))
                 .andExpect(status().isNoContent());
 
@@ -254,7 +260,7 @@ class InvitationControllerTest {
     @Test
     @WithMockUser(roles = "CUSTOMER")
     void cancelInvitation_WithCustomerRole_ReturnsForbidden() throws Exception {
-        mockMvc.perform(delete("/api/invitations/1")
+        mockMvc.perform(delete("/api/v1/invitations/1")
                         .with(csrf()))
                 .andExpect(status().isForbidden());
 

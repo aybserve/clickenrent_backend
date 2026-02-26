@@ -28,9 +28,19 @@ public class BicValidator {
         // Remove spaces and convert to uppercase
         String cleanBic = bic.replaceAll("\\s+", "").toUpperCase();
         
+        // Only letters and digits allowed
+        if (!cleanBic.matches("^[A-Z0-9]+$")) {
+            throw new InvalidBicException(bic, "BIC must contain only letters and digits");
+        }
+        
         // BIC must be 8 or 11 characters
         if (cleanBic.length() != 8 && cleanBic.length() != 11) {
             throw new InvalidBicException(bic, "BIC must be 8 or 11 characters long");
+        }
+        
+        // First 4 characters must be letters (bank code)
+        if (!cleanBic.substring(0, 4).matches("^[A-Z]{4}$")) {
+            throw new InvalidBicException(bic, "Invalid BIC format. Bank code must be 4 letters");
         }
         
         // Validate format

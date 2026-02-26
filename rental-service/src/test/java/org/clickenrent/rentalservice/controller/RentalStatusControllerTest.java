@@ -23,7 +23,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @WebMvcTest(RentalStatusController.class)
 @AutoConfigureMockMvc
-class RentalStatusControllerTest {
+class RentalStatusControllerTest extends BaseWebMvcTest {
 
     @Autowired
     private MockMvc mockMvc;

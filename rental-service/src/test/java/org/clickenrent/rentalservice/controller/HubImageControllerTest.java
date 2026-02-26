@@ -23,7 +23,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @WebMvcTest(HubImageController.class)
 @AutoConfigureMockMvc
-class HubImageControllerTest {
+class HubImageControllerTest extends BaseWebMvcTest {
 
     @Autowired
     private MockMvc mockMvc;

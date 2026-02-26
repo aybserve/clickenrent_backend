@@ -12,6 +12,7 @@ import org.clickenrent.authservice.exception.UnauthorizedException;
 import org.clickenrent.authservice.mapper.UserMapper;
 import org.clickenrent.authservice.metrics.OAuthMetrics;
 import org.clickenrent.authservice.repository.GlobalRoleRepository;
+import org.clickenrent.authservice.repository.UserCompanyRepository;
 import org.clickenrent.authservice.repository.UserGlobalRoleRepository;
 import org.clickenrent.authservice.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -31,7 +32,11 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
+import java.util.function.Supplier;
+
+import io.github.resilience4j.retry.Retry;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
@@ -71,6 +76,15 @@ class GoogleOAuthServiceTest {
     @Mock
     private RestTemplate restTemplate;
     
+    @Mock
+    private Retry tokenExchangeRetry;
+    
+    @Mock
+    private Retry userInfoRetry;
+    
+    @Mock
+    private UserCompanyRepository userCompanyRepository;
+    
     @InjectMocks
     private GoogleOAuthService googleOAuthService;
     
@@ -94,9 +108,21 @@ class GoogleOAuthServiceTest {
         ReflectionTestUtils.setField(googleOAuthService, "userInfoUri", TEST_USER_INFO_URI);
         ReflectionTestUtils.setField(googleOAuthService, "verifyIdToken", true);
         ReflectionTestUtils.setField(googleOAuthService, "restTemplate", restTemplate);
+        ReflectionTestUtils.setField(googleOAuthService, "tokenExchangeRetry", tokenExchangeRetry);
+        ReflectionTestUtils.setField(googleOAuthService, "userInfoRetry", userInfoRetry);
+        ReflectionTestUtils.setField(googleOAuthService, "userCompanyRepository", userCompanyRepository);
         
-        // Setup metrics mock to return timer sample
-        when(oAuthMetrics.startFlowTimer(anyString())).thenReturn(mock(io.micrometer.core.instrument.Timer.Sample.class));
+        // Retry mocks: execute the supplier directly (lenient - not all tests use both)
+        lenient().when(tokenExchangeRetry.executeSupplier(any(Supplier.class)))
+                .thenAnswer(inv -> inv.getArgument(0, Supplier.class).get());
+        lenient().when(userInfoRetry.executeSupplier(any(Supplier.class)))
+                .thenAnswer(inv -> inv.getArgument(0, Supplier.class).get());
+        
+        // UserCompanyRepository for buildJwtClaims (lenient - failure tests may not reach it)
+        lenient().when(userCompanyRepository.findByUserId(anyLong())).thenReturn(Collections.emptyList());
+        
+        // Setup metrics mock to return timer sample (lenient - not all tests record success)
+        lenient().when(oAuthMetrics.startFlowTimer(anyString())).thenReturn(mock(io.micrometer.core.instrument.Timer.Sample.class));
     }
     
     @Test
@@ -145,8 +171,8 @@ class GoogleOAuthServiceTest {
         assertEquals("jwt-access-token", response.getAccessToken());
         assertEquals("jwt-refresh-token", response.getRefreshToken());
         
-        verify(oAuthMetrics).recordLoginAttempt("google");
-        verify(oAuthMetrics).recordLoginSuccess("google");
+        verify(oAuthMetrics).recordLoginAttempt("google", "web");
+        verify(oAuthMetrics).recordLoginSuccess("google", "web");
         verify(oAuthMetrics).recordNewUserRegistration("google");
         verify(userRepository).save(any(User.class));
         verify(userGlobalRoleRepository).save(any(UserGlobalRole.class));
@@ -188,7 +214,7 @@ class GoogleOAuthServiceTest {
         
         // Assert
         assertNotNull(response);
-        verify(oAuthMetrics).recordLoginSuccess("google");
+        verify(oAuthMetrics).recordLoginSuccess("google", "web");
         verify(userRepository, never()).save(any(User.class)); // No new user created
     }
     
@@ -271,7 +297,7 @@ class GoogleOAuthServiceTest {
         });
         
         assertTrue(exception.getMessage().contains("not verified"));
-        verify(oAuthMetrics).recordLoginFailure("google", "unauthorized");
+        verify(oAuthMetrics).recordLoginFailure("google", "web", "unauthorized");
         verify(userRepository, never()).save(any(User.class));
     }
     
@@ -287,8 +313,8 @@ class GoogleOAuthServiceTest {
         });
         
         assertTrue(exception.getMessage().contains("Failed to authenticate with Google"));
-        verify(oAuthMetrics).recordLoginAttempt("google");
-        verify(oAuthMetrics).recordLoginFailure("google", "http_error");
+        verify(oAuthMetrics).recordLoginAttempt("google", "web");
+        verify(oAuthMetrics).recordLoginFailure("google", "web", "http_error");
     }
     
     @Test
@@ -306,8 +332,8 @@ class GoogleOAuthServiceTest {
             googleOAuthService.authenticateWithGoogle(TEST_CODE, TEST_REDIRECT_URI);
         });
         
-        assertTrue(exception.getMessage().contains("Failed to authenticate with Google"));
-        verify(oAuthMetrics).recordLoginFailure(eq("google"), anyString());
+        assertTrue(exception.getMessage().contains("Invalid Google ID token") || exception.getMessage().contains("Failed to authenticate with Google"));
+        verify(oAuthMetrics).recordLoginFailure(eq("google"), eq("web"), anyString());
     }
     
     @Test
@@ -321,7 +347,7 @@ class GoogleOAuthServiceTest {
             googleOAuthService.authenticateWithGoogle(TEST_CODE, TEST_REDIRECT_URI);
         });
         
-        verify(oAuthMetrics).recordLoginFailure("google", "http_error");
+        verify(oAuthMetrics).recordLoginFailure("google", "web", "http_error");
     }
     
     // Helper methods

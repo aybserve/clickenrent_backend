@@ -23,7 +23,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @WebMvcTest(LocationImageController.class)
 @AutoConfigureMockMvc
-class LocationImageControllerTest {
+class LocationImageControllerTest extends BaseWebMvcTest {
 
     @Autowired
     private MockMvc mockMvc;

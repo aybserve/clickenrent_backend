@@ -4,9 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.clickenrent.authservice.dto.CreateUserRequest;
 import org.clickenrent.authservice.config.SecurityConfig;
 import org.clickenrent.authservice.dto.UserDTO;
-import org.clickenrent.authservice.config.SecurityConfig;
 import org.clickenrent.authservice.service.UserService;
-import org.clickenrent.authservice.config.SecurityConfig;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -58,6 +56,15 @@ class UserControllerTest {
     @MockBean
     private UserService userService;
 
+    @MockBean
+    private org.clickenrent.authservice.service.UserStatisticsService userStatisticsService;
+
+    @MockBean
+    private org.clickenrent.authservice.service.SecurityService securityService;
+
+    @MockBean(name = "resourceSecurity")
+    private org.clickenrent.authservice.security.ResourceSecurityExpression resourceSecurity;
+
     private UserDTO userDTO;
     private CreateUserRequest createUserRequest;
 
@@ -95,7 +102,7 @@ class UserControllerTest {
         when(userService.getAllUsers(any(PageRequest.class))).thenReturn(page);
 
         // When & Then
-        mockMvc.perform(get("/api/users")
+        mockMvc.perform(get("/api/v1/users")
                         .with(csrf())
                         .param("page", "0")
                         .param("size", "20"))
@@ -115,7 +122,7 @@ class UserControllerTest {
         when(userService.getAllUsers(any())).thenReturn(page);
 
         // When & Then
-        mockMvc.perform(get("/api/users")
+        mockMvc.perform(get("/api/v1/users")
                         .with(csrf()))
                 .andExpect(status().isOk());
 
@@ -126,7 +133,7 @@ class UserControllerTest {
     @WithMockUser(roles = "CUSTOMER")
     void getAllUsers_WithCustomerRole_ReturnsForbidden() throws Exception {
         // When & Then
-        mockMvc.perform(get("/api/users")
+        mockMvc.perform(get("/api/v1/users")
                         .with(csrf()))
                 .andExpect(status().isForbidden());
 
@@ -140,7 +147,7 @@ class UserControllerTest {
         when(userService.getUserById(1L)).thenReturn(userDTO);
 
         // When & Then
-        mockMvc.perform(get("/api/users/1")
+        mockMvc.perform(get("/api/v1/users/1")
                         .with(csrf()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(1L))
@@ -157,7 +164,7 @@ class UserControllerTest {
         when(userService.getUserById(1L)).thenReturn(userDTO);
 
         // When & Then
-        mockMvc.perform(get("/api/users/1")
+        mockMvc.perform(get("/api/v1/users/1")
                         .with(csrf()))
                 .andExpect(status().isOk());
 
@@ -167,7 +174,7 @@ class UserControllerTest {
     @Test
     void getUserById_WithoutAuthentication_ReturnsForbidden() throws Exception {
         // When & Then
-        mockMvc.perform(get("/api/users/1")
+        mockMvc.perform(get("/api/v1/users/1")
                         .with(csrf()))
                 .andExpect(status().isForbidden());
 
@@ -178,16 +185,16 @@ class UserControllerTest {
     @WithMockUser(roles = "SUPERADMIN")
     void getUserByExternalId_ReturnsOk() throws Exception {
         // Given
-        when(userService.getUserByExternalId("ext-123")).thenReturn(userDTO);
+        when(userService.findByExternalId("ext-123")).thenReturn(userDTO);
 
         // When & Then
-        mockMvc.perform(get("/api/users/external/ext-123")
+        mockMvc.perform(get("/api/v1/users/external/ext-123")
                         .with(csrf()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.externalId").value("ext-123"))
                 .andExpect(jsonPath("$.userName").value("testuser"));
 
-        verify(userService, times(1)).getUserByExternalId("ext-123");
+        verify(userService, times(1)).findByExternalId("ext-123");
     }
 
     @Test
@@ -206,7 +213,7 @@ class UserControllerTest {
         when(userService.createUser(any(UserDTO.class), anyString())).thenReturn(createdUser);
 
         // When & Then
-        mockMvc.perform(post("/api/users")
+        mockMvc.perform(post("/api/v1/users")
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(createUserRequest)))
@@ -231,7 +238,7 @@ class UserControllerTest {
         when(userService.createUser(any(UserDTO.class), anyString())).thenReturn(createdUser);
 
         // When & Then
-        mockMvc.perform(post("/api/users")
+        mockMvc.perform(post("/api/v1/users")
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(createUserRequest)))
@@ -253,7 +260,7 @@ class UserControllerTest {
         when(userService.createUser(any(UserDTO.class), anyString())).thenReturn(createdUser);
 
         // When & Then
-        mockMvc.perform(post("/api/users")
+        mockMvc.perform(post("/api/v1/users")
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(createUserRequest)))
@@ -273,7 +280,7 @@ class UserControllerTest {
                 .build();
 
         // When & Then
-        mockMvc.perform(post("/api/users")
+        mockMvc.perform(post("/api/v1/users")
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(invalidRequest)))
@@ -298,7 +305,7 @@ class UserControllerTest {
         when(userService.updateUser(eq(1L), any(UserDTO.class))).thenReturn(updatedUser);
 
         // When & Then
-        mockMvc.perform(put("/api/users/1")
+        mockMvc.perform(put("/api/v1/users/1")
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(userDTO)))
@@ -316,7 +323,7 @@ class UserControllerTest {
         when(userService.updateUser(eq(1L), any(UserDTO.class))).thenReturn(userDTO);
 
         // When & Then
-        mockMvc.perform(put("/api/users/1")
+        mockMvc.perform(put("/api/v1/users/1")
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(userDTO)))
@@ -329,7 +336,7 @@ class UserControllerTest {
     @WithMockUser(roles = "CUSTOMER")
     void updateUser_WithCustomerRole_ReturnsForbidden() throws Exception {
         // When & Then
-        mockMvc.perform(put("/api/users/1")
+        mockMvc.perform(put("/api/v1/users/1")
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(userDTO)))
@@ -345,7 +352,7 @@ class UserControllerTest {
         doNothing().when(userService).deleteUser(1L);
 
         // When & Then
-        mockMvc.perform(delete("/api/users/1")
+        mockMvc.perform(delete("/api/v1/users/1")
                         .with(csrf()))
                 .andExpect(status().isNoContent());
 
@@ -359,7 +366,7 @@ class UserControllerTest {
         doNothing().when(userService).deleteUser(1L);
 
         // When & Then
-        mockMvc.perform(delete("/api/users/1")
+        mockMvc.perform(delete("/api/v1/users/1")
                         .with(csrf()))
                 .andExpect(status().isNoContent());
 
@@ -370,7 +377,7 @@ class UserControllerTest {
     @WithMockUser(roles = "CUSTOMER")
     void deleteUser_WithCustomerRole_ReturnsForbidden() throws Exception {
         // When & Then
-        mockMvc.perform(delete("/api/users/1")
+        mockMvc.perform(delete("/api/v1/users/1")
                         .with(csrf()))
                 .andExpect(status().isForbidden());
 
@@ -391,7 +398,7 @@ class UserControllerTest {
         when(userService.activateUser(1L)).thenReturn(activatedUser);
 
         // When & Then
-        mockMvc.perform(put("/api/users/1/activate")
+        mockMvc.perform(put("/api/v1/users/1/activate")
                         .with(csrf()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.isActive").value(true));
@@ -406,7 +413,7 @@ class UserControllerTest {
         when(userService.activateUser(1L)).thenReturn(userDTO);
 
         // When & Then
-        mockMvc.perform(put("/api/users/1/activate")
+        mockMvc.perform(put("/api/v1/users/1/activate")
                         .with(csrf()))
                 .andExpect(status().isOk());
 
@@ -417,7 +424,7 @@ class UserControllerTest {
     @WithMockUser(roles = "B2B")
     void activateUser_WithB2BRole_ReturnsForbidden() throws Exception {
         // When & Then
-        mockMvc.perform(put("/api/users/1/activate")
+        mockMvc.perform(put("/api/v1/users/1/activate")
                         .with(csrf()))
                 .andExpect(status().isForbidden());
 
@@ -438,7 +445,7 @@ class UserControllerTest {
         when(userService.deactivateUser(1L)).thenReturn(deactivatedUser);
 
         // When & Then
-        mockMvc.perform(put("/api/users/1/deactivate")
+        mockMvc.perform(put("/api/v1/users/1/deactivate")
                         .with(csrf()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.isActive").value(false));
@@ -453,7 +460,7 @@ class UserControllerTest {
         when(userService.deactivateUser(1L)).thenReturn(userDTO);
 
         // When & Then
-        mockMvc.perform(put("/api/users/1/deactivate")
+        mockMvc.perform(put("/api/v1/users/1/deactivate")
                         .with(csrf()))
                 .andExpect(status().isOk());
 
@@ -464,7 +471,7 @@ class UserControllerTest {
     @WithMockUser(roles = "CUSTOMER")
     void deactivateUser_WithCustomerRole_ReturnsForbidden() throws Exception {
         // When & Then
-        mockMvc.perform(put("/api/users/1/deactivate")
+        mockMvc.perform(put("/api/v1/users/1/deactivate")
                         .with(csrf()))
                 .andExpect(status().isForbidden());
 

@@ -51,6 +51,12 @@ class CompanyTypeControllerTest {
     @MockBean
     private CompanyTypeService companyTypeService;
 
+    @MockBean
+    private org.clickenrent.authservice.service.SecurityService securityService;
+
+    @MockBean(name = "resourceSecurity")
+    private org.clickenrent.authservice.security.ResourceSecurityExpression resourceSecurity;
+
     private CompanyTypeDTO companyTypeDTO;
 
     @BeforeEach
@@ -67,7 +73,7 @@ class CompanyTypeControllerTest {
         List<CompanyTypeDTO> types = Arrays.asList(companyTypeDTO);
         when(companyTypeService.getAllCompanyTypes()).thenReturn(types);
 
-        mockMvc.perform(get("/api/company-types").with(csrf()))
+        mockMvc.perform(get("/api/v1/company-types").with(csrf()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].id").value(1L))
                 .andExpect(jsonPath("$[0].name").value("Hotel"));
@@ -81,7 +87,7 @@ class CompanyTypeControllerTest {
         List<CompanyTypeDTO> types = Arrays.asList(companyTypeDTO);
         when(companyTypeService.getAllCompanyTypes()).thenReturn(types);
 
-        mockMvc.perform(get("/api/company-types").with(csrf()))
+        mockMvc.perform(get("/api/v1/company-types").with(csrf()))
                 .andExpect(status().isOk());
 
         verify(companyTypeService, times(1)).getAllCompanyTypes();
@@ -90,7 +96,7 @@ class CompanyTypeControllerTest {
     @Test
     @WithMockUser(roles = "CUSTOMER")
     void getAllCompanyTypes_WithCustomerRole_ReturnsForbidden() throws Exception {
-        mockMvc.perform(get("/api/company-types").with(csrf()))
+        mockMvc.perform(get("/api/v1/company-types").with(csrf()))
                 .andExpect(status().isForbidden());
 
         verify(companyTypeService, never()).getAllCompanyTypes();
@@ -101,7 +107,7 @@ class CompanyTypeControllerTest {
     void getCompanyTypeById_ReturnsOk() throws Exception {
         when(companyTypeService.getCompanyTypeById(1L)).thenReturn(companyTypeDTO);
 
-        mockMvc.perform(get("/api/company-types/1").with(csrf()))
+        mockMvc.perform(get("/api/v1/company-types/1").with(csrf()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(1L))
                 .andExpect(jsonPath("$.name").value("Hotel"));
@@ -117,7 +123,7 @@ class CompanyTypeControllerTest {
 
         when(companyTypeService.createCompanyType(any(CompanyTypeDTO.class))).thenReturn(createdType);
 
-        mockMvc.perform(post("/api/company-types")
+        mockMvc.perform(post("/api/v1/company-types")
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(newType)))
@@ -135,7 +141,7 @@ class CompanyTypeControllerTest {
 
         when(companyTypeService.updateCompanyType(eq(1L), any(CompanyTypeDTO.class))).thenReturn(updated);
 
-        mockMvc.perform(put("/api/company-types/1")
+        mockMvc.perform(put("/api/v1/company-types/1")
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(companyTypeDTO)))
@@ -150,7 +156,7 @@ class CompanyTypeControllerTest {
     void deleteCompanyType_ReturnsNoContent() throws Exception {
         doNothing().when(companyTypeService).deleteCompanyType(1L);
 
-        mockMvc.perform(delete("/api/company-types/1").with(csrf()))
+        mockMvc.perform(delete("/api/v1/company-types/1").with(csrf()))
                 .andExpect(status().isNoContent());
 
         verify(companyTypeService, times(1)).deleteCompanyType(1L);

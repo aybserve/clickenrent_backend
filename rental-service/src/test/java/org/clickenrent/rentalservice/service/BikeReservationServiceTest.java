@@ -184,7 +184,7 @@ class BikeReservationServiceTest {
     @Test
     void createReservation_Success() {
         // Arrange
-        when(securityService.hasAccessToUser(anyLong())).thenReturn(true);
+        when(securityService.hasAccessToUserByExternalId("usr-ext-00001")).thenReturn(true);
         when(bikeRepository.findById(1L)).thenReturn(Optional.of(testBike));
         when(bikeReservationMapper.toEntity(testReservationDTO)).thenReturn(testReservation);
         when(bikeReservationRepository.save(any(BikeReservation.class))).thenReturn(testReservation);
@@ -228,7 +228,7 @@ class BikeReservationServiceTest {
         // Arrange
         when(bikeReservationRepository.findById(1L)).thenReturn(Optional.of(testReservation));
         when(securityService.isAdmin()).thenReturn(false);
-        when(securityService.hasAccessToUser(anyLong())).thenReturn(true);
+        when(securityService.hasAccessToUserByExternalId("usr-ext-00001")).thenReturn(true);
         doNothing().when(bikeReservationRepository).delete(testReservation);
 
         // Act

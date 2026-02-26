@@ -29,7 +29,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  */
 @WebMvcTest(BikeRentalController.class)
 @AutoConfigureMockMvc
-class BikeRentalControllerTest {
+class BikeRentalControllerTest extends BaseWebMvcTest {
 
     @Autowired
     private MockMvc mockMvc;

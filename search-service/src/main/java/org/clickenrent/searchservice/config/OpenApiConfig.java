@@ -28,7 +28,7 @@ public class OpenApiConfig {
                         .description("Elasticsearch-based global search service for unified search across users, bikes, locations, and hubs")
                         .contact(new Contact()
                                 .name("Vitaliy Shvetsov")
-                                .email("vitaliy@clickenrent.nl")))
+                                .email("aybserve@gmail.com")))
                 .addServersItem(new Server().url("/").description("Current server"))
                 .addSecurityItem(new SecurityRequirement().addList("bearer-jwt"))
                 .components(new Components()

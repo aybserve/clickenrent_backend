@@ -3,6 +3,7 @@ package org.clickenrent.searchservice.exception;
 import io.sentry.Sentry;
 import io.sentry.SentryLevel;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -59,6 +60,29 @@ public class GlobalExceptionHandler {
                 .path(request.getRequestURI())
                 .build();
         
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
+    }
+
+    /**
+     * Handle constraint validation errors (e.g. @RequestParam @Size)
+     */
+    @ExceptionHandler(ConstraintViolationException.class)
+    public ResponseEntity<ErrorResponse> handleConstraintViolation(
+            ConstraintViolationException ex,
+            HttpServletRequest request
+    ) {
+        String message = ex.getConstraintViolations().stream()
+                .map(v -> v.getPropertyPath() + ": " + v.getMessage())
+                .collect(Collectors.joining(", "));
+
+        ErrorResponse error = ErrorResponse.builder()
+                .timestamp(LocalDateTime.now())
+                .status(HttpStatus.BAD_REQUEST.value())
+                .error("Validation Error")
+                .message(message)
+                .path(request.getRequestURI())
+                .build();
+
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
     }
 

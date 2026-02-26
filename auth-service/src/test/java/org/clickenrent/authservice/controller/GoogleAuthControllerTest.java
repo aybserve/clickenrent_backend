@@ -12,6 +12,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static org.mockito.ArgumentMatchers.anyString;
@@ -26,6 +27,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  */
 @WebMvcTest(GoogleAuthController.class)
 @AutoConfigureMockMvc(addFilters = false) // Disable security filters for unit tests
+@TestPropertySource(properties = "jwt.secret=dGVzdC1zZWNyZXQtZm9yLWp3dC10b2tlbi12YWxpZGF0aW9uLW11c3QtYmUtbG9uZy1lbm91Z2g=")
 class GoogleAuthControllerTest {
     
     @Autowired
@@ -36,8 +38,14 @@ class GoogleAuthControllerTest {
     
     @MockBean
     private GoogleOAuthService googleOAuthService;
+
+    @MockBean
+    private org.clickenrent.authservice.service.SecurityService securityService;
+
+    @MockBean
+    private org.clickenrent.authservice.service.JwtService jwtService;
     
-    private static final String GOOGLE_LOGIN_ENDPOINT = "/api/auth/google/login";
+    private static final String GOOGLE_LOGIN_ENDPOINT = "/api/v1/auth/google/login";
     private static final String TEST_CODE = "test-auth-code";
     private static final String TEST_REDIRECT_URI = "http://localhost:3000/callback";
     

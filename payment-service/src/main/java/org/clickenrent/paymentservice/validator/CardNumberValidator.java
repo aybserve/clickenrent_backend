@@ -90,8 +90,8 @@ public class CardNumberValidator {
             return "AMEX";
         }
         
-        // Maestro: starts with 5018, 5020, 5038, 5893, 6304, 6759, 6761, 6762, 6763
-        if (clean.matches("^(5018|5020|5038|5893|6304|6759|6761|6762|6763)[0-9]{8,15}$")) {
+        // Maestro: starts with 5018, 5020, 5038, 5893, 6304, 6703, 6759, 6761, 6762, 6763
+        if (clean.matches("^(5018|5020|5038|5893|6304|6703|6759|6761|6762|6763)[0-9]{8,15}$")) {
             return "MAESTRO";
         }
         

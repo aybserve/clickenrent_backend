@@ -25,7 +25,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @WebMvcTest(LockController.class)
 @AutoConfigureMockMvc
-class LockControllerTest {
+class LockControllerTest extends BaseWebMvcTest {
 
     @Autowired
     private MockMvc mockMvc;

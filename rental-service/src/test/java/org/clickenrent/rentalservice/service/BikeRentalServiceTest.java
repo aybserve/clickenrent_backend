@@ -1,5 +1,6 @@
 package org.clickenrent.rentalservice.service;
 
+import org.clickenrent.rentalservice.client.NotificationClient;
 import org.clickenrent.rentalservice.dto.BikeRentalDTO;
 import org.clickenrent.rentalservice.entity.Bike;
 import org.clickenrent.rentalservice.entity.BikeRental;
@@ -26,8 +27,10 @@ import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
 /**
@@ -68,6 +71,9 @@ class BikeRentalServiceTest {
 
     @Mock
     private PhotoValidationService photoValidationService;
+
+    @Mock
+    private NotificationClient notificationClient;
 
     @InjectMocks
     private BikeRentalService bikeRentalService;
@@ -125,9 +131,9 @@ class BikeRentalServiceTest {
         Page<BikeRentalDTO> result = bikeRentalService.getAllBikeRentals(pageable, null, null);
 
         // Assert
-        assertNotNull(result);
-        assertEquals(1, result.getTotalElements());
-        assertEquals("BR001", result.getContent().get(0).getExternalId());
+        assertThat(result).isNotNull();
+        assertThat(result.getTotalElements()).isOne();
+        assertThat(result.getContent().get(0).getExternalId()).isEqualTo("BR001");
         verify(bikeRentalRepository, times(1)).findAll(pageable);
     }
 
@@ -150,8 +156,8 @@ class BikeRentalServiceTest {
         BikeRentalDTO result = bikeRentalService.getBikeRentalById(1L);
 
         // Assert
-        assertNotNull(result);
-        assertEquals("BR001", result.getExternalId());
+        assertThat(result).isNotNull();
+        assertThat(result.getExternalId()).isEqualTo("BR001");
         verify(bikeRentalRepository, times(1)).findById(1L);
     }
 
@@ -176,7 +182,7 @@ class BikeRentalServiceTest {
     @Test
     void createBikeRental_Success() {
         // Arrange
-        when(securityService.hasAccessToUser(anyLong())).thenReturn(true);
+        when(securityService.hasAccessToUserByExternalId(anyString())).thenReturn(true);
         when(bikeRepository.findById(1L)).thenReturn(Optional.of(testBike));
         when(rentalRepository.findById(1L)).thenReturn(Optional.of(testRental));
         when(bikeRentalMapper.toEntity(testBikeRentalDTO)).thenReturn(testBikeRental);
@@ -187,8 +193,8 @@ class BikeRentalServiceTest {
         BikeRentalDTO result = bikeRentalService.createBikeRental(testBikeRentalDTO);
 
         // Assert
-        assertNotNull(result);
-        assertEquals("BR001", result.getExternalId());
+        assertThat(result).isNotNull();
+        assertThat(result.getExternalId()).isEqualTo("BR001");
         verify(bikeRentalRepository, times(1)).save(any(BikeRental.class));
     }
 

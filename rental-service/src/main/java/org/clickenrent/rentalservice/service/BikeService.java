@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.clickenrent.contracts.search.IndexEventRequest;
 import org.clickenrent.rentalservice.client.SearchServiceClient;
+import org.clickenrent.rentalservice.event.IndexEventPublisher;
 import org.clickenrent.rentalservice.dto.BikeDTO;
 import org.clickenrent.rentalservice.dto.BikeLocationDTO;
 import org.clickenrent.rentalservice.dto.GeoPointDTO;
@@ -15,6 +16,7 @@ import org.clickenrent.rentalservice.mapper.BikeMapper;
 import org.clickenrent.rentalservice.repository.BikeRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -35,6 +37,9 @@ public class BikeService {
     private final SecurityService securityService;
     private final LocationCalculationService locationCalculationService;
     private final SearchServiceClient searchServiceClient;
+
+    @Autowired(required = false)
+    private IndexEventPublisher indexEventPublisher;
 
     @Transactional(readOnly = true)
     public Page<BikeDTO> getAllBikes(Pageable pageable) {
@@ -281,14 +286,25 @@ public class BikeService {
      */
     private void notifySearchService(String entityType, String entityId, String operation) {
         try {
-            searchServiceClient.notifyIndexEvent(
-                IndexEventRequest.builder()
-                    .entityType(entityType)
-                    .entityId(entityId)
-                    .operation(IndexEventRequest.IndexOperation.valueOf(operation))
-                    .build()
-            );
-            log.debug("Notified search-service: {} {} {}", operation, entityType, entityId);
+            if (indexEventPublisher != null) {
+                // New: Kafka event-driven approach
+                indexEventPublisher.publishIndexEvent(
+                        entityType,
+                        entityId,
+                        IndexEventRequest.IndexOperation.valueOf(operation)
+                );
+                log.debug("Published index event: {} {} {}", operation, entityType, entityId);
+            } else {
+                // Fallback: Direct Feign call
+                searchServiceClient.notifyIndexEvent(
+                    IndexEventRequest.builder()
+                        .entityType(entityType)
+                        .entityId(entityId)
+                        .operation(IndexEventRequest.IndexOperation.valueOf(operation))
+                        .build()
+                );
+                log.debug("Notified search-service via Feign: {} {} {}", operation, entityType, entityId);
+            }
         } catch (Exception e) {
             // Don't fail the main operation if search indexing fails
             log.warn("Failed to notify search-service for {} {} {}: {}", 

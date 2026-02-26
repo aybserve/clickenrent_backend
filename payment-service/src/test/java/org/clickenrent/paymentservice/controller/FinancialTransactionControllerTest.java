@@ -1,8 +1,10 @@
 package org.clickenrent.paymentservice.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.clickenrent.paymentservice.config.SecurityConfig;
 import org.clickenrent.paymentservice.dto.*;
 import org.clickenrent.paymentservice.service.FinancialTransactionService;
+import org.clickenrent.paymentservice.service.SecurityService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,7 +16,6 @@ import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
-import org.clickenrent.paymentservice.config.SecurityConfig;
 
 import java.math.BigDecimal;
 import java.util.Arrays;
@@ -39,6 +40,9 @@ class FinancialTransactionControllerTest {
 
     @MockBean
     private FinancialTransactionService financialTransactionService;
+
+    @MockBean
+    private SecurityService securityService;
 
     private FinancialTransactionDTO transactionDTO;
 

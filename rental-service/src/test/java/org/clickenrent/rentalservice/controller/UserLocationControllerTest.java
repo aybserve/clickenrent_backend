@@ -24,7 +24,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @WebMvcTest(UserLocationController.class)
 @AutoConfigureMockMvc
-class UserLocationControllerTest {
+class UserLocationControllerTest extends BaseWebMvcTest {
 
     @Autowired
     private MockMvc mockMvc;

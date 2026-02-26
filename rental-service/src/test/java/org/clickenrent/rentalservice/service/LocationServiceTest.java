@@ -179,7 +179,7 @@ class LocationServiceTest {
     void createLocation_WithCompanyAccess_Success() {
         // Arrange
         when(securityService.isAdmin()).thenReturn(false);
-        when(securityService.hasAccessToCompany(anyLong())).thenReturn(true);
+        when(securityService.hasAccessToCompanyByExternalId("company-ext-001")).thenReturn(true);
         when(locationMapper.toEntity(testLocationDTO)).thenReturn(testLocation);
         when(locationRepository.save(any(Location.class))).thenReturn(testLocation);
         when(hubRepository.save(any(Hub.class))).thenReturn(new Hub());

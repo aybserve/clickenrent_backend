@@ -23,7 +23,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @WebMvcTest(CoordinatesController.class)
 @AutoConfigureMockMvc
-class CoordinatesControllerTest {
+class CoordinatesControllerTest extends BaseWebMvcTest {
 
     @Autowired
     private MockMvc mockMvc;

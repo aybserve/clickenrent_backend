@@ -3,6 +3,7 @@ package org.clickenrent.supportservice.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.clickenrent.supportservice.dto.SupportRequestGuideItemDTO;
 import org.clickenrent.supportservice.service.SupportRequestGuideItemService;
+import org.clickenrent.supportservice.service.SecurityService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,6 +36,9 @@ class SupportRequestGuideItemControllerTest {
     @MockBean
     private SupportRequestGuideItemService supportRequestGuideItemService;
 
+    @MockBean
+    private SecurityService securityService;
+
     private SupportRequestGuideItemDTO guideItemDTO;
 
     @BeforeEach
@@ -52,7 +56,7 @@ class SupportRequestGuideItemControllerTest {
     void getAll_ReturnsOk() throws Exception {
         when(supportRequestGuideItemService.getAll()).thenReturn(Arrays.asList(guideItemDTO));
 
-        mockMvc.perform(get("/api/support-request-guide-items").with(csrf()))
+        mockMvc.perform(get("/api/v1/support-request-guide-items").with(csrf()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].itemIndex").value(1));
     }
@@ -62,7 +66,7 @@ class SupportRequestGuideItemControllerTest {
     void getById_ReturnsOk() throws Exception {
         when(supportRequestGuideItemService.getById(1L)).thenReturn(guideItemDTO);
 
-        mockMvc.perform(get("/api/support-request-guide-items/1").with(csrf()))
+        mockMvc.perform(get("/api/v1/support-request-guide-items/1").with(csrf()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.itemIndex").value(1));
     }
@@ -72,7 +76,7 @@ class SupportRequestGuideItemControllerTest {
     void create_ReturnsCreated() throws Exception {
         when(supportRequestGuideItemService.create(any())).thenReturn(guideItemDTO);
 
-        mockMvc.perform(post("/api/support-request-guide-items")
+        mockMvc.perform(post("/api/v1/support-request-guide-items")
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(guideItemDTO)))
@@ -84,7 +88,7 @@ class SupportRequestGuideItemControllerTest {
     void update_ReturnsOk() throws Exception {
         when(supportRequestGuideItemService.update(eq(1L), any())).thenReturn(guideItemDTO);
 
-        mockMvc.perform(put("/api/support-request-guide-items/1")
+        mockMvc.perform(put("/api/v1/support-request-guide-items/1")
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(guideItemDTO)))
@@ -96,7 +100,7 @@ class SupportRequestGuideItemControllerTest {
     void delete_ReturnsNoContent() throws Exception {
         doNothing().when(supportRequestGuideItemService).delete(1L);
 
-        mockMvc.perform(delete("/api/support-request-guide-items/1").with(csrf()))
+        mockMvc.perform(delete("/api/v1/support-request-guide-items/1").with(csrf()))
                 .andExpect(status().isNoContent());
     }
 }

@@ -1,5 +1,6 @@
 package org.clickenrent.rentalservice.security;
 
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -15,7 +16,9 @@ import static org.assertj.core.api.Assertions.assertThat;
  * Database-level tests for PostgreSQL Row Level Security.
  * These tests verify that RLS policies correctly filter data at the database level,
  * even when bypassing Hibernate (using raw SQL).
+ * Requires PostgreSQL; excluded from default test run (use -Dgroups=postgres to run with Postgres).
  */
+@Tag("postgres")
 @SpringBootTest
 @Sql("/test-data-tenant-isolation.sql")
 public class PostgresRLSTest {

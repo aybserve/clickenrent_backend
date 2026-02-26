@@ -51,6 +51,12 @@ class CountryControllerTest {
     @MockBean
     private CountryService countryService;
 
+    @MockBean
+    private org.clickenrent.authservice.service.SecurityService securityService;
+
+    @MockBean(name = "resourceSecurity")
+    private org.clickenrent.authservice.security.ResourceSecurityExpression resourceSecurity;
+
     private CountryDTO countryDTO;
 
     @BeforeEach
@@ -67,7 +73,7 @@ class CountryControllerTest {
         List<CountryDTO> countries = Arrays.asList(countryDTO);
         when(countryService.getAllCountries()).thenReturn(countries);
 
-        mockMvc.perform(get("/api/countries").with(csrf()))
+        mockMvc.perform(get("/api/v1/countries").with(csrf()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].id").value(1L))
                 .andExpect(jsonPath("$[0].name").value("Germany"));
@@ -80,7 +86,7 @@ class CountryControllerTest {
     void getCountryById_ReturnsOk() throws Exception {
         when(countryService.getCountryById(1L)).thenReturn(countryDTO);
 
-        mockMvc.perform(get("/api/countries/1").with(csrf()))
+        mockMvc.perform(get("/api/v1/countries/1").with(csrf()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(1L))
                 .andExpect(jsonPath("$.name").value("Germany"));
@@ -96,7 +102,7 @@ class CountryControllerTest {
 
         when(countryService.createCountry(any(CountryDTO.class))).thenReturn(createdCountry);
 
-        mockMvc.perform(post("/api/countries")
+        mockMvc.perform(post("/api/v1/countries")
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(newCountry)))
@@ -112,7 +118,7 @@ class CountryControllerTest {
     void createCountry_WithCustomerRole_ReturnsForbidden() throws Exception {
         CountryDTO newCountry = CountryDTO.builder().name("France").build();
 
-        mockMvc.perform(post("/api/countries")
+        mockMvc.perform(post("/api/v1/countries")
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(newCountry)))
@@ -128,7 +134,7 @@ class CountryControllerTest {
 
         when(countryService.updateCountry(eq(1L), any(CountryDTO.class))).thenReturn(updated);
 
-        mockMvc.perform(put("/api/countries/1")
+        mockMvc.perform(put("/api/v1/countries/1")
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(countryDTO)))
@@ -143,7 +149,7 @@ class CountryControllerTest {
     void deleteCountry_ReturnsNoContent() throws Exception {
         doNothing().when(countryService).deleteCountry(1L);
 
-        mockMvc.perform(delete("/api/countries/1").with(csrf()))
+        mockMvc.perform(delete("/api/v1/countries/1").with(csrf()))
                 .andExpect(status().isNoContent());
 
         verify(countryService, times(1)).deleteCountry(1L);

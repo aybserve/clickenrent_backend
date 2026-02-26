@@ -3,6 +3,7 @@ package org.clickenrent.supportservice.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.clickenrent.supportservice.dto.BikeIssueDTO;
 import org.clickenrent.supportservice.service.BikeIssueService;
+import org.clickenrent.supportservice.service.SecurityService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,6 +36,9 @@ class BikeIssueControllerTest {
     @MockBean
     private BikeIssueService bikeIssueService;
 
+    @MockBean
+    private SecurityService securityService;
+
     private BikeIssueDTO bikeIssueDTO;
 
     @BeforeEach
@@ -53,7 +57,7 @@ class BikeIssueControllerTest {
     void getAll_ReturnsOk() throws Exception {
         when(bikeIssueService.getAll()).thenReturn(Arrays.asList(bikeIssueDTO));
 
-        mockMvc.perform(get("/api/bike-issues").with(csrf()))
+        mockMvc.perform(get("/api/v1/bike-issues").with(csrf()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].name").value("Battery Issues"));
     }
@@ -63,7 +67,7 @@ class BikeIssueControllerTest {
     void getById_ReturnsOk() throws Exception {
         when(bikeIssueService.getById(1L)).thenReturn(bikeIssueDTO);
 
-        mockMvc.perform(get("/api/bike-issues/1").with(csrf()))
+        mockMvc.perform(get("/api/v1/bike-issues/1").with(csrf()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.name").value("Battery Issues"));
     }
@@ -74,7 +78,7 @@ class BikeIssueControllerTest {
         when(bikeIssueService.getByExternalId("550e8400-e29b-41d4-a716-446655440101"))
                 .thenReturn(bikeIssueDTO);
 
-        mockMvc.perform(get("/api/bike-issues/external/550e8400-e29b-41d4-a716-446655440101").with(csrf()))
+        mockMvc.perform(get("/api/v1/bike-issues/external/550e8400-e29b-41d4-a716-446655440101").with(csrf()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.name").value("Battery Issues"));
     }
@@ -84,7 +88,7 @@ class BikeIssueControllerTest {
     void getRootIssues_ReturnsOk() throws Exception {
         when(bikeIssueService.getRootIssues()).thenReturn(Arrays.asList(bikeIssueDTO));
 
-        mockMvc.perform(get("/api/bike-issues/root").with(csrf()))
+        mockMvc.perform(get("/api/v1/bike-issues/root").with(csrf()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].name").value("Battery Issues"));
     }
@@ -94,7 +98,7 @@ class BikeIssueControllerTest {
     void getSubIssues_ReturnsOk() throws Exception {
         when(bikeIssueService.getSubIssues(1L)).thenReturn(Arrays.asList(bikeIssueDTO));
 
-        mockMvc.perform(get("/api/bike-issues/parent/1").with(csrf()))
+        mockMvc.perform(get("/api/v1/bike-issues/parent/1").with(csrf()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].name").value("Battery Issues"));
     }
@@ -104,7 +108,7 @@ class BikeIssueControllerTest {
     void create_ReturnsCreated() throws Exception {
         when(bikeIssueService.create(any())).thenReturn(bikeIssueDTO);
 
-        mockMvc.perform(post("/api/bike-issues")
+        mockMvc.perform(post("/api/v1/bike-issues")
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(bikeIssueDTO)))
@@ -116,7 +120,7 @@ class BikeIssueControllerTest {
     void update_ReturnsOk() throws Exception {
         when(bikeIssueService.update(eq(1L), any())).thenReturn(bikeIssueDTO);
 
-        mockMvc.perform(put("/api/bike-issues/1")
+        mockMvc.perform(put("/api/v1/bike-issues/1")
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(bikeIssueDTO)))
@@ -128,7 +132,7 @@ class BikeIssueControllerTest {
     void delete_ReturnsNoContent() throws Exception {
         doNothing().when(bikeIssueService).delete(1L);
 
-        mockMvc.perform(delete("/api/bike-issues/1").with(csrf()))
+        mockMvc.perform(delete("/api/v1/bike-issues/1").with(csrf()))
                 .andExpect(status().isNoContent());
     }
 }

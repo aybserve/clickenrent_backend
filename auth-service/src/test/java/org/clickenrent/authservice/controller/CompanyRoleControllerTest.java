@@ -51,6 +51,12 @@ class CompanyRoleControllerTest {
     @MockBean
     private CompanyRoleService companyRoleService;
 
+    @MockBean
+    private org.clickenrent.authservice.service.SecurityService securityService;
+
+    @MockBean(name = "resourceSecurity")
+    private org.clickenrent.authservice.security.ResourceSecurityExpression resourceSecurity;
+
     private CompanyRoleDTO companyRoleDTO;
 
     @BeforeEach
@@ -67,7 +73,7 @@ class CompanyRoleControllerTest {
         List<CompanyRoleDTO> roles = Arrays.asList(companyRoleDTO);
         when(companyRoleService.getAllCompanyRoles()).thenReturn(roles);
 
-        mockMvc.perform(get("/api/company-roles").with(csrf()))
+        mockMvc.perform(get("/api/v1/company-roles").with(csrf()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].id").value(1L))
                 .andExpect(jsonPath("$[0].name").value("Owner"));
@@ -81,7 +87,7 @@ class CompanyRoleControllerTest {
         List<CompanyRoleDTO> roles = Arrays.asList(companyRoleDTO);
         when(companyRoleService.getAllCompanyRoles()).thenReturn(roles);
 
-        mockMvc.perform(get("/api/company-roles").with(csrf()))
+        mockMvc.perform(get("/api/v1/company-roles").with(csrf()))
                 .andExpect(status().isOk());
 
         verify(companyRoleService, times(1)).getAllCompanyRoles();
@@ -90,7 +96,7 @@ class CompanyRoleControllerTest {
     @Test
     @WithMockUser(roles = "CUSTOMER")
     void getAllCompanyRoles_WithCustomerRole_ReturnsForbidden() throws Exception {
-        mockMvc.perform(get("/api/company-roles").with(csrf()))
+        mockMvc.perform(get("/api/v1/company-roles").with(csrf()))
                 .andExpect(status().isForbidden());
 
         verify(companyRoleService, never()).getAllCompanyRoles();
@@ -101,7 +107,7 @@ class CompanyRoleControllerTest {
     void getCompanyRoleById_ReturnsOk() throws Exception {
         when(companyRoleService.getCompanyRoleById(1L)).thenReturn(companyRoleDTO);
 
-        mockMvc.perform(get("/api/company-roles/1").with(csrf()))
+        mockMvc.perform(get("/api/v1/company-roles/1").with(csrf()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(1L))
                 .andExpect(jsonPath("$.name").value("Owner"));
@@ -117,7 +123,7 @@ class CompanyRoleControllerTest {
 
         when(companyRoleService.createCompanyRole(any(CompanyRoleDTO.class))).thenReturn(createdRole);
 
-        mockMvc.perform(post("/api/company-roles")
+        mockMvc.perform(post("/api/v1/company-roles")
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(newRole)))
@@ -135,7 +141,7 @@ class CompanyRoleControllerTest {
 
         when(companyRoleService.updateCompanyRole(eq(1L), any(CompanyRoleDTO.class))).thenReturn(updated);
 
-        mockMvc.perform(put("/api/company-roles/1")
+        mockMvc.perform(put("/api/v1/company-roles/1")
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(companyRoleDTO)))
@@ -150,7 +156,7 @@ class CompanyRoleControllerTest {
     void deleteCompanyRole_ReturnsNoContent() throws Exception {
         doNothing().when(companyRoleService).deleteCompanyRole(1L);
 
-        mockMvc.perform(delete("/api/company-roles/1").with(csrf()))
+        mockMvc.perform(delete("/api/v1/company-roles/1").with(csrf()))
                 .andExpect(status().isNoContent());
 
         verify(companyRoleService, times(1)).deleteCompanyRole(1L);

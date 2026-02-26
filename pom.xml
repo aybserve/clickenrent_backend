@@ -11,7 +11,6 @@
 
   <name>backend</name>
 
-  <!-- ✔ Parent Spring Boot -->
   <parent>
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-parent</artifactId>
@@ -25,9 +24,9 @@
     <maven.compiler.target>${java.version}</maven.compiler.target>
     <spring-cloud.version>2023.0.1</spring-cloud.version>
     <sentry.version>7.17.0</sentry.version>
+    <surefireArgLine></surefireArgLine>
   </properties>
 
-  <!-- ✔ BOM только Spring Cloud (Spring Boot уже в parent) -->
   <dependencyManagement>
     <dependencies>
       <dependency>
@@ -37,8 +36,7 @@
         <type>pom</type>
         <scope>import</scope>
       </dependency>
-      
-      <!-- Sentry BOM for version consistency -->
+
       <dependency>
         <groupId>io.sentry</groupId>
         <artifactId>sentry-bom</artifactId>
@@ -46,15 +44,13 @@
         <type>pom</type>
         <scope>import</scope>
       </dependency>
-      
-      <!-- Shared contracts module -->
+
       <dependency>
         <groupId>org.clickenrent</groupId>
         <artifactId>shared-contracts</artifactId>
         <version>2.3.0</version>
       </dependency>
-      
-      <!-- dotenv-java for loading .env files -->
+
       <dependency>
         <groupId>io.github.cdimascio</groupId>
         <artifactId>dotenv-java</artifactId>
@@ -82,6 +78,45 @@
         <plugin>
           <groupId>org.springframework.boot</groupId>
           <artifactId>spring-boot-maven-plugin</artifactId>
+        </plugin>
+
+        <plugin>
+          <groupId>org.jacoco</groupId>
+          <artifactId>jacoco-maven-plugin</artifactId>
+          <version>0.8.12</version>
+          <executions>
+            <execution>
+              <id>prepare-agent</id>
+              <goals>
+                <goal>prepare-agent</goal>
+              </goals>
+              <configuration>
+                <propertyName>surefireArgLine</propertyName>
+              </configuration>
+            </execution>
+            <execution>
+              <id>report</id>
+              <phase>test</phase>
+              <goals>
+                <goal>report</goal>
+              </goals>
+            </execution>
+            <execution>
+              <id>report-aggregate</id>
+              <phase>verify</phase>
+              <goals>
+                <goal>report-aggregate</goal>
+              </goals>
+            </execution>
+          </executions>
+        </plugin>
+
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-surefire-plugin</artifactId>
+          <configuration>
+            <argLine>${surefireArgLine}</argLine>
+          </configuration>
         </plugin>
 
         <plugin>

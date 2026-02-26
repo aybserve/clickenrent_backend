@@ -81,13 +81,9 @@ public class DotenvConfig implements EnvironmentPostProcessor {
             }
             
             if (dotenv == null || !dotenv.entries().iterator().hasNext()) {
-                log.error("⚠️ Could not find .env file!");
-                log.error("   Searched in working directory and parent directories");
-                log.error("   Current working dir: {}", workingDir);
-                log.error("   You need to either:");
-                log.error("   1. Set Working Directory in IDE Run Configuration to: /Users/vitaliyshvetsov/IdeaProjects/backend");
-                log.error("   2. Or copy .env file to: {}", workingDir);
-                throw new IllegalStateException("❌ .env file not found - cannot start without environment variables!");
+                log.warn("⚠️ Could not find .env file - running in production mode");
+                log.warn("   Continuing with system/Kubernetes environment variables...");
+                return;
             }
             
             // Convert dotenv entries to a Map
@@ -107,8 +103,7 @@ public class DotenvConfig implements EnvironmentPostProcessor {
             log.info("✅ Loaded {} environment variables", dotenvMap.size());
             
         } catch (Exception e) {
-            log.error("❌ Fatal error loading .env file: {}", e.getMessage(), e);
-            throw new IllegalStateException("Cannot start application without .env file", e);
+            log.warn("⚠️ Could not load .env file: {} - continuing with system environment variables", e.getMessage());
         }
     }
 }

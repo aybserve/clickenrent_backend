@@ -3,6 +3,7 @@ package org.clickenrent.supportservice.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.clickenrent.supportservice.dto.SupportRequestStatusDTO;
 import org.clickenrent.supportservice.service.SupportRequestStatusService;
+import org.clickenrent.supportservice.service.SecurityService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,6 +36,9 @@ class SupportRequestStatusControllerTest {
     @MockBean
     private SupportRequestStatusService supportRequestStatusService;
 
+    @MockBean
+    private SecurityService securityService;
+
     private SupportRequestStatusDTO statusDTO;
 
     @BeforeEach
@@ -51,7 +55,7 @@ class SupportRequestStatusControllerTest {
     void getAll_ReturnsOk() throws Exception {
         when(supportRequestStatusService.getAll()).thenReturn(Arrays.asList(statusDTO));
 
-        mockMvc.perform(get("/api/support-request-statuses").with(csrf()))
+        mockMvc.perform(get("/api/v1/support-request-statuses").with(csrf()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].name").value("OPEN"));
     }
@@ -61,7 +65,7 @@ class SupportRequestStatusControllerTest {
     void getById_ReturnsOk() throws Exception {
         when(supportRequestStatusService.getById(1L)).thenReturn(statusDTO);
 
-        mockMvc.perform(get("/api/support-request-statuses/1").with(csrf()))
+        mockMvc.perform(get("/api/v1/support-request-statuses/1").with(csrf()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.name").value("OPEN"));
     }
@@ -71,7 +75,7 @@ class SupportRequestStatusControllerTest {
     void create_ReturnsCreated() throws Exception {
         when(supportRequestStatusService.create(any())).thenReturn(statusDTO);
 
-        mockMvc.perform(post("/api/support-request-statuses")
+        mockMvc.perform(post("/api/v1/support-request-statuses")
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(statusDTO)))
@@ -83,7 +87,7 @@ class SupportRequestStatusControllerTest {
     void update_ReturnsOk() throws Exception {
         when(supportRequestStatusService.update(eq(1L), any())).thenReturn(statusDTO);
 
-        mockMvc.perform(put("/api/support-request-statuses/1")
+        mockMvc.perform(put("/api/v1/support-request-statuses/1")
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(statusDTO)))
@@ -95,7 +99,7 @@ class SupportRequestStatusControllerTest {
     void delete_ReturnsNoContent() throws Exception {
         doNothing().when(supportRequestStatusService).delete(1L);
 
-        mockMvc.perform(delete("/api/support-request-statuses/1").with(csrf()))
+        mockMvc.perform(delete("/api/v1/support-request-statuses/1").with(csrf()))
                 .andExpect(status().isNoContent());
     }
 }

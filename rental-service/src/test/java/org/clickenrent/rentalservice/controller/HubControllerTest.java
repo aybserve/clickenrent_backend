@@ -26,7 +26,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @WebMvcTest(HubController.class)
 @AutoConfigureMockMvc
-class HubControllerTest {
+class HubControllerTest extends BaseWebMvcTest {
 
     @Autowired
     private MockMvc mockMvc;

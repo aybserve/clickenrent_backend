@@ -3,6 +3,7 @@ package org.clickenrent.supportservice.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.clickenrent.supportservice.dto.ResponsiblePersonDTO;
 import org.clickenrent.supportservice.service.ResponsiblePersonService;
+import org.clickenrent.supportservice.service.SecurityService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,6 +36,9 @@ class ResponsiblePersonControllerTest {
     @MockBean
     private ResponsiblePersonService responsiblePersonService;
 
+    @MockBean
+    private SecurityService securityService;
+
     private ResponsiblePersonDTO responsiblePersonDTO;
 
     @BeforeEach
@@ -51,7 +55,7 @@ class ResponsiblePersonControllerTest {
     void getAll_ReturnsOk() throws Exception {
         when(responsiblePersonService.getAll()).thenReturn(Arrays.asList(responsiblePersonDTO));
 
-        mockMvc.perform(get("/api/responsible-persons").with(csrf()))
+        mockMvc.perform(get("/api/v1/responsible-persons").with(csrf()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].name").value("John Mechanic"));
     }
@@ -61,7 +65,7 @@ class ResponsiblePersonControllerTest {
     void getById_ReturnsOk() throws Exception {
         when(responsiblePersonService.getById(1L)).thenReturn(responsiblePersonDTO);
 
-        mockMvc.perform(get("/api/responsible-persons/1").with(csrf()))
+        mockMvc.perform(get("/api/v1/responsible-persons/1").with(csrf()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.name").value("John Mechanic"));
     }
@@ -71,7 +75,7 @@ class ResponsiblePersonControllerTest {
     void create_ReturnsCreated() throws Exception {
         when(responsiblePersonService.create(any())).thenReturn(responsiblePersonDTO);
 
-        mockMvc.perform(post("/api/responsible-persons")
+        mockMvc.perform(post("/api/v1/responsible-persons")
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(responsiblePersonDTO)))
@@ -83,7 +87,7 @@ class ResponsiblePersonControllerTest {
     void update_ReturnsOk() throws Exception {
         when(responsiblePersonService.update(eq(1L), any())).thenReturn(responsiblePersonDTO);
 
-        mockMvc.perform(put("/api/responsible-persons/1")
+        mockMvc.perform(put("/api/v1/responsible-persons/1")
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(responsiblePersonDTO)))
@@ -95,7 +99,7 @@ class ResponsiblePersonControllerTest {
     void delete_ReturnsNoContent() throws Exception {
         doNothing().when(responsiblePersonService).delete(1L);
 
-        mockMvc.perform(delete("/api/responsible-persons/1").with(csrf()))
+        mockMvc.perform(delete("/api/v1/responsible-persons/1").with(csrf()))
                 .andExpect(status().isNoContent());
     }
 }

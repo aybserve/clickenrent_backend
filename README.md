@@ -1,94 +1,237 @@
 # ClickEnRent Backend - Microservices
 
-Spring Boot microservices architecture for bike rental platform.
+Spring Boot microservices architecture for the ClickEnRent bike rental platform.
 
-## 🏗️ Architecture
+## About the Project
+
+ClickEnRent is a production-ready bike rental platform built with microservices architecture. The system handles bike-sharing operations for multiple companies (B2B) and end-users, including real-time fleet management, payments with multiple providers, and advanced analytics.
+
+**Key capabilities:**
+- Multi-tenant B2B platform with company isolation
+- Real-time bike tracking and smart lock integration
+- Payment processing (Stripe, MultiSafepay) with split payouts
+- Global search with Elasticsearch
+- Analytics dashboards for revenue and fleet metrics
+
+## Key Features
+
+- **Production-Ready Security**: 5-layer multi-tenant isolation (JWT → PostgreSQL RLS)
+- **Advanced Rate Limiting**: Redis-based with IP blocking and attack detection
+- **Observability**: Sentry APM, Prometheus metrics, Grafana dashboards
+- **Payment Integration**: Stripe + MultiSafepay with webhook handling and split payouts
+- **Event-Driven Architecture**: Kafka for async indexing and notifications
+- **OAuth Integration**: Google and Apple Sign-In with token verification
+- **CI/CD**: GitHub Actions with automated testing and Kubernetes deployment
+
+## Architecture
 
 - **7 Microservices** + **1 Service Discovery** + **1 API Gateway**
-- **Spring Boot 3.3.2** + **Java 17**
-- **PostgreSQL** databases
+- **Spring Boot 3.3.2** + **Java 17** + **Spring Cloud 2023.0.1**
+- **PostgreSQL** for persistence (per-service databases)
+- **Elasticsearch** for full-text and global search
+- **Kafka** for async events (search indexing, notifications)
+- **Redis** for rate limiting and attack detection
 - **Eureka** for service discovery
-- **Spring Cloud Gateway** for API routing
-- **JWT** authentication
+- **Spring Cloud Gateway** for API routing and JWT validation
+- **JWT** authentication; **Google** and **Apple** OAuth
 
-## 📦 Services
+### System Architecture
 
-| Service | Port | Database | Description |
-|---------|------|----------|-------------|
-| Gateway | 8080 | - | API Gateway (main entry point) |
+```
+┌─────────────────────────────────────────────────────────────────────────┐
+│                        Web/Mobile Clients                                │
+└───────────────────────────────┬─────────────────────────────────────────┘
+                                │
+                                ▼
+                    ┌───────────────────────┐
+                    │   API Gateway :8080   │◄──────┐
+                    │   (Rate Limiting)     │       │
+                    └───────────┬───────────┘       │
+                                │                   │
+                ┌───────────────┼───────────────┐   │
+                │               │               │   │
+                ▼               ▼               ▼   │ Service
+    ┌─────────────────┐  ┌─────────────┐  ┌──────────────┐  Discovery
+    │  Auth Service   │  │   Rental    │  │   Payment    │     │
+    │     :8081       │  │   :8082     │  │    :8084     │     │
+    └────────┬────────┘  └──────┬──────┘  └──────┬───────┘     │
+             │                  │                 │             │
+    ┌────────▼────────┐  ┌──────▼──────┐  ┌──────▼───────┐    │
+    │    Support      │  │Notification │  │    Search    │    │
+    │     :8083       │  │   :8085     │  │    :8086     │    │
+    └────────┬────────┘  └──────┬──────┘  └──────┬───────┘    │
+             │                  │                 │             │
+             │           ┌──────▼──────┐          │             │
+             │           │  Analytics  │          │             │
+             │           │   :8087     │          │             │
+             │           └──────┬──────┘          │             │
+             │                  │                 │             │
+             └──────────────────┼─────────────────┼─────────────┘
+                                │                 │
+                    ┌───────────▼─────────────────▼──────┐
+                    │   Eureka Server :8761               │
+                    │   (Service Registry)                │
+                    └─────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────────────┐
+│                           Data Layer                                     │
+├─────────────────┬─────────────────┬─────────────────┬───────────────────┤
+│   PostgreSQL    │     Redis       │ Elasticsearch   │      Kafka        │
+│   (Per-Service  │  (Rate Limit)   │  (Search Index) │   (Events Bus)    │
+│    Databases)   │                 │                 │                   │
+└─────────────────┴─────────────────┴─────────────────┴───────────────────┘
+      ▲                   ▲                 ▲                 ▲
+      │                   │                 │                 │
+   All Services        Gateway           Search         Search + Auth
+```
+
+**Request Flow:**
+1. Client → Gateway (JWT validation, rate limiting)
+2. Gateway → Microservice (via Eureka discovery)
+3. Microservice → PostgreSQL (with multi-tenant filtering)
+4. Auth/Search → Kafka (async events)
+5. Search → Elasticsearch (indexing & queries)
+
+## Services
+
+| Service | Port | Storage | Description |
+|---------|------|---------|-------------|
+| Gateway | 8080 | Redis | API Gateway (main entry point), rate limiting |
 | Eureka Server | 8761 | - | Service Discovery |
-| Auth Service | 8081 | clickenrent-auth | Authentication & Users |
-| Rental Service | 8082 | clickenrent-rental | Bikes & Rentals |
-| Support Service | 8083 | clickenrent-support | Customer Support |
-| Payment Service | 8084 | clickenrent-payment | Payments & Billing |
-| Notification Service | 8085 | clickenrent-notification | Push Notifications |
+| Auth Service | 8081 | clickenrent-auth | Authentication, users, companies, invitations |
+| Rental Service | 8082 | clickenrent-rental | Bikes, rentals, rides, locations, hubs, B2B |
+| Support Service | 8083 | clickenrent-support | Support requests, inspections, bike issues |
+| Payment Service | 8084 | clickenrent-payment | Payments (Stripe, MultiSafepay), payouts |
+| Notification Service | 8085 | clickenrent-notification | Push notifications (Expo), preferences |
+| Search Service | 8086 | Elasticsearch, Kafka | Global search, index sync via Kafka |
+| Analytics Service | 8087 | clickenrent-analytics | Dashboards, metrics, revenue & fleet analytics |
 
-## 🚀 Quick Start (Docker)
+**Repository layout:** `shared-contracts/` (shared DTOs), `eureka-server/`, `gateway/`, `*-service/` (auth, rental, support, payment, notification, search, analytics), `docker-services/` (Elasticsearch, Kafka, Kibana, Kafka UI), `k8s/` (Kubernetes manifests), `scripts/` (build, deploy, Flyway).
 
-### Simple 3-Step Deployment:
+## Quick Start
+
+### Build
 
 ```bash
-# 1. Build JARs
+# Build all modules (including shared-contracts)
+mvn clean package
+
+# Skip tests
 mvn clean package -DskipTests
 
-# 2. Configure environment
+# Or use the project script
+./scripts/build-all.sh
+./scripts/build-all.sh --skip-tests
+```
+
+### Configure environment
+
+```bash
 cp .env.example .env
-nano .env  # Edit POSTGRES_PASSWORD and JWT_SECRET
-
-# 3. Run with Docker
-chmod +x build-and-run.sh
-bash build-and-run.sh
+# Edit .env: DB_PASSWORD, JWT_SECRET, and optional ES_PASSWORD, REDIS_PASSWORD, Kafka, OAuth, payments, etc.
 ```
 
-**Or use the automated script:**
+### Run infrastructure (Docker)
+
+Search, auth, and notification services depend on **Elasticsearch**, **Kafka**, and **Redis**. Use the Docker Compose stack for local development:
+
 ```bash
-bash build-and-run.sh
-```
-
-Access your API: http://46.224.148.235:8080
-
-## 📚 Documentation
-
-- **Simple Deployment Guide**: [DEPLOYMENT-SIMPLE.md](DEPLOYMENT-SIMPLE.md) ⭐ **START HERE**
-- **Detailed Deployment Guide**: [DEPLOYMENT.md](DEPLOYMENT.md)
-- **API Documentation**: http://46.224.148.235:8080/swagger-ui.html
-
-## 🛠️ Development
-
-### Build locally:
-```bash
-mvn clean package
-```
-
-### Run single service:
-```bash
-cd auth-service
-mvn spring-boot:run
-```
-
-### Run all services with Docker:
-```bash
+cd docker-services
+cp .env.example .env
+# Set ELASTIC_PASSWORD and any overrides
 docker-compose up -d
+# Elasticsearch :9200, Kibana :5601, Kafka :9092, Kafka UI :8090
 ```
 
-## 📋 Requirements
+### Run services locally
 
-- Java 17
-- Maven 3.6+
+Start **Eureka** first, then **Gateway**, then the rest (each in its own terminal or via your IDE). Example:
+
+```bash
+cd eureka-server && mvn spring-boot:run
+cd gateway && mvn spring-boot:run
+cd auth-service && mvn spring-boot:run
+# ... rental-service, support-service, payment-service, notification-service, search-service, analytics-service
+```
+
+API entry point: **http://localhost:8080** (Gateway). Swagger UI: **http://localhost:8080/swagger-ui.html**
+
+### Kubernetes
+
+Manifests are in `k8s/` (namespace, configmap, secrets, ingress, and per-service deployments). Use `scripts/deploy.sh` or `scripts/fresh-deploy.sh` as referenced in the repo.
+
+## Documentation
+
+- **API (Swagger)**: When running, open `http://localhost:8080/swagger-ui.html` (or your deployed Gateway URL).
+- **Sentry (errors & APM)**: [docs/SENTRY_SETUP.md](docs/SENTRY_SETUP.md) (cloud), [docs/SENTRY_SELF_HOSTED.md](docs/SENTRY_SELF_HOSTED.md) (self-hosted).
+- **OAuth**: [auth-service/docs/GOOGLE_OAUTH_SETUP.md](auth-service/docs/GOOGLE_OAUTH_SETUP.md), [auth-service/docs/APPLE_OAUTH_SETUP.md](auth-service/docs/APPLE_OAUTH_SETUP.md).
+- **Payments**: [payment-service/docs/IMPLEMENTATION_COMPLETE.md](payment-service/docs/IMPLEMENTATION_COMPLETE.md), [payment-service/README.md](payment-service/README.md).
+
+## Development
+
+- **Build**: `mvn clean package` or `./scripts/build-all.sh` (optionally `--skip-tests`, `--docker`).
+- **Single service**: e.g. `cd auth-service && mvn spring-boot:run`. Start Eureka and Gateway first.
+- **Infrastructure**: `docker-services/docker-compose.yml` runs Elasticsearch, Kibana, Zookeeper, Kafka, and Kafka UI only. For full app deployment use the `k8s/` manifests and scripts in `scripts/`.
+- **Shared contracts**: The `shared-contracts` module (version 2.3.0) holds DTOs and contracts used by multiple services.
+
+## Requirements
+
+- **Java 17**
+- **Maven 3.6+**
+- **PostgreSQL 15** (per-service DBs: clickenrent-auth, clickenrent-rental, clickenrent-support, clickenrent-payment, clickenrent-notification, clickenrent-analytics)
+- **Redis** (rate limiting at Gateway)
+- **Elasticsearch 7.x** (search-service; use `docker-services` for local)
+- **Kafka** (search indexing, notification events; use `docker-services` for local)
+- **Docker** (optional, for infra and/or containerized deploy)
+
+## Technology Stack
+
+**Backend:**
+- Java 17, Spring Boot 3.3.2, Spring Cloud 2023.0.1
+- Spring Security (JWT, OAuth2 Resource Server)
+- Spring Data JPA, Hibernate
+- Spring Cloud Gateway, Netflix Eureka
+- Feign (declarative REST clients)
+
+**Data & Storage:**
+- PostgreSQL 15 (with Row Level Security)
+- Elasticsearch 7.x (full-text search)
+- Redis (rate limiting, caching)
+- Apache Kafka (event streaming)
+- Flyway (database migrations)
+
+**Integrations:**
+- Stripe & MultiSafepay (payment processing)
+- Google & Apple OAuth (authentication)
+- Azure Blob Storage (bike images)
+- MapBox API (location services)
+- Expo (push notifications)
+
+**DevOps & Monitoring:**
 - Docker & Docker Compose
-- PostgreSQL 15 (or use Docker)
+- Kubernetes (production deployment)
+- GitHub Actions (CI/CD pipeline)
+- Sentry (error tracking & APM)
+- Prometheus & Grafana (metrics)
+- Maven (build & dependency management)
 
-## 🔧 Configuration
+## Configuration
 
-All configuration is done via environment variables in `.env` file:
+Configuration is driven by environment variables (e.g. root `.env` from `.env.example`). Main options:
 
-- `POSTGRES_PASSWORD` - Database password
-- `JWT_SECRET` - JWT secret key
-- `GOOGLE_CLIENT_ID` - Google OAuth (optional)
-- `STRIPE_API_KEY` - Stripe payments (optional)
-- `AZURE_STORAGE_CONNECTION_STRING` - Azure storage (optional)
+| Category | Variables |
+|----------|-----------|
+| **Database** | `DB_USERNAME`, `DB_PASSWORD`; per-service `DB_URL` override if needed |
+| **JWT** | `JWT_SECRET` (required), `JWT_EXPIRATION`, `JWT_REFRESH_EXPIRATION` |
+| **OAuth** | `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`; `APPLE_*` for Apple Sign-In |
+| **Payments** | `STRIPE_*`, `MULTISAFEPAY_*` (API key, webhook secret, URLs) |
+| **Rental** | `AZURE_STORAGE_*`, `MAPBOX_API_KEY`, `LOCK_ENCRYPTION_KEY` |
+| **Infra** | `REDIS_HOST`, `REDIS_PORT`, `REDIS_PASSWORD`; `ES_URIS`, `ES_USERNAME`, `ES_PASSWORD`; `KAFKA_BOOTSTRAP_SERVERS` |
+| **Service auth** | `SERVICE_AUTH_USERNAME`, `SERVICE_AUTH_PASSWORD` (inter-service) |
+| **Sentry** | `SENTRY_DSN_*` per service, `SENTRY_ENVIRONMENT`, `SENTRY_TRACES_SAMPLE_RATE` |
+| **Profile** | `SPRING_PROFILES_ACTIVE=staging` (or `prod`); Flyway: `FLYWAY_MIGRATE`, `FLYWAY_SKIP_TESTDATA` |
 
-## 🛡️ Rate Limiting
+## Rate Limiting
 
 ClickEnRent implements **production-ready rate limiting** at the API Gateway level using Redis:
 
@@ -128,14 +271,11 @@ RATE_LIMIT_BLOCK_DURATION=15
 ### Testing Rate Limits
 
 ```bash
-# Run load test script
-./load-test-rate-limiting.sh
-
 # Monitor Redis keys
 redis-cli KEYS '*'
 
-# Check rate limit violations in logs
-docker-compose logs -f gateway | grep "Rate limit"
+# Check rate limit violations in logs (e.g. when running via Docker/K8s)
+# logs -f gateway | grep "Rate limit"
 ```
 
 ### Response Headers
@@ -155,20 +295,16 @@ The system automatically:
 - Applies progressive penalties (exponential backoff)
 - Logs security alerts for monitoring
 
-## 📊 Monitoring
+## Monitoring
 
-ClickEnRent uses a comprehensive monitoring stack for production observability:
-
-### Application Monitoring
-- **Eureka Dashboard**: http://46.224.148.235:8761
-- **Health Checks**: http://46.224.148.235:8080/actuator/health
-- **Prometheus Metrics**: http://46.224.148.235:8080/actuator/prometheus
-- **Redis Health**: http://46.224.148.235:8080/actuator/health (includes Redis status)
-- **Logs**: `docker-compose logs -f`
+- **Eureka Dashboard**: `http://<host>:8761`
+- **Gateway health**: `http://<host>:8080/actuator/health` (includes Redis when configured)
+- **Prometheus metrics**: `http://<host>:8080/actuator/prometheus`
+- **K8s**: See `k8s/monitoring/` for Prometheus and Grafana manifests.
 
 ### Sentry Error Tracking & Performance Monitoring
 
-ClickEnRent integrates **Sentry** for real-time error tracking and performance monitoring across all 7 microservices:
+ClickEnRent integrates **Sentry** for real-time error tracking and performance monitoring across all services (Gateway + 7 microservices):
 
 **Features:**
 - Automatic error capture and grouping
@@ -191,6 +327,7 @@ SENTRY_DSN_PAYMENT=https://xxx@yyy.ingest.sentry.io/zzz
 SENTRY_DSN_NOTIFICATION=https://xxx@yyy.ingest.sentry.io/zzz
 SENTRY_DSN_SEARCH=https://xxx@yyy.ingest.sentry.io/zzz
 SENTRY_DSN_GATEWAY=https://xxx@yyy.ingest.sentry.io/zzz
+SENTRY_DSN_ANALYTICS=https://xxx@yyy.ingest.sentry.io/zzz
 
 # Environment and sampling
 SENTRY_ENVIRONMENT=production
@@ -202,35 +339,25 @@ SENTRY_TRACES_SAMPLE_RATE=1.0  # 1.0 = 100% of transactions
 Choose your Sentry deployment option:
 
 - **Cloud Version**: [SENTRY_SETUP.md](docs/SENTRY_SETUP.md) - Managed Sentry.io (starts at $26/mo)
-- **Self-Hosted** ⭐: [SENTRY_SELF_HOSTED.md](docs/SENTRY_SELF_HOSTED.md) - Free, unlimited, full control
+- **Self-Hosted** : [SENTRY_SELF_HOSTED.md](docs/SENTRY_SELF_HOSTED.md) - Free, unlimited, full control
 
 Both options work identically with your application code - only the DSN URLs differ.
 
 **What Gets Tracked:**
 
-1. **Errors**: All unhandled exceptions automatically captured
+1. **Errors**: Unhandled exceptions across all services
 2. **Performance**: Transaction traces for API requests
-3. **OAuth Flows**: Detailed performance monitoring for Google/Apple OAuth
-4. **Context**: Every error tagged with tenant/company information
-5. **Releases**: Errors grouped by service version (1.0-SNAPSHOT)
+3. **OAuth**: Spans for Google/Apple OAuth flows
+4. **Context**: Tenant/company tags on events
+5. **Releases**: Grouping by service version (e.g. 1.0-SNAPSHOT)
 
-## 🐛 Troubleshooting
+## Troubleshooting
 
-```bash
-# Check service status
-docker-compose ps
+- **Infrastructure (docker-services)**: `docker-compose -f docker-services/docker-compose.yml ps | logs | restart <service> | down`
+- **Kubernetes**: `kubectl get pods -n clickenrent`, `kubectl logs -f <pod> -n clickenrent`
+- **Local**: Ensure Eureka and Gateway are up first; check `.env` and DB/Redis/ES/Kafka connectivity for each service.
 
-# View logs
-docker-compose logs -f service-name
-
-# Restart service
-docker-compose restart service-name
-
-# Stop everything
-docker-compose down
-```
-
-## 🔐 Security
+## Security
 
 ### Multi-Tenant Isolation
 
@@ -242,17 +369,15 @@ ClickEnRent implements **company-based multi-tenancy** with defense-in-depth sec
 - **Automatic Filtering:** Hibernate filters add WHERE clauses to all queries
 - **Audit Trail:** All security violations are logged
 
-**Security Coverage:**
-- ✅ gateway: JWT validation and header forwarding
-- ✅ auth-service: User authentication with company claims
-- ✅ rental-service: Full 5-layer security stack
-- ✅ payment-service: Full 5-layer security stack
-- ✅ support-service: Full 5-layer security stack
-- ✅ notification-service: Hybrid isolation (user + company scoped)
-
-**Documentation:**
-- 📖 [SECURITY_ARCHITECTURE.md](SECURITY_ARCHITECTURE.md) - Complete security guide
-- 📊 [IMPLEMENTATION_STATUS.md](IMPLEMENTATION_STATUS.md) - Implementation status
+**Security coverage:**
+-  **Gateway**: JWT validation and header forwarding
+-  **Auth service**: User authentication with company claims
+-  **Rental service**: Full 5-layer security stack
+-  **Payment service**: Full 5-layer security stack
+-  **Support service**: Full 5-layer security stack
+-  **Notification service**: Hybrid isolation (user + company scoped)
+-  **Search service**: Tenant-aware search and indexing
+-  **Analytics service**: Company-scoped analytics (Admin/B2B)
 
 ### Authentication & Authorization
 
@@ -262,11 +387,58 @@ ClickEnRent implements **company-based multi-tenancy** with defense-in-depth sec
 - HTTPS recommended (use Nginx reverse proxy)
 - Firewall: Only expose port 8080
 
-## 📄 License
+## Technical Highlights
 
-Private project - All rights reserved
+### Microservices Architecture
+- **Independent Deployments**: Each service has its own database and can be deployed independently
+- **Service Discovery**: Eureka for dynamic service registration and discovery
+- **Inter-Service Communication**: Feign clients with circuit breaker patterns
+- **Shared Contracts**: Type-safe DTOs shared across services via Maven module
+- **Event-Driven**: Kafka for async communication (search indexing, notifications)
 
-## 👤 Author
+### Security & Multi-Tenancy
+- **PostgreSQL Row Level Security (RLS)**: Database-level tenant isolation
+- **Hibernate Filters**: Automatic query scoping per company
+- **JWT Claims Validation**: Spring Security with custom converters
+- **Resource Security Expressions**: Custom SpEL expressions for fine-grained access control
+- **Defense in Depth**: 5-layer security model from JWT to database
 
-Vitaliy Shvetsov
+### Scalability & Performance
+- **Stateless Authentication**: JWT-based auth enables horizontal scaling
+- **Distributed Rate Limiting**: Redis-backed rate limiting across Gateway instances
+- **Search Optimization**: Elasticsearch for sub-second full-text queries
+- **Async Processing**: Kafka decouples heavy operations from request paths
+- **Connection Pooling**: HikariCP with optimized settings per service
+
+### Production Readiness
+- **Comprehensive Monitoring**: Sentry APM with distributed tracing across services
+- **Metrics & Dashboards**: Prometheus metrics with Grafana visualization
+- **Health Checks**: Actuator endpoints with dependency health indicators
+- **Database Migrations**: Flyway with versioned schema changes
+- **CI/CD Pipeline**: Automated testing, building, and Kubernetes deployment
+- **Error Handling**: Global exception handlers with structured error responses
+
+## License
+
+Copyright (c) 2025–2026 Vitaliy Shvetsov. All rights reserved.
+
+This project and its source code are proprietary. Unauthorized copying, distribution, modification, or use of the code or any part of this repository is prohibited without prior written permission from the author.
+
+## Author
+
+**Vitaliy Shvetsov**
+
+Email: aybserve@gmail.com
+
+LinkedIn: https://linkedin.com/in/vitaliy-shvetsov/
+
+Backend Developer specializing in microservices architecture, distributed systems, and cloud-native applications.
+
+**Skills demonstrated in this project:**
+- Microservices design and implementation
+- Multi-tenant security architecture
+- Payment gateway integration
+- Real-time data processing with Kafka
+- Kubernetes deployment and orchestration
+- Production monitoring and observability
 

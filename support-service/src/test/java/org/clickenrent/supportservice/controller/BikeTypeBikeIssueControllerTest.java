@@ -3,6 +3,7 @@ package org.clickenrent.supportservice.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.clickenrent.supportservice.dto.BikeTypeBikeIssueDTO;
 import org.clickenrent.supportservice.service.BikeTypeBikeIssueService;
+import org.clickenrent.supportservice.service.SecurityService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,6 +35,9 @@ class BikeTypeBikeIssueControllerTest {
     @MockBean
     private BikeTypeBikeIssueService bikeTypeBikeIssueService;
 
+    @MockBean
+    private SecurityService securityService;
+
     private BikeTypeBikeIssueDTO junctionDTO;
 
     @BeforeEach
@@ -50,7 +54,7 @@ class BikeTypeBikeIssueControllerTest {
     void getAll_ReturnsOk() throws Exception {
         when(bikeTypeBikeIssueService.getAll()).thenReturn(Arrays.asList(junctionDTO));
 
-        mockMvc.perform(get("/api/bike-type-bike-issues").with(csrf()))
+        mockMvc.perform(get("/api/v1/bike-type-bike-issues").with(csrf()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].bikeTypeExternalId").value("bike-type-uuid-1"));
     }
@@ -60,7 +64,7 @@ class BikeTypeBikeIssueControllerTest {
     void getById_ReturnsOk() throws Exception {
         when(bikeTypeBikeIssueService.getById(1L)).thenReturn(junctionDTO);
 
-        mockMvc.perform(get("/api/bike-type-bike-issues/1").with(csrf()))
+        mockMvc.perform(get("/api/v1/bike-type-bike-issues/1").with(csrf()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.bikeTypeExternalId").value("bike-type-uuid-1"));
     }
@@ -70,7 +74,7 @@ class BikeTypeBikeIssueControllerTest {
     void create_ReturnsCreated() throws Exception {
         when(bikeTypeBikeIssueService.create(any())).thenReturn(junctionDTO);
 
-        mockMvc.perform(post("/api/bike-type-bike-issues")
+        mockMvc.perform(post("/api/v1/bike-type-bike-issues")
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(junctionDTO)))
@@ -82,7 +86,7 @@ class BikeTypeBikeIssueControllerTest {
     void delete_ReturnsNoContent() throws Exception {
         doNothing().when(bikeTypeBikeIssueService).delete(1L);
 
-        mockMvc.perform(delete("/api/bike-type-bike-issues/1").with(csrf()))
+        mockMvc.perform(delete("/api/v1/bike-type-bike-issues/1").with(csrf()))
                 .andExpect(status().isNoContent());
     }
 }

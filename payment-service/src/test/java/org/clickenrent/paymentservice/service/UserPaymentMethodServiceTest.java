@@ -44,7 +44,7 @@ class UserPaymentMethodServiceTest {
     private SecurityService securityService;
 
     @Mock
-    private StripeService stripeService;
+    private PaymentProviderService paymentProviderService;
 
     @InjectMocks
     private UserPaymentMethodService userPaymentMethodService;
@@ -140,14 +140,16 @@ class UserPaymentMethodServiceTest {
     @Test
     void attachPaymentMethod_Success() {
         when(userPaymentProfileRepository.findById(1L)).thenReturn(Optional.of(testProfile));
-        when(stripeService.attachPaymentMethod("pm_test123", "cus_test123")).thenReturn("pm_test123");
+        lenient().when(paymentProviderService.isStripeActive()).thenReturn(true);
+        lenient().when(paymentProviderService.isMultiSafepayActive()).thenReturn(false);
+        when(paymentProviderService.attachPaymentMethod("pm_test123", "cus_test123")).thenReturn("pm_test123");
         when(userPaymentMethodRepository.save(any(UserPaymentMethod.class))).thenReturn(testMethod);
         when(userPaymentMethodMapper.toDTO(testMethod)).thenReturn(testMethodDTO);
 
         UserPaymentMethodDTO result = userPaymentMethodService.attachPaymentMethod(1L, "pm_test123");
 
         assertNotNull(result);
-        verify(stripeService, times(1)).attachPaymentMethod("pm_test123", "cus_test123");
+        verify(paymentProviderService, times(1)).attachPaymentMethod("pm_test123", "cus_test123");
         verify(userPaymentMethodRepository, times(1)).save(any(UserPaymentMethod.class));
     }
 

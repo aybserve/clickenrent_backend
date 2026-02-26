@@ -10,6 +10,11 @@
 -- Author: Vitaliy Shvetsov
 -- =====================================================================================================================
 
+-- =====================================================================================================================
+-- DISABLE FORCE RLS TEMPORARILY FOR DATA INSERTION
+-- =====================================================================================================================
+ALTER TABLE support_request ENABLE ROW LEVEL SECURITY;
+
 -- Feedback
 INSERT INTO feedback (id, external_id, user_external_id, rate, comment, date_created, last_date_modified, created_by, last_modified_by, is_deleted) VALUES
 (1, '550e8400-e29b-41d4-a716-446655440301', 'usr-ext-00007', 5, 'Excellent service, very responsive support team!', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
@@ -119,6 +124,11 @@ INSERT INTO bike_inspection_item_bike_unit (id, external_id, bike_inspection_ite
 (2, '550e8400-e29b-41d4-a716-446655441302', 6, 1, true, 'company-ext-002', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false),
 (3, '550e8400-e29b-41d4-a716-446655441303', 7, 3, false, 'company-ext-002', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 'system', 'system', false)
 ON CONFLICT (id) DO NOTHING;
+
+-- =====================================================================================================================
+-- RE-ENABLE FORCE RLS AFTER DATA INSERTION
+-- =====================================================================================================================
+ALTER TABLE support_request FORCE ROW LEVEL SECURITY;
 
 -- =====================================================================================================================
 -- END OF SAMPLE DATA

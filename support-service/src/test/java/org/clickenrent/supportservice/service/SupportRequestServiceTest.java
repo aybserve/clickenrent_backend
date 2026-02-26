@@ -84,7 +84,7 @@ class SupportRequestServiceTest {
     @Test
     void getAll_AsNonAdmin_ReturnsUserRequests() {
         when(securityService.isAdmin()).thenReturn(false);
-        when(securityService.getCurrentUserId()).thenReturn(1L);
+        when(securityService.getCurrentUserExternalId()).thenReturn("user-uuid-1");
         when(supportRequestRepository.findByUserExternalId("user-uuid-1")).thenReturn(Arrays.asList(testRequest));
         when(supportRequestMapper.toDto(testRequest)).thenReturn(testRequestDTO);
 
@@ -118,7 +118,7 @@ class SupportRequestServiceTest {
     @Test
     void getById_Unauthorized() {
         when(securityService.isAdmin()).thenReturn(false);
-        when(securityService.getCurrentUserId()).thenReturn(2L);
+        when(securityService.getCurrentUserExternalId()).thenReturn("user-uuid-2");
         when(supportRequestRepository.findById(1L)).thenReturn(Optional.of(testRequest));
 
         assertThrows(UnauthorizedException.class, () -> supportRequestService.getById(1L));
@@ -166,7 +166,7 @@ class SupportRequestServiceTest {
 
     @Test
     void create_Success() {
-        when(securityService.getCurrentUserId()).thenReturn(1L);
+        when(securityService.getCurrentUserExternalId()).thenReturn("user-uuid-1");
         when(supportRequestMapper.toEntity(testRequestDTO)).thenReturn(testRequest);
         when(supportRequestRepository.save(any(SupportRequest.class))).thenReturn(testRequest);
         when(supportRequestMapper.toDto(testRequest)).thenReturn(testRequestDTO);
@@ -184,7 +184,7 @@ class SupportRequestServiceTest {
                 .isNearLocation(true)
                 .build();
         
-        when(securityService.getCurrentUserId()).thenReturn(1L);
+        when(securityService.getCurrentUserExternalId()).thenReturn("user-uuid-1");
         when(supportRequestMapper.toEntity(any(SupportRequestDTO.class))).thenReturn(testRequest);
         when(supportRequestRepository.save(any(SupportRequest.class))).thenReturn(testRequest);
         when(supportRequestMapper.toDto(testRequest)).thenReturn(testRequestDTO);
@@ -198,7 +198,7 @@ class SupportRequestServiceTest {
     @Test
     void create_Unauthorized() {
         when(securityService.isAdmin()).thenReturn(false);
-        when(securityService.getCurrentUserId()).thenReturn(1L);
+        when(securityService.getCurrentUserExternalId()).thenReturn("user-uuid-1");
         testRequestDTO.setUserExternalId("user-uuid-2");
 
         assertThrows(UnauthorizedException.class, () -> supportRequestService.create(testRequestDTO));
@@ -228,7 +228,7 @@ class SupportRequestServiceTest {
     @Test
     void update_Unauthorized() {
         when(securityService.isAdmin()).thenReturn(false);
-        when(securityService.getCurrentUserId()).thenReturn(2L);
+        when(securityService.getCurrentUserExternalId()).thenReturn("user-uuid-2");
         when(supportRequestRepository.findById(1L)).thenReturn(Optional.of(testRequest));
 
         assertThrows(UnauthorizedException.class, () -> supportRequestService.update(1L, testRequestDTO));
@@ -255,7 +255,7 @@ class SupportRequestServiceTest {
     @Test
     void delete_Unauthorized() {
         when(securityService.isAdmin()).thenReturn(false);
-        when(securityService.getCurrentUserId()).thenReturn(2L);
+        when(securityService.getCurrentUserExternalId()).thenReturn("user-uuid-2");
         when(supportRequestRepository.findById(1L)).thenReturn(Optional.of(testRequest));
 
         assertThrows(UnauthorizedException.class, () -> supportRequestService.delete(1L));

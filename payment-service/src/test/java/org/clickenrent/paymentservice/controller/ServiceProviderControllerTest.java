@@ -3,6 +3,7 @@ package org.clickenrent.paymentservice.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.clickenrent.paymentservice.dto.ServiceProviderDTO;
 import org.clickenrent.paymentservice.service.ServiceProviderService;
+import org.clickenrent.paymentservice.service.SecurityService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +25,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @WebMvcTest(ServiceProviderController.class)
 @AutoConfigureMockMvc
+@org.springframework.context.annotation.Import(org.clickenrent.paymentservice.config.SecurityConfig.class)
+@org.springframework.test.context.TestPropertySource(properties = "jwt.secret=dGVzdC1zZWNyZXQtZm9yLWp3dC10b2tlbi12YWxpZGF0aW9uLW11c3QtYmUtbG9uZy1lbm91Z2g=")
 class ServiceProviderControllerTest {
 
     @Autowired
@@ -34,6 +37,9 @@ class ServiceProviderControllerTest {
 
     @MockBean
     private ServiceProviderService serviceProviderService;
+
+    @MockBean
+    private SecurityService securityService;
 
     private ServiceProviderDTO serviceProviderDTO;
 

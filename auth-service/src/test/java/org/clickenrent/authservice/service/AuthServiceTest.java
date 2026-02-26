@@ -13,6 +13,7 @@ import org.clickenrent.authservice.exception.UnauthorizedException;
 import org.clickenrent.authservice.mapper.UserMapper;
 import org.clickenrent.authservice.repository.GlobalRoleRepository;
 import org.clickenrent.authservice.repository.LanguageRepository;
+import org.clickenrent.authservice.repository.UserCompanyRepository;
 import org.clickenrent.authservice.repository.UserGlobalRoleRepository;
 import org.clickenrent.authservice.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -27,6 +28,8 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import java.util.Collections;
+import java.util.Map;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -50,6 +53,9 @@ class AuthServiceTest {
     private UserGlobalRoleRepository userGlobalRoleRepository;
 
     @Mock
+    private UserCompanyRepository userCompanyRepository;
+
+    @Mock
     private LanguageRepository languageRepository;
 
     @Mock
@@ -69,6 +75,12 @@ class AuthServiceTest {
 
     @Mock
     private TokenBlacklistService tokenBlacklistService;
+
+    @Mock
+    private EmailVerificationService emailVerificationService;
+
+    @Mock
+    private UserPreferenceService userPreferenceService;
 
     @InjectMocks
     private AuthService authService;
@@ -112,6 +124,12 @@ class AuthServiceTest {
                 .password("encodedPassword")
                 .roles("USER")
                 .build();
+
+        // Stub services used in register/registerAdmin flows (lenient: only used in register/registerAdmin tests)
+        lenient().when(userPreferenceService.createDefaultPreferences(any(User.class))).thenReturn(null);
+        lenient().doNothing().when(emailVerificationService).generateAndSendCode(any(User.class));
+        // Stub userCompanyRepository used in login/buildJwtClaims
+        lenient().when(userCompanyRepository.findByUserId(anyLong())).thenReturn(Collections.emptyList());
     }
 
     @Test
@@ -124,7 +142,7 @@ class AuthServiceTest {
         when(globalRoleRepository.findByNameIgnoreCase("CUSTOMER")).thenReturn(Optional.of(customerRole));
         when(userRepository.save(any(User.class))).thenReturn(user);
         when(userDetailsService.loadUserByUsername(anyString())).thenReturn(userDetails);
-        when(jwtService.generateToken(any(UserDetails.class))).thenReturn("accessToken");
+        when(jwtService.generateToken(any(Map.class), any(UserDetails.class))).thenReturn("accessToken");
         when(jwtService.generateRefreshToken(any(UserDetails.class))).thenReturn("refreshToken");
         when(jwtService.getExpirationTime()).thenReturn(3600000L);
 
@@ -178,7 +196,7 @@ class AuthServiceTest {
         when(passwordEncoder.encode(anyString())).thenReturn("encodedPassword");
         when(userRepository.save(any(User.class))).thenReturn(user);
         when(userDetailsService.loadUserByUsername(anyString())).thenReturn(userDetails);
-        when(jwtService.generateToken(any(UserDetails.class))).thenReturn("accessToken");
+        when(jwtService.generateToken(any(Map.class), any(UserDetails.class))).thenReturn("accessToken");
         when(jwtService.generateRefreshToken(any(UserDetails.class))).thenReturn("refreshToken");
         when(jwtService.getExpirationTime()).thenReturn(3600000L);
 
@@ -197,7 +215,7 @@ class AuthServiceTest {
                 .thenReturn(null);
         when(userDetailsService.loadUserEntityByUsername(anyString())).thenReturn(user);
         when(userDetailsService.loadUserByUsername(anyString())).thenReturn(userDetails);
-        when(jwtService.generateToken(any(UserDetails.class))).thenReturn("accessToken");
+        when(jwtService.generateToken(any(Map.class), any(UserDetails.class))).thenReturn("accessToken");
         when(jwtService.generateRefreshToken(any(UserDetails.class))).thenReturn("refreshToken");
         when(jwtService.getExpirationTime()).thenReturn(3600000L);
 
@@ -232,7 +250,7 @@ class AuthServiceTest {
         when(userDetailsService.loadUserByUsername("testuser")).thenReturn(userDetails);
         when(jwtService.validateToken("validRefreshToken", userDetails)).thenReturn(true);
         when(userDetailsService.loadUserEntityByUsername("testuser")).thenReturn(user);
-        when(jwtService.generateToken(userDetails)).thenReturn("newAccessToken");
+        when(jwtService.generateToken(any(Map.class), any(UserDetails.class))).thenReturn("newAccessToken");
         when(jwtService.getExpirationTime()).thenReturn(3600000L);
 
         // When
@@ -257,7 +275,7 @@ class AuthServiceTest {
         // When & Then
         assertThatThrownBy(() -> authService.refreshToken(refreshRequest))
                 .isInstanceOf(InvalidTokenException.class)
-                .hasMessageContaining("Invalid refresh token");
+                .hasMessageContaining("Invalid or expired refresh token");
     }
 
     @Test

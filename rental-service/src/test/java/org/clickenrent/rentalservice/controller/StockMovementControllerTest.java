@@ -27,7 +27,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @WebMvcTest(StockMovementController.class)
 @AutoConfigureMockMvc
-class StockMovementControllerTest {
+class StockMovementControllerTest extends BaseWebMvcTest {
 
     @Autowired
     private MockMvc mockMvc;

@@ -36,6 +36,7 @@ import org.springframework.web.client.RestTemplate;
 import java.util.Collections;
 import java.util.Date;
 import java.util.Optional;
+import java.util.function.Supplier;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
@@ -135,11 +136,9 @@ class AppleOAuthServiceTest {
         // Setup metrics mock to return timer sample
         when(oAuthMetrics.startFlowTimer(anyString())).thenReturn(mock(io.micrometer.core.instrument.Timer.Sample.class));
         
-        // Setup retry to execute supplier immediately
-        when(tokenExchangeRetry.executeSupplier(any())).thenAnswer(invocation -> {
-            io.github.resilience4j.core.functions.CheckedSupplier<?> supplier = invocation.getArgument(0);
-            return supplier.get();
-        });
+        // Setup retry to execute supplier immediately (service uses Supplier, not CheckedSupplier)
+        when(tokenExchangeRetry.executeSupplier(any(Supplier.class))).thenAnswer(invocation ->
+                invocation.getArgument(0, Supplier.class).get());
     }
     
     @Test
@@ -415,9 +414,9 @@ class AppleOAuthServiceTest {
     void testAuthenticateWithApple_InvalidCode_ThrowsException() {
         // Given: Apple returns error for invalid code
         when(appleOAuthConfig.generateClientSecret(any())).thenReturn(TEST_CLIENT_SECRET);
-        when(restTemplate.exchange(anyString(), eq(HttpMethod.POST), any(HttpEntity.class), eq(AppleTokenResponse.class)))
+        lenient().when(restTemplate.exchange(anyString(), eq(HttpMethod.POST), any(HttpEntity.class), eq(AppleTokenResponse.class)))
                 .thenThrow(new HttpClientErrorException(HttpStatus.BAD_REQUEST, "invalid_grant"));
-        
+
         // When & Then
         UnauthorizedException exception = assertThrows(UnauthorizedException.class, () ->
                 appleOAuthService.authenticateWithApple(TEST_CODE, TEST_REDIRECT_URI)

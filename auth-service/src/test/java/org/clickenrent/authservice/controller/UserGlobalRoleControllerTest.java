@@ -56,6 +56,12 @@ class UserGlobalRoleControllerTest {
     @MockBean
     private UserGlobalRoleService userGlobalRoleService;
 
+    @MockBean
+    private org.clickenrent.authservice.service.SecurityService securityService;
+
+    @MockBean(name = "resourceSecurity")
+    private org.clickenrent.authservice.security.ResourceSecurityExpression resourceSecurity;
+
     private UserGlobalRoleDTO userGlobalRoleDTO;
     private AssignGlobalRoleRequest assignRequest;
 
@@ -80,7 +86,7 @@ class UserGlobalRoleControllerTest {
         when(userGlobalRoleService.assignGlobalRoleToUser(1L, 2L)).thenReturn(userGlobalRoleDTO);
 
         // When & Then
-        mockMvc.perform(post("/api/user-global-roles")
+        mockMvc.perform(post("/api/v1/user-global-roles")
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(assignRequest)))
@@ -99,7 +105,7 @@ class UserGlobalRoleControllerTest {
         when(userGlobalRoleService.assignGlobalRoleToUser(anyLong(), anyLong())).thenReturn(userGlobalRoleDTO);
 
         // When & Then
-        mockMvc.perform(post("/api/user-global-roles")
+        mockMvc.perform(post("/api/v1/user-global-roles")
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(assignRequest)))
@@ -112,7 +118,7 @@ class UserGlobalRoleControllerTest {
     @WithMockUser(roles = "B2B")
     void assignGlobalRoleToUser_WithB2BRole_ReturnsForbidden() throws Exception {
         // When & Then
-        mockMvc.perform(post("/api/user-global-roles")
+        mockMvc.perform(post("/api/v1/user-global-roles")
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(assignRequest)))
@@ -125,7 +131,7 @@ class UserGlobalRoleControllerTest {
     @WithMockUser(roles = "CUSTOMER")
     void assignGlobalRoleToUser_WithCustomerRole_ReturnsForbidden() throws Exception {
         // When & Then
-        mockMvc.perform(post("/api/user-global-roles")
+        mockMvc.perform(post("/api/v1/user-global-roles")
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(assignRequest)))
@@ -137,7 +143,7 @@ class UserGlobalRoleControllerTest {
     @Test
     void assignGlobalRoleToUser_WithoutAuthentication_ReturnsForbidden() throws Exception {
         // When & Then
-        mockMvc.perform(post("/api/user-global-roles")
+        mockMvc.perform(post("/api/v1/user-global-roles")
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(assignRequest)))
@@ -155,7 +161,7 @@ class UserGlobalRoleControllerTest {
                 .build();
 
         // When & Then
-        mockMvc.perform(post("/api/user-global-roles")
+        mockMvc.perform(post("/api/v1/user-global-roles")
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(invalidRequest)))
@@ -172,7 +178,7 @@ class UserGlobalRoleControllerTest {
         when(userGlobalRoleService.getUserGlobalRoles(1L)).thenReturn(roles);
 
         // When & Then
-        mockMvc.perform(get("/api/user-global-roles/user/1")
+        mockMvc.perform(get("/api/v1/user-global-roles/user/1")
                         .with(csrf()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].id").value(1L))
@@ -190,7 +196,7 @@ class UserGlobalRoleControllerTest {
         when(userGlobalRoleService.getUserGlobalRoles(1L)).thenReturn(roles);
 
         // When & Then
-        mockMvc.perform(get("/api/user-global-roles/user/1")
+        mockMvc.perform(get("/api/v1/user-global-roles/user/1")
                         .with(csrf()))
                 .andExpect(status().isOk());
 
@@ -201,7 +207,7 @@ class UserGlobalRoleControllerTest {
     @WithMockUser(roles = "B2B")
     void getUserGlobalRoles_WithB2BRole_ReturnsForbidden() throws Exception {
         // When & Then
-        mockMvc.perform(get("/api/user-global-roles/user/1")
+        mockMvc.perform(get("/api/v1/user-global-roles/user/1")
                         .with(csrf()))
                 .andExpect(status().isForbidden());
 
@@ -212,7 +218,7 @@ class UserGlobalRoleControllerTest {
     @WithMockUser(roles = "CUSTOMER")
     void getUserGlobalRoles_WithCustomerRole_ReturnsForbidden() throws Exception {
         // When & Then
-        mockMvc.perform(get("/api/user-global-roles/user/1")
+        mockMvc.perform(get("/api/v1/user-global-roles/user/1")
                         .with(csrf()))
                 .andExpect(status().isForbidden());
 
@@ -222,7 +228,7 @@ class UserGlobalRoleControllerTest {
     @Test
     void getUserGlobalRoles_WithoutAuthentication_ReturnsForbidden() throws Exception {
         // When & Then
-        mockMvc.perform(get("/api/user-global-roles/user/1")
+        mockMvc.perform(get("/api/v1/user-global-roles/user/1")
                         .with(csrf()))
                 .andExpect(status().isForbidden());
 
@@ -236,7 +242,7 @@ class UserGlobalRoleControllerTest {
         doNothing().when(userGlobalRoleService).removeGlobalRoleFromUser(1L);
 
         // When & Then
-        mockMvc.perform(delete("/api/user-global-roles/1")
+        mockMvc.perform(delete("/api/v1/user-global-roles/1")
                         .with(csrf()))
                 .andExpect(status().isNoContent());
 
@@ -250,7 +256,7 @@ class UserGlobalRoleControllerTest {
         doNothing().when(userGlobalRoleService).removeGlobalRoleFromUser(1L);
 
         // When & Then
-        mockMvc.perform(delete("/api/user-global-roles/1")
+        mockMvc.perform(delete("/api/v1/user-global-roles/1")
                         .with(csrf()))
                 .andExpect(status().isNoContent());
 
@@ -261,7 +267,7 @@ class UserGlobalRoleControllerTest {
     @WithMockUser(roles = "B2B")
     void removeGlobalRoleFromUser_WithB2BRole_ReturnsForbidden() throws Exception {
         // When & Then
-        mockMvc.perform(delete("/api/user-global-roles/1")
+        mockMvc.perform(delete("/api/v1/user-global-roles/1")
                         .with(csrf()))
                 .andExpect(status().isForbidden());
 
@@ -272,7 +278,7 @@ class UserGlobalRoleControllerTest {
     @WithMockUser(roles = "CUSTOMER")
     void removeGlobalRoleFromUser_WithCustomerRole_ReturnsForbidden() throws Exception {
         // When & Then
-        mockMvc.perform(delete("/api/user-global-roles/1")
+        mockMvc.perform(delete("/api/v1/user-global-roles/1")
                         .with(csrf()))
                 .andExpect(status().isForbidden());
 
@@ -282,7 +288,7 @@ class UserGlobalRoleControllerTest {
     @Test
     void removeGlobalRoleFromUser_WithoutAuthentication_ReturnsForbidden() throws Exception {
         // When & Then
-        mockMvc.perform(delete("/api/user-global-roles/1")
+        mockMvc.perform(delete("/api/v1/user-global-roles/1")
                         .with(csrf()))
                 .andExpect(status().isForbidden());
 

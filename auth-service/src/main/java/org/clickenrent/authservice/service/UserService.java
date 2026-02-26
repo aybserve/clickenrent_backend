@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.clickenrent.authservice.client.SearchServiceClient;
 import org.clickenrent.authservice.dto.UserDTO;
+import org.clickenrent.authservice.event.IndexEventPublisher;
 import org.clickenrent.authservice.entity.Language;
 import org.clickenrent.authservice.entity.User;
 import org.clickenrent.authservice.exception.ResourceNotFoundException;
@@ -16,6 +17,7 @@ import org.clickenrent.contracts.search.IndexEventRequest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -40,6 +42,9 @@ public class UserService {
     private final UserCompanyRepository userCompanyRepository;
     private final SearchServiceClient searchServiceClient;
     private final UserPreferenceService userPreferenceService;
+    
+    @Autowired(required = false)
+    private IndexEventPublisher indexEventPublisher;
     
     @Transactional(readOnly = true)
     public Page<UserDTO> getAllUsers(Pageable pageable) {
@@ -217,14 +222,25 @@ public class UserService {
      */
     private void notifySearchService(String entityType, String entityId, String operation) {
         try {
-            searchServiceClient.notifyIndexEvent(
-                IndexEventRequest.builder()
-                    .entityType(entityType)
-                    .entityId(entityId)
-                    .operation(IndexEventRequest.IndexOperation.valueOf(operation))
-                    .build()
-            );
-            log.debug("Notified search-service: {} {} {}", operation, entityType, entityId);
+            if (indexEventPublisher != null) {
+                // New: Kafka event-driven approach
+                indexEventPublisher.publishIndexEvent(
+                        entityType,
+                        entityId,
+                        IndexEventRequest.IndexOperation.valueOf(operation)
+                );
+                log.debug("Published index event: {} {} {}", operation, entityType, entityId);
+            } else {
+                // Fallback: Direct Feign call
+                searchServiceClient.notifyIndexEvent(
+                    IndexEventRequest.builder()
+                        .entityType(entityType)
+                        .entityId(entityId)
+                        .operation(IndexEventRequest.IndexOperation.valueOf(operation))
+                        .build()
+                );
+                log.debug("Notified search-service via Feign: {} {} {}", operation, entityType, entityId);
+            }
         } catch (Exception e) {
             // Don't fail the main operation if search indexing fails
             log.warn("Failed to notify search-service for {} {} {}: {}", 

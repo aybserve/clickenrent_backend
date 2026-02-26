@@ -30,7 +30,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 @Import(SecurityConfig.class)
 @TestPropertySource(properties = "jwt.secret=dGVzdC1zZWNyZXQtZm9yLWp3dC10b2tlbi12YWxpZGF0aW9uLW11c3QtYmUtbG9uZy1lbm91Z2g=")
-class CurrencyControllerTest {
+class CurrencyControllerTest extends BaseWebMvcTest {
 
     @Autowired
     private MockMvc mockMvc;
@@ -58,7 +58,7 @@ class CurrencyControllerTest {
     void getAllCurrencies_ReturnsOk() throws Exception {
         when(currencyService.findAll()).thenReturn(Arrays.asList(currencyDTO));
 
-        mockMvc.perform(get("/api/currencies").with(csrf()))
+        mockMvc.perform(get("/api/v1/currencies").with(csrf()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].code").value("USD"));
     }
@@ -68,7 +68,7 @@ class CurrencyControllerTest {
     void getCurrencyById_ReturnsOk() throws Exception {
         when(currencyService.findById(1L)).thenReturn(currencyDTO);
 
-        mockMvc.perform(get("/api/currencies/1").with(csrf()))
+        mockMvc.perform(get("/api/v1/currencies/1").with(csrf()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value("USD"));
     }
@@ -78,7 +78,7 @@ class CurrencyControllerTest {
     void createCurrency_ReturnsCreated() throws Exception {
         when(currencyService.create(any())).thenReturn(currencyDTO);
 
-        mockMvc.perform(post("/api/currencies")
+        mockMvc.perform(post("/api/v1/currencies")
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(currencyDTO)))
@@ -88,7 +88,7 @@ class CurrencyControllerTest {
     @Test
     @WithMockUser(roles = "CUSTOMER")
     void createCurrency_WithCustomerRole_ReturnsForbidden() throws Exception {
-        mockMvc.perform(post("/api/currencies")
+        mockMvc.perform(post("/api/v1/currencies")
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(currencyDTO)))
@@ -100,7 +100,7 @@ class CurrencyControllerTest {
     void updateCurrency_ReturnsOk() throws Exception {
         when(currencyService.update(eq(1L), any())).thenReturn(currencyDTO);
 
-        mockMvc.perform(put("/api/currencies/1")
+        mockMvc.perform(put("/api/v1/currencies/1")
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(currencyDTO)))
@@ -112,7 +112,7 @@ class CurrencyControllerTest {
     void deleteCurrency_ReturnsNoContent() throws Exception {
         doNothing().when(currencyService).delete(1L);
 
-        mockMvc.perform(delete("/api/currencies/1").with(csrf()))
+        mockMvc.perform(delete("/api/v1/currencies/1").with(csrf()))
                 .andExpect(status().isNoContent());
     }
 }
