@@ -160,13 +160,6 @@ API entry point: **http://localhost:8080** (Gateway). Swagger UI: **http://local
 
 Manifests are in `k8s/` (namespace, configmap, secrets, ingress, and per-service deployments). Use `scripts/deploy.sh` or `scripts/fresh-deploy.sh` as referenced in the repo.
 
-## Documentation
-
-- **API (Swagger)**: When running, open `http://localhost:8080/swagger-ui.html` (or your deployed Gateway URL).
-- **Sentry (errors & APM)**: [docs/SENTRY_SETUP.md](docs/SENTRY_SETUP.md) (cloud), [docs/SENTRY_SELF_HOSTED.md](docs/SENTRY_SELF_HOSTED.md) (self-hosted).
-- **OAuth**: [auth-service/docs/GOOGLE_OAUTH_SETUP.md](auth-service/docs/GOOGLE_OAUTH_SETUP.md), [auth-service/docs/APPLE_OAUTH_SETUP.md](auth-service/docs/APPLE_OAUTH_SETUP.md).
-- **Payments**: [payment-service/docs/IMPLEMENTATION_COMPLETE.md](payment-service/docs/IMPLEMENTATION_COMPLETE.md), [payment-service/README.md](payment-service/README.md).
-
 ## Development
 
 - **Build**: `mvn clean package` or `./scripts/build-all.sh` (optionally `--skip-tests`, `--docker`).
@@ -333,15 +326,6 @@ SENTRY_DSN_ANALYTICS=https://xxx@yyy.ingest.sentry.io/zzz
 SENTRY_ENVIRONMENT=production
 SENTRY_TRACES_SAMPLE_RATE=1.0  # 1.0 = 100% of transactions
 ```
-
-**Setup Instructions:**
-
-Choose your Sentry deployment option:
-
-- **Cloud Version**: [SENTRY_SETUP.md](docs/SENTRY_SETUP.md) - Managed Sentry.io (starts at $26/mo)
-- **Self-Hosted** : [SENTRY_SELF_HOSTED.md](docs/SENTRY_SELF_HOSTED.md) - Free, unlimited, full control
-
-Both options work identically with your application code - only the DSN URLs differ.
 
 **What Gets Tracked:**
 

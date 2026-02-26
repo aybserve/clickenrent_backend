@@ -2,7 +2,7 @@ name: CI/CD Pipeline
 
 on:
   push:
-    branches: [ features/ci-cd ]
+    branches: [ develop ]
   workflow_dispatch:
 
 env:
