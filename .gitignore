@@ -76,3 +76,5 @@ docker-services/.env.production
 
 # Docker volumes
 postgres-data/
+
+docs/
