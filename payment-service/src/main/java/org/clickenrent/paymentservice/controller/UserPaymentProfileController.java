@@ -1,0 +1,77 @@
+package org.clickenrent.paymentservice.controller;
+
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import org.clickenrent.paymentservice.dto.UserPaymentProfileDTO;
+import org.clickenrent.paymentservice.service.UserPaymentProfileService;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+@RestController
+@RequestMapping("/api/v1/user-payment-profiles")
+@RequiredArgsConstructor
+@Tag(name = "User Payment Profile", description = "User payment profile management API")
+public class UserPaymentProfileController {
+
+    private final UserPaymentProfileService userPaymentProfileService;
+
+    @GetMapping
+    @PreAuthorize("hasAnyRole('SUPERADMIN', 'ADMIN')")
+    @Operation(summary = "Get all user payment profiles")
+    public ResponseEntity<List<UserPaymentProfileDTO>> getAll() {
+        return ResponseEntity.ok(userPaymentProfileService.findAll());
+    }
+
+    @GetMapping("/{id}")
+    @PreAuthorize("hasAnyRole('SUPERADMIN', 'ADMIN')")
+    @Operation(summary = "Get payment profile by ID")
+    public ResponseEntity<UserPaymentProfileDTO> getById(@PathVariable Long id) {
+        return ResponseEntity.ok(userPaymentProfileService.findById(id));
+    }
+
+    @GetMapping("/external/{externalId}")
+    @PreAuthorize("hasAnyRole('SUPERADMIN', 'ADMIN')")
+    @Operation(summary = "Get payment profile by external ID")
+    public ResponseEntity<UserPaymentProfileDTO> getByExternalId(@PathVariable String externalId) {
+        return ResponseEntity.ok(userPaymentProfileService.findByExternalId(externalId));
+    }
+
+    @GetMapping("/user/{userExternalId}")
+    @Operation(summary = "Get payment profile by user external ID")
+    public ResponseEntity<UserPaymentProfileDTO> getByUserExternalId(@PathVariable String userExternalId) {
+        return ResponseEntity.ok(userPaymentProfileService.findByUserExternalId(userExternalId));
+    }
+
+    @PostMapping
+    @Operation(summary = "Create new payment profile")
+    public ResponseEntity<UserPaymentProfileDTO> create(@Valid @RequestBody UserPaymentProfileDTO dto) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(userPaymentProfileService.create(dto));
+    }
+
+    @PostMapping("/create-or-get")
+    @Operation(summary = "Create or get payment profile for user")
+    public ResponseEntity<UserPaymentProfileDTO> createOrGetProfile(
+            @RequestParam String userExternalId,
+            @RequestParam String userEmail) {
+        return ResponseEntity.ok(userPaymentProfileService.createOrGetProfile(userExternalId, userEmail));
+    }
+
+    @PutMapping("/{id}")
+    @Operation(summary = "Update payment profile")
+    public ResponseEntity<UserPaymentProfileDTO> update(@PathVariable Long id, @Valid @RequestBody UserPaymentProfileDTO dto) {
+        return ResponseEntity.ok(userPaymentProfileService.update(id, dto));
+    }
+
+    @DeleteMapping("/{id}")
+    @Operation(summary = "Delete payment profile")
+    public ResponseEntity<Void> delete(@PathVariable Long id) {
+        userPaymentProfileService.delete(id);
+        return ResponseEntity.noContent().build();
+    }
+}

@@ -1,0 +1,94 @@
+package org.clickenrent.rentalservice.controller;
+
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import org.clickenrent.rentalservice.dto.BikeReservationDTO;
+import org.clickenrent.rentalservice.service.BikeReservationService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+
+@RestController
+@RequestMapping("/api/v1/bike-reservations")
+@RequiredArgsConstructor
+@Tag(name = "Bike Reservation", description = "Bike reservation management")
+@SecurityRequirement(name = "bearerAuth")
+public class BikeReservationController {
+
+    private final BikeReservationService bikeReservationService;
+
+    @GetMapping
+    @PreAuthorize("hasAnyRole('SUPERADMIN', 'ADMIN')")
+    @Operation(summary = "Get all bike reservations")
+    public ResponseEntity<Page<BikeReservationDTO>> getAllReservations(
+            @PageableDefault(size = 20, sort = "startDateTime", direction = Sort.Direction.DESC) Pageable pageable) {
+        return ResponseEntity.ok(bikeReservationService.getAllReservations(pageable));
+    }
+
+    @GetMapping("/by-user/{userExternalId}")
+    @PreAuthorize("isAuthenticated()")
+    @Operation(summary = "Get reservations by user external ID")
+    public ResponseEntity<List<BikeReservationDTO>> getReservationsByUserExternalId(@PathVariable String userExternalId) {
+        return ResponseEntity.ok(bikeReservationService.getReservationsByUserExternalId(userExternalId));
+    }
+
+    @GetMapping("/{id}")
+    @PreAuthorize("isAuthenticated()")
+    @Operation(summary = "Get reservation by ID")
+    public ResponseEntity<BikeReservationDTO> getReservationById(@PathVariable Long id) {
+        return ResponseEntity.ok(bikeReservationService.getReservationById(id));
+    }
+
+    @GetMapping("/external/{externalId}")
+    @PreAuthorize("isAuthenticated()")
+    @Operation(summary = "Get bike reservation by external ID", description = "Used for cross-service communication")
+    public ResponseEntity<BikeReservationDTO> getByExternalId(@PathVariable String externalId) {
+        return ResponseEntity.ok(bikeReservationService.findByExternalId(externalId));
+    }
+
+    @PutMapping("/external/{externalId}")
+    @PreAuthorize("isAuthenticated()")
+    @Operation(summary = "Update bike reservation by external ID", description = "Used for cross-service updates")
+    public ResponseEntity<BikeReservationDTO> updateByExternalId(
+            @PathVariable String externalId,
+            @Valid @RequestBody BikeReservationDTO dto) {
+        return ResponseEntity.ok(bikeReservationService.updateByExternalId(externalId, dto));
+    }
+
+    @DeleteMapping("/external/{externalId}")
+    @PreAuthorize("isAuthenticated()")
+    @Operation(summary = "Delete bike reservation by external ID", description = "Used for cross-service deletion")
+    public ResponseEntity<Void> deleteByExternalId(@PathVariable String externalId) {
+        bikeReservationService.deleteByExternalId(externalId);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping
+    @PreAuthorize("isAuthenticated()")
+    @Operation(summary = "Create bike reservation", description = "Users can only reserve bikes for themselves")
+    public ResponseEntity<BikeReservationDTO> createReservation(@Valid @RequestBody BikeReservationDTO dto) {
+        return new ResponseEntity<>(bikeReservationService.createReservation(dto), HttpStatus.CREATED);
+    }
+
+    @DeleteMapping("/{id}")
+    @PreAuthorize("isAuthenticated()")
+    @Operation(summary = "Cancel reservation", description = "Users can only cancel their own reservations")
+    public ResponseEntity<Void> deleteReservation(@PathVariable Long id) {
+        bikeReservationService.deleteReservation(id);
+        return ResponseEntity.noContent().build();
+    }
+}
+
+
+
+

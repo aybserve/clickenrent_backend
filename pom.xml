@@ -11,7 +11,6 @@
 
   <name>backend</name>
 
-  <!-- ✔ Parent Spring Boot -->
   <parent>
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-parent</artifactId>
@@ -24,9 +23,10 @@
     <maven.compiler.source>${java.version}</maven.compiler.source>
     <maven.compiler.target>${java.version}</maven.compiler.target>
     <spring-cloud.version>2023.0.1</spring-cloud.version>
+    <sentry.version>7.17.0</sentry.version>
+    <surefireArgLine></surefireArgLine>
   </properties>
 
-  <!-- ✔ BOM только Spring Cloud (Spring Boot уже в parent) -->
   <dependencyManagement>
     <dependencies>
       <dependency>
@@ -36,15 +36,40 @@
         <type>pom</type>
         <scope>import</scope>
       </dependency>
+
+      <dependency>
+        <groupId>io.sentry</groupId>
+        <artifactId>sentry-bom</artifactId>
+        <version>${sentry.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+
+      <dependency>
+        <groupId>org.clickenrent</groupId>
+        <artifactId>shared-contracts</artifactId>
+        <version>2.3.0</version>
+      </dependency>
+
+      <dependency>
+        <groupId>io.github.cdimascio</groupId>
+        <artifactId>dotenv-java</artifactId>
+        <version>3.0.0</version>
+      </dependency>
     </dependencies>
   </dependencyManagement>
 
   <modules>
+    <module>shared-contracts</module>
+    <module>eureka-server</module>
     <module>auth-service</module>
     <module>rental-service</module>
+    <module>support-service</module>
     <module>payment-service</module>
     <module>gateway</module>
-    <module>common-libs</module>
+    <module>notification-service</module>
+    <module>search-service</module>
+    <module>analytics-service</module>
   </modules>
 
   <build>
@@ -53,6 +78,45 @@
         <plugin>
           <groupId>org.springframework.boot</groupId>
           <artifactId>spring-boot-maven-plugin</artifactId>
+        </plugin>
+
+        <plugin>
+          <groupId>org.jacoco</groupId>
+          <artifactId>jacoco-maven-plugin</artifactId>
+          <version>0.8.12</version>
+          <executions>
+            <execution>
+              <id>prepare-agent</id>
+              <goals>
+                <goal>prepare-agent</goal>
+              </goals>
+              <configuration>
+                <propertyName>surefireArgLine</propertyName>
+              </configuration>
+            </execution>
+            <execution>
+              <id>report</id>
+              <phase>test</phase>
+              <goals>
+                <goal>report</goal>
+              </goals>
+            </execution>
+            <execution>
+              <id>report-aggregate</id>
+              <phase>verify</phase>
+              <goals>
+                <goal>report-aggregate</goal>
+              </goals>
+            </execution>
+          </executions>
+        </plugin>
+
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-surefire-plugin</artifactId>
+          <configuration>
+            <argLine>${surefireArgLine}</argLine>
+          </configuration>
         </plugin>
 
         <plugin>

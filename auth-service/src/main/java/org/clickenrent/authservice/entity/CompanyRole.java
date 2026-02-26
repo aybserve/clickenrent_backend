@@ -1,0 +1,54 @@
+package org.clickenrent.authservice.entity;
+
+import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
+import lombok.*;
+
+import java.util.UUID;
+
+/**
+ * Entity representing roles within a company.
+ * Predefined values: Owner, Admin, Staff
+ */
+@Entity
+@Table(name = "company_role")
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+@ToString
+@EqualsAndHashCode(of = "id")
+public class CompanyRole {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Size(max = 100, message = "External ID must not exceed 100 characters")
+    @Column(name = "external_id", unique = true, length = 100)
+    private String externalId;
+
+    @NotBlank(message = "Company role name is required")
+    @Size(max = 50, message = "Company role name must not exceed 50 characters")
+    @Column(name = "name", nullable = false, unique = true, length = 50)
+    private String name;
+
+    @PrePersist
+    protected void prePersist() {
+        if (externalId == null || externalId.isEmpty()) {
+            externalId = UUID.randomUUID().toString();
+        }
+    }
+}
+
+
+
+
+
+
+
+
+
+

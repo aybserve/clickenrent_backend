@@ -1,0 +1,154 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: rental-service
+  namespace: clickenrent
+  labels:
+    app: rental-service
+spec:
+  type: ClusterIP
+  ports:
+    - port: 8082
+      targetPort: 8082
+      protocol: TCP
+      name: http
+  selector:
+    app: rental-service
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: rental-service
+  namespace: clickenrent
+  labels:
+    app: rental-service
+spec:
+  replicas: 2
+  progressDeadlineSeconds: 1200
+  selector:
+    matchLabels:
+      app: rental-service
+  template:
+    metadata:
+      labels:
+        app: rental-service
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/path: "/actuator/prometheus"
+        prometheus.io/port: "8082"
+    spec:
+      imagePullSecrets:
+      - name: ghcr-secret
+      containers:
+      - name: rental-service
+        image: ghcr.io/aybserve/clickenrent_backend/rental-service:latest
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8082
+          name: http
+        env:
+        - name: SPRING_PROFILES_ACTIVE
+          valueFrom:
+            configMapKeyRef:
+              name: app-config
+              key: SPRING_PROFILES_ACTIVE
+        - name: EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE
+          valueFrom:
+            configMapKeyRef:
+              name: app-config
+              key: EUREKA_CLIENT_SERVICE_URL_DEFAULTZONE
+        - name: DB_HOST
+          valueFrom:
+            configMapKeyRef:
+              name: app-config
+              key: DB_HOST
+        - name: DB_PORT
+          valueFrom:
+            configMapKeyRef:
+              name: app-config
+              key: DB_PORT
+        - name: DB_URL
+          value: "jdbc:postgresql://$(DB_HOST):$(DB_PORT)/clickenrent-rental"
+        - name: DB_USERNAME
+          valueFrom:
+            secretKeyRef:
+              name: app-secrets
+              key: db-username
+        - name: DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: app-secrets
+              key: db-password
+        - name: JWT_SECRET
+          valueFrom:
+            secretKeyRef:
+              name: app-secrets
+              key: jwt-secret
+        - name: LOCK_ENCRYPTION_KEY
+          valueFrom:
+            secretKeyRef:
+              name: app-secrets
+              key: lock-encryption-key
+        - name: AZURE_STORAGE_CONNECTION_STRING
+          valueFrom:
+            secretKeyRef:
+              name: app-secrets
+              key: azure-storage-connection-string
+        - name: AZURE_STORAGE_CONTAINER_NAME
+          valueFrom:
+            configMapKeyRef:
+              name: app-config
+              key: AZURE_STORAGE_CONTAINER_NAME
+        - name: MAPBOX_API_KEY
+          valueFrom:
+            secretKeyRef:
+              name: app-secrets
+              key: mapbox-api-key
+        - name: JPA_DDL_AUTO
+          valueFrom:
+            configMapKeyRef:
+              name: app-config
+              key: JPA_DDL_AUTO
+        - name: FLYWAY_MIGRATE
+          valueFrom:
+            configMapKeyRef:
+              name: app-config
+              key: FLYWAY_MIGRATE
+        - name: FLYWAY_SKIP_TESTDATA
+          valueFrom:
+            configMapKeyRef:
+              name: app-config
+              key: FLYWAY_SKIP_TESTDATA
+        - name: KAFKA_BOOTSTRAP_SERVERS
+          value: "kafka:9092"
+        resources:
+          requests:
+            memory: "512Mi"
+            cpu: "250m"
+          limits:
+            memory: "1Gi"
+            cpu: "500m"
+        startupProbe:
+          httpGet:
+            path: /actuator/health
+            port: 8082
+          initialDelaySeconds: 180
+          periodSeconds: 10
+          timeoutSeconds: 10
+          failureThreshold: 40
+        livenessProbe:
+          httpGet:
+            path: /actuator/health
+            port: 8082
+          initialDelaySeconds: 0
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+        readinessProbe:
+          httpGet:
+            path: /actuator/health
+            port: 8082
+          initialDelaySeconds: 0
+          periodSeconds: 5
+          timeoutSeconds: 3
+          failureThreshold: 3

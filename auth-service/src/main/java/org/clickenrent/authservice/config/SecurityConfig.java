@@ -1,0 +1,106 @@
+package org.clickenrent.authservice.config;
+
+import lombok.RequiredArgsConstructor;
+import org.clickenrent.authservice.service.CustomUserDetailsService;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.AuthenticationProvider;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+
+/**
+ * Security configuration for JWT-based authentication.
+ * Rate limiting is now handled at the Gateway level.
+ */
+@Configuration
+@EnableWebSecurity
+@EnableMethodSecurity
+@RequiredArgsConstructor
+public class SecurityConfig {
+    
+    private final JwtAuthenticationFilter jwtAuthenticationFilter;
+    private final CustomUserDetailsService userDetailsService;
+    
+    /**
+     * Configure security filter chain.
+     */
+    @Bean
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        http
+                .csrf(AbstractHttpConfigurer::disable)
+                .authorizeHttpRequests(auth -> auth
+                        // Public endpoints (legacy /api/auth paths)
+                        .requestMatchers("/api/auth/**").permitAll()
+                        // Public endpoints (v1 API - /api/v1/auth paths)
+                        .requestMatchers("/api/v1/auth/login").permitAll()
+                        .requestMatchers("/api/v1/auth/register").permitAll()
+                        .requestMatchers("/api/v1/auth/refresh").permitAll()
+                        .requestMatchers("/api/v1/auth/verify-email").permitAll()
+                        .requestMatchers("/api/v1/auth/send-verification-code").permitAll()
+                        .requestMatchers("/api/v1/auth/validate-swagger-access").permitAll()
+                        // Google OAuth endpoints (public, both legacy and v1)
+                        .requestMatchers("/api/auth/google/**").permitAll()
+                        .requestMatchers("/api/v1/auth/google/**").permitAll()
+                        // Apple OAuth endpoints (public, both legacy and v1)
+                        .requestMatchers("/api/auth/apple/**").permitAll()
+                        .requestMatchers("/api/v1/auth/apple/**").permitAll()
+                        // Public invitation endpoints (validate token and complete registration)
+                        .requestMatchers("/api/invitations/validate/**", "/api/invitations/complete").permitAll()
+                        .requestMatchers("/api/v1/invitations/validate/**", "/api/v1/invitations/complete").permitAll()
+                        // Actuator endpoints (health checks)
+                        .requestMatchers("/actuator/**").permitAll()
+                        // OpenAPI/Swagger endpoints
+                        .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
+                        // Service-to-service endpoints (for search-service indexing)
+                        .requestMatchers("/api/v1/users/external/**").permitAll()
+                        .requestMatchers("/api/v1/companies/external/**").permitAll()
+                        // All other requests require authentication
+                        .anyRequest().authenticated()
+                )
+                .sessionManagement(session -> session
+                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                )
+                .authenticationProvider(authenticationProvider())
+                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+        
+        return http.build();
+    }
+    
+    /**
+     * Configure authentication provider with custom user details service.
+     */
+    @Bean
+    public AuthenticationProvider authenticationProvider() {
+        DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
+        authProvider.setUserDetailsService(userDetailsService);
+        authProvider.setPasswordEncoder(passwordEncoder());
+        return authProvider;
+    }
+    
+    /**
+     * Configure authentication manager.
+     */
+    @Bean
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
+        return config.getAuthenticationManager();
+    }
+    
+    /**
+     * Configure password encoder using BCrypt.
+     */
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
+}
+

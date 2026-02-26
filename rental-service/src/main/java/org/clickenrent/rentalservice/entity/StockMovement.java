@@ -1,0 +1,72 @@
+package org.clickenrent.rentalservice.entity;
+
+import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
+import lombok.*;
+import lombok.experimental.SuperBuilder;
+import org.hibernate.annotations.SQLDelete;
+import org.hibernate.annotations.Where;
+
+/**
+ * Entity representing stock movements between hubs.
+ */
+@Entity
+@Table(
+    name = "stock_movement",
+    indexes = {
+        @Index(name = "idx_stock_movement_external_id", columnList = "external_id"),
+        @Index(name = "idx_stock_movement_product_id", columnList = "product_id")
+    }
+)
+@SQLDelete(sql = "UPDATE stock_movement SET is_deleted = true WHERE id = ?")
+@Where(clause = "is_deleted = false")
+@Getter
+@Setter
+@NoArgsConstructor
+@SuperBuilder
+@ToString(callSuper = true)
+@EqualsAndHashCode(of = "id", callSuper = false)
+public class StockMovement extends BaseAuditEntity {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Column(name = "external_id", unique = true, length = 100)
+    private String externalId;
+
+    @NotNull(message = "Product is required")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "product_id", nullable = false)
+    private Product product;
+
+    @NotNull(message = "From hub is required")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "from_hub_id", nullable = false)
+    private Hub fromHub;
+
+    @NotNull(message = "To hub is required")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "to_hub_id", nullable = false)
+    private Hub toHub;
+
+    @Override
+    public Long getId() {
+        return id;
+    }
+
+    @Override
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    @Override
+    public String getExternalId() {
+        return externalId;
+    }
+
+    @Override
+    public void setExternalId(String externalId) {
+        this.externalId = externalId;
+    }
+}

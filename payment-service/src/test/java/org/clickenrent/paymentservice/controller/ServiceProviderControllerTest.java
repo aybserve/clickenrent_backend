@@ -1,0 +1,115 @@
+package org.clickenrent.paymentservice.controller;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.clickenrent.paymentservice.dto.ServiceProviderDTO;
+import org.clickenrent.paymentservice.service.ServiceProviderService;
+import org.clickenrent.paymentservice.service.SecurityService;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
+import org.springframework.test.web.servlet.MockMvc;
+
+import java.util.Arrays;
+
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.*;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+
+@WebMvcTest(ServiceProviderController.class)
+@AutoConfigureMockMvc
+@org.springframework.context.annotation.Import(org.clickenrent.paymentservice.config.SecurityConfig.class)
+@org.springframework.test.context.TestPropertySource(properties = "jwt.secret=dGVzdC1zZWNyZXQtZm9yLWp3dC10b2tlbi12YWxpZGF0aW9uLW11c3QtYmUtbG9uZy1lbm91Z2g=")
+class ServiceProviderControllerTest {
+
+    @Autowired
+    private MockMvc mockMvc;
+
+    @Autowired
+    private ObjectMapper objectMapper;
+
+    @MockBean
+    private ServiceProviderService serviceProviderService;
+
+    @MockBean
+    private SecurityService securityService;
+
+    private ServiceProviderDTO serviceProviderDTO;
+
+    @BeforeEach
+    void setUp() {
+        serviceProviderDTO = ServiceProviderDTO.builder()
+                .id(1L)
+                .code("STRIPE")
+                .name("Stripe Payment Gateway")
+                .build();
+    }
+
+    @Test
+    @WithMockUser(roles = "ADMIN")
+    void getAll_ReturnsOk() throws Exception {
+        when(serviceProviderService.findAll()).thenReturn(Arrays.asList(serviceProviderDTO));
+
+        mockMvc.perform(get("/api/service-providers").with(csrf()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].code").value("STRIPE"));
+    }
+
+    @Test
+    @WithMockUser(roles = "ADMIN")
+    void getById_ReturnsOk() throws Exception {
+        when(serviceProviderService.findById(1L)).thenReturn(serviceProviderDTO);
+
+        mockMvc.perform(get("/api/service-providers/1").with(csrf()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value("STRIPE"));
+    }
+
+    @Test
+    @WithMockUser(roles = "ADMIN")
+    void create_ReturnsCreated() throws Exception {
+        when(serviceProviderService.create(any())).thenReturn(serviceProviderDTO);
+
+        mockMvc.perform(post("/api/service-providers")
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(serviceProviderDTO)))
+                .andExpect(status().isCreated());
+    }
+
+    @Test
+    @WithMockUser(roles = "ADMIN")
+    void update_ReturnsOk() throws Exception {
+        when(serviceProviderService.update(eq(1L), any())).thenReturn(serviceProviderDTO);
+
+        mockMvc.perform(put("/api/service-providers/1")
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(serviceProviderDTO)))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    @WithMockUser(roles = "ADMIN")
+    void delete_ReturnsNoContent() throws Exception {
+        doNothing().when(serviceProviderService).delete(1L);
+
+        mockMvc.perform(delete("/api/service-providers/1").with(csrf()))
+                .andExpect(status().isNoContent());
+    }
+}
+
+
+
+
+
+
+
+
