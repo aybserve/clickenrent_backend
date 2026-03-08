@@ -16,7 +16,7 @@ data:
   REDIS_PORT: "6379"
   
   # Elasticsearch Configuration (external via Docker)
-  ES_URIS: "http://cnr.aybserve.com:9200"
+  ES_URIS: "http://10.42.0.1:19200"
   ES_USERNAME: "elastic"
   
   # Eureka Configuration
